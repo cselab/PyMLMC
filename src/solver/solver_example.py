@@ -27,5 +27,8 @@ class Example_Solver (Solver):
     subprocess.call ( [self.cmd, self.args % cmd_config] )
   
   def load (self, leve, type, sample, run_id):
-    f = open ( self.filename % self.name (level, type, sample, run_id), 'r' )
-    return numpy.read_from_file(f) 
+    try:
+      f = open ( self.filename % self.name (level, type, sample, run_id), 'r' )
+      return numpy.read_from_file(f) 
+    except:
+      Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (run_id is %d) !' % (level, type, sample, run_id) )
