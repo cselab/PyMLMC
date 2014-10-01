@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# General MC classes
+# Error indicators classes
 # TODO: add paper, description and link
 #
 # Jonas Sukys
@@ -11,49 +11,27 @@
 
 # === global imports
 
-import os
-import sys
+import numpy
 
 # === local imports
 
 
-
 # === classes
 
-class MC (object):
+class Indicators (object):
   
-  # initialize MC
-  def __init__ (self, config, params, run_id):
+  def __init__ (self, indicator):
     
-    # store configuration
-    self.level          = config ['level']
-    self.type           = config ['type']
-    self.samples        = config ['samples']
-    self.solver         = config ['solver']
-    self.discretization = config ['discretization']
-    self.params         = params
-    self.run_id         = run_id
-
+    # store configuration 
+    self.indicator = indicator
+    
     # list of results
-    self.results = [ None ] * len ( self.samples )
-
-    # dictionary of stats
-    self.stats = {}
+    self.error_relative = [ None ] * len ( self.samples )
+    self.error_total    = [ None ] * len ( self.samples )
+  
+  def compute (self):
     
-  # launch all samples
-  def run (self):
-    for sample in samples:
-      self.solver.run (level, type, sample, discretization, params, run_id)
-  
-  # load the results
-  def load (self):
-    for i, sample in enumerate (samples):
-      self.results [i] = solver.load (level, type, sample, discretization, params, run_id)
-  
-  # assmble MC estimates
-  def assemble (self, stats):
-    self.stats = {}
-    for stat in stats:
-      self.stats [ stat.name ] = stat.compute (self.results)
-    return self.stats
-
+    
+  def report (self):
+    
+    
