@@ -8,24 +8,24 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# === Discretization format:
-# {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'T' : ?}
-
-import subprocess
+import subprocess, numpy
 
 class Example_Solver (Solver):
   
   def __init__ (self):
-    self.cmd = '$RANDOM > output_%(name)s'
+    self.cmd  = '$RANDOM'
+    self.filename = 'output_$(name)s'
+    self.args = '> output_$(name)s'
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
-    return d ['NX'] * d ['NY'] * d ['NZ'] * d['NX'] * T
+    return 1
   
   def run (self, level, type, sample, discretization, params, run_id):
-    
-    call = self.cmd
-    
-    subprocess.
-    counts  [level] = 1
-    indices [level] = [1]
+    cmd_config = {}
+    cmd_config ['name'] = self.name (level, type, sample, run_id)
+    subprocess.call ( [self.cmd, self.args % cmd_config] )
+  
+  def load (self, leve, type, sample, run_id):
+    f = open ( self.filename % self.name (level, type, sample, run_id), 'r' )
+    return numpy.read_from_file(f) 

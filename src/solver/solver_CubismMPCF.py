@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Solver class (example)
+# Solver class (CubismMPCF)
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -9,23 +9,19 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # === Discretization format:
-# {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'T' : ?}
+# discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 import subprocess
 
 class Example_Solver (Solver):
   
   def __init__ (self):
-    self.cmd = '$RANDOM > output_%(name)s'
+    self.cmd = 'mpcf-cluster -name %(name)s'
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
-    return d ['NX'] * d ['NY'] * d ['NZ'] * d['NX'] * T
+    return d ['NX'] * d ['NY'] * d ['NZ'] * d['NS']
   
   def run (self, level, type, sample, discretization, params, run_id):
     
     call = self.cmd
-    
-    subprocess.
-    counts  [level] = 1
-    indices [level] = [1]
