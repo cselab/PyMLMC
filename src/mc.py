@@ -23,17 +23,23 @@ import sys
 class MC (object):
   
   # initialize MC
-  def __init__ (self, level, type, samples, solver, discretization, params, run_id=1):
+  def __init__ (self, config, params, run_id):
     
     # store configuration
-    self.level   = level
-    self.type    = type
-    self.samples = samples
-    self.solver  = solver
-    self.params  = params
-    self.discretization = discretization
-    self.run_id  = run_id
-  
+    self.level          = config ['level']
+    self.type           = config ['type']
+    self.samples        = config ['samples']
+    self.solver         = config ['solver']
+    self.discretization = config ['discretization']
+    self.params         = params
+    self.run_id         = run_id
+
+    # list of results
+    self.results = [ None ] * len ( self.samples )
+
+    # dictionary of stats
+    self.stats = {}
+    
   # launch all samples
   def run (self):
     for sample in samples:
@@ -45,8 +51,9 @@ class MC (object):
       self.results [i] = solver.load (level, type, sample, discretization, params, run_id)
   
   # assmble MC estimates
-  def assemble (self, stats_list):
-    for i, stat in enumerate (stats_list):
-      self.Q [i] = stat.compute (self.results)
-    return self.Q
+  def assemble (self, stats):
+    self.stats = {}
+    for stat in stats:
+      self.stats [ stat.name ] = stat.compute (self.results)
+    return self.stats
 
