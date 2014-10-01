@@ -11,23 +11,35 @@
 
 # === global imports
 
-import re
-import os
 import sys
+import subprocess
 
 # === local imports
 
-libs = [ "rng", "samples", "balancer", "stats" ]
-for lib in libs:
-  sys.path.append ( os.path.dirname(__file__) + "/" + lib )
+from MC import *
+
+sys.path.append ( os.path.dirname(__file__) + "/samples" )
+sys.path.append ( os.path.dirname(__file__) + "/stats" )
+sys.path.append ( os.path.dirname(__file__) + "/balancer" )
+
+from samples  import *
+from stats    import *
+from balancer import *
+
+# === classes
 
 class MLMC (object):
   
   # initialize MLMC
-  def __init__ (self, L, NX, NY, NZ, sampler, RUN_ID=1):
+  def __init__ (self, sampler, solver, discretizations, params, run_id=1):
     
     # store parameters
     self.params = params
+    
+    # store configuration
+    self.solver = solver
+    self.discretizations = discretizations
+    self.run_id = run_id
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
@@ -59,7 +71,8 @@ class MLMC (object):
   def assemble (self, stats_list):
     
     for i, stat in enumerate (stats_list):
-      
+      Q [i] = 
+      for 
 
 
 if __name__ == "__main__":
