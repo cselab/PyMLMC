@@ -17,6 +17,7 @@ import subprocess
 # === local imports
 
 from MC import *
+import helpers
 
 sys.path.append ( os.path.dirname(__file__) + "/samples" )
 sys.path.append ( os.path.dirname(__file__) + "/stats" )
@@ -176,9 +177,12 @@ if __name__ == "__main__":
   
   # configuration
   config = {}
-  
-  from solver_Cubism_MPCF import Cubism_MPCF 
+  '''
+  from solver_Cubism_MPCF import Cubism_MPCF
   config ['solver'] = Cubism_MPCF ()
+  '''
+  from solver_example import Example_solver
+  config ['solver'] = Example_Solver ()
   
   L = 4
   N = 256
