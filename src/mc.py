@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# General MC classes
+# General Monte Carlo (MC) classes
 # TODO: add paper, description and link
 #
 # Jonas Sukys

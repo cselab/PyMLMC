@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Python MLMC wrapper (PyMLMC)
+# PyMLMC: Python Multi-Level Monte Carlo (MLMC) wrapper
 # TODO: add paper, description and link
 #
 # Jonas Sukys
@@ -52,7 +52,10 @@ class MLMC (object):
     
     # list of MC objects
     mc = helpers.level_type_list (levels)
-
+    
+    # indicators
+    #indicators = Indicators ( config ['solver'] .indicator )
+    
     # MLMC results
     stats = {}
     
@@ -78,7 +81,7 @@ class MLMC (object):
   
   # iterative updating phase
   def update (self):
- 
+     
     while True:
       
       # load status of MLMC simulation
@@ -91,7 +94,7 @@ class MLMC (object):
       self.load()
       
       # compute error indicators
-      #self.indicators.compute()
+      #self.indicators.compute (mc)
       
       #if self.indicators.error <= params.tol:
       if True:

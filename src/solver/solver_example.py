@@ -16,6 +16,7 @@ class Example_Solver (Solver):
     self.cmd  = '$RANDOM'
     self.filename = 'output_$(name)s'
     self.args = '> output_$(name)s'
+    self.indicator = lambda x : x
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):

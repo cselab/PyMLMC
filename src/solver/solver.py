@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-class Example_Solver (Solver):
+class Solver (object):
   
   # return the name of a particular run
   def name (self, level, type, sample, run_id):
