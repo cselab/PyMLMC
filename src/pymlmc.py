@@ -157,8 +157,8 @@ class MLMC (object):
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = 0 
       for level, type in self.levels_types: 
-        if type == self.FINE:   self.stats [ name ] += mc [level] [type] .stats [ name ]
-        if type == self.COARSE: self.stats [ name ] -= mc [level] [type] .stats [ name ]
+        if type == self.FINE:   self.stats [ name ] += self.mc [level] [type] .stats [ name ]
+        if type == self.COARSE: self.stats [ name ] -= self.mc [level] [type] .stats [ name ]
     
     return self.stats
   
