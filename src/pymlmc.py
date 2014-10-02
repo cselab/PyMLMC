@@ -16,6 +16,7 @@ import sys
 # === local imports
 
 from mc import *
+from indicators import *
 import helpers
 
 # === additional Python paths
@@ -69,7 +70,7 @@ class MLMC (object):
     self.levels_types += [ [level, self.COARSE] for level in self.levels [1:] ]
     
     # indicators
-    #indicators = Indicators ( config.solver.indicator )
+    self.indicators = Indicators ( config.solver.indicator )
     
     # works
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
@@ -112,10 +113,9 @@ class MLMC (object):
       self.load()
       
       # compute error indicators
-      #self.indicators.compute (self.mcs)
+      self.indicators.compute (self.levels, self.mcs)
       
-      #if self.indicators.error <= params.tol:
-      if True:
+      if self.indicators.error <= self.config.samples.tol:
         break
       
       # compute estimated errors and required number of samples

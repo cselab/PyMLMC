@@ -36,6 +36,73 @@ class Estimated (object):
     self.works      = works
     self.indicators = indicators
     
+     // updating
+  if (multi_main) std::cout << std::endl << " :: Updating number of samples:" << std::endl;
+  
+  // gather error estimators
+  // even if extrapolation is not needed - use these estimates (assume sequence is Cauchy) if a-posteriori error estimator is NOT available
+  if (multi_main) std::cout << "  : -> GATHERING error estimators...";
+  //multi_gather_error_estimators();
+  multi_sync();
+  if (multi_main) std::cout << " done." << std::endl;
+  
+  // report gathered error estimators
+  mlmc_report_error_estimators ();
+  
+  // compute updated number of samples
+  if (multi_main) std::cout << "  : -> COMPUTING updated number of samples:" << std::endl;
+  mlmc_samples_compute();
+  
+  // report gathered estimators and computed errors
+  mlmc_save_error_estimators ();
+  
+  // output the updated number of samples
+  if (multi_main && ADDITIONAL_SAMPLES_NEEDED) {
+    
+    std::cout << "    -> Updated number of samples for each level:" << std::endl;
+    std::cout << "      ";
+    for (int samples_level=L; samples_level>=0; samples_level--)
+      std::cout << " " << NM_UPDATED [samples_level];
+    std::cout << std::endl;
+    
+    std::cout << "       Updated number of samples for each level (" << round(100 * EVALUATION_FRACTION) << "\% of additional, at least " << round(100 * MIN_EVALUATION_FRACTION) << "\% of all)" << std::endl;
+    std::cout << "      ";
+    for (int samples_level=L; samples_level>=0; samples_level--)
+      std::cout << " " << NM [samples_level];
+    std::cout << std::endl;
+    
+    std::cout << "       Additional number of samples for each level (" << round(100 * EVALUATION_FRACTION) << "\% of additional, at least " << round(100 * MIN_EVALUATION_FRACTION) << "\% of all)" << std::endl;
+    std::cout << "      ";
+    for (int samples_level=L; samples_level>=0; samples_level--)
+      std::cout << " " << NM_ADDITIONAL [samples_level];
+    std::cout << std::endl;
+  }
+  
+  // broadcast updated number of samples
+  if (ADDITIONAL_SAMPLES_NEEDED) {
+    if (multi_main) std::cout << "  : -> BROADCASTING updated number of samples...";
+    //multi_broadcast_samples();
+    if (multi_main) std::cout << " done." << std::endl;
+  }
+  
+  // report if no more samples are needed
+  if (multi_main) {
+    if (ADDITIONAL_SAMPLES_NEEDED)
+      std::cout << " :: ADDITIONAL samples are needed." << std::endl << std::endl;
+    else
+      std::cout << " :: NO MORE additional samples are needed." << std::endl << std::endl;
+  }
+  
+  // check if the current coarsest level is optimal
+  mlmc_samples_check_optimal_coarsest_level ();
+  
+  // check if the current finest level is optimal
+  mlmc_samples_check_optimal_finest_level ();
+  
+  // update phase status
+  WARMUP_PHASE = 0;
+
+
     print ' :: WARNING: update() for samples is not yet implemented.'
   
   def mask (self, level):
@@ -54,7 +121,7 @@ class Estimated (object):
     updated = computed
 
     # compute the work-weighted sum of all variances
-    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * work [level] for level in self.levels ] ) )
+    variance_work_sum = sum ( sqrt ( [ self.indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
     
     # perform iterative optimization until valid number of samples is obtained
     optimize = 1
@@ -73,7 +140,7 @@ class Estimated (object):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( 1.0 / (error_required ** 2) * sqrt ( self.variance_diff [ mask(level) ] / work [level] ) * variance_work_sum )
+        updated [level] = ceil ( 1.0 / (error_required ** 2) * sqrt ( self.indicators.variance_diff [ mask(level) ] / self.works [level] ) * variance_work_sum )
         
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
@@ -90,8 +157,8 @@ class Estimated (object):
           optimize = 1
           
           # update variance_work_sum
-          variance_work_sum -= sqrt ( self.variance_diff [ mask(level) ] * work [level] )
+          variance_work_sum -= sqrt ( self.indicators.variance_diff [ mask(level) ] * self.works [level] )
           
           # update required sampling error
-          error_required = sqrt ( (error_required ** 2) - self.variance_diff [ mask(level) ] / computed [level] )
+          error_required = sqrt ( (error_required ** 2) - self.indicators.variance_diff [ mask(level) ] / computed [level] )
  

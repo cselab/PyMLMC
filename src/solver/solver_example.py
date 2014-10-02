@@ -37,4 +37,4 @@ class Example_Solver (Solver):
       Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (id is %d) !' % (level, type, sample, id) )
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
-    return 1 
+    return 1

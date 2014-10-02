@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Error indicators classes
+# Error indicators class
 # TODO: add paper, description and link
 #
 # Jonas Sukys
@@ -24,14 +24,16 @@ class Indicators (object):
     
     # store configuration 
     self.indicator = indicator
+  
+  def compute (self, levels, mcs):
     
     # list of results
-    self.error_relative = [ None ] * len ( self.samples )
-    self.error_total    = [ None ] * len ( self.samples )
-  
-  def compute (self):
-    
+    self.error_relative = [ None ] * len ( levels )
+    self.error_total    = [ None ] * len ( levels )
+    self.error = 0
+
+
     
   def report (self):
     
-    
+    print ' :: WARNING: indicator report() not yet implemented.'
