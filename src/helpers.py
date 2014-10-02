@@ -46,4 +46,4 @@ def grids_3d (N):
 # generates 3D grids with specified numbers of cells N and time steps NS
 def grids_3d (N, NS):
   return [ [ N[l], N[l], N[l], NS[l] ] for l in range(len(N)) ]
-  
+ 

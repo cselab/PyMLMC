@@ -51,18 +51,18 @@ class MLMC (object):
     self.level_types += [ [level, self.COARSE] for level in levels [1:] ]
     
     # list of MC objects
-    mc = level_type_list ()
+    mc = helpers.level_type_list (levels)
 
     # MLMC results
     stats = {}
     
   # MLMC simulation
   def simulation (self):
-
+    
     # initial phase
     if self.params.restart:
       self.init()
-
+    
     # recursive updating phase
     self.update()
   
@@ -121,30 +121,31 @@ class MLMC (object):
     mc_config ['solver']  = self.config ['solver']
     mc_config ['discretization'] = self.config ['discretizations'] [level - type]
     mc_config ['type']           = type 
-  
+    return mc_config
+
   # create MC objects
   def create_MC (self):
     for level, type in self.levels_types:
-      mc [level] [type] = MC ( get_mc_config (level, type), self.params, self.run_id )
+      self.mc [level] [type] = MC ( get_mc_config (level, type), self.params, self.run_id )
    
   # run MC estimates
   def run (self):
     self.create_MC ()
     for level, type in self.levels_types:
-      mc [level] [type] .run ()
+      slef.mc [level] [type] .run ()
   
   # load the results from MC simulations
   def load (self):
     self.create_MC ()
     for level, type in self.levels_types:
-      mc [level] [type] .load ()
+      self.mc [level] [type] .load ()
   
   # assemble MC and MLMC estimates
   def assemble (self, stats):
     
     # assemble MC estimates
     for level, type in self.levels_types:
-      mc [level] [type] .assemble (stats)
+      self.mc [level] [type] .assemble (stats)
     
     # assemble MLMC estimates
     for name in [stat.name for stat in stats]:
@@ -164,11 +165,7 @@ class MLMC (object):
   def status_save (self):
     
     # TODO
-  
-  # creates an empty nested list iterating over levels and types
-  def level_type_list (self):
-    return [ [None, None] ] * len (self.levels)
-  
+
 if __name__ == "__main__":
   
   # parse input parameters
@@ -184,11 +181,9 @@ if __name__ == "__main__":
   from solver_example import Example_solver
   config ['solver'] = Example_Solver ()
   
+  N0 = 16
   L = 4
-  N = 256
-  levels = range(L+1)
-  grids = [ N / (2 ** (L - level)) for level in levels ]
-  config ['discretizations'] = [ [grids[l], grids[l], grids[l]] for l in levels ]
+  config ['discretizations'] = grids_3d ( grids (16, 4) ]
   
   from samples_one_per_level import One_Per_Level
   config ['samples'] = One_Per_Level ()
