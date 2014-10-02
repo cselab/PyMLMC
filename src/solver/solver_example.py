@@ -8,6 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+from solver import Solver
 import subprocess, numpy, os
 
 class Example_Solver (Solver):
