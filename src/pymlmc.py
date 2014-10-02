@@ -32,12 +32,12 @@ class MLMC (object):
   
   # initialize MLMC
   # config must include solver, discretizations, and samples
-  def __init__ (self, config, params, run_id=1):
+  def __init__ (self, config, params, id=1):
     
     # store configuration
     self.config = config
     self.params = params
-    self.run_id = run_id
+    self.id     = id
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
@@ -47,8 +47,8 @@ class MLMC (object):
     self.levels = range ( len ( config ['discretizations'] ) )
     
     # setup required pairs of levels and types
-    self.level_types  = [ [level, self.FINE]   for level in self.levels      ]
-    self.level_types += [ [level, self.COARSE] for level in self.levels [1:] ]
+    self.levels_types  = [ [level, self.FINE]   for level in self.levels      ]
+    self.levels_types += [ [level, self.COARSE] for level in self.levels [1:] ]
     
     # list of MC objects
     self.mc = helpers.level_type_list (self.levels)
@@ -115,27 +115,30 @@ class MLMC (object):
       
       if not self.params.interactive:
         exit() 
-
-  # get MC configuration
-  def get_mc_config (self, level, type):
-    mc_config = {}
-    mc_config ['level']   = level
-    mc_config ['samples'] = self.config ['samples'] .indices [level]
-    mc_config ['solver']  = self.config ['solver']
-    mc_config ['discretization'] = self.config ['discretizations'] [level - type]
-    mc_config ['type']           = type 
-    return mc_config
-
+  
   # create MC objects
   def create_MC (self):
     for level, type in self.levels_types:
-      self.mc [level] [type] = MC ( get_mc_config (level, type), self.params, self.run_id )
+      mc_config = {}
+      mc_config ['level']   = level
+      mc_config ['samples'] = self.config ['samples'] .indices [level]
+      mc_config ['solver']  = self.config ['solver']
+      mc_config ['discretization'] = self.config ['discretizations'] [level - type]
+      mc_config ['type']           = type
+      self.mc [level] [type] = MC ( mc_config, self.params, self.id )
    
   # run MC estimates
   def run (self):
     self.create_MC ()
     for level, type in self.levels_types:
-      slef.mc [level] [type] .run ()
+      self.mc [level] [type] .run ()
+  
+  # check if MC estimates are already available
+  def join (self):
+    self.create_MC ()
+    for level, type in self.levels_types:
+      if not self.mc [level] [type] .finished ():
+        Exception ( ':: ERROR: MC simulations are not yet available')
   
   # load the results from MC simulations
   def load (self):

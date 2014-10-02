@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# General balancer classes                        #
+# Stats class for mean
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,4 +8,9 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+import numpy.mean
 
+class Mean (object):
+  
+  def compute (self, samples):
+    return mean (samples)

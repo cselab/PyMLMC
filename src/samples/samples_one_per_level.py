@@ -17,5 +17,5 @@ class One_Per_Level (object):
     self.indices = [ None ] * len (levels)
     
     for level in self.levels:
-      counts  [level] = 1
-      indices [level] = [1]
+      self.counts  [level] = 1
+      self.indices [level] = [1]

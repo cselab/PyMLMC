@@ -22,6 +22,6 @@ class Example_Solver (Solver):
   def work (self, d):
     return d ['NX'] * d ['NY'] * d ['NZ'] * d['NS']
   
-  def run (self, level, type, sample, discretization, params, run_id):
+  def run (self, level, type, sample, id, discretization, params):
     
     call = self.cmd
