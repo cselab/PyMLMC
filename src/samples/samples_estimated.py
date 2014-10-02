@@ -10,26 +10,34 @@
 
 class Estimated (object):
 
-  def __init__ (self, levels, work, tol=1e-3, warmup=None, indicators):
+  def __init__ (self, warmup=None, warmup_factor=1, tol=1e-3):
     
     # save configuration
-    self.levels = levels
-    self.work = work
     self.tol = tol
     self.warmup = warmup
-    self.indicators = indicators
+    self.warmup_factor = warmup_factor
+  
+  def init (self, levels):
+    
+    self.levels = levels
+    print ' :: SAMPLES: estimated'
     
     # default warmup samples
-    if self.warmup == None:
-      self.warmup = [ 2 ** (len(levels) - level) for level in levels ]
-  
-  def init (self):
-    print ' :: SAMPLES: estimated'
+    if not self.warmup:
+      self.warmup = [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ]
+    
+    self.counts  = self.warmup [:]
     self.indices = [ range ( self.warmup [level] ) for level in self.levels ]
   
-  def update (self):
-   
-   
+  def update (self, levels, works, indicators):
+    
+    # save configuration
+    self.levels     = levels
+    self.works      = works
+    self.indicators = indicators
+    
+    print ' :: WARNING: update() for samples is not yet implemented.'
+  
   def mask (self, level):
     if level == 0:
       return 0

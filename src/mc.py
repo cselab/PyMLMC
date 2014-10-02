@@ -54,6 +54,7 @@ class MC (object):
     config = self.config
     for i, sample in enumerate (config.samples):
       self.results [i] = config.solver.load (config.level, config.type, sample, config.id)
+    print self.results
   
   # assmble MC estimates
   def assemble (self, stats):

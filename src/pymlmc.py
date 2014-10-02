@@ -69,7 +69,10 @@ class MLMC (object):
     self.levels_types += [ [level, self.COARSE] for level in self.levels [1:] ]
     
     # indicators
-    #indicators = Indicators ( config ['solver'] .indicator )
+    #indicators = Indicators ( config.solver.indicator )
+    
+    # works
+    self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
     
     # MLMC results
     self.stats = {}
@@ -109,14 +112,14 @@ class MLMC (object):
       self.load()
       
       # compute error indicators
-      #self.indicators.compute (mc)
+      #self.indicators.compute (self.mcs)
       
       #if self.indicators.error <= params.tol:
       if True:
         break
       
-      # display estimated errors and required number of samples
-      self.samples.update()
+      # compute estimated errors and required number of samples
+      self.samples.update (self.levels, self.works, self.indicators)
       
       if self.params.interactive:
         self.user_query()

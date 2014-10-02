@@ -13,9 +13,5 @@ class One_Per_Level (object):
   def init (self, levels):
     
     self.levels  = levels
-    self.counts  = [ None ] * len (levels)
-    self.indices = [ None ] * len (levels)
-    
-    for level in self.levels:
-      self.counts  [level] = 1
-      self.indices [level] = [1]
+    self.counts  = [ 1 ] * len (levels)
+    self.indices = [ [1] ] * len (levels)
