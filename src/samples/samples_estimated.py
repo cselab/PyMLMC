@@ -78,26 +78,20 @@ class Estimated (object):
   
   def compute (self):
     
-    // compute the required cumulative sampling error
-  #if ESTIMATE_DETERMINISTIC_ERROR
-  required_error_s = sqrt( sqr(TOL * NORMALIZATION) - sqr(error_d [L]) );
-  #else
-  required_error_s = TOL * NORMALIZATION;
-  #endif
-  
-  // compute relative sampling errors
-  for (int samples_level=L; samples_level>=0; samples_level--)
-    #if ITERATIVE_OCV
-    relative_error_s [samples_level] = sqrt ( get_variance_ocv (samples_level) / NM [samples_level] ) / NORMALIZATION;
-    #else
-    relative_error_s [samples_level] = sqrt ( get_variance     (samples_level) / NM [samples_level] ) / NORMALIZATION;
-    #endif
-
-  // compute the cumulative relative sampling error
-  total_relative_error_s = 0;
-  for (int samples_level=L; samples_level>=0; samples_level--)
-    total_relative_error_s += sqr ( relative_error_s [samples_level] );
-  total_relative_error_s = sqrt (total_relative_error_s);
+    # set the normalization
+    self.normalization = self.indicators.mean[0][0]
+    
+    # compute the required cumulative sampling error
+    required_error = self.tol * self.normalization
+    
+    # compute relative sampling errors
+    relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts ) / self.normalization
+    
+    # compute the cumulative relative sampling error
+    total_relative_error = 0;
+    for (int samples_level=L; samples_level>=0; samples_level--)
+      total_relative_error_s += sqr ( relative_error_s [samples_level] );
+    total_relative_error_s = sqrt (total_relative_error_s);
   
   // compute the cumulative sampling error
   total_error_s = total_relative_error_s * NORMALIZATION;

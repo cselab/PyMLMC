@@ -35,9 +35,6 @@ class Indicators (object):
     self.variance       = helpers.level_type_list(self.levels)
     self.mean_diff      = self.levels [:]
     self.variance_diff  = self.levels [:]
-    self.error_relative = helpers.level_type_list(self.levels)
-    self.error_total    = helpers.level_type_list(self.levels)
-    self.error = 0
     
     # compute indicators form MC results
     values = helpers.level_type_list(self.levels)
@@ -53,11 +50,6 @@ class Indicators (object):
     for level in self.levels:
       self.mean_diff      [level] = numpy.mean (values [level] [0] - values [level] [1])
       self.variance_diff  [level] = numpy.var  (values [level] [0] - values [level] [1])
-    
-    # normalization
-    self.normalization = self.mean [level] [0]
-    
-    
     
   def report (self):
     
