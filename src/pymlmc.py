@@ -16,22 +16,22 @@ import subprocess
 
 # === local imports
 
-from MC import *
+from mc import *
 import helpers
 
-sys.path.append ( os.path.dirname(__file__) + "/samples" )
-sys.path.append ( os.path.dirname(__file__) + "/stats" )
-sys.path.append ( os.path.dirname(__file__) + "/balancer" )
+# === additional Python paths
 
-from samples  import *
-from stats    import *
-from balancer import *
+sys.path.append ( os.path.dirname(__file__) + "/solver" )
+sys.path.append ( os.path.dirname(__file__) + "/samples" )
+sys.path.append ( os.path.dirname(__file__) + "/balancer" )
+sys.path.append ( os.path.dirname(__file__) + "/stats" )
 
 # === classes
 
 class MLMC (object):
   
   # initialize MLMC
+  # config must include solver, discretizations, and samples
   def __init__ (self, config, params, run_id=1):
     
     # store configuration
@@ -168,43 +168,3 @@ class MLMC (object):
   def status_save (self):
     
     # TODO
-
-if __name__ == "__main__":
-  
-  # parse input parameters
-  # TODO
-  params = []
-  
-  # configuration
-  config = {}
-  '''
-  from solver_Cubism_MPCF import Cubism_MPCF
-  config ['solver'] = Cubism_MPCF ()
-  '''
-  from solver_example import Example_solver
-  config ['solver'] = Example_Solver ()
-  
-  N0 = 16
-  L = 4
-  config ['discretizations'] = grids_3d ( grids (16, 4) ]
-  
-  from samples_one_per_level import One_Per_Level
-  config ['samples'] = One_Per_Level ()
-  
-  # create MLMC simulation
-  mlmc = MLMC (config, params)
-  
-  # run MLMC simulation
-  mlmc.simulation()
-  
-  # load simulation results
-  mlmc.load()
-  
-  # statistics
-  stats = [ Mean(), Variance() ]
-  
-  # assemble MLMC estimates
-  mlmc.assemble (stats)
-  
-  # report results
-  print mlmc.stats
