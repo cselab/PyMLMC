@@ -44,8 +44,11 @@ class Estimated (object):
     
     # check if the current finest level is optimal
     #self.check_optimal_finest_level ()
+  
   def report (self):
     
+    print ' :: WARNING: samples report not yet implemented.'
+    '''
     std::cout << "    -> Updated number of samples for each level:" << std::endl;
     std::cout << "      ";
     for (int samples_level=L; samples_level>=0; samples_level--)
@@ -63,7 +66,8 @@ class Estimated (object):
     for (int samples_level=L; samples_level>=0; samples_level--)
       std::cout << " " << NM_ADDITIONAL [samples_level];
     std::cout << std::endl;
-
+    '''
+  
   def mask (self, level):
     if level == 0:
       return 0
