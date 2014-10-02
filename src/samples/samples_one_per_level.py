@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-class One_per_level (object):
+class One_Per_Level (object):
   
   def __init__ (self, levels, work):
     
