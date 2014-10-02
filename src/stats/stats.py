@@ -8,6 +8,6 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-class Mean (object):
+class Stats (object):
 
   
