@@ -10,14 +10,12 @@
 
 class One_Per_Level (object):
   
-  def __init__ (self, levels, work):
+  def init (self, levels):
     
     self.levels  = levels
-    self.work    = work
     self.counts  = [ None ] * len (levels)
     self.indices = [ None ] * len (levels)
-  
-  def init (self):
-    for level in levels:
+    
+    for level in self.levels:
       counts  [level] = 1
       indices [level] = [1]

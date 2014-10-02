@@ -47,17 +47,17 @@ class MLMC (object):
     self.levels = range ( len ( config ['discretizations'] ) )
     
     # setup required pairs of levels and types
-    self.level_types  = [ [level, self.FINE]   for level in levels      ]
-    self.level_types += [ [level, self.COARSE] for level in levels [1:] ]
+    self.level_types  = [ [level, self.FINE]   for level in self.levels      ]
+    self.level_types += [ [level, self.COARSE] for level in self.levels [1:] ]
     
     # list of MC objects
-    mc = helpers.level_type_list (levels)
+    self.mc = helpers.level_type_list (self.levels)
     
     # indicators
     #indicators = Indicators ( config ['solver'] .indicator )
     
     # MLMC results
-    stats = {}
+    self.stats = {}
     
   # MLMC simulation
   def simulation (self):
@@ -73,7 +73,7 @@ class MLMC (object):
   def init (self):
     
     self.status_load()
-    self.config["samples"].init()
+    self.config["samples"].init(self.levels)
     self.run()
     self.status_save()
     if not self.params.interactive:
