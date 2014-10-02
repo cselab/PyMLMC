@@ -10,14 +10,14 @@
 
 class Samples (object):
 
-  def __init__ (self, params):
+  def __init__ (self, ):
     
     self.L = params.L + 1
     
     self.M            = range (params.L+1)
     self.M_ADDITIONAL = range (params.L+1)
     self.M_UPDATED    = range (params.L+1)
-    
+  
   def validate (self):
     for samples_level in range(self.params.L+1):
       if self.M [samples_level] == 0:

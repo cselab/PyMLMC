@@ -86,7 +86,8 @@ class MLMC (object):
       self.init()
     
     # recursive updating phase
-    self.update()
+    if self.config.samples.tol != None:
+      self.update()
   
   # initial phase
   def init (self):
@@ -115,15 +116,23 @@ class MLMC (object):
       # compute error indicators
       self.indicators.compute (self.levels, self.mcs)
       
+      # report error indicators
+      seld.indicators.report ()
+      
       if self.indicators.error <= self.config.samples.tol:
         break
       
       # compute estimated errors and required number of samples
       self.samples.update (self.levels, self.works, self.indicators)
       
+      # report estimated errors and required number of samples
+      self.samples.report ()
+      
+      # for interactive session, query user for additional input
       if self.params.interactive:
         self.user_query()
-        self.samples.update()
+        self.samples.update(self.levels, self.works, self.indicators)
+        self.samples.report()
       
       # compute additional samples
       self.run()
