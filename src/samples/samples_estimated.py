@@ -75,6 +75,157 @@ class Estimated (object):
       return level
     else:
       return mask [level-1]
+  
+  def compute (self):
+    
+    // compute the required cumulative sampling error
+  #if ESTIMATE_DETERMINISTIC_ERROR
+  required_error_s = sqrt( sqr(TOL * NORMALIZATION) - sqr(error_d [L]) );
+  #else
+  required_error_s = TOL * NORMALIZATION;
+  #endif
+  
+  // compute relative sampling errors
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    #if ITERATIVE_OCV
+    relative_error_s [samples_level] = sqrt ( get_variance_ocv (samples_level) / NM [samples_level] ) / NORMALIZATION;
+    #else
+    relative_error_s [samples_level] = sqrt ( get_variance     (samples_level) / NM [samples_level] ) / NORMALIZATION;
+    #endif
+
+  // compute the cumulative relative sampling error
+  total_relative_error_s = 0;
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    total_relative_error_s += sqr ( relative_error_s [samples_level] );
+  total_relative_error_s = sqrt (total_relative_error_s);
+  
+  // compute the cumulative sampling error
+  total_error_s = total_relative_error_s * NORMALIZATION;
+  
+  // report relative sampling errors
+  std::ostringstream sampling_error;
+  sampling_error << std::setprecision(1) << std::scientific;
+  sampling_error << "    -> Relative total sampling error is " << total_relative_error_s << " ( = ";
+  sampling_error << std::fixed;
+  sampling_error << round ( 1000 * sqr(total_relative_error_s) / sqr(TOL) ) / 10;
+  sampling_error << std::scientific;
+  sampling_error << "% of REL_TOL=" << TOL << ")" << std::endl;
+  sampling_error << "       Relative level sampling errors:" << std::endl;
+  sampling_error << "      ";
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    sampling_error << " " << relative_error_s [samples_level];
+  sampling_error << std::endl;
+  std::cout << sampling_error.str().c_str();
+  
+  #if ITERATIVE_OCV
+  
+  // report relative sampling error if optimal control variates ARE NOT used
+  std::ostringstream output_error_ocv;
+  output_error_ocv << std::setprecision(1) << std::scientific;
+  output_error_ocv << "    -> Relative total sampling error (no OCV) is ";
+  real error = 0;
+  for (int samples_level=0; samples_level<=L; samples_level++)
+    error += get_variance (samples_level) / NM [samples_level];
+  output_error_ocv << sqrt(error) / NORMALIZATION;
+  output_error_ocv << " ( = " << std::fixed;
+  output_error_ocv << round ( 1000 * error / sqr(NORMALIZATION) / sqr(TOL) ) / 10 << "% of REL_TOL=" << std::scientific << TOL << ")"  << std::endl;
+  output_error_ocv << "       Relative level sampling errors (no OCV):" << std::endl;
+  output_error_ocv << "      ";
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    output_error_ocv << " " << sqrt ( get_variance (samples_level) / NM [samples_level] ) / NORMALIZATION;
+  output_error_ocv << std::endl;
+  std::cout << output_error_ocv.str().c_str();
+  
+  #else
+  
+  // report relative sampling error if optimal control variates ARE used
+  std::ostringstream output_error_ocv;
+  output_error_ocv << std::setprecision(1) << std::scientific;
+  output_error_ocv << "    -> Relative total sampling error (with OCV) is ";
+  real error = 0;
+  for (int samples_level=0; samples_level<=L; samples_level++)
+    error += get_variance_ocv (samples_level) / NM [samples_level];
+  output_error_ocv << sqrt(error) / NORMALIZATION;
+  output_error_ocv << " ( = " << std::fixed;
+  output_error_ocv << round ( 1000 * error / sqr(NORMALIZATION) / sqr(TOL) ) / 10 << "% of REL_TOL=" << std::scientific << TOL << ")"  << std::endl;
+  output_error_ocv << "       Relative level sampling errors (with OCV):" << std::endl;
+  output_error_ocv << "      ";
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    output_error_ocv << " " << sqrt ( get_variance_ocv (samples_level) / NM [samples_level] ) / NORMALIZATION;
+  output_error_ocv << std::endl;
+  std::cout << output_error_ocv.str().c_str();
+  
+  #endif
+
+  // return if the required sampling error is reached
+  if ( total_relative_error_s * NORMALIZATION <= required_error_s ) {
+    
+    // report tolerance status
+    std::ostringstream tot_error;
+    tot_error << std::setprecision(1) << std::scientific;
+    #if ESTIMATE_DETERMINISTIC_ERROR
+    real total_error = sqrt( sqr(total_relative_error_s) + sqr(relative_error_d) );
+    #else
+    real total_error = total_relative_error_s;
+    #endif
+    tot_error << "    -> Required relative tolerance is reached:" << std::endl;
+    tot_error << "       total relative error is " << total_error;
+    tot_error << std::fixed;
+    tot_error << " ( = ";
+    tot_error << round ( 1000 * sqr(total_error) / sqr(TOL) ) / 10;
+    tot_error << std::scientific;
+    tot_error << "% of REL_TOL=" << TOL << ")" << std::endl;
+    std::cout << tot_error.str().c_str();
+    
+    // no additional samples need to be computed
+    ADDITIONAL_SAMPLES_NEEDED = 0;
+  }
+  
+  // otherwise, additional samples are needed
+  else
+    ADDITIONAL_SAMPLES_NEEDED = 1;
+  
+  // compute optimal number of samples
+  // assuming that no samples were computed so far
+  long_int NM_MIN1 [L+1];
+  for (int samples_level=L; samples_level>=0; samples_level--)
+    NM_MIN1 [samples_level] = 1;
+  mlmc_samples_get_optimal (& NM_MIN1 [0], & NM_OPTIMAL [0], required_error_s);
+  
+  // compute optimal number of samples
+  // assuming that NM [*] samples are already computed on each level
+  mlmc_samples_get_optimal (& NM [0], & NM_UPDATED [0], required_error_s);
+  
+  // update NM [*] from NM_UPDATED [*], according to EVALUATION_FRACTION and MIN_EVALUATION_FRACTION
+  if ( ADDITIONAL_SAMPLES_NEEDED ) {
+    
+    // update NM [L] = 1 to NM [L] = 2 first, and only afterwards allow NM [L] > 2
+    if (NM [L] == 1 && NM_UPDATED [L] > 1)
+      NM [L] = 2;
+    else if ( NM_UPDATED [L] > NM [L] ) {
+      NM_ADDITIONAL [L] = max (1, round ( EVALUATION_FRACTION * (NM_UPDATED [L] - NM [L]) ) );
+      NM [L] += NM_ADDITIONAL [L];
+    }
+    
+    // update the remaining NM [*] as usual
+    for (int samples_level=L-1; samples_level>=0; samples_level--)
+      if ( NM_UPDATED [samples_level] > NM [samples_level] ) {
+        NM_ADDITIONAL [samples_level] = max (1, round ( EVALUATION_FRACTION * (NM_UPDATED [samples_level] - NM [samples_level]) ) );
+        if (NM_ADDITIONAL [samples_level] < MIN_EVALUATION_FRACTION * NM_UPDATED [samples_level])
+          NM_ADDITIONAL [samples_level] = NM_UPDATED [samples_level] - NM [samples_level];
+        NM [samples_level] += NM_ADDITIONAL [samples_level];
+      }
+  }
+  
+  // compute optimal_work_fraction
+  real total_work = 0;
+  for (int samples_level = 0; samples_level <= L; samples_level++)
+    total_work += NM [samples_level] * work [samples_level];
+  real optimal_work = 0;
+  for (int samples_level = 0; samples_level <= L; samples_level++)
+    optimal_work += NM_OPTIMAL [samples_level] * work [samples_level];
+  optimal_work_fraction = total_work / optimal_work;
+
 
   # computes the optimal number of samples if some samples are already computed
   def optimal (self, computed, error_required):

@@ -54,6 +54,11 @@ class Indicators (object):
       self.mean_diff      [level] = numpy.mean (values [level] [0] - values [level] [1])
       self.variance_diff  [level] = numpy.var  (values [level] [0] - values [level] [1])
     
+    # normalization
+    self.normalization = self.mean [level] [0]
+    
+    
+    
   def report (self):
     
     print ' :: WARNING: indicator report() not yet implemented.'
