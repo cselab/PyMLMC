@@ -12,7 +12,6 @@
 # === global imports
 
 import sys
-import subprocess
 
 # === local imports
 
@@ -28,30 +27,46 @@ sys.path.append ( os.path.dirname(__file__) + "/stats" )
 
 # === classes
 
+# configuration class for MLMC simulations
+class MLMC_Config (object):
+  
+  def __init__ (self, solver, discretizations, samples, id=1):
+    self.solver = solver
+    self.discretizations = discretizations
+    self.samples = samples
+    self.id = id
+
+# configuration class for MC simulations
+class MC_Config (object):
+  
+  def __init__ (self, mlmc_config, level, type, samples):
+    self.level   = level
+    self.type    = type
+    self.samples = samples
+    self.id      = mlmc_config.id
+    self.solver  = mlmc_config.solver
+    self.discretization = mlmc_config.discretizations [level - type]
+
+# MLMC class
 class MLMC (object):
   
   # initialize MLMC
-  # config must include solver, discretizations, and samples
-  def __init__ (self, config, params, id=1):
+  def __init__ (self, config, params):
     
     # store configuration
     self.config = config
     self.params = params
-    self.id     = id
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
     self.COARSE = 1
     
     # determine levels
-    self.levels = range ( len ( config ['discretizations'] ) )
+    self.levels = range ( len ( config.discretizations ) )
     
     # setup required pairs of levels and types
     self.levels_types  = [ [level, self.FINE]   for level in self.levels      ]
     self.levels_types += [ [level, self.COARSE] for level in self.levels [1:] ]
-    
-    # list of MC objects
-    self.mc = helpers.level_type_list (self.levels)
     
     # indicators
     #indicators = Indicators ( config ['solver'] .indicator )
@@ -73,15 +88,15 @@ class MLMC (object):
   def init (self):
     
     self.status_load()
-    self.config["samples"].init(self.levels)
+    self.config.samples.init(self.levels)
     self.run()
     self.status_save()
     if not self.params.interactive:
-      exit()
+      sys.exit()
   
   # iterative updating phase
   def update (self):
-     
+    
     while True:
       
       # load status of MLMC simulation
@@ -117,48 +132,43 @@ class MLMC (object):
         exit() 
   
   # create MC objects
-  def create_MC (self):
-    for level, type in self.levels_types:
-      mc_config = {}
-      mc_config ['level']   = level
-      mc_config ['samples'] = self.config ['samples'] .indices [level]
-      mc_config ['solver']  = self.config ['solver']
-      mc_config ['discretization'] = self.config ['discretizations'] [level - type]
-      mc_config ['type']           = type
-      self.mc [level] [type] = MC ( mc_config, self.params, self.id )
-   
+  def create_MCs (self):
+    self.mcs = []
+    for i, (level, type) in enumerate(self.levels_types):
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, self.config.samples.indices [level]), self.params ) )
+  
   # run MC estimates
   def run (self):
-    self.create_MC ()
-    for level, type in self.levels_types:
-      self.mc [level] [type] .run ()
+    self.create_MCs ()
+    for mc in self.mcs:
+      mc.run ()
   
   # check if MC estimates are already available
   def join (self):
-    self.create_MC ()
-    for level, type in self.levels_types:
-      if not self.mc [level] [type] .finished ():
+    self.create_MCs ()
+    for mc in self.mcs:
+      if not mc.finished ():
         Exception ( ':: ERROR: MC simulations are not yet available')
   
   # load the results from MC simulations
   def load (self):
-    self.create_MC ()
-    for level, type in self.levels_types:
-      self.mc [level] [type] .load ()
+    self.create_MCs ()
+    for mc in self.mcs:
+      mc.load ()
   
   # assemble MC and MLMC estimates
   def assemble (self, stats):
     
     # assemble MC estimates
-    for level, type in self.levels_types:
-      self.mc [level] [type] .assemble (stats)
+    for mc in self.mcs:
+      mc.assemble (stats)
     
     # assemble MLMC estimates
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = 0 
-      for level, type in self.levels_types: 
-        if type == self.FINE:   self.stats [ name ] += self.mc [level] [type] .stats [ name ]
-        if type == self.COARSE: self.stats [ name ] -= self.mc [level] [type] .stats [ name ]
+      for mc in self.mcs: 
+        if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
+        if mc.config.type == self.COARSE: self.stats [ name ] -= mc.stats [ name ]
     
     return self.stats
   
