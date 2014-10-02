@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Stats class for general stats from NumPy
+# Stats class for variance 
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,12 +8,10 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-import numpy
-
-class NumPy_Stat (object):
+class Variance (object):
   
-  def __init__ (self, stat):
-    self.stat = stat
+  def __init__ (self):
+    self.name = 'variance'
   
   def compute (self, samples):
-    return getattr (numpy, self.stat) (samples)
+    Exception ( " :: ERROR: Variance stat is not implemented." )

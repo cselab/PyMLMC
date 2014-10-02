@@ -16,7 +16,7 @@ class Example_Solver (Solver):
   def __init__ (self):
     self.cmd  = 'echo $RANDOM'
     self.filename = 'output_%(name)s'
-    self.argsf = '>> output_%(name)s'
+    self.argsf = '> output_%(name)s'
     self.indicator = lambda x : x
   
   # return amount of work needed for a given discretization 'd'

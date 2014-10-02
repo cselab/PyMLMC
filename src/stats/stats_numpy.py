@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Stats class for general stats from NumPy
+# Stats class for general statistics from NumPy
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -12,8 +12,12 @@ import numpy
 
 class NumPy_Stat (object):
   
-  def __init__ (self, stat):
+  def __init__ (self, stat, name=None):
     self.stat = stat
+    if name:
+      self.name = name
+    else:
+      self.name = stat
   
   def compute (self, samples):
     return getattr (numpy, self.stat) (samples)

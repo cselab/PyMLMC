@@ -8,9 +8,10 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-import numpy.mean
-
 class Mean (object):
   
+  def __init__ (self):
+    self.name = 'mean'
+  
   def compute (self, samples):
-    return mean (samples)
+    Exception ( ' :: ERROR: Mean stat is not implemented.' )
