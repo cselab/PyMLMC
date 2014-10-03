@@ -33,10 +33,10 @@ class Indicators (object):
     # list of results
     self.mean           = helpers.level_type_list(self.levels)
     self.variance       = helpers.level_type_list(self.levels)
-    self.mean_diff      = numpy.array(self.levels [:])
-    self.variance_diff  = numpy.array(self.levels [:])
-    self.covariance     = numpy.array(self.levels [:])
-    self.correlation    = numpy.array(self.levels [:])
+    self.mean_diff      = numpy.array(self.levels [:], dtype=float)
+    self.variance_diff  = numpy.array(self.levels [:], dtype=float)
+    self.covariance     = numpy.array(self.levels [:], dtype=float)
+    self.correlation    = numpy.array(self.levels [:], dtype=float)
     
     # compute indicators form MC results
     values = helpers.level_type_list(self.levels)
@@ -55,8 +55,8 @@ class Indicators (object):
     
     # compute covariance and correlation
     for level in self.levels:
-      self.covariance     [level] = numpy.cov     (values [level] [0], values [level] [1])
-      self.correlation    [level] = numpy.corroef (values [level] [0], values [level] [1])
+      self.covariance     [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
+      self.correlation    [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
   
   def report (self):
     
