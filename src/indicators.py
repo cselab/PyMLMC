@@ -61,49 +61,49 @@ class Indicators (object):
   def report (self):
     
     # report mean
-    print '    -> EPSILON [FI]:'
+    print '    -> EPSILON [FI]:',
     for level in self.levels:
-      print '%.2e' % self.mean [level] [0],
+      print '%.1e' % self.mean [level] [0],
     print
     
     # report mean
-    print '    -> EPSILON [CO]:'
+    print '    -> EPSILON [CO]:',
     for level in self.levels:
-      print '%.2e' % self.mean [level] [1],
+      print '%.1e' % self.mean [level] [1],
     print
     
     # report variance
-    print '    -> SIGMA   [FI]:'
+    print '    -> SIGMA   [FI]:',
     for level in self.levels:
-      print '%.2e' % self.variance [level] [0] if self.variance [level] else '    N/A',
+      print '%.1e' % self.variance [level] [0] if self.variance [level] else '    N/A',
     print
     
     # report variance
-    print '    -> SIGMA   [CO]:'
+    print '    -> SIGMA   [CO]:',
     for level in self.levels:
-      print '%.2e' % self.variance [level] [1] if self.variance [level] else '    N/A',
+      print '%.1e' % self.variance [level] [1] if self.variance [level] else '    N/A',
     print
     
     # report mean_diff
-    print '    -> EPSILON_DIFF:'
+    print '    -> EPSILON_DIFF:',
     for level in self.levels:
-      print '%.2e' % self.mean_diff [level],
+      print '%.1e' % self.mean_diff [level],
     print
     
     # report variance_diff
-    print '    -> SIGMA_DIFF:  '
+    print '    -> SIGMA_DIFF:  ',
     for level in self.levels:
-      print '%.2e' % self.variance_diff [level] if self.variance_diff [level] else '    N/A',
+      print '%.1e' % self.variance_diff [level] if self.variance_diff [level] else '    N/A',
     print
     
     # report covariance
-    print '    -> COVARIANCE:  '
+    print '    -> COVARIANCE:  ',
     for level in self.levels:
-      print '%.2e' % self.covariance [level] if self.covariance [level] else '    N/A',
+      print '%.1e' % self.covariance [level] if self.covariance [level] else '    N/A',
     print
     
     # report correlation
-    print '    -> CORRELATION: '
+    print '    -> CORRELATION: ',
     for level in self.levels:
-      print '%.2e' % self.correlation [level] if self.correlation [level] else '    N/A',
+      print '%.1e' % self.correlation [level] if self.correlation [level] else '    N/A',
     print
