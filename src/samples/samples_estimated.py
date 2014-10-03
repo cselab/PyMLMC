@@ -82,15 +82,16 @@ class Estimated (Samples):
     self.counts_updated = self.compute_optimal ( self.counts, self.required_error)
     
     # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
+    self.counts_additional = self.counts_updated [:]
     for level in self.levels:
-     if counts_updated [level] > counts [level]:
-       counts_additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts [level] ) ) )
+     if self.counts_updated [level] > self.counts [level]:
+       self.counts_additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts [level] ) ) )
        if self.counts_additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
          self.counts_additional [level] = self.counts_updated [level] - self.counts [level]
     
     # update counts [-1] = 1 to counts [-1] = 2 first, and only afterwards allow counts [-1] > 2
-    if counts [-1] == 1 and counts_updated [-1] > 1:
-      counts_additional [-1] = 1;
+    if self.counts [-1] == 1 and self.counts_updated [-1] > 1:
+      self.counts_additional [-1] = 1;
     
     # update counts using counts_additional
     self.counts += self.counts_additional
@@ -109,19 +110,19 @@ class Estimated (Samples):
     print '    -> Updated number of samples for each level:'
     print '      ',
     for level in self.levels:
-      print ' %d' % self.counts_updated [level],
+      print '%d' % self.counts_updated [level],
     print
     
     fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
 
-    print '       Updated number of samples for each level (%d%% of additional, at least %d\% of all)' % fractions
-    print '     '
+    print '       Updated number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
+    print '      ',
     for level in self.levels:
       print '%d' % self.counts [level],
     print
     
-    print '       Additional number of samples for each level (%d%% of additional, at least %d\% of all)' % fractions
-    print '     '
+    print '       Additional number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
+    print '      ',
     for level in self.levels:
       print '%d' % self.counts_additional [level],
     print
@@ -182,4 +183,6 @@ class Estimated (Samples):
           
           # update required sampling error
           required_error = sqrt ( (required_error ** 2) - self.indicators.variance_diff [level] / computed [level] )
+    
+    return updated
  
