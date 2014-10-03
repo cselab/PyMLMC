@@ -55,7 +55,7 @@ class Indicators (object):
     
     # compute covariance and correlation
     for level in self.levels:
-      self.covariance     [level] = numpy.covar   (values [level] [0], values [level] [1])
+      self.covariance     [level] = numpy.cov     (values [level] [0], values [level] [1])
       self.correlation    [level] = numpy.corroef (values [level] [0], values [level] [1])
   
   def report (self):
