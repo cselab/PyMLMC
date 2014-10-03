@@ -145,7 +145,7 @@ class Estimated (Samples):
     
     from numpy import sqrt, zeros, ceil
     
-    updated = computed
+    updated = computed [:]
 
     # compute the work-weighted sum of all variances
     variance_work_sum = sum ( sqrt ( [ self.indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
