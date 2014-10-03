@@ -47,6 +47,8 @@ class Indicators (object):
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
       self.variance [level] [type] = numpy.cov  (values [level] [type])
+    self.mean     [0] [1] = float('NaN')
+    self.variance [0] [1] = float('NaN')
     
     # compute error indicators for differences
     self.mean_diff     [0] = numpy.abs ( numpy.mean (values [0] [0]) )
@@ -73,7 +75,7 @@ class Indicators (object):
     # report mean
     print '    -> EPSILON [CO]:',
     for level in self.levels:
-      print '%.1e' % self.mean [level] [1],
+      print '%.1e' % self.mean [level] [1] if not isnan ( self.mean [level] [1] ) else '    N/A',
     print
     
     # report variance
@@ -111,3 +113,10 @@ class Indicators (object):
     for level in self.levels:
       print '   %.2f' % self.correlation [level] if not isnan ( self.correlation [level] ) else '    N/A',
     print
+  
+  # extrapolate missing variance estimates using available estimates
+  def extrapolate (self):
+    
+    for level in self.levels:
+      if isnan ( self.variance_diff [level] ):
+        self.variance_diff [level] = self.variance_diff [level-1] / 2

@@ -38,6 +38,9 @@ class Estimated (Samples):
     # save configuration
     self.indicators = indicators
     
+    # extrapolate missing indicators
+    self.indicators.extrapolate ()
+    
     # set the normalization
     self.normalization = self.indicators.mean[0][0]
     
@@ -158,7 +161,7 @@ class Estimated (Samples):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( self.indicators.variance_diff [ mask(level) ] / self.works [level] ) * variance_work_sum )
+        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( self.indicators.variance_diff [level] / self.works [level] ) * variance_work_sum )
         
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
@@ -175,8 +178,8 @@ class Estimated (Samples):
           optimize = 1
           
           # update variance_work_sum
-          variance_work_sum -= sqrt ( self.indicators.variance_diff [ mask(level) ] * self.works [level] )
+          variance_work_sum -= sqrt ( self.indicators.variance_diff [level] * self.works [level] )
           
           # update required sampling error
-          required_error = sqrt ( (required_error ** 2) - self.indicators.variance_diff [ mask(level) ] / computed [level] )
+          required_error = sqrt ( (required_error ** 2) - self.indicators.variance_diff [level] / computed [level] )
  
