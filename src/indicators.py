@@ -12,6 +12,7 @@
 # === global imports
 
 import numpy
+from math import isnan
 
 # === local imports
 
@@ -24,19 +25,18 @@ class Indicators (object):
   def __init__ (self, indicator, levels, levels_types):
     
     # store configuration 
-    self.indicator = indicator
-    self.levels = levels
-    self.levels_types = levels_types
+    vars (self) .update ( locals() )
+    self.L = len (self.levels) - 1
   
   def compute (self, mcs):
     
     # list of results
-    self.mean           = helpers.level_type_list(self.levels)
-    self.variance       = helpers.level_type_list(self.levels)
-    self.mean_diff      = numpy.array(self.levels [:], dtype=float)
-    self.variance_diff  = numpy.array(self.levels [:], dtype=float)
-    self.covariance     = numpy.array(self.levels [:], dtype=float)
-    self.correlation    = numpy.array(self.levels [:], dtype=float)
+    self.mean           = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
+    self.variance       = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
+    self.mean_diff      = numpy.zeros ( self.L + 1, dtype=float)
+    self.variance_diff  = numpy.zeros ( self.L + 1, dtype=float)
+    self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
+    self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
     
     # compute indicators form MC results
     values = helpers.level_type_list(self.levels)
@@ -45,18 +45,22 @@ class Indicators (object):
     
     # compute plain error indicators
     for level, type in self.levels_types:
-      self.mean      [level] [type] = numpy.mean (values [level] [type])
-      self.variance  [level] [type] = numpy.var  (values [level] [type])
+      self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
+      self.variance [level] [type] = numpy.cov  (values [level] [type])
     
     # compute error indicators for differences
-    for level in self.levels:
-      self.mean_diff      [level] = numpy.mean (values [level] [0] - values [level] [1])
-      self.variance_diff  [level] = numpy.var  (values [level] [0] - values [level] [1])
+    self.mean_diff     [0] = numpy.abs ( numpy.mean (values [0] [0]) )
+    self.variance_diff [0] = numpy.cov  (values [0] [0])
+    for level in self.levels [1:] :
+      self.mean_diff     [level] = numpy.abs ( numpy.mean (values [level] [0] - values [level] [1]) )
+      self.variance_diff [level] = numpy.cov  (values [level] [0] - values [level] [1])
     
     # compute covariance and correlation
-    for level in self.levels:
-      self.covariance     [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
-      self.correlation    [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
+    self.covariance  [0] = float('NaN')
+    self.correlation [0] = float('NaN')
+    for level in self.levels [1:] :
+      self.covariance  [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
+      self.correlation [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
   
   def report (self):
     
@@ -75,13 +79,13 @@ class Indicators (object):
     # report variance
     print '    -> SIGMA   [FI]:',
     for level in self.levels:
-      print '%.1e' % self.variance [level] [0] if self.variance [level] else '    N/A',
+      print '%.1e' % self.variance [level] [0] if not isnan ( self.variance [level] [0] ) else '    N/A',
     print
     
     # report variance
     print '    -> SIGMA   [CO]:',
     for level in self.levels:
-      print '%.1e' % self.variance [level] [1] if self.variance [level] else '    N/A',
+      print '%.1e' % self.variance [level] [1] if not isnan ( self.variance [level] [1] ) else '    N/A',
     print
     
     # report mean_diff
@@ -93,17 +97,17 @@ class Indicators (object):
     # report variance_diff
     print '    -> SIGMA_DIFF:  ',
     for level in self.levels:
-      print '%.1e' % self.variance_diff [level] if self.variance_diff [level] else '    N/A',
+      print '%.1e' % self.variance_diff [level] if not isnan ( self.variance_diff [level] ) else '    N/A',
     print
     
     # report covariance
     print '    -> COVARIANCE:  ',
     for level in self.levels:
-      print '%.1e' % self.covariance [level] if self.covariance [level] else '    N/A',
+      print '%.1e' % self.covariance [level] if not isnan ( self.covariance [level] ) else '    N/A',
     print
     
     # report correlation
     print '    -> CORRELATION: ',
     for level in self.levels:
-      print '%.1e' % self.correlation [level] if self.correlation [level] else '    N/A',
+      print '   %.2f' % self.correlation [level] if not isnan ( self.correlation [level] ) else '    N/A',
     print

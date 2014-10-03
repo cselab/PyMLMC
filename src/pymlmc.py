@@ -33,22 +33,15 @@ class MLMC_Config (object):
   
   def __init__ (self, solver, discretizations, samples, id=1):
     vars (self) .update ( locals() )
-    self.solver = solver
-    self.discretizations = discretizations
-    self.samples = samples
-    self.id = id
 
 # configuration class for MC simulations
 class MC_Config (object):
   
   def __init__ (self, mlmc_config, level, type, samples):
     vars (self) .update ( locals() )
-    self.level   = level
-    self.type    = type
-    self.samples = samples
-    self.id      = mlmc_config.id
-    self.solver  = mlmc_config.solver
-    self.discretization = mlmc_config.discretizations [level - type]
+    self.solver         = mlmc_config.solver
+    self.discretization = mlmc_config.discretizations [level]
+    self.id             = mlmc_config.id
 
 # MLMC class
 class MLMC (object):
@@ -58,8 +51,6 @@ class MLMC (object):
     
     # store configuration
     vars (self) .update ( locals() )
-    self.config = config
-    self.params = params
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
@@ -80,7 +71,7 @@ class MLMC (object):
     
     # MLMC results
     self.stats = {}
-    
+  
   # MLMC simulation
   def simulation (self):
     

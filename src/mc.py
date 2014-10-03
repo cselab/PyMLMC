@@ -26,8 +26,7 @@ class MC (object):
   def __init__ (self, config, params):
     
     # store configuration
-    self.config = config
-    self.params = params
+    vars (self) .update ( locals() )
     
     # list of results
     self.results = [ None ] * len ( self.config.samples )

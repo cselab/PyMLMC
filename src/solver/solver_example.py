@@ -37,5 +37,6 @@ class Example_Solver (Solver):
       Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (id is %d) !' % (level, type, sample, id) )
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
-    from numpy.random import randn
+    from numpy.random import seed, randn
+    seed ( self.pair ( self.pair (level, type), self.pair (sample, id) ) )
     return randn() / ( 2 ** level )

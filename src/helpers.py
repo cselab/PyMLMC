@@ -25,7 +25,7 @@ def parse ():
 
 # creates an empty nested list iterating over levels and types
 def level_type_list (levels):
-  return [ [None, None] ] * len (levels)
+  return [ [None, None] for level in levels ]
 
 # generates hierarchical grids specifying the coarsest grid and the additional number of levels L
 def grids (N0, L):

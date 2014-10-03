@@ -8,12 +8,15 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-class One_Per_Level (object):
+from samples import Samples
+
+class One_Per_Level (Samples):
   
   def init (self, levels, works):
     
-    self.levels  = levels
-    self.works   = works
+    # store configuration
+    vars (self) .update ( locals() )
+    
     self.counts  = [ 1 ] * len (levels)
     self.indices = [ [1] ] * len (levels)
   
