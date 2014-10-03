@@ -8,7 +8,9 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-class Estimated (object):
+from samples import Samples
+
+class Estimated (Samplest):
 
   def __init__ (self, warmup=None, warmup_factor=1, tol=1e-3, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
     

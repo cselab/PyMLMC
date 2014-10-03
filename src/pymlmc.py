@@ -96,6 +96,7 @@ class MLMC (object):
     
     self.status_load()
     self.config.samples.init(self.levels)
+    self.config.samples.validate()
     self.run()
     self.status_save()
     if not self.params.interactive:
@@ -123,20 +124,21 @@ class MLMC (object):
       self.config.samples.compute_errors ()
       self.config.samples.report_errors  ()
       
+      # check if the simulation is already finished 
       if config.samples.finished ():
         break
       
-      # compute estimated errors and required number of samples
-      self.samples.update (self.levels, self.works, self.indicators)
-      
-      # report estimated errors and required number of samples
-      self.samples.report ()
+      # update, validate and report the required number of samples
+      self.config.samples.update (self.levels, self.works, self.indicators)
+      self.config.samples.validate()
+      self.config.samples.report ()
       
       # for interactive session, query user for additional input
       if self.params.interactive:
         self.user_query()
-        self.samples.update(self.levels, self.works, self.indicators)
-        self.samples.report()
+        self.config.samples.update(self.levels, self.works, self.indicators)
+        self.config.samples.validate()
+        self.config.samples.report()
       
       # compute additional samples
       self.run()
