@@ -66,6 +66,9 @@ class Indicators (object):
   
   def report (self):
     
+    print
+    print ' :: INDICATORS:'
+
     # report mean
     print '    -> EPSILON [FI]:',
     for level in self.levels:

@@ -13,7 +13,7 @@ import numpy
 
 class Estimated (Samples):
 
-  def __init__ (self, warmup=None, warmup_factor=1, tol=1e-3, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
+  def __init__ (self, warmup=None, warmup_factor=1, tol=1e-1, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -24,6 +24,7 @@ class Estimated (Samples):
     self.levels = levels
     self.works  = works
     
+    print
     print ' :: SAMPLES: estimated'
     
     # default warmup samples
@@ -107,6 +108,9 @@ class Estimated (Samples):
   
   def report (self):
     
+    print
+    print ' :: SAMPLES:'
+    
     print '    -> Updated number of samples for each level:'
     print '      ',
     for level in self.levels:
@@ -130,8 +134,11 @@ class Estimated (Samples):
   # query for tolerance
   def query (self):
     
-    tol = float ( raw_input ( ' :: QUERY: enter required tolerance [%.1e]:' % self.tol ) or str(self.tol) )
-    return tol != self.tol
+    print
+    tol = float ( raw_input ( ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol ) or str(self.tol) )
+    modified = tol != self.tol
+    self.tol = tol
+    return modified
   
   # computes the optimal number of samples if some samples are already computed
   def compute_optimal (self, computed, required_error):

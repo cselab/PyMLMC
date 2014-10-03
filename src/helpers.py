@@ -20,7 +20,8 @@ import argparse
 def parse ():
   parser = argparse.ArgumentParser()
   parser.add_argument ('-r', '--restart',     action = "count", default = 0, help = 'restart the simulation')
-  parser.add_argument ('-i', '--interactive', action = "count", default = 0, help = 'query user for the modification of the tolerance after each update')
+  parser.add_argument ('-i', '--interactive', action = "count", default = 1, help = 'if set tonot s')
+  parser.add_argument ('-q', '--query',       action = "count", default = 1, help = 'query user for the modification of the tolerance after each update')
   return parser.parse_args()
 
 # creates an empty nested list iterating over levels and types

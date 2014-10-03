@@ -89,7 +89,7 @@ class MLMC (object):
     self.status_load ()
     
     # initialize and validate the required number of samples
-    self.config.samples.init (self.levels, self.works)
+    self.config.samples.init     (self.levels, self.works)
     self.config.samples.validate ()
     
     # compute initial samples
@@ -158,6 +158,9 @@ class MLMC (object):
   # run MC estimates
   def run (self):
     self.create_MCs ()
+    print
+    print ' :: SAMPLES TO COMPUTE:',
+    print self.config.samples.counts
     for mc in self.mcs:
       mc.run ()
   

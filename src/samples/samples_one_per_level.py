@@ -17,6 +17,9 @@ class One_Per_Level (Samples):
     # store configuration
     vars (self) .update ( locals() )
     
+    print
+    print ' :: SAMPLES: estimated'
+    
     self.counts  = [ 1 ] * len (levels)
     self.indices = [ [1] ] * len (levels)
   
