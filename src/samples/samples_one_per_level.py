@@ -15,4 +15,6 @@ class One_Per_Level (object):
     self.levels  = levels
     self.counts  = [ 1 ] * len (levels)
     self.indices = [ [1] ] * len (levels)
-    self.tol = None
+  
+  def finished (self):
+    return 1

@@ -32,6 +32,7 @@ sys.path.append ( os.path.dirname(__file__) + "/stats" )
 class MLMC_Config (object):
   
   def __init__ (self, solver, discretizations, samples, id=1):
+    vars (self) .update ( locals() )
     self.solver = solver
     self.discretizations = discretizations
     self.samples = samples
@@ -41,6 +42,7 @@ class MLMC_Config (object):
 class MC_Config (object):
   
   def __init__ (self, mlmc_config, level, type, samples):
+    vars (self) .update ( locals() )
     self.level   = level
     self.type    = type
     self.samples = samples
@@ -55,6 +57,7 @@ class MLMC (object):
   def __init__ (self, config, params):
     
     # store configuration
+    vars (self) .update ( locals() )
     self.config = config
     self.params = params
     
@@ -86,8 +89,7 @@ class MLMC (object):
       self.init()
     
     # recursive updating phase
-    if self.config.samples.tol != None:
-      self.update()
+    self.update()
   
   # initial phase
   def init (self):
@@ -113,13 +115,15 @@ class MLMC (object):
       # load results
       self.load()
       
-      # compute error indicators
+      # compute and report error indicators
       self.indicators.compute (self.mcs)
+      self.indicators.report  ()
       
-      # report error indicators
-      self.indicators.report ()
+      # compute and report errors
+      self.config.samples.compute_errors ()
+      self.config.samples.report_errors  ()
       
-      if self.indicators.error <= self.config.samples.tol:
+      if config.samples.finished ():
         break
       
       # compute estimated errors and required number of samples
