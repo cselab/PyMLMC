@@ -9,57 +9,34 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 from samples import Samples
+import numpy
 
-class Estimated (Samplest):
+class Estimated (Samples):
 
   def __init__ (self, warmup=None, warmup_factor=1, tol=1e-3, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
     
     # save configuration
     vars (self) .update ( locals() )
   
-  def init (self, levels):
+  def init (self, levels, works):
     
+    # save configuration
     self.levels = levels
+    self.works  = works
     
     print ' :: SAMPLES: estimated'
     
     # default warmup samples
     if not self.warmup:
-      self.warmup = [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ]
+      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ] )
     
     self.counts  = self.warmup [:]
     self.indices = [ range ( self.warmup [level] ) for level in self.levels ]
   
-  def update (self, levels, works, indicators):
+  def compute_errors (self, indicators):
     
     # save configuration
-    self.levels     = levels
-    self.works      = works
     self.indicators = indicators
-    
-    # compute and report errors
-    self.compute_errors ()
-    self.report_errors  ()
-
-    # compute and report number of samples
-    self.compute_samples ()
-    self.report_samples  ()
-    
-    # check if the current coarsest level is optimal
-    #self.check_optimal_coarsest_level ()
-    
-    # check if the current finest level is optimal
-    #self.check_optimal_finest_level ()
-  
-  def mask (self, level):
-    if level == 0:
-      return 0
-    elif self.indices [level] > 1:
-      return level
-    else:
-      return mask [level-1]
-  
-  def compute_errors (self):
     
     # set the normalization
     self.normalization = self.indicators.mean[0][0]
@@ -79,62 +56,80 @@ class Estimated (Samplest):
   def report_errors (self):
     
     # report relative sampling errors
-    print '    -> Relative total sampling error is %.2e' % self.total_relative_error,
-    print ' ( = %.2f\% of rel_tol=%.2e)' % ( round ( 1000 * (total_relative_error ** 2) / (self.tol ** 2) ) / 10, self.tol )
+    print '    -> Relative total sampling error is %.1e' % self.total_relative_error,
+    print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * (self.total_relative_error ** 2) / (self.tol ** 2) ) / 10, self.tol )
     print '       Relative level sampling errors:'
-    print '       ',
-    print ' %.2e' % relative_error [level], for level in self.levels
+    print '      ',
+    for level in self.levels:
+      print '%.1e' % self.relative_error [level],
     print
   
   def finished (self):
     
     return self.total_relative_error <= self.tol
   
-  def compute_samples (self):
-     
-     # compute optimal number of samples
-     # assuming that no samples were computed so far
-     self.counts_optimal = self.compute_optimal ( numpy.ones(len(self.levels)), self.required_error )
-     
-     # compute optimal number of samples
-     # assuming that self.counts samples are already computed on each level
-     self.counts_updated = self.compute_optimal ( self.counts, self.required_error)
-     
-     # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
-     for level in self.levels:
-      if counts_updated [level] > counts [level]:
-        counts_additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts [level] ) ) )
-        if self.counts_additional [level] < self.min_evaluation_fraction * self.counts_updated [level]
-          self.counts_additional [level] = self.counts_updated [level] - self.counts [level]
-     
-     # update counts [-1] = 1 to counts [-1] = 2 first, and only afterwards allow counts [-1] > 2
-     if counts [-1] == 1 and counts_updated [-1] > 1:
-       counts_additional [-1] = 1;
-     
-     # update counts using counts_additional
-     self.counts += self.counts_additional
-     
-     # compute optimal_work_fraction
-     self.optimal_work_fraction = numpy.sum ( self.counts * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+  def update (self):
+    
+    # compute optimal number of samples
+    # assuming that no samples were computed so far
+    self.counts_optimal = self.compute_optimal ( numpy.ones(len(self.levels)), self.required_error )
+    
+    # compute optimal number of samples
+    # assuming that self.counts samples are already computed on each level
+    self.counts_updated = self.compute_optimal ( self.counts, self.required_error)
+    
+    # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
+    for level in self.levels:
+     if counts_updated [level] > counts [level]:
+       counts_additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts [level] ) ) )
+       if self.counts_additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
+         self.counts_additional [level] = self.counts_updated [level] - self.counts [level]
+    
+    # update counts [-1] = 1 to counts [-1] = 2 first, and only afterwards allow counts [-1] > 2
+    if counts [-1] == 1 and counts_updated [-1] > 1:
+      counts_additional [-1] = 1;
+    
+    # update counts using counts_additional
+    self.counts += self.counts_additional
+    
+    # compute optimal_work_fraction
+    self.optimal_work_fraction = numpy.sum ( self.counts * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    
+    # check if the current coarsest level is optimal
+    #self.check_optimal_coarsest_level ()
+    
+    # check if the current finest level is optimal
+    #self.check_optimal_finest_level ()
   
-  def report_samples (self):
+  def report (self):
     
     print '    -> Updated number of samples for each level:'
     print '      ',
-    print ' %d' % self.counts_updated [level], for self.levels
+    for level in self.levels:
+      print ' %d' % self.counts_updated [level],
     print
     
     fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
 
-    print '       Updated number of samples for each level (%d\% of additional, at least %d\% of all)' % fractions
-    pirnt '      '
-    print ' %d' % self.counts [level], for level in self.levels
+    print '       Updated number of samples for each level (%d%% of additional, at least %d\% of all)' % fractions
+    print '     '
+    for level in self.levels:
+      print '%d' % self.counts [level],
     print
     
-    print '       Additional number of samples for each level (%d\% of additional, at least %d\% of all)' % fractions
-    print '      '
-    print ' %d' % self.counts_additional [level], for level in self.levels
+    print '       Additional number of samples for each level (%d%% of additional, at least %d\% of all)' % fractions
+    print '     '
+    for level in self.levels:
+      print '%d' % self.counts_additional [level],
     print
+  
+  def mask (self, level):
+    if level == 0:
+      return 0
+    elif self.indices [level] > 1:
+      return level
+    else:
+      return mask [level-1]
   
   # computes the optimal number of samples if some samples are already computed
   def compute_optimal (self, computed, required_error):

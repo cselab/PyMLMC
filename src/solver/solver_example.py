@@ -20,7 +20,7 @@ class Example_Solver (Solver):
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
-    return 1
+    return d ['NX'] * d ['NY'] * d ['NZ']
   
   def run (self, level, type, sample, id, discretization, params):
     args = {}
@@ -37,4 +37,5 @@ class Example_Solver (Solver):
       Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (id is %d) !' % (level, type, sample, id) )
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
-    return 1
+    from numpy.random import randn
+    return randn() / ( 2 ** level )

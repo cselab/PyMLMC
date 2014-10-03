@@ -33,8 +33,10 @@ class Indicators (object):
     # list of results
     self.mean           = helpers.level_type_list(self.levels)
     self.variance       = helpers.level_type_list(self.levels)
-    self.mean_diff      = self.levels [:]
-    self.variance_diff  = self.levels [:]
+    self.mean_diff      = numpy.array(self.levels [:])
+    self.variance_diff  = numpy.array(self.levels [:])
+    self.covariance     = numpy.array(self.levels [:])
+    self.correlation    = numpy.array(self.levels [:])
     
     # compute indicators form MC results
     values = helpers.level_type_list(self.levels)
@@ -51,6 +53,57 @@ class Indicators (object):
       self.mean_diff      [level] = numpy.mean (values [level] [0] - values [level] [1])
       self.variance_diff  [level] = numpy.var  (values [level] [0] - values [level] [1])
     
+    # compute covariance and correlation
+    for level in self.levels:
+      self.covariance     [level] = numpy.covar   (values [level] [0], values [level] [1])
+      self.correlation    [level] = numpy.corroef (values [level] [0], values [level] [1])
+  
   def report (self):
     
-    print ' :: WARNING: indicator report() not yet implemented.'
+    # report mean
+    print '    -> EPSILON [FI]:'
+    for level in self.levels:
+      print '%.2e' % self.mean [level] [0],
+    print
+    
+    # report mean
+    print '    -> EPSILON [CO]:'
+    for level in self.levels:
+      print '%.2e' % self.mean [level] [1],
+    print
+    
+    # report variance
+    print '    -> SIGMA   [FI]:'
+    for level in self.levels:
+      print '%.2e' % self.variance [level] [0] if self.variance [level] else '    N/A',
+    print
+    
+    # report variance
+    print '    -> SIGMA   [CO]:'
+    for level in self.levels:
+      print '%.2e' % self.variance [level] [1] if self.variance [level] else '    N/A',
+    print
+    
+    # report mean_diff
+    print '    -> EPSILON_DIFF:'
+    for level in self.levels:
+      print '%.2e' % self.mean_diff [level],
+    print
+    
+    # report variance_diff
+    print '    -> SIGMA_DIFF:  '
+    for level in self.levels:
+      print '%.2e' % self.variance_diff [level] if self.variance_diff [level] else '    N/A',
+    print
+    
+    # report covariance
+    print '    -> COVARIANCE:  '
+    for level in self.levels:
+      print '%.2e' % self.covariance [level] if self.covariance [level] else '    N/A',
+    print
+    
+    # report correlation
+    print '    -> CORRELATION: '
+    for level in self.levels:
+      print '%.2e' % self.correlation [level] if self.correlation [level] else '    N/A',
+    print

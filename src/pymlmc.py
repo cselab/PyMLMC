@@ -86,7 +86,7 @@ class MLMC (object):
     
     # initial phase
     if self.params.restart:
-      self.init()
+      self.init ()
     
     # recursive updating phase
     self.update()
@@ -94,13 +94,13 @@ class MLMC (object):
   # initial phase
   def init (self):
     
-    self.status_load()
-    self.config.samples.init(self.levels)
-    self.config.samples.validate()
-    self.run()
-    self.status_save()
+    self.status_load ()
+    self.config.samples.init (self.levels, self.works)
+    self.config.samples.validate ()
+    self.run ()
+    self.status_save ()
     if not self.params.interactive:
-      sys.exit()
+      sys.exit ()
   
   # iterative updating phase
   def update (self):
@@ -108,46 +108,46 @@ class MLMC (object):
     while True:
       
       # load status of MLMC simulation
-      self.status_load()
+      self.status_load ()
       
       # wait for jobs to finish 
-      self.join()
+      self.join ()
       
       # load results
-      self.load()
+      self.load ()
       
       # compute and report error indicators
       self.indicators.compute (self.mcs)
       self.indicators.report  ()
       
       # compute and report errors
-      self.config.samples.compute_errors ()
+      self.config.samples.compute_errors (self.indicators)
       self.config.samples.report_errors  ()
       
       # check if the simulation is already finished 
-      if config.samples.finished ():
+      if self.config.samples.finished ():
         break
       
       # update, validate and report the required number of samples
-      self.config.samples.update (self.levels, self.works, self.indicators)
-      self.config.samples.validate()
-      self.config.samples.report ()
-      
+      self.config.samples.update   ()
+      self.config.samples.report   ()
+      self.config.samples.validate ()
+
       # for interactive session, query user for additional input
       if self.params.interactive:
         self.user_query()
-        self.config.samples.update(self.levels, self.works, self.indicators)
-        self.config.samples.validate()
-        self.config.samples.report()
-      
+        self.config.samples.update   ()
+        self.config.samples.report   ()
+        self.config.samples.validate ()
+
       # compute additional samples
-      self.run()
+      self.run ()
       
       # save status of MLMC simulation
-      self.status_save()
+      self.status_save ()
       
       if not self.params.interactive:
-        exit() 
+        sys.exit () 
   
   # create MC objects
   def create_MCs (self):

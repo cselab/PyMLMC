@@ -10,9 +10,10 @@
 
 class One_Per_Level (object):
   
-  def init (self, levels):
+  def init (self, levels, works):
     
     self.levels  = levels
+    self.works   = works
     self.counts  = [ 1 ] * len (levels)
     self.indices = [ [1] ] * len (levels)
   
