@@ -85,11 +85,20 @@ class MLMC (object):
   # initial phase
   def init (self):
     
+    # load status of MLMC simulation
     self.status_load ()
+    
+    # initialize and validate the required number of samples
     self.config.samples.init (self.levels, self.works)
     self.config.samples.validate ()
+    
+    # compute initial samples
     self.run ()
+    
+    # save status of MLMC simulation
     self.status_save ()
+    
+    # if non-interactive session, exit
     if not self.params.interactive:
       sys.exit ()
   
@@ -123,14 +132,14 @@ class MLMC (object):
       self.config.samples.update   ()
       self.config.samples.report   ()
       self.config.samples.validate ()
-
-      # for interactive session, query user for additional input
+      
+      # for interactive sessions, query user for additional input
       if self.params.interactive:
-        self.user_query()
-        self.config.samples.update   ()
-        self.config.samples.report   ()
-        self.config.samples.validate ()
-
+        while self.query():
+          self.config.samples.update   ()
+          self.config.samples.report   ()
+          self.config.samples.validate ()
+      
       # compute additional samples
       self.run ()
       
@@ -151,6 +160,10 @@ class MLMC (object):
     self.create_MCs ()
     for mc in self.mcs:
       mc.run ()
+  
+  # query user for additional information
+  def query (self):
+    return self.config.samples.query ()
   
   # check if MC estimates are already available
   def join (self):

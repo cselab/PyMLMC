@@ -127,13 +127,11 @@ class Estimated (Samples):
       print '%d' % self.counts_additional [level],
     print
   
-  def mask (self, level):
-    if level == 0:
-      return 0
-    elif self.indices [level] > 1:
-      return level
-    else:
-      return mask [level-1]
+  # query for tolerance
+  def query (self):
+    
+    tol = float ( raw_input ( ' :: QUERY: enter required tolerance [%.1e]:' % self.tol ) or str(self.tol) )
+    return tol != self.tol
   
   # computes the optimal number of samples if some samples are already computed
   def compute_optimal (self, computed, required_error):
