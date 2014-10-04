@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from samples import Samples
+from samples import *
 
 class One_Per_Level (Samples):
   
@@ -17,10 +17,14 @@ class One_Per_Level (Samples):
     # store configuration
     vars (self) .update ( locals() )
     
-    print
-    print ' :: SAMPLES: estimated'
+    self.counts  = Counts  ()
+    self.indices = Indices ()
     
-    self.counts.additional = [ 1 ] * len (levels)
+    print
+    print ' :: SAMPLES: one sample per each level'
+    
+    self.counts.computed   = [ 0 for level in self.levels ]
+    self.counts.additional = [ 1 for level in self.levels ]
   
   def finished (self):
     return 1

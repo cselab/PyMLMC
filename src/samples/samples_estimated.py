@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from samples import Samples
+from samples import *
 import numpy
 
 class Estimated (Samples):
@@ -17,6 +17,9 @@ class Estimated (Samples):
     
     # save configuration
     vars (self) .update ( locals() )
+    
+    self.counts  = Counts  ()
+    self.indices = Indices ()
   
   def init (self, levels, works):
     
@@ -31,6 +34,7 @@ class Estimated (Samples):
     if not self.warmup:
       self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ] )
     
+    self.counts.computed   = [ 0 for levels in self.levels ]
     self.counts.additional = self.warmup [:]
   
   def compute_errors (self, indicators):

@@ -148,19 +148,20 @@ class MLMC (object):
         sys.exit () 
   
   # create MC objects
-  def create_MCs (self):
+  def create_MCs (self, indices):
     self.mcs = []
     for i, (level, type) in enumerate(self.levels_types):
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, self.config.samples.indices [level]), self.params ) )
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params ) )
   
   # run MC estimates
   def run (self):
-    self.create_MCs ()
+    self.create_MCs (self.config.samples.indices.additional)
     print
     print ' :: SAMPLES TO COMPUTE:',
-    print self.config.samples.counts
+    print self.config.samples.counts.additional
     for mc in self.mcs:
       mc.run ()
+    self.config.samples.append ()
   
   # query user for additional information
   def query (self):
@@ -168,14 +169,13 @@ class MLMC (object):
   
   # check if MC estimates are already available
   def join (self):
-    self.create_MCs ()
+    self.create_MCs (self.config.samples.indices.computed)
     for mc in self.mcs:
       if not mc.finished ():
         Exception ( ':: ERROR: MC simulations are not yet available')
   
   # load the results from MC simulations
   def load (self):
-    self.create_MCs ()
     for mc in self.mcs:
       mc.load ()
   
@@ -210,6 +210,7 @@ class MLMC (object):
     statusf = open ( 'status.py', 'r' )
     self.config.samples.counts = pickle.load ( statusf )
     statusf.close()
-    self.config.samples.indices ()
+    self.config.samples.make_indices ()
+    print self.config.samples.counts.computed
     print
     print (' :: INFO: MLMC status loaded from to status.py') 
