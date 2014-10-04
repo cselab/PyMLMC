@@ -45,7 +45,6 @@ class Indicators (object):
     
     # compute plain error indicators
     for level, type in self.levels_types:
-      print values [level] [type]
       self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
       self.variance [level] [type] = numpy.cov  (values [level] [type])
     self.mean     [0] [1] = float('NaN')

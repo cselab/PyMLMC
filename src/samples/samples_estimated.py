@@ -34,8 +34,8 @@ class Estimated (Samples):
     if not self.warmup:
       self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ] )
     
-    self.counts.computed   = [ 0 for levels in self.levels ]
-    self.counts.additional = self.warmup [:]
+    self.counts.computed   = numpy.zeros ( len(self.levels) )
+    self.counts.additional = numpy.array (self.warmup, copy=True)
   
   def compute_errors (self, indicators):
     
@@ -52,7 +52,7 @@ class Estimated (Samples):
     self.required_error = self.tol * self.normalization
     
     # compute relative sampling errors
-    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts ) / self.normalization
+    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.computed ) / self.normalization
     
     # compute the cumulative relative sampling error
     self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
@@ -82,13 +82,13 @@ class Estimated (Samples):
     self.counts_optimal = self.compute_optimal ( numpy.ones(len(self.levels)), self.required_error )
     
     # compute optimal number of samples
-    # assuming that self.counts samples are already computed on each level
-    self.counts_updated = self.compute_optimal ( self.counts, self.required_error)
+    # assuming that self.counts.computed samples are already computed on each level
+    self.counts_updated = self.compute_optimal ( self.counts.computed, self.required_error)
     
     # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
-    self.counts.additional = self.counts_updated [:]
+    self.counts.additional = numpy.array ( self.counts_updated, copy=True )
     for level in self.levels:
-     if self.counts_updated [level] > self.counts [level]:
+     if self.counts_updated [level] > self.counts.computed [level]:
        self.counts.additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.computed [level] ) ) )
        if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
          self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
@@ -101,7 +101,7 @@ class Estimated (Samples):
     self.counts.computed += self.counts.additional
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( self.counts.computed * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.computed + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
@@ -125,7 +125,7 @@ class Estimated (Samples):
     print '       Updated number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
     print '      ',
     for level in self.levels:
-      print '%d' % self.counts.computed [level],
+      print '%d' % ( self.counts.computed [level] + self.counts.additional [level] ),
     print
     
     print '       Additional number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
@@ -148,7 +148,7 @@ class Estimated (Samples):
     
     from numpy import sqrt, zeros, ceil
     
-    updated = computed [:]
+    updated = numpy.array ( computed, copy=True )
     
     # compute the work-weighted sum of all variances
     variance_work_sum = sum ( sqrt ( [ self.indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )

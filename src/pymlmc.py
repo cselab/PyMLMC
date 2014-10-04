@@ -211,6 +211,5 @@ class MLMC (object):
     self.config.samples.counts = pickle.load ( statusf )
     statusf.close()
     self.config.samples.make_indices ()
-    print self.config.samples.counts.computed
     print
     print (' :: INFO: MLMC status loaded from to status.py') 
