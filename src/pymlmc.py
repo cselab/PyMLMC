@@ -70,6 +70,9 @@ class MLMC (object):
     # works
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
     
+    # setup samples
+    self.config.samples.setup ( self.levels, self.works )
+    
     # MLMC results
     self.stats = {}
   
@@ -87,7 +90,7 @@ class MLMC (object):
   def init (self):
     
     # initialize and validate the required number of samples
-    self.config.samples.init     (self.levels, self.works)
+    self.config.samples.init     ()
     self.config.samples.validate ()
     
     # compute initial samples
@@ -132,7 +135,7 @@ class MLMC (object):
       self.config.samples.validate ()
       
       # for interactive sessions, query user for additional input
-      if self.params.interactive:
+      if self.params.query:
         while self.query():
           self.config.samples.update   ()
           self.config.samples.report   ()

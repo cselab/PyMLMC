@@ -11,8 +11,11 @@
 from samples import *
 import numpy
 
-class Estimated (Samples):
+# surpresses invalid division errors
+numpy.seterr ( divide='ignore', invalid='ignore' )
 
+class Estimated (Samples):
+  
   def __init__ (self, warmup=None, warmup_factor=1, tol=1e-1, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
     
     # save configuration
@@ -21,11 +24,7 @@ class Estimated (Samples):
     self.counts  = Counts  ()
     self.indices = Indices ()
   
-  def init (self, levels, works):
-    
-    # save configuration
-    self.levels = levels
-    self.works  = works
+  def init (self):
     
     print
     print ' :: SAMPLES: estimated'

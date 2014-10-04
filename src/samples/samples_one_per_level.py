@@ -12,10 +12,7 @@ from samples import *
 
 class One_Per_Level (Samples):
   
-  def init (self, levels, works):
-    
-    # store configuration
-    vars (self) .update ( locals() )
+  def init (self):
     
     self.counts  = Counts  ()
     self.indices = Indices ()

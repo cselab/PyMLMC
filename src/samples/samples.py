@@ -24,6 +24,11 @@ class Indices (object):
 
 class Samples (object):
   
+  def setup (self, levels, works):
+    
+    # store configuration
+    vars (self) .update ( locals() )
+  
   def validate (self):
     
     for level in self.levels:
