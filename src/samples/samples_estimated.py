@@ -32,7 +32,7 @@ class Estimated (Samples):
       self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ] )
     
     self.counts  = self.warmup [:]
-    self.indices = [ range ( self.warmup [level] ) for level in self.levels ]
+    self.indices = [ range ( self.counts [level] ) for level in self.levels ]
   
   def compute_errors (self, indicators):
     
@@ -97,6 +97,9 @@ class Estimated (Samples):
     # update counts using counts_additional
     self.counts += self.counts_additional
     
+    # update indices
+    self.indices = [ range ( self.counts [level] ) for level in self.levels ]
+    
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( self.counts * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
@@ -145,8 +148,8 @@ class Estimated (Samples):
     
     from numpy import sqrt, zeros, ceil
     
-    updated = computed [:]
-
+    updated = list(computed)
+    
     # compute the work-weighted sum of all variances
     variance_work_sum = sum ( sqrt ( [ self.indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
     

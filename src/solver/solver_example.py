@@ -39,4 +39,5 @@ class Example_Solver (Solver):
     f = open ( filename, 'r' )
     from numpy.random import seed, randn
     seed ( self.pair ( self.pair (level, type), self.pair (sample, id) ) )
+    f.close()
     return randn() / ( 2 ** level )

@@ -12,6 +12,7 @@
 # === global imports
 
 import sys
+import pickle
 
 # === local imports
 
@@ -84,9 +85,6 @@ class MLMC (object):
   
   # initial phase
   def init (self):
-    
-    # load status of MLMC simulation
-    self.status_load ()
     
     # initialize and validate the required number of samples
     self.config.samples.init     (self.levels, self.works)
@@ -197,14 +195,20 @@ class MLMC (object):
     
     return self.stats
   
-  # load MLMC status
-  def status_load (self):
-   
-   print (' :: WARNING: status_load() is not yet implemented.') 
-    # TODO
-  
   # save MLMC status
   def status_save (self):
     
-    print (' :: WARNING: status_save() is not yet implemented.') 
-    # TODO
+    statusf = open ( 'status.py', 'w' )
+    pickle.dump ( self.config.samples.counts, statusf )
+    statusf.close()
+    print
+    print (' :: INFO: MLMC status saved to status.py') 
+    
+  # laod MLMC status
+  def status_load (self):
+    
+    statusf = open ( 'status.py', 'r' )
+    self.config.samples.counts = pickle.load ( statusf )
+    statusf.close()
+    print
+    print (' :: INFO: MLMC status loaded from to status.py') 
