@@ -26,7 +26,8 @@ class Example_Solver (Solver):
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')
-    subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT )
+    subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
+    #subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT )
   
   def finished (self, level, type, sample, id):
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }

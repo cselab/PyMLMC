@@ -20,8 +20,7 @@ class One_Per_Level (Samples):
     print
     print ' :: SAMPLES: estimated'
     
-    self.counts  = [ 1 ] * len (levels)
-    self.indices = [ [1] ] * len (levels)
+    self.counts.additional = [ 1 ] * len (levels)
   
   def finished (self):
     return 1
