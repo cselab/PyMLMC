@@ -36,7 +36,7 @@ class MC (object):
     
   # launch all samples
   def run (self):
-    print ' :: MC run: level %d type %d with %d sample(s) on %s cores' % ( self.config.level, self.config.type, len(self.config.samples), str(self.multi) )
+    print ' :: MC run:   level %2d   type %d   with %7d sample(s)   on %6d cores' % ( self.config.level, self.config.type, len(self.config.samples), self.multi )
     config = self.config
     for sample in config.samples:
       config.solver.run (config.level, config.type, sample, config.id, config.discretization, self.params, self.multi)

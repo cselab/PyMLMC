@@ -22,4 +22,4 @@ class Static (Balancer):
     
     for level, type in self.levels_types:
       factor = self.works [ self.L ] / self.works [ level - type ]
-      self.multi [level] [type] = max ( 1, round ( self.cores / factor ) )
+      self.multi [level] [type] = max ( 1, int ( round ( self.cores / factor ) ) )
