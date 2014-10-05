@@ -15,5 +15,3 @@ class Balancer (object):
     self.levels = levels
     self.L      = len(levels) - 1
     self.works  = works
-    
-    self.print()

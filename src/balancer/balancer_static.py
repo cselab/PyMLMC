@@ -16,11 +16,9 @@ class Static (Balancer):
     
     self.cores = cores
   
-  def print (self):
+  def distribute (self):
     
     print ' :: BALANCER: static'
-  
-  def distribute (self):
     
     self.multi = helpers.level_type_list ()
     for level, type in helpers.level_type_list ():
