@@ -58,6 +58,8 @@ def grids_3d_t (N, NS):
 
 # integer format with multipliers K, M, etc.
 def intf (number):
+  if number == 0:
+    return '%3d%s' % ( 0, ' ' )
   from math import log, floor
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
