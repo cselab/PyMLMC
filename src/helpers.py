@@ -55,4 +55,10 @@ def grids_3d (N):
 # generates 3D grids with specified numbers of cells N and time steps NS
 def grids_3d_t (N, NS):
   return [ { 'NX' : N[l], 'NY' : N[l], 'NZ' : N[l], 'NS' : NS[l] } for l in range(len(N)) ]
- 
+
+# integer format with multipliers K, M, etc.
+def intf (number):
+  from math import log
+  magnitude = log ( 1000, number )
+  number /= 1000 * magnitude
+  return '%3d%s' % ( round ( number ), ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
