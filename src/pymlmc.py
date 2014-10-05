@@ -72,6 +72,7 @@ class MLMC (object):
     self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
     
     # works
+    # TODO: take into account _differences_ on all levels except the coarsest
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
     
     # setup samples
@@ -171,7 +172,7 @@ class MLMC (object):
   def create_MCs (self, indices):
     self.mcs = []
     for i, (level, type) in enumerate(self.levels_types):
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params ) )
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.balancer.multi [level] [type] ) )
   
   # run MC estimates
   def run (self):

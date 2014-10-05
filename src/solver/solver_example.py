@@ -22,7 +22,7 @@ class Example_Solver (Solver):
   def work (self, d):
     return d ['NX'] * d ['NY'] * d ['NZ']
   
-  def run (self, level, type, sample, id, discretization, params):
+  def run (self, level, type, sample, id, discretization, params, multi):
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')

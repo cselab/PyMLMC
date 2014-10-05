@@ -8,6 +8,8 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+import helpers
+
 class Static (Balancer):
   
   def __init__ (self, cores):
@@ -20,7 +22,9 @@ class Static (Balancer):
   
   def distribute (self):
     
-    self.multi = [ max (1, cores / 2 ** (self.L - level) ) for level in self.levels ]
+    self.multi = helpers.level_type_list ()
+    for level, type in helpers.level_type_list ():
+      self.multi [level] [type] = max (1, self.cores / 2 ** (self.L - ( level - type ) ) )
   
   def multi (self, level, discretization):
     

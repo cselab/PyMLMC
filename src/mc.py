@@ -23,7 +23,7 @@ import sys
 class MC (object):
   
   # initialize MC
-  def __init__ (self, config, params):
+  def __init__ (self, config, params, multi):
     
     # store configuration
     vars (self) .update ( locals() )
@@ -36,10 +36,10 @@ class MC (object):
     
   # launch all samples
   def run (self):
-    print ' :: MC run: level %d type %d with %d sample(s)' % ( self.config.level, self.config.type, len(self.config.samples) )
+    print ' :: MC run: level %d type %d with %d sample(s) on %s cores' % ( self.config.level, self.config.type, len(self.config.samples), str(self.multi) )
     config = self.config
     for sample in config.samples:
-      config.solver.run (config.level, config.type, sample, config.id, config.discretization, self.params)
+      config.solver.run (config.level, config.type, sample, config.id, config.discretization, self.params, self.multi)
   
   def finished (self):
     config = self.config
