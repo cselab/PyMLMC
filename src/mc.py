@@ -23,7 +23,7 @@ import sys
 class MC (object):
   
   # initialize MC
-  def __init__ (self, config, params, multi):
+  def __init__ (self, config, params, multi=None):
     
     # store configuration
     vars (self) .update ( locals() )

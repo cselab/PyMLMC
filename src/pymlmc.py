@@ -79,7 +79,7 @@ class MLMC (object):
     self.config.samples.setup ( self.levels, self.works )
     
     # setup balancer
-    self.config.balancer.setup (self.levels, self.works )
+    self.config.balancer.setup (self.levels, self.levels_types, self.works )
     
     # MLMC results
     self.stats = {}

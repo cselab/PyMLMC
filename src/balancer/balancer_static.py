@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-import helpers
+from balancer import Balancer
 
 class Static (Balancer):
   
@@ -20,10 +20,5 @@ class Static (Balancer):
     
     print ' :: BALANCER: static'
     
-    self.multi = helpers.level_type_list ()
     for level, type in helpers.level_type_list ():
       self.multi [level] [type] = max (1, self.cores / 2 ** (self.L - ( level - type ) ) )
-  
-  def multi (self, level, discretization):
-    
-    return
