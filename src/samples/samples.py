@@ -28,6 +28,7 @@ class Samples (object):
     
     # store configuration
     vars (self) .update ( locals() )
+    self.L = len(levels) - 1
   
   def validate (self):
     

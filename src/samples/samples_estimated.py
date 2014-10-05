@@ -31,7 +31,7 @@ class Estimated (Samples):
     
     # default warmup samples
     if not self.warmup:
-      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (len(levels) - 1 - level) ) for level in levels ] )
+      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (self.L - level) ) for level in self.levels ] )
     
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array (self.warmup, copy=True)
