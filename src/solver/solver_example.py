@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Solver class (example)
+# Example solver class
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,13 +8,16 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# === Discretization format:
+# discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?}
+
 from solver import Solver
 import os, subprocess
 
 class Example_Solver (Solver):
   
   def __init__ (self):
-    self.cmd  = ['echo', '$RANDOM']
+    self.cmd  = 'echo $RANDOM'
     self.filename = 'output_%(name)s'
     self.indicator = lambda x : x
   
@@ -22,7 +25,7 @@ class Example_Solver (Solver):
   def work (self, d):
     return d ['NX'] * d ['NY'] * d ['NZ']
   
-  def run (self, level, type, sample, id, discretization, params, multi):
+  def run (self, level, type, sample, id, discretization, options, multi):
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')
