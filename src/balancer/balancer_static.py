@@ -18,6 +18,7 @@ class Static (Balancer):
   
   def distribute (self):
     
+    print
     print ' :: BALANCER: static'
     
     for level, type in self.levels_types:
