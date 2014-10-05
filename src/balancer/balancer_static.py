@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Static load balancing                           #
+# Static load balancing class
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,4 +8,12 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+class Static (Balancer):
+  
+  def print (self):
+    
+    print ' :: BALANCER: static'
 
+  def multi (self, level, discretization):
+    
+    return

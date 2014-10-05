@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# General balancer classes                        #
+# Balancer base class
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,4 +8,11 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+class Balancer (object):
 
+  def setup (self, levels, works):
+    
+    self.levels = levels
+    self.works  = works
+    
+    self.print()
