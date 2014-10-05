@@ -25,6 +25,10 @@ class Example_Solver (Solver):
   def work (self, d):
     return d ['NX'] * d ['NY'] * d ['NZ']
   
+  def validate (self):
+    
+    return 1
+  
   def run (self, level, type, sample, id, discretization, options, multi):
     args = {}
     args ['name'] = self.name (level, type, sample, id)

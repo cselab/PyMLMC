@@ -187,6 +187,8 @@ class MLMC (object):
     print ' :: SAMPLES TO COMPUTE:',
     print self.config.samples.counts.additional
     for mc in self.mcs:
+      mc.validate ()
+    for mc in self.mcs:
       mc.run ()
     self.config.samples.append ()
   
