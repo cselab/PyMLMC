@@ -59,6 +59,6 @@ def grids_3d_t (N, NS):
 # integer format with multipliers K, M, etc.
 def intf (number):
   from math import log
-  magnitude = floor ( log ( 1000, number ) )
-  number /= 1000 * magnitude
-  return '%3d%s' % ( floor ( number ), ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  magnitude = int ( round ( log ( 1000, number ) ) )
+  number    = int ( round ( number / ( 1000 ** magnitude ) ) )
+  return '%3d%s' % ( number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
