@@ -9,12 +9,20 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 from balancer import Balancer
+import local
 
 class Static (Balancer):
   
-  def __init__ (self, cores):
+  def __init__ (self, cores=None, walltime=None ):
     
     self.cores = cores
+    self.walltime = walltime
+    
+    if self.cores == None:
+      self.cores = local.cores
+    
+    if self.walltime == None:
+      self.walltime = local.walltime
   
   def distribute (self):
     
@@ -22,5 +30,4 @@ class Static (Balancer):
     print ' :: BALANCER: static'
     
     for level, type in self.levels_types:
-      factor = self.works [ self.L ] / self.works [ level - type ]
-      self.multi [level] [type] = max ( 1, int ( round ( self.cores / factor ) ) )
+      self.parallelization [level] [type] = max ( local.threads, int ( round ( self.cores / self.ratios [level - type] ) ) )

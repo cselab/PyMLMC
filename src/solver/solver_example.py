@@ -25,11 +25,16 @@ class Example_Solver (Solver):
   def work (self, d):
     return d ['NX'] * d ['NY'] * d ['NZ']
   
-  def validate (self):
+  # return the approproate ratio of the number of cores between two discretizations
+  def ratio (self, d1, d2):
+    
+    return d1 ['NX'] / d2 ['NX'] * d1 ['NY'] / d2 ['NY'] * d1 ['NZ'] / d2 ['NZ']
+  
+  def validate (self, discretization, parallelization):
     
     return 1
   
-  def run (self, level, type, sample, id, discretization, options, multi):
+  def run (self, level, type, sample, id, discretization, options, paralellization):
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')

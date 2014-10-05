@@ -35,10 +35,9 @@ class MC (object):
     self.stats = {}
   
   # validate all samples
-  def validate (self):
-    
+  def validate (self): 
     with self.config as config:
-      config.solver.validate ( config.discretization, self.params, self.multi )
+      config.solver.validate ( config.discretization, self.multi )
   
   # launch all samples
   def run (self):

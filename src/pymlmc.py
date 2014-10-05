@@ -64,6 +64,9 @@ class MLMC (object):
     # determine levels
     self.levels = range ( len ( config.discretizations ) )
     
+    # determine finest level
+    self.L = self.levels - 1
+    
     # setup required pairs of levels and types
     self.levels_types  = [ [level, self.FINE]   for level in self.levels      ]
     self.levels_types += [ [level, self.COARSE] for level in self.levels [1:] ]
@@ -75,11 +78,14 @@ class MLMC (object):
     # TODO: take into account _differences_ on all levels except the coarsest
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
     
+    # core ratios
+    self.ratios = [ config.solver.ratio (config.discretizations [self.L], discretization) for discretization in config.discretizations ]
+    
     # setup samples
     self.config.samples.setup ( self.levels, self.works )
     
     # setup balancer
-    self.config.balancer.setup (self.levels, self.levels_types, self.works )
+    self.config.balancer.setup (self.levels, self.levels_types, self.works, self.ratios )
     
     # MLMC results
     self.stats = {}

@@ -12,20 +12,27 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-import os, subprocess
+import os, subprocess, shutil
 import local
 
-class Example_Solver (Solver):
+class CubismMPCF (Solver):
   
-  def __init__ (self, options, cluster=0, bs=32):
+  def __init__ (self, options, path=None, bs=32):
     
     self.options = options
-    self.cluster = cluster
     self.bs = bs
     
-    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d %(options)s'
-    self.cmd_node    = 'mpcf-node ' + args
-    self.cmd_cluster = 'mpcf-cluster ' + args + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
+    if local.cluster:
+      self.executable = 'mpcf-cluster'
+    else:
+      self.executable = 'mpcf-node'
+    
+    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d'
+    
+    if local.cluster:
+      self.cmd = './' + self.executable + ' ' + args + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
+    else:
+      self.cmd = self.executable + ' ' + args
     
     self.filename = 'output_%(name)s'
     self.indicator = lambda x : x
@@ -35,14 +42,24 @@ class Example_Solver (Solver):
     
     return d ['NX'] * d ['NY'] * d ['NZ'] * d['NS']
   
-  def validate (self, discretization, options, multi):
+  # return the approproate ratio of the number of cores between two discretizations
+  def ratio (self, d1, d2):
     
-    if discretization ['NX'] < self.bs:
-      print ' :: ERROR: mesh resolution NX is smaller than block size: %d < %d.' % ( discretization ['NX'], self.bs )
-      print ' :: ERROR: mesh resolution NY is smaller than block size: %d < %d.' % ( discretization ['NY'], self.bs )
-      print ' :: ERROR: mesh resolution NZ is smaller than block size: %d < %d.' % ( discretization ['NZ'], self.bs )
+    return d1 ['NX'] / d2 ['NX'] * d1 ['NY'] / d2 ['NY'] * d1 ['NZ'] / d2 ['NZ']
   
-  def run (self, level, type, sample, id, discretization, options, multi):
+  def validate (self, discretization, parallelization):
+    
+    # check if number of cells in not smaller than block size
+    ranks = parallelization / local.threads
+    multi = ranks ** 1/3
+    if discretization ['NX'] < self.bs * multi:
+      print ' :: ERROR: mesh resolution NX / multi is smaller than block size: %d < %d.' % ( discretization ['NX'] / multi, self.bs )
+    if discretization ['NY'] < self.bs * multi:
+      print ' :: ERROR: mesh resolution NY / multi is smaller than block size: %d < %d.' % ( discretization ['NY'] / multi, self.bs )
+    if discretization ['NZ'] < self.bs * multi:
+      print ' :: ERROR: mesh resolution NZ / multi is smaller than block size: %d < %d.' % ( discretization ['NZ'] / multi, self.bs )
+  
+  def run (self, level, type, sample, id, discretization, options, parallelization):
     
     args = {}
     args ['name'] = self.name (level, type, sample, id)
@@ -53,25 +70,45 @@ class Example_Solver (Solver):
     
     args ['options'] = self.options
     
-    if self.cluster:
-      xpesize = multi ** 1/3
-      ypesize = multi ** 1/3
-      zpesize = multi ** 1/3
-      args ['bpdx'] /= xpesize
-      args ['bpdy'] /= ypesize
-      args ['bpdz'] /= zpesize
-      args ['xpesize'] = xpesize
-      args ['ypesize'] = ypesize
-      args ['zpesize'] = zpesize
+    args ['threads'] = local.threads
+    
+    # cluster run
+    if local.cluster:
+      
+      # compute number of ranks
+      ranks = parallelization / local.threads
+      
+      # compute *pesizes
+      args ['xpesize'] = ranks ** 1/3
+      args ['ypesize'] = ranks ** 1/3
+      args ['zpesize'] = ranks ** 1/3
+      
+      # adjust bpd*
+      args ['bpdx'] /= args ['xpesize']
+      args ['bpdy'] /= args ['ypesize']
+      args ['bpdz'] /= args ['zpesize']
+      
+      # assemble arguments for job submission
+      submit_args ['job']               = local.run % { 'cmd' : self.cmd % args }
+      submit_args ['ranks']             = ranks
+      submit_args ['threads']           = local.threads
+      submit_args ['cores']             = self.multi
+      submit_args ['walltime-hours']    = self.walltime_hours
+      submit_args ['walltime-minutes']  = seld.walltime_minutes
+      submit_args ['memory']            = self.memory
+      cmd = local.submit % submit_args
+      
+      # copy executable to present working directory
+      if self.path:
+        shutil.copy (self.path + self.executable, '.')
+    
+    # node run
+    else:
+      
+      cmd = local.run % { 'cmd' : self.cmd % args }
     
     outputf = open (self.filename % args, 'w')
-    
-    if self.cluster:
-      subprocess.check_call ( self.cmd_cluster % args, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
-    else:
-      subprocess.check_call ( self.cmd_node    % args, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
-    
-    #subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT )
+    subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
   
   def finished (self, level, type, sample, id):
     
