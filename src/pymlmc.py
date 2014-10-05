@@ -100,6 +100,9 @@ class MLMC (object):
     self.config.samples.init     ()
     self.config.samples.validate ()
     
+    # distribute initial samples
+    self.config.balancer.distribute ()
+    
     # compute initial samples
     self.run ()
     
@@ -144,9 +147,16 @@ class MLMC (object):
       # for interactive sessions, query user for additional input
       if self.params.query:
         while self.query():
+          # check if the simulation is already finished 
+          if self.config.samples.finished ():
+            break
+          # otherwise update the number of samples
           self.config.samples.update   ()
           self.config.samples.report   ()
           self.config.samples.validate ()
+      
+      # distribute additional samples
+      self.config.balancer.distribute ()
       
       # compute additional samples
       self.run ()

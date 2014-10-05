@@ -141,6 +141,7 @@ class Estimated (Samples):
     tol = float ( raw_input ( ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol ) or str(self.tol) )
     modified = tol != self.tol
     self.tol = tol
+    # TODO: self.tol needs to be saved to status.py and then loaded afterwards
     return modified
   
   # computes the optimal number of samples if some samples are already computed

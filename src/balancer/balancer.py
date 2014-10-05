@@ -9,10 +9,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 class Balancer (object):
-
+  
   def setup (self, levels, works):
     
     self.levels = levels
+    self.L      = len(levels) - 1
     self.works  = works
     
     self.print()
