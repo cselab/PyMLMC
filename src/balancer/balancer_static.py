@@ -21,4 +21,5 @@ class Static (Balancer):
     print ' :: BALANCER: static'
     
     for level, type in self.levels_types:
-      self.multi [level] [type] = max (1, self.cores / 2 ** (self.L - ( level - type ) ) )
+      factor = work [ self.L ] / work [ level - type ]
+      self.multi [level] [type] = max ( 1, round ( self.cores / factor ) )
