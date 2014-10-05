@@ -121,14 +121,14 @@ class Estimated (Samples):
     print
     
     fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-
-    print '       Updated number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
+    '''
+    print '       Updated number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
     print '      ',
     for level in self.levels:
       print '%d' % ( self.counts.computed [level] + self.counts.additional [level] ),
     print
-    
-    print '       Additional number of samples for each level (%d%% of additional, at least %d%% of all)' % fractions
+    '''
+    print '       Additional number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
     print '      ',
     for level in self.levels:
       print '%d' % self.counts.additional [level],

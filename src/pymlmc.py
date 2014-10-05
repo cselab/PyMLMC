@@ -138,7 +138,10 @@ class MLMC (object):
       
       # check if the simulation is already finished 
       if self.config.samples.finished ():
-        break
+        print
+        print ' :: TOLERANCE reached.'
+        self.status_save ()
+        return
       
       # update, validate and report the required number of samples
       self.config.samples.update   ()
@@ -150,7 +153,10 @@ class MLMC (object):
         while self.query():
           # check if the simulation is already finished 
           if self.config.samples.finished ():
-            break
+            print
+            print ' :: TOLERANCE reached.'
+            self.status_save ()
+            return
           # otherwise update the number of samples
           self.config.samples.update   ()
           self.config.samples.report   ()
