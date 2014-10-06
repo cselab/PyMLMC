@@ -20,6 +20,7 @@ class CubismMPCF (Solver):
   def __init__ (self, options, path=None, bs=32):
     
     self.options = options
+    self.path = path
     self.bs = bs
     
     if local.cluster:

@@ -15,9 +15,9 @@ name = 'Brutus + GCC'
 cluster = 1
 
 # default configuration
-cores     = 1
+cores     = 12
 threads   = 12
-walltime  = 1
+walltime  = 0.3
 memory    = 1024
 
 # simple run command
