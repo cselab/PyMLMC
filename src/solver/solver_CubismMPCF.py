@@ -135,8 +135,8 @@ class CubismMPCF (Solver):
       cmd = local.job % args
     
     print cmd
-    devnull = open ( os.devnull, 'w' )
-    subprocess.check_call ( cmd, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+    #with open ( os.devnull, 'w' ) as devnull:
+    #  subprocess.check_call ( cmd, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   def finished (self, level, type, sample, id):
     
