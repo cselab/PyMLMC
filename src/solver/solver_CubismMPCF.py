@@ -12,7 +12,7 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-import os, subprocess, shutil
+import os, sys, subprocess, shutil
 import local
 
 class CubismMPCF (Solver):
