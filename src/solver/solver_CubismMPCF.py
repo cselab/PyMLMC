@@ -88,14 +88,19 @@ class CubismMPCF (Solver):
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
       
+      # assemble excutable command
+      args ['cmd'] = self.cmd % args
+      
       # assemble arguments for job submission
-      submit_args ['job']               = local.run % { 'cmd' : self.cmd % args }
+      submit_args ['job']               = local.mpi_run % args
       submit_args ['ranks']             = ranks
       submit_args ['threads']           = local.threads
       submit_args ['cores']             = self.multi
       submit_args ['walltime-hours']    = self.walltime_hours
       submit_args ['walltime-minutes']  = seld.walltime_minutes
       submit_args ['memory']            = self.memory
+      
+      # assemble submission command
       cmd = local.submit % submit_args
       
       # copy executable to present working directory
@@ -104,8 +109,12 @@ class CubismMPCF (Solver):
     
     # node run
     else:
+
+      # assemble executable command
+      args ['cmd'] = self.cmd % args
       
-      cmd = local.run % args.update ( { 'cmd' : self.cmd % args } )
+      # assemble excutable command
+      cmd = local.run % args
     
     outputf = open (self.filename % args, 'w')
     subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
