@@ -52,7 +52,7 @@ class CubismMPCF (Solver):
     
     # check if number of cells in not smaller than block size
     ranks = parallelization.cores / local.threads
-    multi = ranks ** (1.0/3)
+    multi = int ( ranks ** (1.0/3) )
     if discretization ['NX'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NX / multi is smaller than block size: %d < %d.' % ( discretization ['NX'] / multi, self.bs )
     if discretization ['NY'] < self.bs * multi:
@@ -88,12 +88,11 @@ class CubismMPCF (Solver):
       # compute *pesizes
       #TODO: increment *pesizes iteratively to allow powers of 2 instead of powers of 8 only ???
       # this, of course, would change the behaviour of the self.ratio()
-      args ['xpesize'] = (ranks ** 1.0/3)
-      args ['ypesize'] = (ranks ** 1.0/3)
-      args ['zpesize'] = (ranks ** 1.0/3)
+      args ['xpesize'] = int ( ranks ** (1.0/3) )
+      args ['ypesize'] = int ( ranks ** (1.0/3) )
+      args ['zpesize'] = int ( ranks ** (1.0/3) )
       
       # adjust bpd*
-      print args ['bpdx'], args ['xpesize']
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
