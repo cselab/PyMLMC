@@ -37,7 +37,7 @@ class MC (object):
   # validate all samples
   def validate (self): 
     with self.config as config:
-      config.solver.validate ( config.discretization, self.multi )
+      config.solver.validate ( config.discretization, self.parallelization )
   
   # launch all samples
   def run (self):
