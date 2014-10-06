@@ -82,14 +82,10 @@ class CubismMPCF (Solver):
       # compute number of ranks
       ranks = parallelization.cores / local.threads
       
-      print parallelization.cores, ranks, local.threads
-      print 1/3
-      print ranks ** 1/3
-
       # compute *pesizes
-      args ['xpesize'] = ranks ** 1/3
-      args ['ypesize'] = ranks ** 1/3
-      args ['zpesize'] = ranks ** 1/3
+      args ['xpesize'] = (ranks ** 1.0/3)
+      args ['ypesize'] = (ranks ** 1.0/3)
+      args ['zpesize'] = (ranks ** 1.0/3)
       
       # adjust bpd*
       args ['bpdx'] /= args ['xpesize']
