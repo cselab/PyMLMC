@@ -27,4 +27,4 @@ job = '%(cmd)s %(options)s'
 mpi_job = 'mpirun -np %(ranks)d -pernode %(cmd)s %(options)s'
 
 # submit command
-submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(shortname)s %(job)s'
+submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s %(job)s'
