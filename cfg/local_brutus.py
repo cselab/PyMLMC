@@ -17,7 +17,7 @@ cluster = 1
 # default configuration
 cores     = 12
 threads   = 12
-walltime  = 0.3
+walltime  = 1
 memory    = 1024
 
 # simple run command
