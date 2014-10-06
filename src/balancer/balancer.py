@@ -13,7 +13,7 @@ from math import modf, floor
 
 class Parallelization (object):
   
-  def __init__ (selfi, cores, walltime):
+  def __init__ (self, cores, walltime):
     vars (self) .update ( locals() )
 
 class Balancer (object):
