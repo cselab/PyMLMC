@@ -114,7 +114,7 @@ class CubismMPCF (Solver):
       submit_args ['cores']   = parallelization.cores
       submit_args ['hours']   = parallelization.hours
       submit_args ['minutes'] = parallelization.minutes
-      submit_args ['memory']  = self.memory
+      submit_args ['memory']  = local.memory
       
       # assemble submission command
       cmd = local.submit % submit_args
