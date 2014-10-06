@@ -67,8 +67,7 @@ class CubismMPCF (Solver):
     args = {}
     
     args ['name']  = self.name  ( level, type, sample, id )
-    args ['label'] = self.label ( self.prefix, level, type, sample ) 
-    
+        
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
@@ -120,6 +119,7 @@ class CubismMPCF (Solver):
       submit_args ['hours']   = parallelization.hours
       submit_args ['minutes'] = parallelization.minutes
       submit_args ['memory']  = local.memory
+      submit_args ['label']   = self.label ( self.prefix, level, type, sample ) 
       
       # assemble submission command
       cmd = local.submit % submit_args
