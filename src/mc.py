@@ -26,7 +26,7 @@ class MC_Config (object):
   def __init__ (self, mlmc_config, level, type, samples):
     vars (self) .update ( locals() )
     self.solver         = mlmc_config.solver
-    self.discretization = mlmc_config.discretizations [level]
+    self.discretization = mlmc_config.discretizations [level - type]
     self.id             = mlmc_config.id
 
 class MC (object):
