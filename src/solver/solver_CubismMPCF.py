@@ -100,6 +100,7 @@ class CubismMPCF (Solver):
       args ['cmd'] = self.cmd % args
       
       # assemble job
+      submit_args = {}
       if ranks > 1:
         submit_args ['job']               = local.mpi_job % args
       else:
