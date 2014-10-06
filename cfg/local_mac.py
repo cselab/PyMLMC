@@ -19,4 +19,4 @@ cores   = 2
 threads = 2
 
 # run command
-run = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
+job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'

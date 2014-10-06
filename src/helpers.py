@@ -66,3 +66,7 @@ def intf (number):
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
   return '%3d%s' % ( number, [' ', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+
+# pair two seeds into one
+def pair (self, a, b):
+  return a ** 2 + a + b if a >= b else a + b ** 2

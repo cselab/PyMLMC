@@ -34,12 +34,12 @@ class Example_Solver (Solver):
     
     return 1
   
-  def run (self, level, type, sample, id, discretization, options, paralellization):
+  def run (self, level, type, sample, id, seed, discretization, params, paralellization):
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')
-    subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
-    #subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT )
+    subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True, env=os.inviron.copy() )
+    #subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT, env=os.inviron.copy() )
   
   def finished (self, level, type, sample, id):
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
@@ -51,6 +51,6 @@ class Example_Solver (Solver):
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
     from numpy.random import seed, randn
-    seed ( self.pair ( self.pair (level, type), self.pair (sample, id) ) )
+    seed ( self.seed (level, sample, id) )
     f.close()
     return randn() / ( 2 ** level )

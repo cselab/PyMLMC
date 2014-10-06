@@ -59,7 +59,7 @@ class CubismMPCF (Solver):
     if discretization ['NZ'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NZ / multi is smaller than block size: %d < %d.' % ( discretization ['NZ'] / multi, self.bs )
   
-  def run (self, level, type, sample, id, discretization, params, parallelization):
+  def run (self, level, type, sample, id, seed, discretization, params, parallelization):
     
     args = {}
     args ['name'] = self.name (level, type, sample, id)
@@ -70,13 +70,15 @@ class CubismMPCF (Solver):
     
     args ['options'] = self.options
     
+    if parallelization.cores < local.threads:
+      local.threads = parallelization.cores
     args ['threads'] = local.threads
     
     # cluster run
     if local.cluster:
       
       # compute number of ranks
-      ranks = parallelization / local.threads
+      ranks = parallelization.cores / local.threads
       
       # compute *pesizes
       args ['xpesize'] = ranks ** 1/3
@@ -91,11 +93,16 @@ class CubismMPCF (Solver):
       # assemble excutable command
       args ['cmd'] = self.cmd % args
       
+      # assemble job
+      if ranks > 1:
+        submit_args ['job']               = local.mpi_job % args
+      else:
+        submit_args ['job']               = local.job % args
+      
       # assemble arguments for job submission
-      submit_args ['job']               = local.mpi_run % args
       submit_args ['ranks']             = ranks
       submit_args ['threads']           = local.threads
-      submit_args ['cores']             = self.multi
+      submit_args ['cores']             = self.parallelization.cores
       submit_args ['walltime-hours']    = self.walltime_hours
       submit_args ['walltime-minutes']  = seld.walltime_minutes
       submit_args ['memory']            = self.memory
@@ -109,12 +116,12 @@ class CubismMPCF (Solver):
     
     # node run
     else:
-
+      
       # assemble executable command
       args ['cmd'] = self.cmd % args
       
-      # assemble excutable command
-      cmd = local.run % args
+      # assemble job
+      cmd = local.job % args
     
     outputf = open (self.filename % args, 'w')
     subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )

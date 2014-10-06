@@ -16,7 +16,7 @@ import sys
 
 # === local imports
 
-from helpers import intf
+from helpers import intf, pair
 
 # === classes
 
@@ -38,13 +38,17 @@ class MC (object):
   def validate (self): 
     self.config.solver.validate ( self.config.discretization, self.parallelization )
   
+  # return the seed for the specified sample
+  def seed (self, sample):
+    return helpers.pair ( helpers.pair (self.config.level, sample), self.config.id )
+  
   # launch all samples
   def run (self):
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
     print ' :: MC run:  |  level %2d  |  type %d  |  with %s sample(s)  |  on %s cores' % args
     config = self.config
     for sample in config.samples:
-      config.solver.run ( config.level, config.type, sample, config.id, config.discretization, self.params, self.parallelization )
+      config.solver.run ( config.level, config.type, sample, config.id, self.seed (sample), config.discretization, self.params, self.parallelization )
   
   def finished (self):
     config = self.config
