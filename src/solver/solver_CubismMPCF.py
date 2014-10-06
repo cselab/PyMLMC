@@ -35,6 +35,8 @@ class CubismMPCF (Solver):
     else:
       self.cmd = self.executable + ' ' + args
     
+    self.label = 'mpcf'
+    
     self.filename = 'output_%(name)s'
     self.indicator = lambda x : x
   
@@ -64,7 +66,8 @@ class CubismMPCF (Solver):
     
     args = {}
     
-    args ['name'] = self.name (level, type, sample, id)
+    args ['name']  = self.name  ( level, type, sample, id )
+    args ['label'] = self.label ( self.label, level, type, sample ) 
     
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
