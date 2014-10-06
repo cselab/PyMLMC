@@ -27,7 +27,7 @@ class CubismMPCF (Solver):
     else:
       self.executable = 'mpcf-node'
     
-    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d'
+    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
     
     if local.cluster:
       self.cmd = './' + self.executable + ' ' + args + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
@@ -68,6 +68,8 @@ class CubismMPCF (Solver):
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
+    args ['steps'] = discretization ['NS']
+
     args ['options'] = self.options
     
     if parallelization.cores < local.threads:
