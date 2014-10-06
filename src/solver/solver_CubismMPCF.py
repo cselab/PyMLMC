@@ -70,6 +70,8 @@ class CubismMPCF (Solver):
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
+    print discretization ['NX'], self.bs, args ['bpdx']
+    
     args ['steps'] = discretization ['NS']
 
     args ['options'] = self.options
