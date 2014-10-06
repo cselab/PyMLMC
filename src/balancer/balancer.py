@@ -11,13 +11,19 @@
 import helpers
 from math import modf, floor
 
+class Parallelization (object):
+  
+  def __init__ (selfi, cores, walltime):
+    vars (self) .update ( locals() )
+
 class Balancer (object):
   
-  def setup (self, levels, levels_types, works, self.ratios):
+  def setup (self, levels, levels_types, works, ratios):
     
     vars (self) .update ( locals() )
+    
     self.L = len(levels) - 1
-    self.parallelization = helpers.level_type_list (levels)
+    self.parallelizations = helpers.level_type_list (levels)
   
   def parse_walltime (self):
     

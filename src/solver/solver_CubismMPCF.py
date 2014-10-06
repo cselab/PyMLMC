@@ -59,7 +59,7 @@ class CubismMPCF (Solver):
     if discretization ['NZ'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NZ / multi is smaller than block size: %d < %d.' % ( discretization ['NZ'] / multi, self.bs )
   
-  def run (self, level, type, sample, id, discretization, options, parallelization):
+  def run (self, level, type, sample, id, discretization, params, parallelization):
     
     args = {}
     args ['name'] = self.name (level, type, sample, id)

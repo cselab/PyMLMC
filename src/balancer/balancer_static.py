@@ -8,7 +8,7 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from balancer import Balancer
+from balancer import *
 import local
 
 class Static (Balancer):
@@ -30,4 +30,6 @@ class Static (Balancer):
     print ' :: BALANCER: static'
     
     for level, type in self.levels_types:
-      self.parallelization [level] [type] = max ( local.threads, int ( round ( self.cores / self.ratios [level - type] ) ) )
+      cores = max ( local.threads, int ( round ( self.cores / self.ratios [level - type] ) ) )
+      walltime = 1
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime )

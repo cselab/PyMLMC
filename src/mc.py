@@ -23,7 +23,7 @@ from helpers import intf
 class MC (object):
   
   # initialize MC
-  def __init__ (self, config, params, multi=None):
+  def __init__ (self, config, params, parallelization):
     
     # store configuration
     vars (self) .update ( locals() )
@@ -41,15 +41,16 @@ class MC (object):
   
   # launch all samples
   def run (self):
-    print ' :: MC run:  |  level %2d  |  type %d  |  with %s sample(s)  |  on %s cores' % ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.multi) )
+    args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
+    print ' :: MC run:  |  level %2d  |  type %d  |  with %s sample(s)  |  on %s cores' % args
     with self.config as config:
       for sample in config.samples:
-        config.solver.run (config.level, config.type, sample, config.id, config.discretization, self.params, self.multi)
+        config.solver.run ( config.level, config.type, sample, config.id, config.discretization, self.params, self.parallelization )
   
   def finished (self):
     with self.config as config:
       for sample in config.samples:
-        if not config.solver.finished (config.level, config.type, sample, config.id):
+        if not config.solver.finished ( config.level, config.type, sample, config.id ):
           return 0
     return 1
   
@@ -57,7 +58,7 @@ class MC (object):
   def load (self):
     with self.config as config:
       for i, sample in enumerate (config.samples):
-        self.results [i] = config.solver.load (config.level, config.type, sample, config.id)
+        self.results [i] = config.solver.load ( config.level, config.type, sample, config.id )
   
   # assmble MC estimates
   def assemble (self, stats):

@@ -65,7 +65,7 @@ class MLMC (object):
     self.levels = range ( len ( config.discretizations ) )
     
     # determine finest level
-    self.L = self.levels - 1
+    self.L = len(self.levels) - 1
     
     # setup required pairs of levels and types
     self.levels_types  = [ [level, self.FINE]   for level in self.levels      ]
@@ -184,7 +184,7 @@ class MLMC (object):
   def create_MCs (self, indices):
     self.mcs = []
     for i, (level, type) in enumerate(self.levels_types):
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params.options, self.config.balancer.multi [level] [type] ) )
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.balancer.parallelizations [level] [type] ) )
   
   # run MC estimates
   def run (self):
