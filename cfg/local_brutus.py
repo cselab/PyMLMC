@@ -24,7 +24,7 @@ memory    = 1024
 job = '%(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'mpirun -np %(ranks) -pernode %(cmd)s %(options)'
+mpi_job = 'mpirun -np %(ranks)d -pernode %(cmd)s %(options)'
 
 # submit command
 submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(walltime-hours)d:%(walltime-minutes)d -R "rusage[mem=%(memory)d]" %(job)s'
