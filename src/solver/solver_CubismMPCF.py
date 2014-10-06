@@ -117,7 +117,7 @@ class CubismMPCF (Solver):
       cmd = local.run % args
     
     outputf = open (self.filename % args, 'w')
-    subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
+    subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   def finished (self, level, type, sample, id):
     
