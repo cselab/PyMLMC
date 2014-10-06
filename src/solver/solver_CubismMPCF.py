@@ -27,7 +27,7 @@ class CubismMPCF (Solver):
     else:
       self.executable = 'mpcf-node'
     
-    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d'
+    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d'
     
     if local.cluster:
       self.cmd = './' + self.executable + ' ' + args + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
@@ -89,6 +89,9 @@ class CubismMPCF (Solver):
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
+      
+      # set seed
+      args ['seed'] = seed
       
       # assemble excutable command
       args ['cmd'] = self.cmd % args
