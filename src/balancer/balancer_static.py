@@ -31,5 +31,5 @@ class Static (Balancer):
     
     for level, type in self.levels_types:
       cores = max ( local.threads, int ( round ( self.cores / self.ratios [level - type] ) ) )
-      walltime = 1
+      walltime = self.walltime
       self.parallelizations [level] [type] = Parallelization ( cores, walltime )

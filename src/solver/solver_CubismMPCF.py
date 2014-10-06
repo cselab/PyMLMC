@@ -109,9 +109,9 @@ class CubismMPCF (Solver):
       # assemble arguments for job submission
       submit_args ['ranks']             = ranks
       submit_args ['threads']           = local.threads
-      submit_args ['cores']             = self.parallelization.cores
+      submit_args ['cores']             = parallelization.cores
       submit_args ['walltime-hours']    = self.walltime_hours
-      submit_args ['walltime-minutes']  = seld.walltime_minutes
+      submit_args ['walltime-minutes']  = self.walltime_minutes
       submit_args ['memory']            = self.memory
       
       # assemble submission command
