@@ -105,7 +105,7 @@ class CubismMPCF (Solver):
     # node run
     else:
       
-      cmd = local.run % { 'cmd' : self.cmd % args }
+      cmd = local.run % args.update ( { 'cmd' : self.cmd % args } )
     
     outputf = open (self.filename % args, 'w')
     subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True )
