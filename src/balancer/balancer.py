@@ -14,7 +14,14 @@ from math import modf, floor
 class Parallelization (object):
   
   def __init__ (self, cores, walltime):
+    
+    # save configuration
     vars (self) .update ( locals() )
+    
+    # convert walltime to hours and minutes
+    frac, whole = modf ( self.walltime )
+    self.hours  = int ( whole )
+    self.minutes = int ( floor ( 100 * frac ) )
 
 class Balancer (object):
   
@@ -24,9 +31,3 @@ class Balancer (object):
     
     self.L = len(levels) - 1
     self.parallelizations = helpers.level_type_list (levels)
-  
-  def parse_walltime (self):
-    
-    frac, whole = modf (self.walltime )
-    self.walltime_hours  = int ( whole )
-    self.walltime_minutes = int ( floor ( 60 * frac ) )

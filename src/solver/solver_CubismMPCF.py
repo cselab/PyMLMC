@@ -84,6 +84,8 @@ class CubismMPCF (Solver):
       args ['ranks'] = ranks
       
       # compute *pesizes
+      #TODO: increment *pesizes iteratively to allow powers of 2 instead of powers of 8 only ???
+      # this, of course, would change the behaviour of the self.ratio()
       args ['xpesize'] = (ranks ** 1.0/3)
       args ['ypesize'] = (ranks ** 1.0/3)
       args ['zpesize'] = (ranks ** 1.0/3)
@@ -107,12 +109,12 @@ class CubismMPCF (Solver):
         submit_args ['job']               = local.job % args
       
       # assemble arguments for job submission
-      submit_args ['ranks']             = ranks
-      submit_args ['threads']           = local.threads
-      submit_args ['cores']             = parallelization.cores
-      submit_args ['walltime-hours']    = self.walltime_hours
-      submit_args ['walltime-minutes']  = self.walltime_minutes
-      submit_args ['memory']            = self.memory
+      submit_args ['ranks']   = ranks
+      submit_args ['threads'] = local.threads
+      submit_args ['cores']   = parallelization.cores
+      submit_args ['hours']   = parallelization.hours
+      submit_args ['minutes'] = parallelization.minutes
+      submit_args ['memory']  = self.memory
       
       # assemble submission command
       cmd = local.submit % submit_args
