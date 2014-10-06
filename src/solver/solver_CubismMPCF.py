@@ -50,7 +50,7 @@ class CubismMPCF (Solver):
   def validate (self, discretization, parallelization):
     
     # check if number of cells in not smaller than block size
-    ranks = parallelization / local.threads
+    ranks = parallelization.cores / local.threads
     multi = ranks ** 1/3
     if discretization ['NX'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NX / multi is smaller than block size: %d < %d.' % ( discretization ['NX'] / multi, self.bs )
