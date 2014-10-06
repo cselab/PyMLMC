@@ -20,6 +20,15 @@ from helpers import intf, pair
 
 # === classes
 
+# configuration class for MC simulations
+class MC_Config (object):
+  
+  def __init__ (self, mlmc_config, level, type, samples):
+    vars (self) .update ( locals() )
+    self.solver         = mlmc_config.solver
+    self.discretization = mlmc_config.discretizations [level]
+    self.id             = mlmc_config.id
+
 class MC (object):
   
   # initialize MC

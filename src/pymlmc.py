@@ -32,21 +32,12 @@ sys.path.append ( os.path.dirname(__file__) + "/stats" )
 # configuration class for MLMC simulations
 class MLMC_Config (object):
   
-  #def __init__ (self, solver, discretizations, samples, balancer, id=1):
   def __init__ (self, id=1):
     vars (self) .update ( locals() )
   
+  # used to set solver, discretizations, samples and balancer
   def set (self, name, value):
     vars (self) .update ( { name : value } )
-
-# configuration class for MC simulations
-class MC_Config (object):
-  
-  def __init__ (self, mlmc_config, level, type, samples):
-    vars (self) .update ( locals() )
-    self.solver         = mlmc_config.solver
-    self.discretization = mlmc_config.discretizations [level]
-    self.id             = mlmc_config.id
 
 # MLMC class
 class MLMC (object):
