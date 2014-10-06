@@ -1,6 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for Mac
+# Local configuration for Brutus cluster
+# More information: http://www.clusterwiki.ethz.ch/brutus/Brutus_wiki
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
