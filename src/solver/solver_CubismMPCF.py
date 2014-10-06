@@ -70,8 +70,6 @@ class CubismMPCF (Solver):
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
-    print discretization ['NX'], self.bs, args ['bpdx']
-    
     args ['steps'] = discretization ['NS']
 
     args ['options'] = self.options
@@ -95,6 +93,7 @@ class CubismMPCF (Solver):
       args ['zpesize'] = (ranks ** 1.0/3)
       
       # adjust bpd*
+      print args ['bpdx'], args ['xpesize']
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
