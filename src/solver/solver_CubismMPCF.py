@@ -12,7 +12,7 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-import os, sys, subprocess, shutil
+import os, subprocess, shutil
 import local
 
 class CubismMPCF (Solver):
@@ -139,7 +139,7 @@ class CubismMPCF (Solver):
     
     with open ( os.devnull, 'w' ) as devnull:
       directory = os.getcwd () + '/' + args ['name']
-      sys.mkdir ( directory )
+      os.mkdir ( directory )
       subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   def finished (self, level, type, sample, id):
