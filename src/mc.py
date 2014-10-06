@@ -40,7 +40,7 @@ class MC (object):
   
   # return the seed for the specified sample
   def seed (self, sample):
-    return helpers.pair ( helpers.pair (self.config.level, sample), self.config.id )
+    return pair ( pair (self.config.level, sample), self.config.id )
   
   # launch all samples
   def run (self):

@@ -17,12 +17,14 @@ import os, subprocess
 class Example_Solver (Solver):
   
   def __init__ (self):
+    
     self.cmd  = 'echo $RANDOM'
     self.filename = 'output_%(name)s'
     self.indicator = lambda x : x
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
+    
     return d ['NX'] * d ['NY'] * d ['NZ']
   
   # return the approproate ratio of the number of cores between two discretizations
@@ -35,6 +37,7 @@ class Example_Solver (Solver):
     return 1
   
   def run (self, level, type, sample, id, seed, discretization, params, paralellization):
+    
     args = {}
     args ['name'] = self.name (level, type, sample, id)
     outputf = open (self.filename % args, 'w')
@@ -42,15 +45,17 @@ class Example_Solver (Solver):
     #subprocess.check_call ( self.cmd, stdout=outputf, stderr=subprocess.STDOUT, env=os.inviron.copy() )
   
   def finished (self, level, type, sample, id):
+    
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     return os.path.exists ( filename )
   
   def load (self, level, type, sample, id):
-    if not self.finished (level, type, sample, id):
-      Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (id is %d) !' % (level, type, sample, id) )
+    
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
-    from numpy.random import seed, randn
-    seed ( self.seed (level, sample, id) )
     f.close()
+    
+    from numpy.random import seed, randn
+    from helpers import pair
+    seed ( pair ( pair (level, sample), id ) )
     return randn() / ( 2 ** level )
