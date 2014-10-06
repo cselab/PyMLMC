@@ -31,7 +31,7 @@ class CubismMPCF (Solver):
     args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
     
     if local.cluster:
-      self.cmd = './' + self.executable + ' ' + args + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
+      self.cmd = './' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
     else:
       self.cmd = self.executable + ' ' + args
     
@@ -52,7 +52,7 @@ class CubismMPCF (Solver):
     
     # check if number of cells in not smaller than block size
     ranks = parallelization.cores / local.threads
-    multi = ranks ** 1/3
+    multi = ranks ** (1.0/3)
     if discretization ['NX'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NX / multi is smaller than block size: %d < %d.' % ( discretization ['NX'] / multi, self.bs )
     if discretization ['NY'] < self.bs * multi:
@@ -63,6 +63,7 @@ class CubismMPCF (Solver):
   def run (self, level, type, sample, id, seed, discretization, params, parallelization):
     
     args = {}
+    
     args ['name'] = self.name (level, type, sample, id)
     
     args ['bpdx'] = discretization ['NX'] / self.bs
@@ -133,8 +134,8 @@ class CubismMPCF (Solver):
       # assemble job
       cmd = local.job % args
     
-    outputf = open (self.filename % args, 'w')
-    subprocess.check_call ( cmd, stdout=outputf, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+    print cmd
+    subprocess.check_call ( cmd, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   def finished (self, level, type, sample, id):
     
@@ -143,10 +144,9 @@ class CubismMPCF (Solver):
   
   def load (self, level, type, sample, id):
     
-    if not self.finished (level, type, sample, id):
-      Exception ( ' :: ERROR: sample %d form level %d of type %d could not be loaded (id is %d) !' % (level, type, sample, id) )
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     f = open ( filename, 'r' )
+    
     from numpy.random import seed, randn
     seed ( self.pair ( self.pair (level, type), self.pair (sample, id) ) )
     f.close()
