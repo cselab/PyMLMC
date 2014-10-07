@@ -145,7 +145,7 @@ class CubismMPCF (Solver):
   def finished (self, level, type, sample, id):
     
     # open self.statusfile and check if both numbers are equal to 0
-    statusfile = open ( os.getcwd() + '/' + self.directory (level, type, sample,id) + '/' + self.statusfile, 'r' )
+    statusfile = open ( os.getcwd() + '/' + self.name (level, type, sample,id) + '/' + self.statusfile, 'r' )
     status = statusfile .read () .strip () .split ()
     return ( float ( status[0] ) == 0 and float ( status [1] ) == 0 )
     #return os.path.exists ( self.statusfile )
