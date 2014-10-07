@@ -154,6 +154,7 @@ class CubismMPCF (Solver):
   
   def load (self, level, type, sample, id):
     
+    # open self.outputfile, read and return results
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
