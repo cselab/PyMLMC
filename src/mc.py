@@ -54,7 +54,7 @@ class MC (object):
   # launch all samples
   def run (self):
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores), self.parallelization.hours, self.parallelization.minutes )
-    print ' :: MC run:  |  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm ' % args
+    print '  |  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm ' % args
     config = self.config
     for sample in config.samples:
       config.solver.run ( config.level, config.type, sample, config.id, self.seed (sample), config.discretization, self.params, self.parallelization )
