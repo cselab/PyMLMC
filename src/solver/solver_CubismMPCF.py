@@ -12,34 +12,40 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-import os, subprocess, shutil
+from shutil import copy
 import local
 
 class CubismMPCF (Solver):
   
   def __init__ (self, options, path=None, bs=32):
     
-    self.options = options
-    self.path = path
-    self.bs = bs
+    # save configuration
+    vars (self) .update ( locals() )
     
+    # set executable name
     if local.cluster:
       self.executable = 'mpcf-cluster'
     else:
       self.executable = 'mpcf-node'
     
+    # set executable command template
     args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
-    
     if local.cluster:
       self.cmd = '../' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
     else:
       self.cmd = self.executable + ' ' + args
     
+    # prefix for the labels
     self.prefix = 'mpcf'
     
+    # set files and indicator
     self.statusfile = 'restart.status'
     self.outputfile = 'integrals.dat'
-    self.indicator = lambda x : x
+    self.indicator = lambda x : x [0]
+    
+    # copy executable to present working directory
+    if local.cluster and self.path:
+      copy (self.path + self.executable, '.')
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
@@ -124,10 +130,6 @@ class CubismMPCF (Solver):
       
       # assemble submission command
       cmd = local.submit % submit_args
-      
-      # copy executable to present working directory
-      if self.path:
-        shutil.copy (self.path + self.executable, '.')
     
     # node run
     else:
@@ -138,10 +140,8 @@ class CubismMPCF (Solver):
       # assemble job
       cmd = local.job % args
     
-    with open ( os.devnull, 'w' ) as devnull:
-      directory = self.firectory ( level, type, sample, id )
-      os.mkdir ( directory )
-      subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+    directory = self.directory ( level, type, sample, id )
+    self.execute ( cmd, directory )
   
   def finished (self, level, type, sample, id):
     

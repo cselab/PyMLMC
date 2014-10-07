@@ -8,7 +8,8 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from os impport getcwd
+import os
+import subprocess
 
 class Solver (object):
   
@@ -18,8 +19,15 @@ class Solver (object):
   
   # return the directory for a particular run
   def directory (self, level, type, sample, id):
-    return getcwd () + '/' + self.name ( level, type, sample, id )
+    return os.getcwd () + '/' + self.name ( level, type, sample, id )
   
   # return the label (i.e. short name) of a particular run
   def label (self, prefix, level, type, sample):
     return '%s_%d_%d_%d' % (prefix, level, type, sample)
+  
+  # execute the command
+  def execute (self, cmd, directory):
+    os.mkdir ( directory )
+    with open ( os.devnull, 'w' ) as devnull:
+      subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+
