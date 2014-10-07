@@ -37,7 +37,7 @@ class CubismMPCF (Solver):
     
     self.prefix = 'mpcf'
     
-    self.filename = 'output_%(name)s'
+    self.statusfile = 'restart.status'
     self.indicator = lambda x : x
   
   # return amount of work needed for a given discretization 'd'
@@ -144,9 +144,11 @@ class CubismMPCF (Solver):
   
   def finished (self, level, type, sample, id):
     
-    # open restart.status file and check if both number are equal to 0
-    filename = self.filename % { 'name' : self.name (level, type, sample, id) }
-    return os.path.exists ( filename )
+    # open self.statusfile and check if both numbers are equal to 0
+    statusfile = open ( os.getcwd() + '/' + self.directory (level, type, sample,id) + '/' + self.statusfile, 'r' )
+    status = statusfile .read () .strip () .split ()
+    return ( float ( status[0] ) == 0 and float ( status [1] ) == 0 )
+    #return os.path.exists ( self.statusfile )
   
   def load (self, level, type, sample, id):
     
