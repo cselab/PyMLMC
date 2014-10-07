@@ -154,6 +154,10 @@ class CubismMPCF (Solver):
   
   def load (self, level, type, sample, id):
     
+    # NumPy style
+    #data = numpy.loadtxt ( file, dtype={ 'names' : ('col1', 'col2', 'col3', 'col4'), 'formats' : ('S2', 'f4', 'f4', 'f4') } )
+    #print data['FIP']
+    
     # open self.outputfile, read and return results
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
     lines = outputfile .readlines ()
