@@ -144,6 +144,7 @@ class CubismMPCF (Solver):
   
   def finished (self, level, type, sample, id):
     
+    # open restart.status file and check if both number are equal to 0
     filename = self.filename % { 'name' : self.name (level, type, sample, id) }
     return os.path.exists ( filename )
   
