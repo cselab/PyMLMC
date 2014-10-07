@@ -38,6 +38,7 @@ class CubismMPCF (Solver):
     self.prefix = 'mpcf'
     
     self.statusfile = 'restart.status'
+    self.outputfile = 'integrals.dat'
     self.indicator = lambda x : x
   
   # return amount of work needed for a given discretization 'd'
@@ -138,24 +139,22 @@ class CubismMPCF (Solver):
       cmd = local.job % args
     
     with open ( os.devnull, 'w' ) as devnull:
-      directory = os.getcwd () + '/' + args ['name']
+      directory = self.firectory ( level, type, sample, id )
       os.mkdir ( directory )
       subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   def finished (self, level, type, sample, id):
     
     # open self.statusfile and check if both numbers are equal to 0
-    statusfile = open ( os.getcwd() + '/' + self.name (level, type, sample,id) + '/' + self.statusfile, 'r' )
+    statusfile = open ( self.directory ( level, type, sample, id ) + '/' + self.statusfile, 'r' )
     status = statusfile .read () .strip () .split ()
+    statusfile.close()
     return ( float ( status[0] ) == 0 and float ( status [1] ) == 0 )
     #return os.path.exists ( self.statusfile )
   
   def load (self, level, type, sample, id):
     
-    filename = self.filename % { 'name' : self.name (level, type, sample, id) }
-    f = open ( filename, 'r' )
-    
-    from numpy.random import seed, randn
-    seed ( self.pair ( self.pair (level, type), self.pair (sample, id) ) )
-    f.close()
-    return randn() / ( 2 ** level )
+    outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
+    lines = outputfile .readlines ()
+    outputfile.close()
+    return [ float ( line .strip() ) for line in lines ]
