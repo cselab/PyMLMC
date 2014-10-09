@@ -17,7 +17,7 @@ import local
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, path=None, bs=32, inputfiles=[]):
+  def __init__ (self, options, path=None, inputfiles=[], bs=32):
     
     # save configuration
     vars (self) .update ( locals() )
