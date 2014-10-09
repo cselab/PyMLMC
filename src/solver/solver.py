@@ -10,6 +10,7 @@
 
 import os
 import subprocess
+import shutil
 
 class Solver (object):
   
