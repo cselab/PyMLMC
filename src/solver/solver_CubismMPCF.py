@@ -14,10 +14,11 @@
 from solver import Solver
 import shutil
 import local
+import numpy
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, path=None, inputfiles=[], bs=32):
+  def __init__ (self, options, path=None, inputfiles=[], points=10, bs=32):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -148,6 +149,11 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.execute ( cmd, directory )
   
+  def generate_seed (self):
+    
+    #TODO:
+    print ' Generate_seed() is not implemented'
+  
   def finished (self, level, type, sample, id):
     
     # get directory
@@ -163,10 +169,9 @@ class CubismMPCF (Solver):
   
   def load (self, level, type, sample, id):
     
-    # open self.outputfile, read and return results
-    
+    # open self.outputfile and read results
+
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
-    
     from numpy import loadtxt
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(0.75*vol*h3/M_PI,1/3)', 'wall_p_max' )
@@ -176,15 +181,26 @@ class CubismMPCF (Solver):
     records = { name : table [name] for name in names }
     
     # split metadata from actual data
+    
     meta = ( 'step', 't',  'dt' )
     results = { 'meta' : {}, 'data' : {} }
     for key in meta:
-      results [ 'meta' ] [key] = records [key]
+      results ['meta'] [key] = records [key]
       del records [key]
-    results [ 'data' ] = records
+    results ['data'] = records
     
-    # TODO!
-    #numpy.interp
+    # interpolate time dependent results using linear interpolation
+    # this is needed since number of time steps and time step sizes
+    # are usually different for every deterministic simulation
+    
+    times = numpy.linspace ( results ['meta'] ['t'] [0], results ['meta'] ['t'] [-1], self.points + 1 )
+    for key in results ['data']:
+      results ['data'] [key] = numpy.interp ( times, results ['meta'] ['t'], results ['data'] [key], left=None, right=None )
+    
+    # update times
+    
+    results ['meta'] ['it']  = times
+    results ['meta'] ['idt'] = ( results ['meta'] ['t'] [-1] - results ['meta'] ['t'] [0] ) / ( self.points - 1 )
     
     return results
     
