@@ -25,7 +25,7 @@ class NumPy_Stat (object):
     stats = {}
     
     # copy metadata from the first sample
-    stats ['meta'] = samples [0] ['meta']
+    stats ['meta'] = samples [0] .meta
     
     # copy keys from the first sample
     keys = samples [0] ['data'] .keys()

@@ -11,7 +11,7 @@
 # === Discretization format:
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
-from solver import Solver
+from solver import Solver, Results
 import shutil
 import local
 import numpy
@@ -170,7 +170,7 @@ class CubismMPCF (Solver):
   def load (self, level, type, sample, id):
     
     # open self.outputfile and read results
-
+    
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
     from numpy import loadtxt
     
@@ -183,24 +183,24 @@ class CubismMPCF (Solver):
     # split metadata from actual data
     
     meta = ( 'step', 't',  'dt' )
-    results = { 'meta' : {}, 'data' : {} }
+    results = Results ()
     for key in meta:
-      results ['meta'] [key] = records [key]
+      results.meta [key] = records [key]
       del records [key]
-    results ['data'] = records
+    results.data = records
     
     # interpolate time dependent results using linear interpolation
     # this is needed since number of time steps and time step sizes
     # are usually different for every deterministic simulation
     
-    times = numpy.linspace ( results ['meta'] ['t'] [0], results ['meta'] ['t'] [-1], self.points + 1 )
-    for key in results ['data']:
-      results ['data'] [key] = numpy.interp ( times, results ['meta'] ['t'], results ['data'] [key], left=None, right=None )
+    times = numpy.linspace ( results.meta ['t'] [0], results.meta ['t'] [-1], self.points + 1 )
+    for key in results.data:
+      results.data [key] = numpy.interp ( times, results.meta ['t'], results.meta [key], left=None, right=None )
     
     # update times
     
-    results ['meta'] ['it']  = times
-    results ['meta'] ['idt'] = ( results ['meta'] ['t'] [-1] - results ['meta'] ['t'] [0] ) / ( self.points - 1 )
+    results.meta ['it']  = times
+    results.meta ['idt'] = ( results.meta ['t'] [-1] - results.meta ['t'] [0] ) / ( self.points - 1 )
     
     return results
     

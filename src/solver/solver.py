@@ -12,6 +12,22 @@ import os
 import subprocess
 import shutil
 
+class Data (object):
+  
+  def __init__ (self):
+    self.meta = {}
+    self.data = {}
+  
+  def __iadd__ (self, a):
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] += a.data [key] [step]
+  
+  def __isub__ (self):
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] -= a.data [key] [step]
+
 class Solver (object):
   
   # return the name of a particular run
