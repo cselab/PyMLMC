@@ -12,12 +12,12 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-from shutil import copy
+import shutil
 import local
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, path=None, bs=32):
+  def __init__ (self, options, path=None, bs=32, inputfiles=[]):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -45,7 +45,7 @@ class CubismMPCF (Solver):
     
     # copy executable to present working directory
     if local.cluster and self.path:
-      copy (self.path + self.executable, '.')
+      shutil.copy (self.path + self.executable, '.')
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
@@ -141,6 +141,10 @@ class CubismMPCF (Solver):
     # get directory
     directory = self.directory ( level, type, sample, id )
     
+    # copy needed input files
+    for inputfile in self.inputfiles:
+      shutil.copy ( inputfile, directory + '/' )
+    
     # report full submission command
     if params.verbose >= 1:
       print cmd
@@ -150,8 +154,11 @@ class CubismMPCF (Solver):
   
   def finished (self, level, type, sample, id):
     
+     # get directory
+    directory = self.directory ( level, type, sample, id )
+    
     # open self.statusfile and check if both numbers are equal to 0
-    statusfile = open ( self.directory ( level, type, sample, id ) + '/' + self.statusfile, 'r' )
+    statusfile = open ( directory + '/' + self.statusfile, 'r' )
     status = statusfile .read () .strip () .split ()
     statusfile.close()
     return ( float ( status[0] ) == 0 and float ( status [1] ) == 0 )
