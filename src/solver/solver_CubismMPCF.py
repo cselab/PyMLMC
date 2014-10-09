@@ -138,7 +138,7 @@ class CubismMPCF (Solver):
       # assemble job
       cmd = local.job % args
     
-    if params.verbose:
+    if params.verbose >= 1:
       directory = self.directory ( level, type, sample, id )
     self.execute ( cmd, directory )
   
