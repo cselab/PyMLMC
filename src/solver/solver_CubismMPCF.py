@@ -41,7 +41,7 @@ class CubismMPCF (Solver):
     # set files and indicator
     self.statusfile = 'restart.status'
     self.outputfile = 'integrals.dat'
-    self.indicator = lambda x : x [0]
+    self.indicator = lambda x : x [ 'p_max' ] [ -1 ]
     
     # copy executable to present working directory
     if local.cluster and self.path:
@@ -150,24 +150,47 @@ class CubismMPCF (Solver):
   
   def finished (self, level, type, sample, id):
     
-     # get directory
+    # get directory
     directory = self.directory ( level, type, sample, id )
     
+    # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
     # open self.statusfile and check if both numbers are equal to 0
-    statusfile = open ( directory + '/' + self.statusfile, 'r' )
-    status = statusfile .read () .strip () .split ()
-    statusfile.close()
-    return ( float ( status[0] ) == 0 and float ( status [1] ) == 0 )
+    #statusfile = open ( directory + '/' + self.statusfile, 'r' )
+    #status = statusfile .read () .strip () .split ()
+    #statusfile.close()
+    return 1
     #return os.path.exists ( self.statusfile )
   
   def load (self, level, type, sample, id):
     
-    # NumPy style
-    #data = numpy.loadtxt ( file, dtype={ 'names' : ('col1', 'col2', 'col3', 'col4'), 'formats' : ('S2', 'f4', 'f4', 'f4') } )
-    #print data['FIP']
-    
     # open self.outputfile, read and return results
+    
+    outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
+    
+    from numpy import loadtxt
+    
+    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(0.75*vol*h3/M_PI,1/3)', 'wall_p_max' )
+    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',                         'f'          )
+    
+    table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
+    records = { name : table [name] for name in names }
+    
+    # split metadata from actual data
+    meta = ( 'step', 't',  'dt' )
+    results = { 'meta' : {}, 'data' : {} }
+    for key in meta:
+      results [ 'meta' ] [key] = records [key]
+      del records [key]
+    results [ 'data' ] = records
+    
+    # TODO!
+    #numpy.interp
+    
+    return results
+    
+    '''
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
     return [ float ( line .strip() ) for line in lines ]
+    '''

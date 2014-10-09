@@ -41,7 +41,8 @@ class Indicators (object):
     # compute indicators form MC results
     values = helpers.level_type_list(self.levels)
     for i, (level, type) in enumerate(self.levels_types):
-      values [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [i] .results ] )
+      #TODO: need to this AFTER interpolation of results
+      values [level] [type] = numpy.array ( [ self.indicator ( result [ 'data' ] ) for result in mcs [i] .results ] )
     
     # compute plain error indicators
     for level, type in self.levels_types:
