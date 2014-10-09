@@ -138,8 +138,14 @@ class CubismMPCF (Solver):
       # assemble job
       cmd = local.job % args
     
+    # get directory
+    directory = self.directory ( level, type, sample, id )
+    
+    # report full submission command
     if params.verbose >= 1:
-      directory = self.directory ( level, type, sample, id )
+      print cmd
+    
+    # execute/submit job
     self.execute ( cmd, directory )
   
   def finished (self, level, type, sample, id):
