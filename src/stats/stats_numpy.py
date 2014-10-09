@@ -22,19 +22,18 @@ class NumPy_Stat (object):
   #TODO: parts of this should be moved out to stats.py general object, only the actual statistics for an array should be computed here
   def compute (self, samples):
     
-    stats = {}
+    stats = Results ()
     
     # copy metadata from the first sample
-    stats ['meta'] = samples [0] .meta
+    stats.meta = samples [0] .meta
     
     # copy keys from the first sample
-    keys = samples [0] ['data'] .keys()
+    keys = samples [0] .data.keys()
     
     # compute sample statistics
-    stats ['data'] = {}
     for key in keys:
-      stats ['data'] [key] = []
-      for step in xrange ( len ( samples [0] ['data'] [key] ) ):
-        stats ['data'] [key] .append ( self.stat ( [ sample ['data'] [key] [step] for sample in samples ] ) )
+      stats.data [key] = []
+      for step in xrange ( len ( samples [0] .data [key] ) ):
+        stats.data [key] .append ( self.stat ( [ sample.data [key] [step] for sample in samples ] ) )
     
     return stats
