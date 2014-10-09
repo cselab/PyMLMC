@@ -141,10 +141,6 @@ class CubismMPCF (Solver):
     # get directory
     directory = self.directory ( level, type, sample, id )
     
-    # copy needed input files
-    for inputfile in self.inputfiles:
-      shutil.copy ( inputfile, directory + '/' )
-    
     # report full submission command
     if params.verbose >= 1:
       print cmd

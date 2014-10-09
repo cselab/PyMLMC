@@ -27,7 +27,15 @@ class Solver (object):
   
   # execute the command
   def execute (self, cmd, directory):
+    
+    # create directory
     os.mkdir ( directory )
+    
+    # copy needed input files
+    for inputfile in self.inputfiles:
+      shutil.copy ( inputfile, directory + '/' )
+    
+    # execute command
     with open ( os.devnull, 'w' ) as devnull:
       subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
 
