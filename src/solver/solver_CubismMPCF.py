@@ -143,7 +143,7 @@ class CubismMPCF (Solver):
     
     # copy needed input files
     for inputfile in self.inputfiles:
-      shutil.copyfile ( inputfile, directory + '/' + inputfile )
+      shutil.copy ( inputfile, directory + '/.' )
     
     # report full submission command
     if params.verbose >= 1:
