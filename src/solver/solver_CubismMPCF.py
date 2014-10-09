@@ -29,7 +29,7 @@ class CubismMPCF (Solver):
       self.executable = 'mpcf-node'
     
     # set executable command template
-    args = '-name %(name)s -bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
     if local.cluster:
       self.cmd = '../' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
     else:
@@ -74,17 +74,15 @@ class CubismMPCF (Solver):
     args = {}
     
     args ['name']  = self.name  ( level, type, sample, id )
-        
+    
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
     args ['steps'] = discretization ['NS']
-
+    
     args ['options'] = self.options
     
-    if parallelization.cores < local.threads:
-      local.threads = parallelization.cores
     args ['threads'] = local.threads
     
     # cluster run
@@ -140,7 +138,8 @@ class CubismMPCF (Solver):
       # assemble job
       cmd = local.job % args
     
-    directory = self.directory ( level, type, sample, id )
+    if params.verbose:
+      directory = self.directory ( level, type, sample, id )
     self.execute ( cmd, directory )
   
   def finished (self, level, type, sample, id):
