@@ -19,9 +19,10 @@ class Parallelization (object):
     vars (self) .update ( locals() )
     
     # convert walltime to hours and minutes
-    frac, whole = modf ( self.walltime )
-    self.hours  = int ( whole )
-    self.minutes = int ( floor ( 100 * frac ) )
+    if walltime:
+      frac, whole = modf ( self.walltime )
+      self.hours  = int ( whole )
+      self.minutes = int ( floor ( 100 * frac ) )
 
 class Balancer (object):
   

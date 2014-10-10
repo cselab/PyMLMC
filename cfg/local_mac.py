@@ -15,8 +15,9 @@ name = 'Mac + GCC'
 cluster = 0
 
 # default configuration
-cores   = 2
-threads = 2
+cores    = 2
+threads  = 2
+walltime = None
 
 # run command
 job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'

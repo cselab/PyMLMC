@@ -9,6 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import os
+import sys
 import subprocess
 import shutil
 import pprint
@@ -59,7 +60,8 @@ class Solver (object):
   
   # return the directory for a particular run
   def directory (self, level, type, sample, id):
-    return os.getcwd () + '/' + self.name ( level, type, sample, id )
+    #return os.getcwd () + '/' + self.name ( level, type, sample, id )
+    return self.name ( level, type, sample, id )
   
   # return the label (i.e. short name) of a particular run
   def label (self, prefix, level, type, sample):
@@ -69,8 +71,15 @@ class Solver (object):
   def execute (self, cmd, directory):
     
     # create directory
-    os.mkdir ( directory )
-    
+    try:
+      os.mkdir ( directory )
+    except:
+      print
+      print ' :: ERROR: working directory is NOT clean!'
+      print '  : -> remove all directories like "%s".' % directory
+      print
+      sys.exit()
+
     # copy needed input files
     for inputfile in self.inputfiles:
       shutil.copy ( inputfile, directory + '/' )

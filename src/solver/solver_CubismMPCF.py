@@ -30,7 +30,7 @@ class CubismMPCF (Solver):
       self.executable = 'mpcf-node'
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -nsteps %(steps)d -seed %(seed)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d'
     if local.cluster:
       self.cmd = '../' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
     else:
@@ -83,7 +83,7 @@ class CubismMPCF (Solver):
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
-    args ['steps'] = discretization ['NS']
+    args ['seed'] = seed
     
     args ['options'] = self.options
     
@@ -107,9 +107,6 @@ class CubismMPCF (Solver):
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
-      
-      # set seed
-      args ['seed'] = seed
       
       # assemble excutable command
       args ['cmd'] = self.cmd % args
@@ -152,10 +149,10 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.execute ( cmd, directory )
   
-  def generate_seed (self):
+  def cloud (self):
     
     #TODO:
-    print ' Generate_seed() is not implemented'
+    print ' cloud() is not implemented'
   
   def finished (self, level, type, sample, id):
     
