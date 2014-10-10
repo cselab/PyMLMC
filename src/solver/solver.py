@@ -12,7 +12,7 @@ import os
 import subprocess
 import shutil
 
-class Data (object):
+class Results (object):
   
   def __init__ (self):
     self.meta = {}

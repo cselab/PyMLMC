@@ -76,6 +76,6 @@ class MC (object):
   def assemble (self, stats):
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute (self.results)
+      self.stats [ stat.name ] = stat.compute_all (self.results)
     return self.stats
 

@@ -182,9 +182,9 @@ class CubismMPCF (Solver):
     
     # split metadata from actual data
     
-    meta = ( 'step', 't',  'dt' )
+    meta_keys = ( 'step', 't',  'dt' )
     results = Results ()
-    for key in meta:
+    for key in meta_keys:
       results.meta [key] = records [key]
       del records [key]
     results.data = records
@@ -194,8 +194,8 @@ class CubismMPCF (Solver):
     # are usually different for every deterministic simulation
     
     times = numpy.linspace ( results.meta ['t'] [0], results.meta ['t'] [-1], self.points + 1 )
-    for key in results.data:
-      results.data [key] = numpy.interp ( times, results.meta ['t'], results.meta [key], left=None, right=None )
+    for key in results.data.keys():
+      results.data [key] = numpy.interp ( times, results.meta ['t'], results.data [key], left=None, right=None )
     
     # update times
     
