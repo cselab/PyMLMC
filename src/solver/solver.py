@@ -19,14 +19,23 @@ class Results (object):
     self.data = {}
   
   def __iadd__ (self, a):
+    if self.data = {}:
+      self.zeros (a)
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] += a.data [key] [step]
   
-  def __isub__ (self):
+  def __isub__ (self, a):
+    if self.data = {}:
+      self.zeros (a)
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] -= a.data [key] [step]
+  
+  def zeros (self, a):
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] = 0
 
 class Solver (object):
   
