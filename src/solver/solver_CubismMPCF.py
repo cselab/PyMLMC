@@ -15,6 +15,7 @@ from solver import Solver, Results
 import shutil
 import local
 import numpy
+import sys
 
 class CubismMPCF (Solver):
   
@@ -30,7 +31,7 @@ class CubismMPCF (Solver):
       self.executable = 'mpcf-node'
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
     if local.cluster:
       self.cmd = '../' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher'
     else:
@@ -82,6 +83,11 @@ class CubismMPCF (Solver):
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
+    
+    if 'NS' in discretization:
+      args ['nsteps'] = discretization ['NS']
+    else:
+      args ['nsteps'] = sys.maxint
     
     args ['seed'] = seed
     
