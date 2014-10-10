@@ -36,15 +36,18 @@ class Results (object):
     return self
   
   def zeros (self, a):
+    self.meta = a.meta
     for key in a.data.keys():
       self.data [key] = []
       for step in xrange ( len ( a.data [key] ) ):
         self.data [key] .append ( 0 )
   
   def __str__ (self):
-    output = str (self.meta)
+    output = ''
+    for key in self.meta.keys():
+      output += '\n %10s :%s' % ( str (key), ( ' %1.1e' * len (self.meta [key]) ) % tuple ( self.meta [key] ) )
     for key in self.data.keys():
-      output += '\n %6s : %s' % ( str (key), str ( self.meta [key] ) )
+      output += '\n %10s :%s' % ( str (key), ( ' %1.1e' * len (self.data [key]) ) % tuple ( self.data [key] ) )
     return output
 
 class Solver (object):

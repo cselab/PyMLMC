@@ -221,6 +221,14 @@ class MLMC (object):
     
     return self.stats
   
+  # report computed statistics
+  def report (self):
+    
+    for stat in self.stats:
+      print
+      print ' :: STATISTIC: %s' % stat
+      print self.stats [stat] 
+  
   # save MLMC status
   def status_save (self):
     

@@ -18,7 +18,7 @@ import numpy
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, path=None, inputfiles=[], points=10, bs=32):
+  def __init__ (self, options, path=None, inputfiles=[], points=5, bs=32):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -177,8 +177,8 @@ class CubismMPCF (Solver):
     outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
     from numpy import loadtxt
     
-    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(0.75*vol*h3/M_PI,1/3)', 'wall_p_max' )
-    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',                         'f'          )
+    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
+    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )
     
     table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
     records = { name : table [name] for name in names }
@@ -203,7 +203,7 @@ class CubismMPCF (Solver):
     # update times
     
     results.meta ['it']  = times
-    results.meta ['idt'] = ( results.meta ['t'] [-1] - results.meta ['t'] [0] ) / ( self.points - 1 )
+    results.meta ['idt'] = numpy.diff (times)
     
     return results
     
