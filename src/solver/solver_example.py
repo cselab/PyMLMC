@@ -21,6 +21,12 @@ class Example_Solver (Solver):
     self.cmd  = 'echo $RANDOM'
     self.filename = 'output_%(name)s'
     self.indicator = lambda x : x
+
+    # prefix for the labels
+    self.prefix = 'mpcf'
+    
+    # set datatype
+    self.DataClass = float
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):

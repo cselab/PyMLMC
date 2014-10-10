@@ -12,8 +12,9 @@ from solver import Results
 
 class Stat (object):
   
+  # TODO: implement serialize() method for DataClass and generalize this
   def compute_all (self, samples):
-      
+    
     stats = Results ()
     
     # copy metadata from the first sample

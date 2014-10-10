@@ -39,6 +39,9 @@ class CubismMPCF (Solver):
     # prefix for the labels
     self.prefix = 'mpcf'
     
+    # set datatype
+    self.DataClass = Results
+    
     # set files and indicator
     self.statusfile = 'restart.status'
     self.outputfile = 'integrals.dat'

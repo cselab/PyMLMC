@@ -18,7 +18,6 @@ import pickle
 
 from mc import *
 from indicators import *
-from solver import Results
 import helpers
 
 # === additional Python paths
@@ -215,9 +214,11 @@ class MLMC (object):
     
     # assemble MLMC estimates
     for name in [stat.name for stat in stats]:
-      self.stats [ name ] = Results()
+      self.stats [ name ] = self.config.solver.DataClass ()
+      print self.stats [ name ]
       for mc in self.mcs: 
-        if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
+        #if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
+        if mc.config.type == self.FINE:   iadd ( self.stats [ name ], mc.stats [ name ] )
         if mc.config.type == self.COARSE: self.stats [ name ] -= mc.stats [ name ]
     
     return self.stats
