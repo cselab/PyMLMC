@@ -54,7 +54,7 @@ class CubismMPCF (Solver):
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return d ['NX'] * d ['NY'] * d ['NZ'] * d['NS']
+    return d ['NX'] * d ['NY'] * d ['NZ'] * ( d['NX'] + d['NY'] + d['NZ'] )
   
   # return the approproate ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):
