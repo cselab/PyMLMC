@@ -38,6 +38,9 @@ class Results (object):
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] = 0
+  
+  def __str__ (self):
+    return str (self.meta) + '\n' + str (self.data)
 
 class Solver (object):
   
