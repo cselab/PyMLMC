@@ -35,9 +35,10 @@ class Results (object):
     return self
   
   def zeros (self, a):
-    for key in self.data.keys():
-      for step in xrange ( len ( self.data [key] ) ):
-        self.data [key] [step] = 0
+    for key in a.data.keys():
+      self.data [key] = []
+      for step in xrange ( len ( a.data [key] ) ):
+        self.data [key] .append ( 0 )
   
   def __str__ (self):
     return str (self.meta) + '\n' + str (self.data)
