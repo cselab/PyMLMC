@@ -43,11 +43,12 @@ class Results (object):
         self.data [key] .append ( 0 )
   
   def __str__ (self):
-    output = ''
+    output = '\n' + 'meta:'
     for key in self.meta.keys():
-      output += '\n %10s :%s' % ( str (key), ( ' %1.1e' * len (self.meta [key]) ) % tuple ( self.meta [key] ) )
+      output += '\n %10s :%s' % ( str (key), ( '%8s' * len (self.meta [key]) ) % tuple ( [ '%1.1e' % value for value in self.meta [key] ] ) )
+    output += '\n' + 'data:'
     for key in self.data.keys():
-      output += '\n %10s :%s' % ( str (key), ( ' %1.1e' * len (self.data [key]) ) % tuple ( self.data [key] ) )
+      output += '\n %10s :%s' % ( str (key), ( '%8s' * len (self.data [key]) ) % tuple ( [ '%1.1e' % value for value in self.data [key] ] ) )
     return output
 
 class Solver (object):
