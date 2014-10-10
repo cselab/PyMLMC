@@ -11,6 +11,7 @@
 import os
 import subprocess
 import shutil
+import pprint
 
 class Results (object):
   
@@ -41,7 +42,10 @@ class Results (object):
         self.data [key] .append ( 0 )
   
   def __str__ (self):
-    return str (self.meta) + '\n' + str (self.data)
+    output = str (self.meta)
+    for key in self.data.keys():
+      output += '\n %6s : %s' % ( str (key), str ( self.meta [key] ) )
+    return output
 
 class Solver (object):
   
