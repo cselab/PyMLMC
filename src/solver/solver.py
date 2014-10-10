@@ -76,7 +76,7 @@ class Solver (object):
     except:
       print
       print ' :: ERROR: working directory is NOT clean!'
-      print '  : -> remove all directories like "%s".' % directory
+      print '  : -> Remove all directories like "%s".' % directory
       print
       sys.exit()
 
