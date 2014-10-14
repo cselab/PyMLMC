@@ -22,3 +22,6 @@ memory   = None
 
 # run command
 job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
+
+# submit command
+submit = '%(job)s'
