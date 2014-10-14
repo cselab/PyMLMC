@@ -20,9 +20,12 @@ class Parallelization (object):
     
     # convert walltime to hours and minutes
     if walltime:
-      frac, whole = modf ( self.walltime )
-      self.hours  = int ( whole )
+      frac, whole  = modf ( self.walltime )
+      self.hours   = int ( whole )
       self.minutes = int ( floor ( 100 * frac ) )
+    else:
+      self.hours   = None
+      self.minutes = None
 
 class Balancer (object):
   

@@ -12,12 +12,13 @@
 name = 'Mac + GCC'
 
 # Mac is (usually) not a cluster
-cluster = 0
+cluster = 1
 
 # default configuration
 cores    = 2
 threads  = 2
 walltime = None
+memory   = None
 
 # run command
 job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
