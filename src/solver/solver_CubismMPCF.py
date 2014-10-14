@@ -147,13 +147,9 @@ class CubismMPCF (Solver):
     
     # get directory
     directory = self.directory ( level, type, sample, id )
-    
-    # report full submission command
-    if params.verbose >= 1:
-      print cmd
-    
+        
     # execute/submit job
-    self.execute ( cmd, directory )
+    self.execute ( cmd, directory, params )
   
   def cloud (self):
     

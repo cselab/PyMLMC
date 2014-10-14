@@ -68,7 +68,7 @@ class Solver (object):
     return '%s_%d_%d_%d' % (prefix, level, type, sample)
   
   # execute the command
-  def execute (self, cmd, directory):
+  def execute (self, cmd, directory, params):
     
     # create directory
     try:
@@ -84,7 +84,17 @@ class Solver (object):
     for inputfile in self.inputfiles:
       shutil.copy ( inputfile, directory + '/' )
     
+    # report full submission command
+    if params.verbose >= 1:
+      print cmd
+    
+    # set stdout based on verbosity level
+    if params.verbose >= 2:
+      stdout = subprocess.STDOUT
+    else:
+      stdout = open ( os.devnull, 'w' )
+    
     # execute command
     with open ( os.devnull, 'w' ) as devnull:
-      subprocess.check_call ( cmd, cwd=directory, stdout=devnull, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
 
