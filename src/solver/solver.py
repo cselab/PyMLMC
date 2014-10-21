@@ -54,14 +54,25 @@ class Results (object):
 
 class Solver (object):
   
+  # set default path
+  def setpath (self):
+    if not self.path:
+      try:
+        self.path = os.environ [self.pathvar] + '/'
+      except:
+        print ' :: ERROR: executable path not set in %s.' % self.pathvar
+        sys.exit()
+  
   # return the name of a particular run
   def name (self, level, type, sample, id):
     return 'level=%d_type=%d_sample=%d_id=%d' % ( level, type, sample, id )
   
   # return the directory for a particular run
-  def directory (self, level, type, sample, id):
-    #return os.getcwd () + '/' + self.name ( level, type, sample, id )
-    return self.name ( level, type, sample, id )
+  def directory (self, level, type, sample, id, deterministic=0):
+    if deterministic:
+      return '.'
+    else:
+      return self.name ( level, type, sample, id )
   
   # return the label (i.e. short name) of a particular run
   def label (self, prefix, level, type, sample):
@@ -71,30 +82,31 @@ class Solver (object):
   def execute (self, cmd, directory, params):
     
     # create directory
-    try:
-      os.mkdir ( directory )
-    except:
-      print
-      print ' :: ERROR: working directory is NOT clean!'
-      print '  : -> Remove all directories like "%s".' % directory
-      print
-      sys.exit()
-
+    if directory != '.':
+      try:
+        os.mkdir ( directory )
+      except:
+        print
+        print ' :: ERROR: working directory is NOT clean!'
+        print '  : -> Remove all directories like "%s".' % directory
+        print
+        sys.exit()
+    
     # copy needed input files
     for inputfile in self.inputfiles:
       shutil.copy ( inputfile, directory + '/' )
     
     # report full submission command
     if params.verbose >= 1:
+      print
       print cmd
+      print
     
     # set stdout based on verbosity level
     if params.verbose >= 2:
-      stdout = subprocess.STDOUT
+      stdout = None
     else:
       stdout = open ( os.devnull, 'w' )
     
     # execute command
-    with open ( os.devnull, 'w' ) as devnull:
-      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
-
+    subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )

@@ -35,6 +35,9 @@ class Estimated (Samples):
     
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array (self.warmup, copy=True)
+    
+    # set simulation type (deterministic or stochastic)
+    self.deterministic = ( self.warmup_factor == 1 and self.L == 0 )
   
   def compute_errors (self, indicators):
     

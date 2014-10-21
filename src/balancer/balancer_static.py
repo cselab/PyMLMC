@@ -30,6 +30,6 @@ class Static (Balancer):
     print ' :: BALANCER: static'
     
     for level, type in self.levels_types:
-      cores = max ( local.threads, int ( round ( self.cores / self.ratios [level - type] ) ) )
+      cores = max ( min ( local.threads, self.cores ), int ( round ( self.cores / self.ratios [level - type] ) ) )
       walltime = self.walltime
       self.parallelizations [level] [type] = Parallelization ( cores, walltime )

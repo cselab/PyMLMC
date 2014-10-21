@@ -241,9 +241,17 @@ class MLMC (object):
   # laod MLMC status
   def status_load (self):
     
-    statusf = open ( 'status.py', 'r' )
-    self.config.samples.counts = pickle.load ( statusf )
-    statusf.close()
-    self.config.samples.make_indices ()
-    print
-    print (' :: INFO: MLMC status loaded from to status.py') 
+    try:
+      statusf = open ( 'status.py', 'r' )
+      self.config.samples.counts = pickle.load ( statusf )
+      statusf.close()
+      self.config.samples.make_indices ()
+      print
+      print (' :: INFO: MLMC status loaded from to status.py')
+      print
+    except:
+      print
+      print (' :: ERROR: MLMC status could not be loaded')
+      print ('  : -> run PyMLMC with \'-r\' option to restart the simulation')
+      print
+      sys.exit()

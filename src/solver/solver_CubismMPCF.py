@@ -19,7 +19,7 @@ import sys
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, path=None, inputfiles=[], points=5, bs=32):
+  def __init__ (self, options, inputfiles=[], path=None, points=5, bs=32):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -29,6 +29,12 @@ class CubismMPCF (Solver):
       self.executable = 'mpcf-cluster'
     else:
       self.executable = 'mpcf-node'
+    
+    # set path environment variable
+    self.pathvar = 'MPCF_CLUSTER_PATH'
+    
+    # set default path
+    self.setpath()
     
     # set executable command template
     args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
@@ -87,7 +93,7 @@ class CubismMPCF (Solver):
     if 'NS' in discretization:
       args ['nsteps'] = discretization ['NS']
     else:
-      args ['nsteps'] = sys.maxint
+      args ['nsteps'] = 0
     
     args ['seed'] = seed
     
@@ -147,7 +153,7 @@ class CubismMPCF (Solver):
     
     # get directory
     directory = self.directory ( level, type, sample, id )
-        
+    
     # execute/submit job
     self.execute ( cmd, directory, params )
   
@@ -156,7 +162,13 @@ class CubismMPCF (Solver):
     #TODO:
     print ' cloud() is not implemented'
   
+  # TODO: this should be called only if local.cluster == 1
   def finished (self, level, type, sample, id):
+    
+    # for non-cluster machines, jobs are executed interactively
+    # TODO: is this consistent with 'params.interactive'?
+    if not local.cluster:
+      return 1
     
     # get directory
     directory = self.directory ( level, type, sample, id )
