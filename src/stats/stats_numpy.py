@@ -13,7 +13,7 @@ import numpy
 
 class NumPy_Stat (Stat):
   
-  def __init__ (self, stat, name=None):
+  def __init__ (self, stat, name=None, params=None):
     self.stat = getattr ( numpy, stat )
     if name:
       self.name = name
@@ -23,4 +23,7 @@ class NumPy_Stat (Stat):
   # compute statistic 'self.stat' of given samples
   def compute (self, samples):
     
-    return self.stat (samples)
+    if self.params:
+      return self.stat (samples, self.params)
+    else:
+      return self.stat (samples)
