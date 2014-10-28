@@ -99,13 +99,13 @@ class CubismMPCF (Solver):
     
     args ['options'] = self.options
     
-    args ['threads'] = local.threads
+    args ['threads'] = min ( local.threads, parallelization.cores )
     
     # cluster run
     if local.cluster:
       
       # compute number of ranks
-      ranks = parallelization.cores / local.threads
+      ranks = max ( 1, parallelization.cores / local.threads )
       args ['ranks'] = ranks
       
       # compute *pesizes
@@ -132,7 +132,7 @@ class CubismMPCF (Solver):
       
       # assemble arguments for job submission
       submit_args ['ranks']   = ranks
-      submit_args ['threads'] = local.threads
+      submit_args ['threads'] = args ['threads']
       submit_args ['cores']   = parallelization.cores
       submit_args ['hours']   = parallelization.hours
       submit_args ['minutes'] = parallelization.minutes
@@ -155,6 +155,7 @@ class CubismMPCF (Solver):
     directory = self.directory ( level, type, sample, id )
     
     # execute/submit job
+    #self.execute ( cmd + ' -factor %f' % ( 0.25 ** (1 - level) ), directory, params )
     self.execute ( cmd, directory, params )
   
   def cloud (self):

@@ -32,7 +32,7 @@ sys.path.append ( os.path.dirname(__file__) + "/stats" )
 # configuration class for MLMC simulations
 class MLMC_Config (object):
   
-  def __init__ (self, id=1):
+  def __init__ (self, id=0):
     vars (self) .update ( locals() )
   
   # used to set solver, discretizations, samples and balancer
@@ -238,7 +238,7 @@ class MLMC (object):
     print
     print (' :: INFO: MLMC status saved to status.py') 
   
-  # laod MLMC status
+  # load MLMC status
   def status_load (self):
     
     try:
