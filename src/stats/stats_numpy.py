@@ -19,7 +19,8 @@ class NumPy_Stat (Stat):
       self.name = name
     else:
       self.name = stat
-  
+    self.params = params
+   
   # compute statistic 'self.stat' of given samples
   def compute (self, samples):
     
