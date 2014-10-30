@@ -24,7 +24,7 @@ def parse ():
   parser.add_argument ('-q', '--query',       action = "count", default = 1,  help = 'query user for the modification of the tolerance after each update')
   #parser.add_argument ('-o', '--options',     action = "store", default = '', help = 'additional options for the solver')
   parser.add_argument ('-v', '--verbose',     action = "store", default = 0, help = 'additional options for the solver', type=int)
-  parser.add_argument ('-s', '--simulate',    action = "store", default = 0, help = 'simulate run only - no actual execution', type=int)
+  parser.add_argument ('-s', '--simulate',    action = "count", default = 0, help = 'simulate run only - no actual execution', type=int)
   return parser.parse_args()
 
 # creates an empty nested list iterating over levels and types
