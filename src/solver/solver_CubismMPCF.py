@@ -19,7 +19,7 @@ import sys
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, inputfiles=[], path=None, points=5, bs=32):
+  def __init__ (self, options, inputfiles=[], path=None, points=5, bs=32, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -154,6 +154,10 @@ class CubismMPCF (Solver):
     # get directory
     directory = self.directory ( level, type, sample, id )
     
+    # if specified, execute the initialization function
+    if self.init:
+      self.init ( args ['seed'] )
+    
     # execute/submit job
     #self.execute ( cmd + ' -factor %f' % ( 0.25 ** (1 - level) ), directory, params )
     self.execute ( cmd, directory, params )
@@ -191,13 +195,13 @@ class CubismMPCF (Solver):
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )
-    
+    meta_keys = ( 'step', 't',  'dt' )
+
     table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
     records = { name : table [name] for name in names }
     
     # split metadata from actual data
     
-    meta_keys = ( 'step', 't',  'dt' )
     results = Results ()
     for key in meta_keys:
       results.meta [key] = records [key]

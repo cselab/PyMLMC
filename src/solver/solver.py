@@ -12,7 +12,6 @@ import os
 import sys
 import subprocess
 import shutil
-import pprint
 
 class Results (object):
   
@@ -109,4 +108,5 @@ class Solver (object):
       stdout = open ( os.devnull, 'w' )
     
     # execute command
-    subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+    if not params.simulate:
+      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )

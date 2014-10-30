@@ -239,6 +239,7 @@ class MLMC (object):
   def status_save (self):
     
     statusf = open ( 'status.py', 'w' )
+    #TODO: use python style status file (i.e. human readable, not binary)
     pickle.dump ( self.config.samples.counts, statusf )
     statusf.close()
     print
