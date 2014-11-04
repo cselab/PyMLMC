@@ -159,7 +159,6 @@ class CubismMPCF (Solver):
       self.init ( args ['seed'] )
     
     # execute/submit job
-    #self.execute ( cmd + ' -factor %f' % ( 0.25 ** (1 - level) ), directory, params )
     self.execute ( cmd, directory, params )
   
   def cloud (self):
