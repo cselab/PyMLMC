@@ -239,8 +239,9 @@ class MLMC (object):
       print self.stats [stat] 
   
   # plot computed MLMC statistics
-  def plot_mlmc (self, qoi=self.config.solver.qoi, infolines=False, save=None):
+  def plot_mlmc (self, qoi=None, infolines=False, save=None):
     
+    if not qoi: qoi = self.config.solver.qoi
     from plot import plot_mlmc_stats
     plot_mlmc_stats (qoi, self.stats, infolines, save)
   
