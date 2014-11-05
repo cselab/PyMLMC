@@ -100,7 +100,7 @@ class MLMC (object):
     # initialize, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.validate ()
-    self.cinfig.samples.save     ()
+    self.config.samples.save     ()
     
     # distribute initial samples
     self.config.balancer.distribute ()
