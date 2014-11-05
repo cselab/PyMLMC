@@ -190,6 +190,9 @@ class MLMC (object):
       self.status_save ()
       
       if not self.params.interactive:
+        print
+        print ' :: INFO: non-interactive mode specified - exiting...'
+        print
         sys.exit () 
   
   # create MC objects
