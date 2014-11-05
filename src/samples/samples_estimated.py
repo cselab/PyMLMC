@@ -22,9 +22,6 @@ class Estimated (Samples):
     # save configuration
     vars (self) .update ( locals() )
     
-    self.counts  = Counts  ()
-    self.indices = Indices ()
-    
     self.samples_file = 'samples.dat'
     self.errors_file  = 'errors.dat'
   
@@ -45,6 +42,7 @@ class Estimated (Samples):
     
     # initialize samples file
     with open ( self.samples_file, 'w') as f:
+      f.write ( 'computed   = []\n' )
       f.write ( 'additional = []\n' )
     
     # initialize errors file
@@ -159,6 +157,7 @@ class Estimated (Samples):
   
   def save (self):
     
+    helpers.dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
     helpers.dump (self.counts.additional, '%d', 'additional', self.samples_file)
   
   # query for tolerance

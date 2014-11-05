@@ -102,12 +102,18 @@ class MLMC (object):
     self.config.samples.validate ()
     self.config.samples.save     ()
     
+    # make indices for the required number of samples
+    self.config.samples.make ()
+    
     # distribute initial samples
     self.config.balancer.distribute ()
     
     # compute initial samples
     self.run ()
     
+    # update the computed number of samples
+    self.config.samples.append ()
+
     # save status of MLMC simulation
     self.status_save ()
     
@@ -168,11 +174,17 @@ class MLMC (object):
       # save the required number of samples
       self.config.samples.save ()
       
+      # make indices for the required number of samples
+      self.config.samples.make ()
+      
       # distribute additional samples
       self.config.balancer.distribute ()
       
       # compute additional samples
       self.run ()
+      
+      # update the computed number of samples
+      self.config.samples.append ()
       
       # save status of MLMC simulation
       self.status_save ()
@@ -196,7 +208,6 @@ class MLMC (object):
       mc.validate ()
     for mc in self.mcs:
       mc.run ()
-    self.config.samples.append ()
   
   # query user for additional information
   def query (self):
@@ -256,9 +267,8 @@ class MLMC (object):
   def status_save (self):
     
     with open ( self.status_file, 'w' ) as f:
-      f.write ('computed   = ' + str(self.config.samples.counts.computed)   + '\n' )
-      f.write ('additional = ' + str(self.config.samples.counts.additional) + '\n' )
-      f.write ('tol        = ' + str(self.config.samples.tol)               + '\n' )
+      f.write ('samples = [ ' + ''.join ( [ str(self.config.samples.counts.computed   [level]) + ', ' for level in self.levels ] ) + ']\n' )
+      f.write ('tol     = ' + str (self.config.samples.tol) + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to status.py') 
@@ -271,9 +281,8 @@ class MLMC (object):
       status = {}
       execfile (self.status_file, globals(), status)
       
-      self.config.samples.counts.computed   = status ['computed']
-      self.config.samples.counts.additional = status ['additional']
-      self.config.samples.make_indices ()
+      self.config.samples.counts.computed = status ['samples']
+      self.config.samples.make ()
       
       if self.config.samples.tol != status ['tol']:
         print

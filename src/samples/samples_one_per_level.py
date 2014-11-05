@@ -14,9 +14,6 @@ class One_Per_Level (Samples):
   
   def init (self):
     
-    self.counts  = Counts  ()
-    self.indices = Indices ()
-    
     print
     print ' :: SAMPLES: one sample per each level'
     

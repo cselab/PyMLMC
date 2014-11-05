@@ -75,9 +75,9 @@ def pair (a, b):
 
 # dump list to file
 def dump (listvar, listformat, listname, filename):
-  with open ( filename, 'wa') as f:
+  with open ( filename, 'a') as f:
     line = listname + ' .append ( [ '
     for var in listvar:
-      line += listformat + ', ' % var
+      line += listformat % var + ', '
     f.write ( line + '] )\n' )
 

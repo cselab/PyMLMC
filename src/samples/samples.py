@@ -21,6 +21,11 @@ class Indices (object):
     
     self.computed   = []
     self.additional = []
+  
+  def make (self, counts):
+    
+    self.computed   = [ range ( 0,                       counts.computed [level] ) for level in range(len(counts.computed)) ]
+    self.additional = [ range ( counts.computed [level], counts.computed [level] + counts.additional [level] ) for level in range(len(counts.additional)) ]
 
 class Samples (object):
   
@@ -29,21 +34,21 @@ class Samples (object):
     # store configuration
     vars (self) .update ( locals() )
     
-    self.L   = len(levels) - 1
-    self.tol = None
+    self.counts  = Counts ()
+    self.indices = Indices ()
+    
+    self.L       = len(levels) - 1
+    self.tol     = None
   
   def validate (self):
     
     for level in self.levels:
       if self.counts.additional [level] == 0:
         Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
-    
-    self.make_indices ()
   
-  def make_indices (self):
+  def make (self):
     
-    self.indices.computed   = [ range ( 0,                            self.counts.computed [level] ) for level in self.levels ]
-    self.indices.additional = [ range ( self.counts.computed [level], self.counts.computed [level] + self.counts.additional [level] ) for level in self.levels ]
+    self.indices.make (self.counts)
   
   def append (self):
     
