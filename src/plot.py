@@ -19,20 +19,10 @@ styles ['mean']             = 'b-'
 styles ['std. deviation']   = 'r--'
 styles ['percentile']       = 'g--'
 
-qoi = 'p_max'
-
-def plot (stats, infolines=True, save='stats.pdf'):
+# plot each stat
+def plot_stats (qoi, stats):
   
-  pylab.figure ( figsize = (8,6) )
-  
-  #TODO: infolines
-  
-  pylab.title ( 'estimated statistics for %s' % qoi )
-  
-  # plot each stat
   for name, stat in stats.iteritems():
-    
-    print name
     
     ts = numpy.array ( stat.meta ['t'] )
     vs = numpy.array ( stat.data [qoi] )
@@ -50,5 +40,32 @@ def plot (stats, infolines=True, save='stats.pdf'):
       pylab.plot (ts, vs, style, label=name)
   
   pylab.legend (loc='best')
-  pylab.savefig (save)
+
+def plot_mlmc_stats (qoi, stats, infolines, save):
+  
+  pylab.figure ( figsize = (8,6) )
+  
+  #TODO: infolines
+  
+  pylab.title ( 'estimated statistics for %s' % qoi )
+  plot_stats (qoi, stats)
+  
+  if save: pylab.savefig (save)
+  pylab.show ()
+
+def plot_mc_stats (qoi, mcs, infolines, save):
+  
+  pylab.figure ( figsize = ( 2 * 8, 6 * len(mcs) ) )
+  
+  #TODO: infolines
+  
+  levels = len(mcs) / 2 + 1
+  
+  for mc in mcs:
+    
+    pylab.subplot ( levels, 2, mc.level + 1 + (mc.type == 1) * levels )
+    pylab.title ( 'estimated statistics for %s (level %d)' % (qoi, mc.level) )
+    plot_stats ( qoi, mc.stats )
+  
+  if save: pylab.savefig (save)
   pylab.show ()

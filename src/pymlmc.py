@@ -80,6 +80,9 @@ class MLMC (object):
     
     # MLMC results
     self.stats = {}
+    
+    # status file name
+    self.status_file = 'status.dat'
   
   # MLMC simulation
   def simulation (self):
@@ -94,9 +97,10 @@ class MLMC (object):
   # initial phase
   def init (self):
     
-    # initialize and validate the required number of samples
+    # initialize, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.validate ()
+    self.cinfig.samples.save     ()
     
     # distribute initial samples
     self.config.balancer.distribute ()
@@ -125,22 +129,24 @@ class MLMC (object):
       # load results
       self.load ()
       
-      # compute and report error indicators
+      # compute, report, and save error indicators
       self.indicators.compute (self.mcs)
       self.indicators.report  ()
+      self.indicators.save    ()
       
-      # compute and report errors
+      # compute, report, and save errors
       self.config.samples.compute_errors (self.indicators)
       self.config.samples.report_errors  ()
+      self.config.samples.save_errors  ()
       
       # check if the simulation is already finished 
       if self.config.samples.finished ():
         print
-        print ' :: TOLERANCE reached.'
+        print ' :: TOLERANCE reached - simulation finished.'
         self.status_save ()
         return
       
-      # update, validate and report the required number of samples
+      # update, report, and validate the required number of samples
       self.config.samples.update   ()
       self.config.samples.report   ()
       self.config.samples.validate ()
@@ -154,10 +160,13 @@ class MLMC (object):
             print ' :: TOLERANCE reached.'
             self.status_save ()
             return
-          # otherwise update the number of samples
+          # otherwise update, report, and validate the number of samples
           self.config.samples.update   ()
           self.config.samples.report   ()
           self.config.samples.validate ()
+      
+      # save the required number of samples
+      self.config.samples.save ()
       
       # distribute additional samples
       self.config.balancer.distribute ()
@@ -229,19 +238,26 @@ class MLMC (object):
       print ' :: STATISTIC: %s' % stat
       print self.stats [stat] 
   
-  # plot computed statistics
-  def plot (self):
+  # plot computed MLMC statistics
+  def plot_mlmc (self, qoi=self.config.solver.qoi, infolines=False, save=None):
     
-    from plot import plot
-    plot (self.stats)
+    from plot import plot_mlmc_stats
+    plot_mlmc_stats (qoi, self.stats, infolines, save)
+  
+  # plot computed MC statistics
+  def plot_mc (self, qoi=self.config.solver.qoi, infolines=False, save=None):
+    
+    from plot import plot_mc_stats
+    plot_mc_stats (qoi, self.mcs, infolines, save)
   
   # save MLMC status
   def status_save (self):
     
-    statusf = open ( 'status.py', 'w' )
-    #TODO: use python style status file (i.e. human readable, not binary)
-    pickle.dump ( self.config.samples.counts, statusf )
-    statusf.close()
+    with open ( self.status_file, 'w' ) as f:
+      f.write ('computed   = ' + str(self.config.samples.counts.computed)   + '\n' )
+      f.write ('additional = ' + str(self.config.samples.counts.additional) + '\n' )
+      f.write ('tol        = ' + str(self.config.samples.tol)               + '\n' )
+    
     print
     print (' :: INFO: MLMC status saved to status.py') 
   
@@ -249,16 +265,29 @@ class MLMC (object):
   def status_load (self):
     
     try:
-      statusf = open ( 'status.py', 'r' )
-      self.config.samples.counts = pickle.load ( statusf )
-      statusf.close()
+      
+      status = {}
+      execfile (self.status_file, globals(), status)
+      
+      self.config.samples.counts.computed   = status ['computed']
+      self.config.samples.counts.additional = status ['additional']
       self.config.samples.make_indices ()
+      
+      if self.config.samples.tol != status ['tol']:
+        print
+        print (' :: WARNING: the requested tolerance is different from the tolerance in the in status file.')
+        print
+      self.config.samples.tol = status ['tol']
+      
       print
       print (' :: INFO: MLMC status loaded from to status.py')
       print
+    
     except:
+      
       print
       print (' :: ERROR: MLMC status could not be loaded')
       print ('  : -> run PyMLMC with \'-r\' option to restart the simulation')
       print
+      
       sys.exit()

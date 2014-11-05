@@ -9,9 +9,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 from samples import *
+import helpers
 import numpy
 
-# surpresses invalid division errors
+# surpresses invalid division errors and simply returns 'nan' in such cases
 numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
@@ -23,6 +24,9 @@ class Estimated (Samples):
     
     self.counts  = Counts  ()
     self.indices = Indices ()
+    
+    self.samples_file = 'samples.dat'
+    self.errors_file  = 'errors.dat'
   
   def init (self):
     
@@ -38,6 +42,16 @@ class Estimated (Samples):
     
     # set simulation type (deterministic or stochastic)
     self.deterministic = ( self.warmup_factor == 1 and self.L == 0 )
+    
+    # initialize samples file
+    with open ( self.samples_file, 'w') as f:
+      f.write ( 'additional = []\n' )
+    
+    # initialize errors file
+    with open ( self.errors_file, 'w') as f:
+      f.write ( 'relative_error = []\n' )
+      f.write ( 'total_relative_error = []\n' )
+      f.write ( 'total_error = []\n' )
   
   def compute_errors (self, indicators):
     
@@ -59,9 +73,9 @@ class Estimated (Samples):
     # compute the cumulative sampling error
     self.total_error = self.total_relative_error * self.normalization
   
+  # report relative sampling errors
   def report_errors (self):
     
-    # report relative sampling errors
     print '    -> Relative total sampling error is %.1e' % self.total_relative_error,
     print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * (self.total_relative_error ** 2) / (self.tol ** 2) ) / 10, self.tol )
     print '       Relative level sampling errors:'
@@ -69,6 +83,12 @@ class Estimated (Samples):
     for level in self.levels:
       print '%.1e' % self.relative_error [level],
     print
+  
+  def save_errors (self):
+    
+    helpers.dump (self.relative_error,       '%f', 'relative_error',       self.errors_file)
+    helpers.dump (self.total_relative_error, '%f', 'total_relative_error', self.errors_file)
+    helpers.dump (self.total_error,          '%f', 'total_error',          self.errors_file)
   
   def finished (self):
     
@@ -137,6 +157,10 @@ class Estimated (Samples):
       print '%d' % self.counts.additional [level],
     print
   
+  def save (self):
+    
+    helpers.dump (self.counts.additional, '%d', 'additional', self.samples_file)
+  
   # query for tolerance
   def query (self):
     
@@ -144,7 +168,6 @@ class Estimated (Samples):
     tol = float ( raw_input ( ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol ) or str(self.tol) )
     modified = tol != self.tol
     self.tol = tol
-    # TODO: self.tol needs to be saved to status.py and then loaded afterwards
     return modified
   
   # computes the optimal number of samples if some samples are already computed

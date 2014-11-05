@@ -26,7 +26,10 @@ class Indicators (object):
     
     # store configuration 
     vars (self) .update ( locals() )
+    
     self.L = len (self.levels) - 1
+    
+    self.indicators_file = 'indicators.dat'
   
   def compute (self, mcs):
     
@@ -69,26 +72,26 @@ class Indicators (object):
     
     print
     print ' :: INDICATORS:'
-
-    # report mean
+    
+    # report mean (fine)
     print '    -> EPSILON [FI]:',
     for level in self.levels:
       print '%.1e' % self.mean [level] [0],
     print
     
-    # report mean
+    # report mean (coarse)
     print '    -> EPSILON [CO]:',
     for level in self.levels:
       print '%.1e' % self.mean [level] [1] if not isnan ( self.mean [level] [1] ) else '    N/A',
     print
     
-    # report variance
+    # report variance (fine)
     print '    -> SIGMA   [FI]:',
     for level in self.levels:
       print '%.1e' % self.variance [level] [0] if not isnan ( self.variance [level] [0] ) else '    N/A',
     print
     
-    # report variance
+    # report variance (coarse)
     print '    -> SIGMA   [CO]:',
     for level in self.levels:
       print '%.1e' % self.variance [level] [1] if not isnan ( self.variance [level] [1] ) else '    N/A',
@@ -117,6 +120,36 @@ class Indicators (object):
     for level in self.levels:
       print '   %.2f' % self.correlation [level] if not isnan ( self.correlation [level] ) else '    N/A',
     print
+  
+  def save (self):
+    
+    # save mean (fine)
+    epsilon_fi = [ self.mean [level] [0] for level in self.levels ]
+    helpers.dump (epsilon_fi, '%f', 'epsilon_fi', self.indicators_file)
+    
+    # save mean (coarse)
+    epsilon_co = [ self.mean [level] [1] for level in self.levels ]
+    helpers.dump (epsilon_co, '%f', 'epsilon_co', self.indicators_file)
+
+    # save variance (fine)
+    sigma_fi = [ self.variance [level] [0] for level in self.levels ]
+    helpers.dump (sigma_fi, '%f', 'sigma_fi', self.indicators_file)
+
+    # save variance (coarse)
+    sigma_co = [ self.variance [level] [1] for level in self.levels ]
+    helpers.dump (sigma_co, '%f', 'sigma_co', self.indicators_file)
+    
+    # save mean_diff
+    helpers.dump (self.mean_diff, '%f', 'epsilon_diff', self.indicators_file)
+
+    # save variance_diff
+    helpers.dump (self.variance_diff, '%f', 'variance_diff', self.indicators_file)
+
+    # save covariance
+    helpers.dump (self.covariance, '%f', 'covariance', self.indicators_file)
+
+    # save correlation
+    helpers.dump (self.correlation, '%f', 'correlation', self.indicators_file)
   
   # extrapolate missing variance estimates using available estimates
   def extrapolate (self):

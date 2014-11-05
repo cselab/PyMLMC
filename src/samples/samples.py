@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# General samples classes                        #
+# General samples classes
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -28,7 +28,9 @@ class Samples (object):
     
     # store configuration
     vars (self) .update ( locals() )
-    self.L = len(levels) - 1
+    
+    self.L   = len(levels) - 1
+    self.tol = None
   
   def validate (self):
     

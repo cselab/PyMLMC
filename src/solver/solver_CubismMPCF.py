@@ -57,6 +57,9 @@ class CubismMPCF (Solver):
     # copy executable to present working directory
     if local.cluster and self.path:
       shutil.copy (self.path + self.executable, '.')
+    
+    # set default quantity of interest 'qoi'
+    self.qoi = 'p_max'
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):

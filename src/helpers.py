@@ -72,3 +72,12 @@ def intf (number):
 # pair two seeds into one
 def pair (a, b):
   return a ** 2 + a + b if a >= b else a + b ** 2
+
+# dump list to file
+def dump (listvar, listformat, listname, filename):
+  with open ( filename, 'wa') as f:
+    line = listname + ' .append ( [ '
+    for var in listvar:
+      line += listformat + ', ' % var
+    f.write ( line + '] )\n' )
+
