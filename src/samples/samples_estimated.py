@@ -86,8 +86,8 @@ class Estimated (Samples):
     
     helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file)
     with open ( self.errors_file, 'a' ) as f:
-      f.write ( 'total_relative_error = %f\n' % self.total_relative_error )
-      f.write ( 'total_error = %f\n' % self.total_error )
+      f.write ( 'total_relative_error .append ( %f )\n' % self.total_relative_error )
+      f.write ( 'total_error .append ( %f )\n' % self.total_error )
   
   def finished (self):
     
