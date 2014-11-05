@@ -29,6 +29,10 @@ class Indices (object):
 
 class Samples (object):
   
+  def __init__ (self):
+    
+    self.tol = None
+  
   def setup (self, levels, works):
     
     # store configuration
@@ -38,7 +42,6 @@ class Samples (object):
     self.indices = Indices ()
     
     self.L       = len(levels) - 1
-    self.tol     = None
   
   def validate (self):
     
