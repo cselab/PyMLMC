@@ -119,6 +119,10 @@ class MLMC (object):
     
     # if non-interactive session, exit
     if not self.params.interactive:
+      print
+      print ' :: INFO: Non-interactive mode specified - exiting.'
+      print '  : -> run PyMLMC with \'-i\' option for an interactive mode.'
+      print
       sys.exit ()
   
   # iterative updating phase
@@ -191,7 +195,8 @@ class MLMC (object):
       
       if not self.params.interactive:
         print
-        print ' :: INFO: non-interactive mode specified - exiting...'
+        print ' :: INFO: Non-interactive mode specified - exiting.'
+        print '  : -> run PyMLMC with \'-i\' option for an interactive mode.'
         print
         sys.exit () 
   
@@ -289,7 +294,7 @@ class MLMC (object):
       
       if self.config.samples.tol != status ['tol']:
         print
-        print (' :: WARNING: the requested tolerance is different from the tolerance in the in status file.')
+        print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
         print
       self.config.samples.tol = status ['tol']
       
