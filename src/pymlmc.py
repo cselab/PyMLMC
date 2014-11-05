@@ -246,8 +246,9 @@ class MLMC (object):
     plot_mlmc_stats (qoi, self.stats, infolines, save)
   
   # plot computed MC statistics
-  def plot_mc (self, qoi=self.config.solver.qoi, infolines=False, save=None):
+  def plot_mc (self, qoi=None, infolines=False, save=None):
     
+    if not qoi: qoi = self.config.solver.qoi
     from plot import plot_mc_stats
     plot_mc_stats (qoi, self.mcs, infolines, save)
   
