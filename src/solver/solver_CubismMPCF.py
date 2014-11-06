@@ -49,9 +49,10 @@ class CubismMPCF (Solver):
     # set datatype
     self.DataClass = Results
     
-    # set files and indicator
+    # set files, default quantity of interest, and indicator
     self.statusfile = 'restart.status'
     self.outputfile = 'integrals.dat'
+    self.qoi = 'p_max'
     self.indicator = lambda x : x [ 'p_max' ] [ -1 ]
     
     # copy executable to present working directory
