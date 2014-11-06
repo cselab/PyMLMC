@@ -17,7 +17,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
   
-  def __init__ (self, warmup=None, warmup_factor=1, tol=1e-1, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
+  def __init__ (self, tol=1e-1, warmup=None, warmup_finest_level='last', warmup_factor=1, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -32,7 +32,9 @@ class Estimated (Samples):
     
     # default warmup samples
     if not self.warmup:
-      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** (self.L - level) ) for level in self.levels ] )
+      if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
+      elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
+      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
     
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array (self.warmup, copy=True)
