@@ -73,19 +73,23 @@ class Solver (object):
   def label (self, prefix, level, type, sample):
     return '%s_%d_%d_%d' % (prefix, level, type, sample)
   
+  # check if nothing will be overwritten
+  def check (self, level, type, sample, id):
+    directory = self.directory (level, type, sample, id)
+    if os.path.exists (directory):
+      print
+      print ' :: ERROR: working directory is NOT clean!'
+      print '  : -> Remove all directories like "%s".' % directory
+      print '  : -> Alterntively, use option \'-f\' to override.' 
+      print
+      sys.exit()
+
   # execute the command
   def execute (self, cmd, directory, params):
     
     # create directory
     if directory != '.':
-      try:
-        os.mkdir ( directory )
-      except:
-        print
-        print ' :: ERROR: working directory is NOT clean!'
-        print '  : -> Remove all directories like "%s".' % directory
-        print
-        sys.exit()
+      os.mkdir ( directory )
     
     # copy needed input files
     if directory != '.':

@@ -19,6 +19,7 @@ import pickle
 from mc import *
 from indicators import *
 from errors import *
+from plot import *
 import helpers
 
 # === additional Python paths
