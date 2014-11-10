@@ -11,7 +11,7 @@
 # === Discretization format:
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
-from solver import Solver, Results
+from solver import Solver, Interpolated_Time_Series
 import shutil
 import local
 import numpy
@@ -47,7 +47,7 @@ class CubismMPCF (Solver):
     self.prefix = 'mpcf'
     
     # set datatype
-    self.DataClass = Results
+    self.DataClass = Interpolated_Time_Series
     
     # set files, default quantity of interest, and indicator
     self.outputfile = 'integrals.dat'
@@ -196,7 +196,7 @@ class CubismMPCF (Solver):
     
     # split metadata from actual data
     
-    results = Results ()
+    results = Interpolated_Time_Series ()
     for key in meta_keys:
       results.meta [key] = records [key]
       del records [key]

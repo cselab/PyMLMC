@@ -11,9 +11,6 @@
 import helpers
 import numpy
 
-# surpresses invalid division errors and simply returns 'nan' in such cases
-#numpy.seterr ( divide='ignore', invalid='ignore' )
-
 class Errors (object):
   
   def __init__ (self, levels):

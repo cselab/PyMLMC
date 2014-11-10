@@ -13,7 +13,7 @@ import helpers
 import numpy
 
 # surpresses invalid division errors and simply returns 'nan' in such cases
-#numpy.seterr ( divide='ignore', invalid='ignore' )
+numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
   
