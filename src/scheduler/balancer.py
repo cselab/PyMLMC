@@ -21,8 +21,8 @@ class Parallelization (object):
     # convert walltime to hours and minutes
     if walltime:
       frac, whole  = modf ( self.walltime )
-      self.hours   = int ( whole )
-      self.minutes = int ( floor ( 100 * frac ) )
+      self.hours   = int  ( whole )
+      self.minutes = int  ( floor ( 60 * frac ) )
     else:
       self.hours   = None
       self.minutes = None
