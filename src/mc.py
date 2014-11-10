@@ -54,7 +54,7 @@ class MC (object):
   # launch all samples
   def run (self):
     config = self.config
-    if self.params.force:
+    if not self.params.force:
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample, config.id )
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
