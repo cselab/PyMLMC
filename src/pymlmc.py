@@ -271,7 +271,7 @@ class MLMC (object):
     with open ( self.status_file, 'w' ) as f:
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
       f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
-      f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
+      #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
     
     print
     print (' :: INFO: MLMC status saved to status.py') 
