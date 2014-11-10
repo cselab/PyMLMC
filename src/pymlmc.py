@@ -25,7 +25,7 @@ import helpers
 
 sys.path.append ( os.path.dirname(__file__) + "/solver" )
 sys.path.append ( os.path.dirname(__file__) + "/samples" )
-sys.path.append ( os.path.dirname(__file__) + "/balancer" )
+sys.path.append ( os.path.dirname(__file__) + "/scheduler" )
 sys.path.append ( os.path.dirname(__file__) + "/stats" )
 sys.path.append ( os.path.dirname(__file__) + "/plot" )
 
@@ -69,7 +69,7 @@ class MLMC (object):
     
     # errors
     self.errors = Errors (self.levels)
-
+    
     # works
     # TODO: take into account _differences_ on all levels except the coarsest
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
@@ -80,8 +80,8 @@ class MLMC (object):
     # setup samples
     self.config.samples.setup ( self.levels, self.works )
     
-    # setup balancer
-    self.config.balancer.setup (self.levels, self.levels_types, self.works, self.ratios )
+    # setup scheduler
+    self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios )
     
     # MLMC results
     self.stats = {}
@@ -114,7 +114,7 @@ class MLMC (object):
     self.config.samples.make ()
     
     # distribute initial samples
-    self.config.balancer.distribute ()
+    self.config.scheduler.distribute ()
     
     # compute initial samples
     self.run ()
@@ -190,7 +190,7 @@ class MLMC (object):
       self.config.samples.make ()
       
       # distribute additional samples
-      self.config.balancer.distribute ()
+      self.config.scheduler.distribute ()
       
       # compute additional samples
       self.run ()

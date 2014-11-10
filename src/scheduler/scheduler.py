@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Balancer base class
+# Scheduler base class
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -27,7 +27,7 @@ class Parallelization (object):
       self.hours   = None
       self.minutes = None
 
-class Balancer (object):
+class Scheduler (object):
   
   def setup (self, levels, levels_types, works, ratios):
     

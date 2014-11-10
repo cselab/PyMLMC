@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Static load balancing                           #
+# Scheduling using TORC tasking library
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #

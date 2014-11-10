@@ -1,6 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Static load balancing class
+# Static scheduler class
+# Load balancing is offloaded to the underlying job scheduling sub-system (LSF, SLURM, etc.)
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -8,10 +9,10 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from balancer import *
+from scheduler import *
 import local
 
-class Static (Balancer):
+class Static (Scheduler):
   
   def __init__ (self, cores=None, walltime=None ):
     
@@ -27,7 +28,7 @@ class Static (Balancer):
   def distribute (self):
     
     print
-    print ' :: BALANCER: static'
+    print ' :: SCHEDULER: static'
     
     for level, type in self.levels_types:
       required = float(self.cores) / self.ratios [level - type]
