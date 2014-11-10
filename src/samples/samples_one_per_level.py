@@ -23,5 +23,5 @@ class One_Per_Level (Samples):
     # set simulation type (deterministic or stochastic)
     self.deterministic = ( self.L == 0 )
   
-  def finished (self):
+  def finished (self, errors):
     return 1

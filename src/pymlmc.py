@@ -18,6 +18,7 @@ import pickle
 
 from mc import *
 from indicators import *
+from errors import *
 import helpers
 
 # === additional Python paths
@@ -65,6 +66,9 @@ class MLMC (object):
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
     
+    # errors
+    self.errors = Errors (self.levels)
+
     # works
     # TODO: take into account _differences_ on all levels except the coarsest
     self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
@@ -101,6 +105,9 @@ class MLMC (object):
     self.config.samples.init     ()
     self.config.samples.validate ()
     self.config.samples.save     ()
+    
+    # initialize errors
+    self.errors.init ()
     
     # make indices for the required number of samples
     self.config.samples.make ()
@@ -145,19 +152,19 @@ class MLMC (object):
       self.indicators.save    ()
       
       # compute, report, and save errors
-      self.config.samples.compute_errors (self.indicators)
-      self.config.samples.report_errors  ()
-      self.config.samples.save_errors  ()
+      self.errors.compute (self.indicators, self.config.samples.counts)
+      self.errors.report  (self.config.samples.tol)
+      self.errors.save    ()
       
       # check if the simulation is already finished 
-      if self.config.samples.finished ():
+      if self.config.samples.finished (self.errors):
         print
-        print ' :: TOLERANCE reached - simulation finished.'
+        print ' :: Simulation finished.'
         self.status_save ()
         return
       
       # update, report, and validate the required number of samples
-      self.config.samples.update   ()
+      self.config.samples.update   (self.errors)
       self.config.samples.report   ()
       self.config.samples.validate ()
       
@@ -165,13 +172,13 @@ class MLMC (object):
       if self.params.query:
         while self.query():
           # check if the simulation is already finished 
-          if self.config.samples.finished ():
+          if self.config.samples.finished (self.errors):
             print
-            print ' :: TOLERANCE reached.'
+            print ' :: Simulation finished.'
             self.status_save ()
             return
           # otherwise update, report, and validate the number of samples
-          self.config.samples.update   ()
+          self.config.samples.update   (self.errors)
           self.config.samples.report   ()
           self.config.samples.validate ()
       
@@ -278,18 +285,18 @@ class MLMC (object):
     plot_indicators (self, exact, infolines, save)
   
   # plot errors
-  def plot_errors (self, infolines=False, save=None):
+  def plot_errors (self, infolines=False, warmup=True, optimal=True, save=None):
     
     from plot import plot_errors
-    plot_errors (self, infolines, save)
+    plot_errors (self, infolines, warmup, optimal, save)
   
   # save MLMC status
   def status_save (self):
     
     with open ( self.status_file, 'w' ) as f:
-      f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed   [level]) + ', ' for level in self.levels ] ) + ']\n' )
+      f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
       f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
-      f.write ( 'finished = %d' % int(self.config.samples.finished()) )
+      f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
 
     print
     print (' :: INFO: MLMC status saved to status.py') 

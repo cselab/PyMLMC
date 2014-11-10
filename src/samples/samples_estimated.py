@@ -13,7 +13,7 @@ import helpers
 import numpy
 
 # surpresses invalid division errors and simply returns 'nan' in such cases
-numpy.seterr ( divide='ignore', invalid='ignore' )
+#numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
   
@@ -21,8 +21,6 @@ class Estimated (Samples):
     
     # save configuration
     vars (self) .update ( locals() )
-    
-    self.errors_file  = 'errors.dat'
   
   def init (self):
     
@@ -45,67 +43,23 @@ class Estimated (Samples):
     with open ( self.samples_file, 'w') as f:
       f.write ( 'computed   = []\n' )
       f.write ( 'additional = []\n' )
-    
-    # initialize errors file
-    with open ( self.errors_file, 'w') as f:
-      f.write ( 'relative_error = []\n' )
-      f.write ( 'total_relative_error = []\n' )
-      f.write ( 'total_error = []\n' )
   
-  def compute_errors (self, indicators):
+  def finished (self, errors):
     
-    # save configuration
-    self.indicators = indicators
-    
-    # extrapolate missing indicators
-    self.indicators.extrapolate ()
-    
-    # set the normalization
-    self.normalization = self.indicators.mean[0][0]
-        
-    # compute relative sampling errors
-    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.computed ) / self.normalization
-    
-    # compute the cumulative relative sampling error
-    self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
-    
-    # compute the cumulative sampling error
-    self.total_error = self.total_relative_error * self.normalization
+    return errors.total_relative_error <= self.tol
   
-  # report relative sampling errors
-  def report_errors (self):
-    
-    print '    -> Relative total sampling error is %.1e' % self.total_relative_error,
-    print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * (self.total_relative_error ** 2) / (self.tol ** 2) ) / 10, self.tol )
-    print '       Relative level sampling errors:'
-    print '      ',
-    for level in self.levels:
-      print '%.1e' % self.relative_error [level],
-    print
-  
-  def save_errors (self):
-    
-    helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file)
-    with open ( self.errors_file, 'a' ) as f:
-      f.write ( 'total_relative_error .append ( %f )\n' % self.total_relative_error )
-      f.write ( 'total_error .append ( %f )\n' % self.total_error )
-  
-  def finished (self):
-    
-    return self.total_relative_error <= self.tol
-  
-  def update (self):
+  def update (self, errors):
     
     # compute the required cumulative sampling error
-    self.required_error = self.tol * self.normalization
+    self.required_error = self.tol * errors.normalization
     
     # compute optimal number of samples
     # assuming that no samples were computed so far
-    self.counts_optimal = self.compute_optimal ( numpy.ones(len(self.levels)), self.required_error )
+    self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error )
     
     # compute optimal number of samples
     # assuming that self.counts.computed samples are already computed on each level
-    self.counts_updated = self.compute_optimal ( self.counts.computed, self.required_error)
+    self.counts_updated = self.optimal ( self.counts.computed, self.required_error)
     
     # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
@@ -167,7 +121,7 @@ class Estimated (Samples):
     return modified
   
   # computes the optimal number of samples if some samples are already computed
-  def compute_optimal (self, computed, required_error):
+  def optimal (self, computed, required_error):
     
     from numpy import sqrt, zeros, ceil
     

@@ -14,6 +14,10 @@
 import pylab
 import numpy
 
+import matplotlib
+matplotlib.rcParams['font.size'] = 16
+matplotlib.rcParams['legend.fontsize'] = 14
+
 styles = {}
 styles ['mean']             = 'b-'
 styles ['std. deviation']   = 'r--'
@@ -98,13 +102,14 @@ def plot_indicators (self, exact, infolines, save):
   TOL           = self.config.samples.tol
   NORMALIZATION = self.config.samples.normalization
   levels        = self.levels
+  qoi           = self.config.solver.qoi
   
   # === compute error using the exact solution mean_exact
   
   if exact:
     
     # TODO: this needs to be reviewed
-    error = numpy.abs ( exact - self.stats [ self.config.solver.qoi ] ) / NORMALIZATION
+    error = numpy.abs ( exact - self.stats [ qoi ] ) / NORMALIZATION
   
   # === plot
   
@@ -116,24 +121,24 @@ def plot_indicators (self, exact, infolines, save):
   # plot EPSILON
   
   pylab.subplot(121)
-  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON],        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='estimated means of $Q_\ell - Q_{\ell-1}$')
+  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON],        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='relative level means')
   if exact:
     pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],           color='k', linestyle='-',  linewidth=2, alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
   pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],           color='m', linestyle='--', linewidth=2, label='TOL = %1.1e' % TOL)
-  pylab.title('Estimated relative level means')
-  pylab.ylabel(r'mean of relative $Q_\ell - Q_{\ell-1}$')
-  pylab.xlabel('mesh level')
-  pylab.legend(loc='upper right')
+  pylab.title  ('Estimated relative level means for Q = %s' % qoi)
+  pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
+  pylab.xlabel ('mesh level')
+  pylab.legend (loc='upper right')
   
   # plot SIGMA
   
   pylab.subplot(122)
-  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION,        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='rel. level standard deviations (final)')
+  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION,        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='rel. level standard deviations')
   pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1],            color='m', linestyle='--', linewidth=2, label='TOL = %1.1e' % TOL)
-  pylab.title('Estimated rel. level standard deviations')
-  pylab.ylabel(r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
-  pylab.xlabel('mesh level')
-  pylab.legend(loc='best')
+  pylab.title  ('Estimated rel. level standard deviations for Q = %s' % qoi)
+  pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
+  pylab.xlabel ('mesh level')
+  pylab.legend (loc='best')
   
   pylab.subplots_adjust(top=0.94)
   pylab.subplots_adjust(right=0.95)
@@ -143,7 +148,7 @@ def plot_indicators (self, exact, infolines, save):
     plot_infolines (self)
     pylab.subplots_adjust(bottom=0.28)
   else:
-    pylab.subplots_adjust(bottom=0.1)
+    pylab.subplots_adjust(bottom=0.15)
   
   if save:
     pylab.savefig(save)
@@ -152,34 +157,32 @@ def plot_indicators (self, exact, infolines, save):
   
   pylab.show()
 
-def plot_errors (self, infolines, save):
+def plot_errors (self, infolines, warmup, optimal, save):
   
   # === load all required data
-  
+  '''
   try:
     data = {}
     execfile(self.estimatorsf, globals(), data)
   except:
     raise Exception ("ERROR: Estimators datafile " + self.estimatorsf + " is not available!")
-  
-  relative_error_s = data['relative_error_s']
-  NM_OPTIMAL       = data['NM_OPTIMAL']
-  optimal_fraction = data['optimal_work_fraction']
-  NORMALIZATION    = data['NORMALIZATION']
-  
-  required_relative_error_s = data['required_relative_error_s']
-  
+  '''
+  relative_error   = self.config.samples.relative_error
+  #counts_optimal   = self.config.samples.counts_optimal
+  #optimal_fraction = self.config.samples.optimal_fraction
+  NORMALIZATION    = self.config.samples.normalization
+  TOL              = self.config.samples.tol
+  levels           = self.levels
+  samples          = self.config.samples.counts.computed
+  warmup_samples   = self.config.samples.warmup
+  qoi              = self.config.solver.qoi
+  '''
   try:
     data = {}
     execfile(self.samplesf, globals(), data)
   except:
     raise Exception ("ERROR: Samples datafile " + self.samplesf + " is not available!")
-  
-  samples = data['samples']
-  
-  levels = numpy.arange(0, self.i.L+1)
-  
-  warmup_samples = self.i.WARMUP * self.i.WARMUP_FACTOR ** (self.i.L - levels)
+  '''
   
   # === plot
   
@@ -193,25 +196,26 @@ def plot_errors (self, infolines, save):
   pylab.subplot(121)
   if warmup:
     pylab.semilogy (levels, warmup_samples, color='r', linestyle='--', linewidth=2, marker='+', markeredgewidth=2, markersize=12, label='warmup')
-  pylab.semilogy (levels, samples, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='estimated for TOL=%1.1e' % self.f.TOL)
-  if optimal:
-    pylab.semilogy (levels, NM_OPTIMAL, color='g', linestyle='--', linewidth=2, marker='|', markeredgewidth=2, markersize=12, label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
-  pylab.title('Estimated number of samples')
-  pylab.ylabel('number of samples')
-  pylab.xlabel('mesh level')
-  pylab.ylim(ymin=0.7)
-  pylab.legend(loc='upper right')
+  pylab.semilogy (levels, samples, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='estimated for TOL=%1.1e' % TOL)
+  #if optimal:
+  #  pylab.semilogy (levels, counts_optimal, color='g', linestyle='--', linewidth=2, marker='|', markeredgewidth=2, markersize=12, label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
+  pylab.title  ('Estimated number of samples')
+  pylab.ylabel ('number of samples')
+  pylab.xlabel ('mesh level')
+  pylab.ylim   (ymin=0.7)
+  #TODO: add light gray lines at y = 1, 2, 4
+  pylab.legend (loc='upper right')
   
   # plot relative sampling error
   
   pylab.subplot(122)
-  pylab.semilogy (levels, relative_error_s, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='relative sampling errors')
+  pylab.semilogy (levels, relative_error, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='relative sampling errors')
   pylab.axhline(y=required_relative_error_s, xmin=levels[0], xmax=levels[-1], color='m', linestyle='--', linewidth=2, label='required sampling tolerance (%.1f%%)' % (100 * (required_relative_error_s ** 2) / (self.f.TOL ** 2)))
-  pylab.title('Estimated relative sampling errors')
-  pylab.ylabel(r'relative error $\sqrt{\operatorname{Var}\Vert U_\ell - U_{\ell-1} \Vert_{1} / M_\ell}$')
-  pylab.xlabel('mesh level')
-  pylab.ylim(ymax=1.5*required_relative_error_s)
-  pylab.legend(loc='lower left')
+  pylab.title  ('Estimated relative sampling errors for Q = %s' % qoi)
+  pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
+  pylab.xlabel ('mesh level')
+  pylab.ylim   (ymax=1.5*TOL)
+  pylab.legend (loc='lower left')
   
   pylab.subplots_adjust(top=0.94)
   pylab.subplots_adjust(right=0.95)
@@ -221,7 +225,7 @@ def plot_errors (self, infolines, save):
     show_info(self)
     pylab.subplots_adjust(bottom=0.28)
   else:
-    pylab.subplots_adjust(bottom=0.1)
+    pylab.subplots_adjust(bottom=0.15)
   
   if save:
     pylab.savefig(save)
@@ -229,19 +233,3 @@ def plot_errors (self, infolines, save):
     self.generateTexTable(save)
   
   pylab.show()
-
-
-
-  pylab.figure ( figsize = ( 2 * 8, 6 ) )
-  
-  pylab.subplot (121)
-  pylab.title ( 'numer of samples' )
-  
-  pylab.subplot (122)
-  pylab.title ( 'estimated errors for Q = %s' % qoi )
-  plot_stats (qoi, stats)
-  
-  if infolines: plot_infolines (self)
-  if save: pylab.savefig (save)
-  pylab.show ()
-
