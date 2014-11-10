@@ -88,7 +88,7 @@ class Solver (object):
   def execute (self, cmd, directory, params):
     
     # create directory
-    if directory != '.':
+    if directory != '.' and not os.path.exists (directory):
       os.mkdir ( directory )
     
     # copy needed input files
