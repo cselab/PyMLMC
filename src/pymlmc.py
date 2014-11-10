@@ -37,7 +37,7 @@ class MLMC_Config (object):
   def __init__ (self, id=0):
     vars (self) .update ( locals() )
   
-  # used to set solver, discretizations, samples and balancer
+  # used to set solver, discretizations, samples and scheduler
   def set (self, name, value):
     vars (self) .update ( { name : value } )
 
@@ -212,7 +212,7 @@ class MLMC (object):
   def create_MCs (self, indices):
     self.mcs = []
     for i, (level, type) in enumerate(self.levels_types):
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.balancer.parallelizations [level] [type] ) )
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.scheduler.parallelizations [level] [type] ) )
   
   # run MC estimates
   def run (self):
