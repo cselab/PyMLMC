@@ -13,7 +13,7 @@ import sys
 import subprocess
 import shutil
 
-class Multiple_Time_Series (object):
+class Interpolated_Time_Series (object):
   
   meta = {}
   data = {}
