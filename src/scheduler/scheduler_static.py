@@ -34,7 +34,7 @@ class Static (Scheduler):
       required = float(self.cores) / self.ratios [level - type]
       cores = max ( min ( local.threads, self.cores ), int ( round ( required ) ) )
       if cores > required:
-        walltime = self.walltime / ( cores / cores_neeeded )
+        walltime = self.walltime / ( cores / required )
       else:
         walltime = self.walltime
       self.parallelizations [level] [type] = Parallelization ( cores, walltime )
