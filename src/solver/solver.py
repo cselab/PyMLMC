@@ -80,7 +80,7 @@ class Solver (object):
       print
       print ' :: ERROR: working directory is NOT clean!'
       print '  : -> Remove all directories like "%s".' % directory
-      print '  : -> Alterntively, use option \'-f\' to override.' 
+      print '  : -> Alternatively, run PyMLMC with \'-f\' option to force override.' 
       print
       sys.exit()
 

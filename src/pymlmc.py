@@ -19,7 +19,6 @@ import pickle
 from mc import *
 from indicators import *
 from errors import *
-from plot import *
 import helpers
 
 # === additional Python paths
@@ -28,6 +27,7 @@ sys.path.append ( os.path.dirname(__file__) + "/solver" )
 sys.path.append ( os.path.dirname(__file__) + "/samples" )
 sys.path.append ( os.path.dirname(__file__) + "/balancer" )
 sys.path.append ( os.path.dirname(__file__) + "/stats" )
+sys.path.append ( os.path.dirname(__file__) + "/plot" )
 
 # === classes
 
@@ -129,7 +129,7 @@ class MLMC (object):
     if not self.params.interactive:
       print
       print ' :: INFO: Non-interactive mode specified -> exiting.'
-      print '  : -> run PyMLMC with \'-i\' option for an interactive mode.'
+      print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
       print
       sys.exit ()
   
@@ -204,7 +204,7 @@ class MLMC (object):
       if not self.params.interactive:
         print
         print ' :: INFO: Non-interactive mode specified -> exiting.'
-        print '  : -> run PyMLMC with \'-i\' option for an interactive mode.'
+        print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
         print
         sys.exit () 
   
@@ -265,32 +265,6 @@ class MLMC (object):
       print ' :: STATISTIC: %s' % stat
       print self.stats [stat] 
   
-  # plot computed MC statistics
-  def plot_mc (self, qoi=None, infolines=False, save=None):
-    
-    if not qoi: qoi = self.config.solver.qoi
-    from plot import plot_mc_stats
-    plot_mc_stats (self, qoi, infolines, save)
-  
-  # plot computed MLMC statistics
-  def plot_mlmc (self, qoi=None, infolines=False, save=None):
-    
-    if not qoi: qoi = self.config.solver.qoi
-    from plot import plot_mlmc_stats
-    plot_mlmc_stats (self, qoi, infolines, save)
-  
-  # plot indicators
-  def plot_indicators (self, exact=None, infolines=False, save=None):
-    
-    from plot import plot_indicators
-    plot_indicators (self, exact, infolines, save)
-  
-  # plot errors
-  def plot_errors (self, infolines=False, warmup=True, optimal=True, save=None):
-    
-    from plot import plot_errors
-    plot_errors (self, infolines, warmup, optimal, save)
-  
   # save MLMC status
   def status_save (self):
     
@@ -298,7 +272,7 @@ class MLMC (object):
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
       f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
       f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
-
+    
     print
     print (' :: INFO: MLMC status saved to status.py') 
   
@@ -327,7 +301,7 @@ class MLMC (object):
       
       print
       print (' :: ERROR: MLMC status could not be loaded')
-      print ('  : -> run PyMLMC with \'-r\' option to restart the simulation')
+      print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       
       sys.exit()
