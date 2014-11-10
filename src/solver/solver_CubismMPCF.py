@@ -19,7 +19,7 @@ import sys
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, inputfiles=[], path=None, points=5, bs=32, init=None):
+  def __init__ (self, options, inputfiles=[], path=None, points=1000, bs=32, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -39,7 +39,7 @@ class CubismMPCF (Solver):
     # set executable command template
     args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
     if local.cluster:
-      self.cmd = '../' + self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
+      self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
       self.cmd = self.executable + ' ' + args
     
@@ -50,10 +50,9 @@ class CubismMPCF (Solver):
     self.DataClass = Results
     
     # set files, default quantity of interest, and indicator
-    self.statusfile = 'restart.status'
     self.outputfile = 'integrals.dat'
     self.qoi = 'p_max'
-    self.indicator = lambda x : x [ 'p_max' ] [ -1 ]
+    self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
     
     # copy executable to present working directory
     if local.cluster and self.path:
@@ -113,11 +112,12 @@ class CubismMPCF (Solver):
       args ['ranks'] = ranks
       
       # compute *pesizes
-      #TODO: increment *pesizes iteratively to allow powers of 2 instead of powers of 8 only ???
-      # this, of course, would change the behaviour of the self.ratio()
-      args ['xpesize'] = int ( ranks ** (1.0/3) )
-      args ['ypesize'] = int ( ranks ** (1.0/3) )
-      args ['zpesize'] = int ( ranks ** (1.0/3) )
+      # increment *pesizes iteratively to allow ranks as powers of 2
+      args ['xpesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
+      args ['ypesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
+      args ['zpesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
+      if ranks % 2 == 0: args ['xpesize'] *= 2
+      if ranks % 4 == 0: args ['ypesize'] *= 2
       
       # adjust bpd*
       args ['bpdx'] /= args ['xpesize']
@@ -125,7 +125,7 @@ class CubismMPCF (Solver):
       args ['bpdz'] /= args ['zpesize']
       
       # assemble excutable command
-      args ['cmd'] = self.cmd % args
+      args ['cmd'] = ('../' + self.cmd) % args
       
       # assemble job
       submit_args = {}
@@ -165,11 +165,6 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.execute ( cmd, directory, params )
   
-  def cloud (self):
-    
-    #TODO:
-    print ' cloud() is not implemented'
-  
   # TODO: this should be called only if local.cluster == 1
   def finished (self, level, type, sample, id):
     
@@ -182,13 +177,9 @@ class CubismMPCF (Solver):
     directory = self.directory ( level, type, sample, id )
     
     # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
-    # open self.statusfile and check if both numbers are equal to 0
-    #statusfile = open ( directory + '/' + self.statusfile, 'r' )
-    #status = statusfile .read () .strip () .split ()
-    #statusfile.close()
-    return 1
     #return os.path.exists ( self.statusfile )
-  
+    return 1
+    
   def load (self, level, type, sample, id):
     
     # open self.outputfile and read results

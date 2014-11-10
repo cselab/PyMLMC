@@ -24,8 +24,8 @@ def plot_stats (qoi, stats):
   
   for name, stat in stats.iteritems():
     
-    ts = numpy.array ( stat.meta ['t'] )
-    vs = numpy.array ( stat.data [qoi] )
+    ts = numpy.array ( stat.meta ['it'] )
+    vs = numpy.array ( stat.data [qoi]  )
     
     style = styles [name] if name in styles else ''
     
@@ -41,31 +41,207 @@ def plot_stats (qoi, stats):
   
   pylab.legend (loc='best')
 
-def plot_mlmc_stats (qoi, stats, infolines, save):
+def plot_infolines (self):
   
-  pylab.figure ( figsize = (8,6) )
+  #TODO
+  print ' :: ERROR: infolines not implemented.'
+
+def plot_mc_stats (self, qoi, infolines, save):
   
-  #TODO: infolines
+  levels = (len(self.mcs) + 1) / 2
+  
+  if infolines:
+    pylab.figure(figsize=(levels*8,2*6))
+  else:
+    pylab.figure(figsize=(levels*8,5+6))
+  
+  for mc in self.mcs:
+    
+    pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
+    pylab.title ( 'estimated statistics for %s (level %d, type %d)' % (qoi, mc.config.level, mc.config.type) )
+    plot_stats ( qoi, mc.stats )
+  
+  if infolines: plot_infolines (self)
+  if save:
+    pylab.savefig (save)
+    pylab.savefig (save[:-3] + 'eps')
+  pylab.show ()
+
+def plot_mlmc_stats (self, qoi, infolines, save):
+  
+  if infolines:
+    pylab.figure(figsize=(8,6))
+  else:
+    pylab.figure(figsize=(8,5))
   
   pylab.title ( 'estimated statistics for %s' % qoi )
+  plot_stats (qoi, self.stats)
+  
+  if infolines: plot_infolines (self)
+  if save:
+    pylab.savefig (save)
+    pylab.savefig (save[:-3] + 'eps')
+  pylab.show ()
+
+def plot_indicators (self, exact, infolines, save):
+  
+  # === load all required data
+  '''
+  try:
+    data = {}
+    execfile(self.estimatorsf, globals(), data)
+  except:
+    raise Exception ("ERROR: Estimators datafile " + self.estimatorsf + " is not available!")
+  '''
+  EPSILON       = self.indicators.mean_diff
+  SIGMA         = self.indicators.variance_diff
+  TOL           = self.config.samples.tol
+  NORMALIZATION = self.config.samples.normalization
+  levels        = self.levels
+  
+  # === compute error using the exact solution mean_exact
+  
+  if exact:
+    
+    # TODO: this needs to be reviewed
+    error = numpy.abs ( exact - self.stats [ self.config.solver.qoi ] ) / NORMALIZATION
+  
+  # === plot
+  
+  if infolines:
+    pylab.figure(figsize=(2*8,6))
+  else:
+    pylab.figure(figsize=(2*8,5))
+  
+  # plot EPSILON
+  
+  pylab.subplot(121)
+  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON],        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='estimated means of $Q_\ell - Q_{\ell-1}$')
+  if exact:
+    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],           color='k', linestyle='-',  linewidth=2, alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],           color='m', linestyle='--', linewidth=2, label='TOL = %1.1e' % TOL)
+  pylab.title('Estimated relative level means')
+  pylab.ylabel(r'mean of relative $Q_\ell - Q_{\ell-1}$')
+  pylab.xlabel('mesh level')
+  pylab.legend(loc='upper right')
+  
+  # plot SIGMA
+  
+  pylab.subplot(122)
+  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION,        color='b', linestyle='-',  linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='rel. level standard deviations (final)')
+  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1],            color='m', linestyle='--', linewidth=2, label='TOL = %1.1e' % TOL)
+  pylab.title('Estimated rel. level standard deviations')
+  pylab.ylabel(r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
+  pylab.xlabel('mesh level')
+  pylab.legend(loc='best')
+  
+  pylab.subplots_adjust(top=0.94)
+  pylab.subplots_adjust(right=0.95)
+  pylab.subplots_adjust(left=0.07)
+  
+  if infolines:
+    plot_infolines (self)
+    pylab.subplots_adjust(bottom=0.28)
+  else:
+    pylab.subplots_adjust(bottom=0.1)
+  
+  if save:
+    pylab.savefig(save)
+    pylab.savefig(save[:-3] + 'eps')
+    #self.generateTexTable(save)
+  
+  pylab.show()
+
+def plot_errors (self, infolines, save):
+  
+  # === load all required data
+  
+  try:
+    data = {}
+    execfile(self.estimatorsf, globals(), data)
+  except:
+    raise Exception ("ERROR: Estimators datafile " + self.estimatorsf + " is not available!")
+  
+  relative_error_s = data['relative_error_s']
+  NM_OPTIMAL       = data['NM_OPTIMAL']
+  optimal_fraction = data['optimal_work_fraction']
+  NORMALIZATION    = data['NORMALIZATION']
+  
+  required_relative_error_s = data['required_relative_error_s']
+  
+  try:
+    data = {}
+    execfile(self.samplesf, globals(), data)
+  except:
+    raise Exception ("ERROR: Samples datafile " + self.samplesf + " is not available!")
+  
+  samples = data['samples']
+  
+  levels = numpy.arange(0, self.i.L+1)
+  
+  warmup_samples = self.i.WARMUP * self.i.WARMUP_FACTOR ** (self.i.L - levels)
+  
+  # === plot
+  
+  if infolines:
+    pylab.figure(figsize=(2*8,6))
+  else:
+    pylab.figure(figsize=(2*8,5))
+  
+  # plot number of samples
+  
+  pylab.subplot(121)
+  if warmup:
+    pylab.semilogy (levels, warmup_samples, color='r', linestyle='--', linewidth=2, marker='+', markeredgewidth=2, markersize=12, label='warmup')
+  pylab.semilogy (levels, samples, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='estimated for TOL=%1.1e' % self.f.TOL)
+  if optimal:
+    pylab.semilogy (levels, NM_OPTIMAL, color='g', linestyle='--', linewidth=2, marker='|', markeredgewidth=2, markersize=12, label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
+  pylab.title('Estimated number of samples')
+  pylab.ylabel('number of samples')
+  pylab.xlabel('mesh level')
+  pylab.ylim(ymin=0.7)
+  pylab.legend(loc='upper right')
+  
+  # plot relative sampling error
+  
+  pylab.subplot(122)
+  pylab.semilogy (levels, relative_error_s, color='b', linestyle='-', linewidth=2, marker='x', markeredgewidth=2, markersize=8, label='relative sampling errors')
+  pylab.axhline(y=required_relative_error_s, xmin=levels[0], xmax=levels[-1], color='m', linestyle='--', linewidth=2, label='required sampling tolerance (%.1f%%)' % (100 * (required_relative_error_s ** 2) / (self.f.TOL ** 2)))
+  pylab.title('Estimated relative sampling errors')
+  pylab.ylabel(r'relative error $\sqrt{\operatorname{Var}\Vert U_\ell - U_{\ell-1} \Vert_{1} / M_\ell}$')
+  pylab.xlabel('mesh level')
+  pylab.ylim(ymax=1.5*required_relative_error_s)
+  pylab.legend(loc='lower left')
+  
+  pylab.subplots_adjust(top=0.94)
+  pylab.subplots_adjust(right=0.95)
+  pylab.subplots_adjust(left=0.07)
+  
+  if infolines:
+    show_info(self)
+    pylab.subplots_adjust(bottom=0.28)
+  else:
+    pylab.subplots_adjust(bottom=0.1)
+  
+  if save:
+    pylab.savefig(save)
+    pylab.savefig(save[:-3] + 'eps')
+    self.generateTexTable(save)
+  
+  pylab.show()
+
+
+
+  pylab.figure ( figsize = ( 2 * 8, 6 ) )
+  
+  pylab.subplot (121)
+  pylab.title ( 'numer of samples' )
+  
+  pylab.subplot (122)
+  pylab.title ( 'estimated errors for Q = %s' % qoi )
   plot_stats (qoi, stats)
   
+  if infolines: plot_infolines (self)
   if save: pylab.savefig (save)
   pylab.show ()
 
-def plot_mc_stats (qoi, mcs, infolines, save):
-  
-  pylab.figure ( figsize = ( 2 * 8, 6 * len(mcs) ) )
-  
-  #TODO: infolines
-  
-  levels = len(mcs) / 2 + 1
-  
-  for mc in mcs:
-    
-    pylab.subplot ( levels, 2, mc.level + 1 + (mc.type == 1) * levels )
-    pylab.title ( 'estimated statistics for %s (level %d)' % (qoi, mc.level) )
-    plot_stats ( qoi, mc.stats )
-  
-  if save: pylab.savefig (save)
-  pylab.show ()

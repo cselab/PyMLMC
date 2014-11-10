@@ -22,7 +22,6 @@ class Estimated (Samples):
     # save configuration
     vars (self) .update ( locals() )
     
-    self.samples_file = 'samples.dat'
     self.errors_file  = 'errors.dat'
   
   def init (self):
@@ -157,11 +156,6 @@ class Estimated (Samples):
     for level in self.levels:
       print '%d' % self.counts.additional [level],
     print
-  
-  def save (self):
-    
-    helpers.dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
-    helpers.dump (self.counts.additional, '%d', 'additional', self.samples_file)
   
   # query for tolerance
   def query (self):

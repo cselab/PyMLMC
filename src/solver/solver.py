@@ -15,9 +15,8 @@ import shutil
 
 class Results (object):
   
-  def __init__ (self):
-    self.meta = {}
-    self.data = {}
+  meta = {}
+  data = {}
   
   def __iadd__ (self, a):
     if self.data == {}:
@@ -67,11 +66,8 @@ class Solver (object):
     return 'level=%d_type=%d_sample=%d_id=%d' % ( level, type, sample, id )
   
   # return the directory for a particular run
-  def directory (self, level, type, sample, id, deterministic=0):
-    if deterministic:
-      return '.'
-    else:
-      return self.name ( level, type, sample, id )
+  def directory (self, level, type, sample, id):
+    return self.name ( level, type, sample, id )
   
   # return the label (i.e. short name) of a particular run
   def label (self, prefix, level, type, sample):
@@ -92,8 +88,9 @@ class Solver (object):
         sys.exit()
     
     # copy needed input files
-    for inputfile in self.inputfiles:
-      shutil.copy ( inputfile, directory + '/' )
+    if directory != '.':
+      for inputfile in self.inputfiles:
+        shutil.copy ( inputfile, directory + '/' )
     
     # report full submission command
     if params.verbose >= 1:

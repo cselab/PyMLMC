@@ -23,5 +23,8 @@ memory   = None
 # run command
 job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
+# MPI run command
+mpi_job = 'mpirun -np %(ranks)d %(cmd)s %(options)s'
+
 # submit command
 submit = '%(job)s'

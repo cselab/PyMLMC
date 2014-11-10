@@ -257,27 +257,40 @@ class MLMC (object):
       print ' :: STATISTIC: %s' % stat
       print self.stats [stat] 
   
-  # plot computed MLMC statistics
-  def plot_mlmc (self, qoi=None, infolines=False, save=None):
-    
-    if not qoi: qoi = self.config.solver.qoi
-    from plot import plot_mlmc_stats
-    plot_mlmc_stats (qoi, self.stats, infolines, save)
-  
   # plot computed MC statistics
   def plot_mc (self, qoi=None, infolines=False, save=None):
     
     if not qoi: qoi = self.config.solver.qoi
     from plot import plot_mc_stats
-    plot_mc_stats (qoi, self.mcs, infolines, save)
+    plot_mc_stats (self, qoi, infolines, save)
+  
+  # plot computed MLMC statistics
+  def plot_mlmc (self, qoi=None, infolines=False, save=None):
+    
+    if not qoi: qoi = self.config.solver.qoi
+    from plot import plot_mlmc_stats
+    plot_mlmc_stats (self, qoi, infolines, save)
+  
+  # plot indicators
+  def plot_indicators (self, exact=None, infolines=False, save=None):
+    
+    from plot import plot_indicators
+    plot_indicators (self, exact, infolines, save)
+  
+  # plot errors
+  def plot_errors (self, infolines=False, save=None):
+    
+    from plot import plot_errors
+    plot_errors (self, infolines, save)
   
   # save MLMC status
   def status_save (self):
     
     with open ( self.status_file, 'w' ) as f:
-      f.write ('samples = [ ' + ''.join ( [ str(self.config.samples.counts.computed   [level]) + ', ' for level in self.levels ] ) + ']\n' )
-      f.write ('tol     = ' + str (self.config.samples.tol) + '\n' )
-    
+      f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed   [level]) + ', ' for level in self.levels ] ) + ']\n' )
+      f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
+      f.write ( 'finished = %d' % int(self.config.samples.finished()) )
+
     print
     print (' :: INFO: MLMC status saved to status.py') 
   

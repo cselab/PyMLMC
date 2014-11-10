@@ -10,17 +10,13 @@
 
 class Counts (object):
   
-  def __init__ (self):
-    
-    self.computed   = []
-    self.additional = []
+  computed   = []
+  additional = []
 
 class Indices (object):
   
-  def __init__ (self):
-    
-    self.computed   = []
-    self.additional = []
+  computed   = []
+  additional = []
   
   def make (self, counts):
     
@@ -29,9 +25,8 @@ class Indices (object):
 
 class Samples (object):
   
-  def __init__ (self):
-    
-    self.tol = None
+  tol          = None
+  samples_file = 'samples.dat'
   
   def setup (self, levels, works):
     
@@ -48,6 +43,12 @@ class Samples (object):
     for level in self.levels:
       if self.counts.additional [level] == 0:
         Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
+  
+  def save (self):
+    
+    from helpers import dump
+    dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
+    dump (self.counts.additional, '%d', 'additional', self.samples_file)
   
   def make (self):
     
