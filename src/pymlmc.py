@@ -20,6 +20,7 @@ from mc import *
 from indicators import *
 from errors import *
 import helpers
+import local
 
 # === additional Python paths
 

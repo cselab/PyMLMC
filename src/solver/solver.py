@@ -13,6 +13,8 @@ import sys
 import subprocess
 import shutil
 
+import local
+
 class Interpolated_Time_Series (object):
   
   meta = {}
