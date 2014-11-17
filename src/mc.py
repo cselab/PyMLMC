@@ -83,6 +83,6 @@ class MC (object):
   def assemble (self, stats):
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute_all (self.results)
+      self.stats [ stat.name ] = stat.compute_all ( self.results, self.config.solver.DataClass )
     return self.stats
 

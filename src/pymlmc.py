@@ -257,7 +257,7 @@ class MLMC (object):
     # assemble MLMC estimates
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = self.config.solver.DataClass ()
-      for mc in self.mcs: 
+      for mc in self.mcs:
         if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
         if mc.config.type == self.COARSE: self.stats [ name ] -= mc.stats [ name ]
     

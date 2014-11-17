@@ -20,6 +20,11 @@ from solver import Solver
 import local
 import os, subprocess
 
+class Float (float):
+  
+  def zero (self):
+    self = 0
+
 class Example_Solver (Solver):
   
   # constructor for the example solver
@@ -49,7 +54,7 @@ class Example_Solver (Solver):
     self.prefix = 'test'
     
     # set datatype that function self.load(...) returns
-    self.DataClass = float
+    self.DataClass = Float
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):

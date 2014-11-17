@@ -11,11 +11,75 @@
 # === Discretization format:
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
-from solver import Solver, Interpolated_Time_Series
+from solver import Solver
 import local
 
 import numpy
 import sys
+
+class Interpolated_Time_Series (object):
+  
+  meta = {}
+  data = {}
+  
+  def load (self, filename, names, formats, meta_keys):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import loadtxt
+    table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
+    records = { name : table [name] for name in names }
+    
+    outputfile.close()
+    
+    # split metadata from actual data
+    
+    for key in meta_keys:
+      self.meta [key] = records [key]
+      del records [key]
+    self.data = records
+  
+  def interpolate (self, wrt, points):
+    
+    from numpy import linspace, interp
+    
+    times = linspace ( self.meta [wrt] [0], self.meta [wrt] [-1], points )
+    for key in self.data.keys():
+      self.data [key] = interp ( times, self.meta [wrt], self.data [key], left=None, right=None )
+    
+    self.meta [wrt + '_i']  = times
+  
+  def __iadd__ (self, a):
+    if self.data == {}:
+      self.zeros (a)
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] += a.data [key] [step]
+    return self
+  
+  def __isub__ (self, a):
+    if self.data == {}:
+      self.zeros (a)
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] -= a.data [key] [step]
+    return self
+  
+  def zeros (self, a):
+    self.meta = a.meta
+    for key in a.data.keys():
+      self.data [key] = []
+      for step in xrange ( len ( a.data [key] ) ):
+        self.data [key] .append ( 0 )
+  
+  def __str__ (self):
+    output = '\n' + 'meta:'
+    for key in self.meta.keys():
+      output += '\n %10s :%s' % ( str (key), ( '%8s' * len (self.meta [key]) ) % tuple ( [ '%1.1e' % value for value in self.meta [key] ] ) )
+    output += '\n' + 'data:'
+    for key in self.data.keys():
+      output += '\n %10s :%s' % ( str (key), ( '%8s' * len (self.data [key]) ) % tuple ( [ '%1.1e' % value for value in self.data [key] ] ) )
+    return output
 
 class CubismMPCF (Solver):
   

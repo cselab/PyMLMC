@@ -8,14 +8,12 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from solver import Results
-
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
-  def compute_all (self, samples):
+  def compute_all (self, samples, DataClass):
     
-    stats = Results ()
+    stats = DataClass ()
     
     # copy metadata from the first sample
     stats.meta = samples [0] .meta
