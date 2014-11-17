@@ -19,8 +19,12 @@ import sys
 
 class Interpolated_Time_Series (object):
   
-  meta = {}
-  data = {}
+  def __init__ (self):
+    
+    # somehow this is needed here --
+    # otherwise I get non-empty dictionaries upon instantiation
+    self.meta = {}
+    self.data = {}
   
   def load (self, filename, names, formats, meta_keys):
     
@@ -39,20 +43,26 @@ class Interpolated_Time_Series (object):
       del records [key]
     self.data = records
   
-  def interpolate (self, wrt, points):
+  def interpolate (self, points):
     
     from numpy import linspace, interp
     
-    times = linspace ( self.meta [wrt] [0], self.meta [wrt] [-1], points )
+    times = linspace ( self.meta ['t'] [0], self.meta ['t'] [-1], points )
     for key in self.data.keys():
-      self.data [key] = interp ( times, self.meta [wrt], self.data [key], left=None, right=None )
+      self.data [key] = interp ( times, self.meta ['t'], self.data [key], left=None, right=None )
     
-    self.meta [wrt + '_i']  = times
+    self.meta ['t']  = times
+  
+  def init (self, a):
+    self.meta = a.meta
+    for key in a.data.keys():
+      self.data [key] = []
+      for step in xrange ( len ( a.data [key] ) ):
+        self.data [key] .append ( 0 )
   
   def __iadd__ (self, a):
     if not self.data:
-      self.zeros (a)
-    print 'boo'
+      self.init (a)
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] += a.data [key] [step]
@@ -60,18 +70,11 @@ class Interpolated_Time_Series (object):
   
   def __isub__ (self, a):
     if not self.data:
-      self.zeros (a)
+      self.init (a)
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] -= a.data [key] [step]
     return self
-  
-  def zeros (self, a):
-    self.meta = a.meta
-    for key in a.data.keys():
-      self.data [key] = []
-      for step in xrange ( len ( a.data [key] ) ):
-        self.data [key] .append ( 0 )
   
   def __str__ (self):
     output = '\n' + 'meta:'
@@ -211,9 +214,9 @@ class CubismMPCF (Solver):
     # interpolate time dependent results using linear interpolation
     # this is needed since number of time steps and time step sizes
     # are usually different for every deterministic simulation
-    results .interpolate ( 't', self.points + 1 )
+    results .interpolate ( self.points + 1 )
     
     # compute meta parameters for interpolation 
-    results.meta ['dt_i'] = numpy.diff (results.meta['t_i'])
+    results.meta ['dt'] = numpy.diff (results.meta['t'])
     
     return results

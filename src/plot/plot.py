@@ -28,7 +28,7 @@ def plot_stats (qoi, stats):
   
   for name, stat in stats.iteritems():
     
-    ts = numpy.array ( stat.meta ['t_i'] )
+    ts = numpy.array ( stat.meta ['t'] )
     vs = numpy.array ( stat.data [qoi]  )
     
     style = styles [name] if name in styles else ''
