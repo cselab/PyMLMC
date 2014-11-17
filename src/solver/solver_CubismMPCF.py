@@ -50,15 +50,16 @@ class Interpolated_Time_Series (object):
     self.meta [wrt + '_i']  = times
   
   def __iadd__ (self, a):
-    if self.data == {}:
+    if not self.data:
       self.zeros (a)
+    print 'boo'
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] += a.data [key] [step]
     return self
   
   def __isub__ (self, a):
-    if self.data == {}:
+    if not self.data:
       self.zeros (a)
     for key in self.data.keys():
       for step in xrange ( len ( self.data [key] ) ):

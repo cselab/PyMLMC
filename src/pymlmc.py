@@ -253,6 +253,7 @@ class MLMC (object):
     # assemble MC estimates
     for mc in self.mcs:
       mc.assemble (stats)
+      print max(mc.stats ['mean'] .data ['p_max'])
     
     # assemble MLMC estimates
     for name in [stat.name for stat in stats]:
@@ -261,6 +262,7 @@ class MLMC (object):
         if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
         if mc.config.type == self.COARSE: self.stats [ name ] -= mc.stats [ name ]
     
+    print max(self.stats ['mean'] .data ['p_max'])
     return self.stats
   
   # report computed statistics
