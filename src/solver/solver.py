@@ -18,6 +18,33 @@ class Interpolated_Time_Series (object):
   meta = {}
   data = {}
   
+  def load (self, filename, names, formats, meta_keys):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import loadtxt
+    table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
+    records = { name : table [name] for name in names }
+    
+    outputfile.close()
+    
+    # split metadata from actual data
+    
+    for key in meta_keys:
+      self.meta [key] = records [key]
+      del records [key]
+    self.data = records
+  
+  def interpolate (self, wrt, points):
+    
+    from numpy import linspace, interp
+    
+    times = linspace ( self.meta [wrt] [0], self.meta [wrt] [-1], points )
+    for key in self.data.keys():
+      self.data [key] = interp ( times, self.meta [wrt], self.data [key], left=None, right=None )
+    
+    self.meta [wrt + '_i']  = times
+  
   def __iadd__ (self, a):
     if self.data == {}:
       self.zeros (a)
@@ -52,14 +79,34 @@ class Interpolated_Time_Series (object):
 
 class Solver (object):
   
-  # set default path
-  def setpath (self):
-    if not self.path:
-      try:
-        self.path = os.environ [self.pathvar] + '/'
-      except:
-        print ' :: ERROR: executable path not set in %s.' % self.pathvar
-        sys.exit()
+  # common setup routines
+  def setup (self):
+    
+    # copy executable to present working directory
+    if local.cluster and self.path:
+      shutil.copy (self.path + self.executable, '.')
+  
+  # check if nothing will be overwritten
+  def check (self, level, type, sample, id):
+    directory = self.directory (level, type, sample, id)
+    if os.path.exists (directory):
+      print
+      print ' :: ERROR: working directory is NOT clean!'
+      print '  : -> Remove all directories like "%s".' % directory
+      print '  : -> Alternatively, run PyMLMC with \'-f\' option to force override.' 
+      print
+      sys.exit()
+  
+  # set default path from the environment variable
+  def env (self, var):
+    try:
+      return os.environ [var] + '/'
+    except:
+      print
+      print ' :: WARNING: environment variable %s not set.' % var
+      print '  : -> Using path = None'
+      print
+      return None
   
   # return the name of a particular run
   def name (self, level, type, sample, id):
@@ -73,17 +120,65 @@ class Solver (object):
   def label (self, prefix, level, type, sample):
     return '%s_%d_%d_%d' % (prefix, level, type, sample)
   
-  # check if nothing will be overwritten
-  def check (self, level, type, sample, id):
-    directory = self.directory (level, type, sample, id)
-    if os.path.exists (directory):
-      print
-      print ' :: ERROR: working directory is NOT clean!'
-      print '  : -> Remove all directories like "%s".' % directory
-      print '  : -> Alternatively, run PyMLMC with \'-f\' option to force override.' 
-      print
-      sys.exit()
+  # assemble args
+  def args (self, parallelization):
+    
+    # initialize dictionary
+    args = {}
+    
+    # additional options
+    args ['options'] = self.options
+    
+    # number of threads must not exceed the specified number of cores
+    args ['threads'] = min ( local.threads, parallelization.cores )
+    
+    # if cluster
+    if local.cluster:
+      
+      # compute number of ranks
+      args ['ranks'] = max ( 1, parallelization.cores / local.threads )
+    
+    return args
+  
+  # assemble the command
+  def assemble (self, paralellization, args):
+    
+    # cluster run
+    if local.cluster:
+      
+      # assemble excutable command
+      args ['cmd'] = ('../' + self.cmd) % args
+      
+      # assemble job
+      submit_args = {}
+      if args ['ranks'] > 1:
+        submit_args ['job']               = local.mpi_job % args
+      else:
+        submit_args ['job']               = local.job % args
+      
+      # assemble arguments for job submission
+      submit_args ['ranks']   = args ['ranks']
+      submit_args ['threads'] = args ['threads']
+      submit_args ['cores']   = parallelization.cores
+      submit_args ['hours']   = parallelization.hours
+      submit_args ['minutes'] = parallelization.minutes
+      submit_args ['memory']  = local.memory
+      submit_args ['label']   = self.label ( self.prefix, level, type, sample ) 
+      
+      # assemble submission command
+      cmd = local.submit % submit_args
+    
+    # node run
+    else:
+      
+      # assemble executable command
+      args ['cmd'] = self.cmd % args
+      
+      # assemble job
+      cmd = local.job % args
 
+    return cmd
+  
   # execute the command
   def execute (self, cmd, directory, params):
     

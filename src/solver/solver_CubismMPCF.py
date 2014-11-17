@@ -12,14 +12,13 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver, Interpolated_Time_Series
-import shutil
 import local
 import numpy
 import sys
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options, inputfiles=[], path=None, points=1000, bs=32, init=None):
+  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=32, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -30,11 +29,8 @@ class CubismMPCF (Solver):
     else:
       self.executable = 'mpcf-node'
     
-    # set path environment variable
-    self.pathvar = 'MPCF_CLUSTER_PATH'
-    
-    # set default path
-    self.setpath()
+    # set path to the executable
+    if not path: self.path = self.env('MPCF_CLUSTER_PATH')
     
     # set executable command template
     args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
@@ -43,30 +39,23 @@ class CubismMPCF (Solver):
     else:
       self.cmd = self.executable + ' ' + args
     
-    # prefix for the labels
+    # prefix for the job names
     self.prefix = 'mpcf'
     
-    # set datatype
+    # set datatype that function self.load(...) returns
     self.DataClass = Interpolated_Time_Series
     
     # set files, default quantity of interest, and indicator
     self.outputfile = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
-    
-    # copy executable to present working directory
-    if local.cluster and self.path:
-      shutil.copy (self.path + self.executable, '.')
-    
-    # set default quantity of interest 'qoi'
-    self.qoi = 'p_max'
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
     return d ['NX'] * d ['NY'] * d ['NZ'] * ( d['NX'] + d['NY'] + d['NZ'] )
   
-  # return the approproate ratio of the number of cores between two discretizations
+  # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):
     
     return d1 ['NX'] / d2 ['NX'] * d1 ['NY'] / d2 ['NY'] * d1 ['NZ'] / d2 ['NZ']
@@ -85,9 +74,11 @@ class CubismMPCF (Solver):
   
   def run (self, level, type, sample, id, seed, discretization, params, parallelization):
     
-    args = {}
+    # initialize arguments for the specified parallelization
+    #TODO: move this to Scheduler base class?
+    args = self.args (parallelization)
     
-    args ['name']  = self.name  ( level, type, sample, id )
+    # === set additional arguments
     
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
@@ -100,16 +91,8 @@ class CubismMPCF (Solver):
     
     args ['seed'] = seed
     
-    args ['options'] = self.options
-    
-    args ['threads'] = min ( local.threads, parallelization.cores )
-    
     # cluster run
     if local.cluster:
-      
-      # compute number of ranks
-      ranks = max ( 1, parallelization.cores / local.threads )
-      args ['ranks'] = ranks
       
       # compute *pesizes
       # increment *pesizes iteratively to allow ranks as powers of 2
@@ -123,37 +106,10 @@ class CubismMPCF (Solver):
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
-      
-      # assemble excutable command
-      args ['cmd'] = ('../' + self.cmd) % args
-      
-      # assemble job
-      submit_args = {}
-      if ranks > 1:
-        submit_args ['job']               = local.mpi_job % args
-      else:
-        submit_args ['job']               = local.job % args
-      
-      # assemble arguments for job submission
-      submit_args ['ranks']   = ranks
-      submit_args ['threads'] = args ['threads']
-      submit_args ['cores']   = parallelization.cores
-      submit_args ['hours']   = parallelization.hours
-      submit_args ['minutes'] = parallelization.minutes
-      submit_args ['memory']  = local.memory
-      submit_args ['label']   = self.label ( self.prefix, level, type, sample ) 
-      
-      # assemble submission command
-      cmd = local.submit % submit_args
     
-    # node run
-    else:
-      
-      # assemble executable command
-      args ['cmd'] = self.cmd % args
-      
-      # assemble job
-      cmd = local.job % args
+    # assemble job
+    # TODO: move this to Scheduler base class?
+    cmd = assemble (self, paralellization, args)
     
     # get directory
     directory = self.directory ( level, type, sample, id )
@@ -165,61 +121,33 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.execute ( cmd, directory, params )
   
-  # TODO: this should be called only if local.cluster == 1
   def finished (self, level, type, sample, id):
-    
-    # for non-cluster machines, jobs are executed interactively
-    # TODO: is this consistent with 'params.interactive'?
-    if not local.cluster:
-      return 1
     
     # get directory
     directory = self.directory ( level, type, sample, id )
     
     # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
-    #return os.path.exists ( self.statusfile )
     return 1
     
   def load (self, level, type, sample, id):
     
     # open self.outputfile and read results
     
-    outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
-    from numpy import loadtxt
+    outputfile = self.directory (level, type, sample, id) + '/' + self.outputfile
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )
     meta_keys = ( 'step', 't',  'dt' )
-
-    table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
-    records = { name : table [name] for name in names }
-    
-    # split metadata from actual data
     
     results = Interpolated_Time_Series ()
-    for key in meta_keys:
-      results.meta [key] = records [key]
-      del records [key]
-    results.data = records
+    results .load ( outputfile, names, formats, meta_keys )
     
     # interpolate time dependent results using linear interpolation
     # this is needed since number of time steps and time step sizes
     # are usually different for every deterministic simulation
+    results .interpolate ( 't', self.points + 1 )
     
-    times = numpy.linspace ( results.meta ['t'] [0], results.meta ['t'] [-1], self.points + 1 )
-    for key in results.data.keys():
-      results.data [key] = numpy.interp ( times, results.meta ['t'], results.data [key], left=None, right=None )
-    
-    # update times
-    
-    results.meta ['it']  = times
-    results.meta ['idt'] = numpy.diff (times)
+    # compute meta parameters for interpolation 
+    results.meta ['dt_i'] = numpy.diff (results.meta['t_i'])
     
     return results
-    
-    '''
-    outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
-    lines = outputfile .readlines ()
-    outputfile.close()
-    return [ float ( line .strip() ) for line in lines ]
-    '''

@@ -83,6 +83,9 @@ class MLMC (object):
     # setup scheduler
     self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios )
     
+    # setup solver
+    self.config.solver.setup ()
+    
     # MLMC results
     self.stats = {}
     
@@ -125,8 +128,8 @@ class MLMC (object):
     # save status of MLMC simulation
     self.status_save ()
     
-    # if non-interactive session, exit
-    if not self.params.interactive:
+    # for clusters: if non-interactive session -> exit
+    if local.cluster and not self.params.interactive:
       print
       print ' :: INFO: Non-interactive mode specified -> exiting.'
       print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
@@ -141,8 +144,9 @@ class MLMC (object):
       # load status of MLMC simulation
       self.status_load ()
       
-      # wait for jobs to finish 
-      self.join ()
+      # for clusters: if non-interactive session -> wait for jobs to finish
+      if local.cluster and not self.params.interactive:
+        self.join ()
       
       # load results
       self.load ()
@@ -201,7 +205,8 @@ class MLMC (object):
       # save status of MLMC simulation
       self.status_save ()
       
-      if not self.params.interactive:
+      # for clusters: if non-interactive session -> exit
+      if local.cluster and not self.params.interactive:
         print
         print ' :: INFO: Non-interactive mode specified -> exiting.'
         print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
