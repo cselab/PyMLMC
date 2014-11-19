@@ -68,7 +68,10 @@ class MC (object):
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
     if self.parallelization.walltime:
       args += ( self.parallelization.hours, self.parallelization.minutes )
-      print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm' % args
+      if self.params.batch:
+        print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm (each)' % args
+      else:
+        print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm (all)' % args
     else:
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
     
