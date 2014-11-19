@@ -26,6 +26,7 @@ def parse ():
   parser.add_argument ('-v', '--verbose',     action = "store", default = 0, help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',    action = "count", default = 0, help = 'simulate run only - no actual execution')
   parser.add_argument ('-f', '--force',       action = "count", default = 0, help = 'force override of existing simulation files')
+  parser.add_argument ('-b', '--batch',       action = "count", default = 1, help = 'group all jobs for a given level and type into a single batch job')
   return parser.parse_args()
 
 # creates an empty nested list iterating over levels and types

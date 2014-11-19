@@ -11,7 +11,8 @@
 class Mean (object):
   
   def __init__ (self):
-    self.name = 'mean'
+    self.name  = 'mean'
+    self.style = 'b-'
   
   def compute (self, samples):
     Exception ( ' :: ERROR: Mean stat is not implemented.' )

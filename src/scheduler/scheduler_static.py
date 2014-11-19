@@ -14,16 +14,11 @@ import local
 
 class Static (Scheduler):
   
-  def __init__ (self, cores=None, walltime=None ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None ):
     
-    self.cores = cores
     self.walltime = walltime
-    
-    if self.cores == None:
-      self.cores = local.cores
-    
-    if self.walltime == None:
-      self.walltime = local.walltime
+    self.nodes    = nodes
+    self.cores    = cores
   
   def distribute (self):
     
@@ -31,10 +26,13 @@ class Static (Scheduler):
     print ' :: SCHEDULER: static'
     
     for level, type in self.levels_types:
+      
       required = float(self.cores) / self.ratios [level - type]
       cores = max ( min ( local.threads, self.cores ), int ( round ( required ) ) )
+      
       if cores > required:
         walltime = max ( local.walltime, self.walltime / ( cores / required ) )
       else:
         walltime = self.walltime
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime )
+      
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem )

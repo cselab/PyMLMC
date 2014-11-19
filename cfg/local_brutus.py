@@ -10,7 +10,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Brutus + GCC'
+name = 'Brutus'
 
 # Brutus is a cluster
 cluster = 1
@@ -22,10 +22,13 @@ walltime  = 1
 memory    = 1024
 
 # simple run command
-job = '%(cmd)s %(options)s'
+simple_job = '%(cmd)s %(options)s'
 
 # MPI run command
 mpi_job = 'mpirun -np %(ranks)d -pernode %(cmd)s %(options)s'
 
+# batch script command
+batch_job = '< %s(script)'
+
 # submit command
-submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s %(job)s'
+submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(job)s'

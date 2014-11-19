@@ -24,7 +24,7 @@ styles ['std. deviation']   = 'r--'
 styles ['percentile']       = 'g--'
 
 # plot each stat
-def plot_stats (qoi, stats):
+def plot_stats (qoi, stats, extent):
   
   for name, stat in stats.iteritems():
     
@@ -32,6 +32,7 @@ def plot_stats (qoi, stats):
     vs = numpy.array ( stat.data [qoi]  )
     
     style = styles [name] if name in styles else ''
+    if 'percentile' in name: style = styles ['percentile']
     
     # stat-specific plotting
     if name == 'std. deviation' and 'mean' in stats:
@@ -42,6 +43,9 @@ def plot_stats (qoi, stats):
     # general plotting
     else:  
       pylab.plot (ts, vs, style, label=name)
+  
+  if extent:
+    pylab.ylim(*extent)
   
   pylab.legend (loc='best')
 
@@ -56,7 +60,7 @@ def generateTexTable (mlmc):
   print ' :: ERROR: generateTexTable() not implemented.'
 
 # plot computed MC statistics
-def plot_mc (mlmc, qoi=None, infolines=False, save=None):
+def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -71,7 +75,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, save=None):
     
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'estimated statistics for %s (level %d, type %d)' % (qoi, mc.config.level, mc.config.type) )
-    plot_stats ( qoi, mc.stats )
+    plot_stats ( qoi, mc.stats, extent )
   
   if infolines: plot_infolines (self)
   if save:
@@ -81,7 +85,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, save=None):
   pylab.show ()
 
 # plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, save=None):
+def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -91,7 +95,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, save=None):
     pylab.figure(figsize=(8,5))
   
   pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats)
+  plot_stats (qoi, mlmc.stats, extent)
   
   if infolines: plot_infolines (self)
   if save:

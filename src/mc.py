@@ -17,6 +17,7 @@ import sys
 # === local imports
 
 from helpers import intf, pair
+import local
 
 # === classes
 
@@ -45,28 +46,45 @@ class MC (object):
   
   # validate all samples
   def validate (self): 
+    
     self.config.solver.validate ( self.config.discretization, self.parallelization )
   
   # return the seed for the specified sample
   def seed (self, sample):
+    
     return pair ( pair (self.config.level, sample), self.config.id )
   
   # launch all samples
   def run (self):
+    
     config = self.config
+    
+    # check if nothing is overwritten
     if not self.params.force:
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample, config.id )
+    
+    # report information of the MC run and the prescribed parallelization
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
     if self.parallelization.walltime:
       args += ( self.parallelization.hours, self.parallelization.minutes )
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm' % args
     else:
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
+    
+    # init solver
+    config.solver.init (config.level, config.type)
+    
+    # run all samples
     for sample in config.samples:
       config.solver.run ( config.level, config.type, sample, config.id, self.seed (sample), config.discretization, self.params, self.parallelization )
+    
+    # exit solver
+    config.solver.exit (config.level, config.type)
   
+  # check if results are available
   def finished (self):
+    
     config = self.config
     for sample in config.samples:
       if not config.solver.finished ( config.level, config.type, sample, config.id ):
@@ -75,12 +93,14 @@ class MC (object):
   
   # load the results
   def load (self):
+    
     config = self.config
     for i, sample in enumerate (config.samples):
       self.results [i] = config.solver.load ( config.level, config.type, sample, config.id )
   
   # assmble MC estimates
   def assemble (self, stats):
+    
     self.stats = {}
     for stat in stats:
       self.stats [ stat.name ] = stat.compute_all ( self.results, self.config.solver.DataClass )

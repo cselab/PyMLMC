@@ -11,7 +11,8 @@
 class Variance (object):
   
   def __init__ (self):
-    self.name = 'variance'
+    self.name  = 'variance'
+    self.style = 'r--'
   
   def compute (self, samples):
     Exception ( " :: ERROR: Variance stat is not implemented." )

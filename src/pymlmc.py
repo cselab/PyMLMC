@@ -46,10 +46,13 @@ class MLMC_Config (object):
 class MLMC (object):
   
   # initialize MLMC
-  def __init__ (self, config, params):
+  def __init__ (self, config):
     
     # store configuration
     vars (self) .update ( locals() )
+    
+    # parse input parameters
+    self.params = helpers.parse()
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
@@ -82,10 +85,10 @@ class MLMC (object):
     self.config.samples.setup ( self.levels, self.works )
     
     # setup scheduler
-    self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios )
+    self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
     
     # setup solver
-    self.config.solver.setup ()
+    self.config.solver.setup (self.params)
     
     # MLMC results
     self.stats = {}

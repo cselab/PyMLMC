@@ -114,6 +114,9 @@ class CubismMPCF (Solver):
     # set datatype that function self.load(...) returns
     self.DataClass = Interpolated_Time_Series
     
+    # enable shared memory (i.e. 1 MPI-rank per node)
+    self.sharedmem = 1
+    
     # set files, default quantity of interest, and indicator
     self.outputfile = 'integrals.dat'
     self.qoi = 'p_max'
@@ -165,30 +168,25 @@ class CubismMPCF (Solver):
       
       # compute *pesizes
       # increment *pesizes iteratively to allow ranks as powers of 2
-      args ['xpesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
-      args ['ypesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
-      args ['zpesize'] = int ( numpy.floor (ranks ** (1.0/3) ) )
-      if ranks % 2 == 0: args ['xpesize'] *= 2
-      if ranks % 4 == 0: args ['ypesize'] *= 2
+      args ['xpesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
+      args ['ypesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
+      args ['zpesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
+      if parallelization.ranks % 2 == 0: args ['xpesize'] *= 2
+      if parallelization.ranks % 4 == 0: args ['ypesize'] *= 2
       
       # adjust bpd*
       args ['bpdx'] /= args ['xpesize']
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
     
-    # assemble job
-    # TODO: move this to Scheduler base class?
-    cmd = assemble (self, paralellization, args)
-    
     # get directory
     directory = self.directory ( level, type, sample, id )
     
-    # if specified, execute the initialization function
-    if self.init:
-      self.init ( args ['seed'] )
+    # assemble job
+    job = self.job (args)
     
     # execute/submit job
-    self.execute ( cmd, directory, params )
+    self.launch (job, args, paralellization, directory)
   
   def finished (self, level, type, sample, id):
     

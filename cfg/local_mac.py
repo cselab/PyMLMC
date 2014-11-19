@@ -9,9 +9,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Mac + GCC'
+name = 'Mac'
 
 # Mac is (usually) not a cluster
+#TODO: this was modified for testing purposes
 cluster = 1
 
 # default configuration

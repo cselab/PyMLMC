@@ -55,6 +55,9 @@ class Example_Solver (Solver):
     
     # set datatype that function self.load(...) returns
     self.DataClass = Float
+    
+    # enable shared memory (i.e. 1 MPI-rank per node)
+    #self.sharedmem = 1
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
@@ -78,19 +81,14 @@ class Example_Solver (Solver):
     #TODO: move this to Scheduler base class?
     args = self.args (parallelization)
     
-    # assemble job
-    # TODO: move this to Scheduler base class?
-    cmd = assemble (self, paralellization, args)
-    
     # get directory
     directory = self.directory ( level, type, sample, id )
     
-    # if specified, execute the initialization function
-    if self.init:
-      self.init ( args ['seed'] )
+    # assemble job
+    job = self.job (args)
     
     # execute/submit job
-    self.execute ( cmd, directory, params )
+    self.launch (job, args, paralellization, directory)
   
   # check if the job is finished
   # (required only for non-interactive sessions on clusters)
