@@ -22,10 +22,13 @@ walltime = None
 memory   = None
 
 # run command
-job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
+simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
 # MPI run command
 mpi_job = 'mpirun -np %(ranks)d %(cmd)s %(options)s'
+
+# batch run command
+batch_job = '< %(script)s'
 
 # submit command
 submit = '%(job)s'

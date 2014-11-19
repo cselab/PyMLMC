@@ -31,8 +31,8 @@ class Solver (object):
       shutil.copy (self.path + self.executable, '.')
   
   # check if nothing will be overwritten
-  def check (self, level, type, sample, id):
-    directory = self.directory (level, type, sample, id)
+  def check (self, level, type, sample):
+    directory = self.directory (level, type, sample)
     if os.path.exists (directory):
       print
       print ' :: ERROR: working directory is NOT clean!'
@@ -43,7 +43,7 @@ class Solver (object):
   
   # init solver
   # TODO: 'init' shadows the constructor argument 'init' for script
-  def begin (self, level, type):
+  def begin (self, level, type, parallelization):
     
     # if batch mode -> init script
     if local.cluster and self.params.batch:
@@ -60,26 +60,17 @@ class Solver (object):
       print
       return None
   
-  # return the name of a particular run
-  def name (self, level, type, sample, id):
+  # return the directory for a particular run
+  def directory (self, level, type, sample=None):
     name = 'level=%d_type=%d' % ( level, type )
-    if sample:
+    if sample != None:
       name += '_sample=%d' % sample
-    if id:
-      name += '_id=%d' % id
     return name
   
-  # return the directory for a particular run
-  def directory (self, level, type, sample=None, id=None):
-    return self.name ( level, type, sample, id )
+  # return the label (= name_directory) of a particular run
+  def label (self, directory):
+    return '%s_%s' % (self.name, directory)
   
-  # return the label (i.e. short name) of a particular run
-  def label (self, prefix, level, type, sample=None):
-    label = '%s_%d_%d' % (prefix, level, type)
-    if sample:
-      label += '_%d' % sample
-    return label
-   
   # assemble args
   def args (self, parallelization):
     
@@ -99,6 +90,10 @@ class Solver (object):
   
   # assemble job command
   def job (self, args):
+    
+    # if specified, execute the initialization function
+    if self.init:
+      self.init ( args ['seed'] )
     
     # cluster run
     if local.cluster:
@@ -121,9 +116,10 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization):
+  def submit (self, job, parallelization, label):
     
     # assemble arguments for job submission
+    args             = {}
     args ['job']     = job
     args ['ranks']   = parallelization.ranks
     args ['threads'] = parallelization.threads
@@ -131,11 +127,7 @@ class Solver (object):
     args ['hours']   = parallelization.hours
     args ['minutes'] = parallelization.minutes
     args ['memory']  = parallelization.memory
-    
-    if self.params.batch:
-      args ['label']   = self.label ( self.prefix, level, type ) 
-    else:
-      args ['label']   = self.label ( self.prefix, level, type, sample )
+    args ['label']   = label
     
     # assemble submission command
     return local.submit % args
@@ -155,7 +147,7 @@ class Solver (object):
       
       # else submit job to job management system
       else:
-        self.execute ( self.submit (job, parallelization), directory )
+        self.execute ( self.submit (job, parallelization, self.label(directory)), directory )
     
     # node run -> execute job directly
     else:
@@ -168,17 +160,13 @@ class Solver (object):
     if directory != '.' and not os.path.exists (directory):
       os.mkdir ( directory )
     
-    # if specified, execute the initialization function
-    if self.init:
-      self.init ( args ['seed'] )
-    
     # copy needed input files
     if directory != '.':
       for inputfile in self.inputfiles:
         shutil.copy ( inputfile, directory + '/' )
   
   # execute the command
-  def execute (self, cmd, directory):
+  def execute (self, cmd, directory=None):
     
     # report full submission command
     if self.params.verbose >= 1:
@@ -206,7 +194,7 @@ class Solver (object):
     self.scriptfile.write ( 'cd ..\n' )
   
   # execute the script
-  def exit (self, level, type):
+  def exit (self, level, type, parallelization):
     
     # if batch mode -> submit script
     if local.cluster and self.params.batch:
@@ -215,10 +203,8 @@ class Solver (object):
       self.scriptfile.close()
       
       # assemble batch job for the generated script
-      job = local.batch_job % ( self.scriptname % self.directory (level, type) )
-      
-      # script is in the current working directory
-      directory = None
+      job = local.batch_job % { 'script' : self.scriptname % self.directory (level, type) }
       
       # submit script to job management system
-      self.execute ( self.submit (job, parallelization), directory )
+      label = self.label ( self.directory (level, type) )
+      self.execute ( self.submit (job, parallelization, label) )

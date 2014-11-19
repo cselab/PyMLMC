@@ -108,8 +108,8 @@ class CubismMPCF (Solver):
     else:
       self.cmd = self.executable + ' ' + args
     
-    # prefix for the job names
-    self.prefix = 'mpcf'
+    # name of this solver (used as prefix for the job names)
+    self.name = 'mpcf'
     
     # set datatype that function self.load(...) returns
     self.DataClass = Interpolated_Time_Series
@@ -144,7 +144,7 @@ class CubismMPCF (Solver):
     if discretization ['NZ'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NZ / multi is smaller than block size: %d < %d.' % ( discretization ['NZ'] / multi, self.bs )
   
-  def run (self, level, type, sample, id, seed, discretization, params, parallelization):
+  def run (self, level, type, sample, seed, discretization, params, parallelization):
     
     # initialize arguments for the specified parallelization
     #TODO: move this to Scheduler base class?
@@ -180,7 +180,7 @@ class CubismMPCF (Solver):
       args ['bpdz'] /= args ['zpesize']
     
     # get directory
-    directory = self.directory ( level, type, sample, id )
+    directory = self.directory ( level, type, sample )
     
     # assemble job
     job = self.job (args)
@@ -188,15 +188,15 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.launch (job, parallelization, directory)
   
-  def finished (self, level, type, sample, id):
+  def finished (self, level, type, sample):
     
     # get directory
-    directory = self.directory ( level, type, sample, id )
+    directory = self.directory ( level, type, sample )
     
     # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
     return 1
     
-  def load (self, level, type, sample, id):
+  def load (self, level, type, sample):
     
     # open self.outputfile and read results
     

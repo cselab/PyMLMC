@@ -62,7 +62,7 @@ class MC (object):
     # check if nothing is overwritten
     if not self.params.force:
       for sample in config.samples:
-        config.solver.check ( config.level, config.type, sample, config.id )
+        config.solver.check ( config.level, config.type, sample )
     
     # report information of the MC run and the prescribed parallelization
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
@@ -73,21 +73,21 @@ class MC (object):
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
     
     # init solver
-    config.solver.begin (config.level, config.type)
+    config.solver.begin (config.level, config.type, self.parallelization)
     
     # run all samples
     for sample in config.samples:
-      config.solver.run ( config.level, config.type, sample, config.id, self.seed (sample), config.discretization, self.params, self.parallelization )
+      config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
     
     # exit solver
-    config.solver.exit (config.level, config.type)
+    config.solver.exit (config.level, config.type, self.parallelization)
   
   # check if results are available
   def finished (self):
     
     config = self.config
     for sample in config.samples:
-      if not config.solver.finished ( config.level, config.type, sample, config.id ):
+      if not config.solver.finished ( config.level, config.type, sample ):
         return 0
     return 1
   
@@ -96,7 +96,7 @@ class MC (object):
     
     config = self.config
     for i, sample in enumerate (config.samples):
-      self.results [i] = config.solver.load ( config.level, config.type, sample, config.id )
+      self.results [i] = config.solver.load ( config.level, config.type, sample )
   
   # assmble MC estimates
   def assemble (self, stats):

@@ -50,8 +50,8 @@ class Example_Solver (Solver):
     # picks out (or computes) the required quantity of interest
     self.indicator = lambda x : x
     
-    # prefix for the job names
-    self.prefix = 'test'
+    # name of this solver (used as prefix for the job names)
+    self.name = 'example'
     
     # set datatype that function self.load(...) returns
     self.DataClass = Float
@@ -74,15 +74,15 @@ class Example_Solver (Solver):
     
     return 1
   
-  # run the specified deterministic simulation (level, type, sample, id)
-  def run (self, level, type, sample, id, seed, discretization, params, paralellization):
+  # run the specified deterministic simulation (level, type, sample)
+  def run (self, level, type, sample, seed, discretization, params, paralellization):
     
     # initialize arguments for the specified parallelization
     #TODO: move this to Scheduler base class?
     args = self.args (parallelization)
     
     # get directory
-    directory = self.directory ( level, type, sample, id )
+    directory = self.directory ( level, type, sample )
     
     # assemble job
     job = self.job (args)
@@ -92,18 +92,18 @@ class Example_Solver (Solver):
   
   # check if the job is finished
   # (required only for non-interactive sessions on clusters)
-  def finished (self, level, type, sample, id):
+  def finished (self, level, type, sample):
     
     # get directory
-    directory = self.directory ( level, type, sample, id )
+    directory = self.directory ( level, type, sample )
     
     # check if the output file exists
     return os.path.exists ( self.directory + '/' + self.outputfile )
   
   # open output file and read results
-  def load (self, level, type, sample, id):
+  def load (self, level, type, sample):
     
-    outputfile = open ( self.directory (level, type, sample, id) + '/' + self.outputfile, 'r' )
+    outputfile = open ( self.directory (level, type, sample) + '/' + self.outputfile, 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
     return [ float ( lines[0] .strip() ) ]
