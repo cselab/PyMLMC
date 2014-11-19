@@ -62,9 +62,9 @@ class Solver (object):
   
   # return the directory for a particular run
   def directory (self, level, type, sample=None):
-    name = 'level=%d_type=%d' % ( level, type )
+    name = '%d_%d' % ( level, type )
     if sample != None:
-      name += '_sample=%d' % sample
+      name += '_%d' % sample
     return name
   
   # return the label (= name_directory) of a particular run

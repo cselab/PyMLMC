@@ -31,7 +31,7 @@ class Static (Scheduler):
       cores = max ( min ( local.threads, self.cores ), int ( round ( required ) ) )
       
       if cores > required:
-        walltime = max ( local.walltime, self.walltime / ( cores / required ) )
+        walltime = self.walltime / ( cores / required )
       else:
         walltime = self.walltime
       

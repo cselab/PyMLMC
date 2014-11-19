@@ -9,7 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import helpers
-from math import modf, floor
+from math import modf, ceil
 import local
 
 class Parallelization (object):
@@ -20,13 +20,7 @@ class Parallelization (object):
     vars (self) .update ( locals() )
     
     # convert walltime to hours and minutes
-    if walltime:
-      frac, whole  = modf ( self.walltime )
-      self.hours   = int  ( whole )
-      self.minutes = int  ( floor ( 60 * frac ) )
-    else:
-      self.hours   = None
-      self.minutes = None
+    self.set_walltime (walltime)
     
     # if shared memory is not available, use one rank per core
     if not sharedmem:
@@ -39,6 +33,17 @@ class Parallelization (object):
       self.ranks   = max ( 1, cores / local.threads )
       self.threads = min ( local.threads, cores )
       self.memory  = local.memory * self.threads if local.memory else None
+  
+  # convert walltime to hours and minutes
+  def set_walltime (self, walltime):
+    
+    if walltime:
+      frac, whole  = modf ( walltime )
+      self.hours   = int  ( whole )
+      self.minutes = int  ( ceil ( 60 * frac ) )
+    else:
+      self.hours   = None
+      self.minutes = None
 
 class Scheduler (object):
   

@@ -38,6 +38,10 @@ class MC (object):
     # store configuration
     vars (self) .update ( locals() )
     
+    # modify parallelization walltime if batch mode
+    if params.batch:
+      parallelization.set_walltime ( len(config.samples) * parallelization.walltime )
+    
     # list of results
     self.results = [ None ] * len ( self.config.samples )
     
