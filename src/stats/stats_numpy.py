@@ -13,13 +13,12 @@ import numpy
 
 class NumPy_Stat (Stat):
   
-  def __init__ (self, stat, name=None, params=None, style=''):
+  def __init__ (self, stat, name=None, params=None):
     self.stat = getattr ( numpy, stat )
     if name:
       self.name = name
     else:
       self.name = stat
-    self.style  = style
     self.params = params
   
   # compute statistic 'self.stat' of given samples
