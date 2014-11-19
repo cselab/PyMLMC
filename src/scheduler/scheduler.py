@@ -22,17 +22,18 @@ class Parallelization (object):
     # convert walltime to hours and minutes
     self.set_walltime (walltime)
     
+    # memory usage is per core
+    self.memory  = local.memory
+    
     # if shared memory is not available, use one rank per core
     if not sharedmem:
       self.ranks   = cores
       self.threads = 1
-      self.memory  = local.memory
     
     # otherwise, use one rank per node
     else:
       self.ranks   = max ( 1, cores / local.threads )
       self.threads = min ( local.threads, cores )
-      self.memory  = local.memory * self.threads if local.memory else None
   
   # convert walltime to hours and minutes
   def set_walltime (self, walltime):
