@@ -38,7 +38,7 @@ class Parallelization (object):
     else:
       self.ranks   = max ( 1, cores / local.threads )
       self.threads = min ( local.threads, cores )
-      self.memory  = local.memory * self.threads
+      self.memory  = local.memory * self.threads if local.memory else None
 
 class Scheduler (object):
   

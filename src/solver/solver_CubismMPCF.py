@@ -186,7 +186,7 @@ class CubismMPCF (Solver):
     job = self.job (args)
     
     # execute/submit job
-    self.launch (job, args, paralellization, directory)
+    self.launch (job, parallelization, directory)
   
   def finished (self, level, type, sample, id):
     

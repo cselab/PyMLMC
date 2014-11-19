@@ -42,7 +42,8 @@ class Solver (object):
       sys.exit()
   
   # init solver
-  def init (self, level, type):
+  # TODO: 'init' shadows the constructor argument 'init' for script
+  def begin (self, level, type):
     
     # if batch mode -> init script
     if local.cluster and self.params.batch:
@@ -140,7 +141,7 @@ class Solver (object):
     return local.submit % args
   
   # launch a job - be it run immediately, submitted as is, or combined into a single script
-  def launch (self, job, args, paralellization, directory):
+  def launch (self, job, parallelization, directory):
     
     # prepare solver
     self.prepare (directory)
@@ -154,7 +155,7 @@ class Solver (object):
       
       # else submit job to job management system
       else:
-        self.execute ( self.submit (job, args, paralellization), directory )
+        self.execute ( self.submit (job, parallelization), directory )
     
     # node run -> execute job directly
     else:
@@ -220,4 +221,4 @@ class Solver (object):
       directory = None
       
       # submit script to job management system
-      self.execute ( self.submit (job, args, paralellization), directory )
+      self.execute ( self.submit (job, parallelization), directory )

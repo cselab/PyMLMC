@@ -73,7 +73,7 @@ class MC (object):
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
     
     # init solver
-    config.solver.init (config.level, config.type)
+    config.solver.begin (config.level, config.type)
     
     # run all samples
     for sample in config.samples:

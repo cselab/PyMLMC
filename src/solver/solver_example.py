@@ -88,7 +88,7 @@ class Example_Solver (Solver):
     job = self.job (args)
     
     # execute/submit job
-    self.launch (job, args, paralellization, directory)
+    self.launch (job, parallelization, directory)
   
   # check if the job is finished
   # (required only for non-interactive sessions on clusters)
