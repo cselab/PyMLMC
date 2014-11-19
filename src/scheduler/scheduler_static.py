@@ -27,11 +27,10 @@ class Static (Scheduler):
     
     for level, type in self.levels_types:
       
-      required = float(self.cores) / self.ratios [level - type]
+      required = self.cores / float(self.ratios [level - type])
       cores = max ( min ( local.threads, self.cores ), int ( round ( required ) ) )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
-      walltime  = self.walltime /self.works [level - type] / self.works [self.L]
-      walltime *= (float(self.cores) / cores)
+      walltime  = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
       
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem )

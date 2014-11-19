@@ -128,7 +128,7 @@ class Solver (object):
     args ['minutes'] = parallelization.minutes
     args ['memory']  = parallelization.memory
     args ['label']   = label
-    print args
+    
     # assemble submission command
     return local.submit % args
   
