@@ -17,7 +17,7 @@ import local
 
 class Solver (object):
   
-  scriptname = 'batch_job_%s'
+  scriptname = 'batch_%s'
   scriptfile = None
   sharedmem  = 0
   
