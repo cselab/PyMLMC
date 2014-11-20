@@ -38,9 +38,8 @@ class MC (object):
     # store configuration
     vars (self) .update ( locals() )
     
-    # modify parallelization walltime if batch mode
-    if params.batch:
-      parallelization.set_walltime ( len(config.samples) * parallelization.walltime )
+    # setup parallelization based on the number of samples (affects only walltime)
+    parallelization.setup ( len(config.samples) )
     
     # list of results
     self.results = [ None ] * len ( self.config.samples )
@@ -71,11 +70,8 @@ class MC (object):
     # report information of the MC run and the prescribed parallelization
     args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
     if self.parallelization.walltime:
-      args += ( self.parallelization.hours, self.parallelization.minutes )
-      if self.params.batch:
-        print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm (all)' % args
-      else:
-        print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm (each)' % args
+      args += ( self.parallelization.hours, self.parallelization.minutes, self.parallelization.scope )
+      print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %dh %dm (%s)' % args
     else:
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
     

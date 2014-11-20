@@ -14,10 +14,16 @@ import local
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem):
+  def __init__ (self, cores, walltime, sharedmem, batch):
     
     # save configuration
     vars (self) .update ( locals() )
+    
+    # set scope (for batch)
+    if batch:
+      self.scope = 'all'
+    else:
+      self.scope = 'each'
     
     # convert walltime to hours and minutes
     self.set_walltime (walltime)
@@ -45,6 +51,12 @@ class Parallelization (object):
     else:
       self.hours   = None
       self.minutes = None
+  
+  # setup parallelization based on the number of samples
+  def setup (self, count):
+    
+    if self.batch:
+      self.set_walltime ( self.walltime * count )
 
 class Scheduler (object):
   

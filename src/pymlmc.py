@@ -12,7 +12,7 @@
 # === global imports
 
 import sys
-import pickle
+import time
 
 # === local imports
 
@@ -215,7 +215,11 @@ class MLMC (object):
         print ' :: INFO: Non-interactive mode specified -> exiting.'
         print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
         print
-        sys.exit () 
+        sys.exit ()
+      
+      # otherwise, sleep a bit
+      else:
+        time.sleep(5)
   
   # create MC objects
   def create_MCs (self, indices):

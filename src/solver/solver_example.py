@@ -41,7 +41,7 @@ class Example_Solver (Solver):
     self.cmd  = 'echo $RANDOM'
     
     # set path from the environment variable
-    #if not path: self.path = self.env('ENV_VARIABLE_FOR_PATH')
+    # if not path: self.path = self.env('ENV_VARIABLE_FOR_PATH')
     
     # name of the relevant output file
     self.outputfile = 'output.dat'
@@ -57,7 +57,7 @@ class Example_Solver (Solver):
     self.DataClass = Float
     
     # enable shared memory (i.e. 1 MPI-rank per node)
-    #self.sharedmem = 1
+    # self.sharedmem = 1
   
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
@@ -81,10 +81,17 @@ class Example_Solver (Solver):
     #TODO: move this to Scheduler base class?
     args = self.args (parallelization)
     
+    # inspect args - uncomment this for first time use!
+    # print args
+    
+    # here, args can be modified and additional args can be added
+    # args ['parameter'] = value
+    # args ['seed'] = seed
+    
     # get directory
     directory = self.directory ( level, type, sample )
     
-    # assemble job
+    # assemble job (using self.cmd)
     job = self.job (args)
     
     # execute/submit job

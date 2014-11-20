@@ -14,11 +14,12 @@ import local
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, separate=2 ):
     
     self.walltime = walltime
     self.nodes    = nodes
     self.cores    = cores
+    self.separate = separate
   
   def distribute (self):
     
@@ -33,4 +34,7 @@ class Static (Scheduler):
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores) 
       
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem )
+      # process in batch all levels, except the 'self.separate' finest ones
+      batch = ( level <= self.L - self.separate )
+      
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch )

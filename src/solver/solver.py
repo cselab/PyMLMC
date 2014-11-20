@@ -33,7 +33,7 @@ class Solver (object):
   # check if nothing will be overwritten
   def check (self, level, type, sample):
     directory = self.directory (level, type, sample)
-    if os.path.exists (directory):
+    if not self.params.deterministic and os.path.exists (directory):
       print
       print ' :: ERROR: working directory is NOT clean!'
       print '  : -> Remove all directories like "%s".' % directory
@@ -62,6 +62,8 @@ class Solver (object):
   
   # return the directory for a particular run
   def directory (self, level, type, sample=None):
+    if self.params.deterministic:
+      return '.'
     name = '%d_%d' % ( level, type )
     if sample != None:
       name += '_%d' % sample
@@ -69,7 +71,10 @@ class Solver (object):
   
   # return the label (= name_directory) of a particular run
   def label (self, directory):
-    return '%s_%s' % (self.name, directory)
+    if self.params.deterministic:
+      return self.name
+    else:
+      return '%s_%s' % (self.name, directory)
   
   # assemble args
   def args (self, parallelization):
@@ -99,7 +104,10 @@ class Solver (object):
     if local.cluster:
       
       # assemble excutable command
-      args ['cmd'] = ('../' + self.cmd) % args
+      if self.params.deterministic:
+        args ['cmd'] = ( './' + self.cmd) % args
+      else:
+        args ['cmd'] = ('../' + self.cmd) % args
     
     # node run
     else:
@@ -157,11 +165,11 @@ class Solver (object):
   def prepare (self, directory):
     
     # create directory
-    if directory != '.' and not os.path.exists (directory):
+    if not self.params.deterministic and not os.path.exists (directory):
       os.mkdir ( directory )
     
     # copy needed input files
-    if directory != '.':
+    if not self.params.deterministic:
       for inputfile in self.inputfiles:
         shutil.copy ( inputfile, directory + '/' )
   
@@ -189,9 +197,11 @@ class Solver (object):
     
     # add cmd to the script
     self.scriptfile.write ( '\n' )
-    self.scriptfile.write ( 'cd %s\n' % directory )
+    if not self.params.deterministic:
+      self.scriptfile.write ( 'cd %s\n' % directory )
     self.scriptfile.write ( cmd + '\n' )
-    self.scriptfile.write ( 'cd ..\n' )
+    if not self.params.deterministic:
+      self.scriptfile.write ( 'cd ..\n' )
   
   # execute the script
   def exit (self, level, type, parallelization):
