@@ -232,7 +232,8 @@ class MLMC (object):
     self.create_MCs (self.config.samples.indices.additional)
     print
     print ' :: SAMPLES TO COMPUTE:',
-    print self.config.samples.counts.additional
+    print helpers.intf(count), for count in self.config.samples.counts.additional
+    print
     for mc in self.mcs:
       mc.validate ()
     for mc in self.mcs:
