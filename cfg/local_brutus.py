@@ -25,10 +25,10 @@ memory    = 1024
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; mpirun -np %(ranks)d -pernode %(cmd)s %(options)s'
+mpi_job = 'mpirun -np %(ranks)d -pernode %(cmd)s %(options)s'
 
 # batch script command
 batch_job = '< %(script)s'
 
 # submit command
-submit = 'bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(job)s'
+submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(job)s'

@@ -118,6 +118,7 @@ class Solver (object):
     # assemble job
     # TODO: in fact, 'and not local.cluster' is _not_ needed -
     # the only problem is with _different_ binaries 'mpcf-node' and 'mpcf-cluster'
+    # also, 'export OMP_NUM_THREADS=%(threads)d;' in front of binary does not work with LSF, for instance
     if args ['ranks'] == 1 and not local.cluster:
       return local.simple_job % args
     else:
