@@ -21,9 +21,9 @@ class Parallelization (object):
     
     # set scope (for batch)
     if batch:
-      self.scope = 'all'
+      self.scope = 'batch'
     else:
-      self.scope = 'each'
+      self.scope = 'single'
     
     # convert walltime to hours and minutes
     self.set_walltime (walltime)
