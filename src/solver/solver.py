@@ -150,7 +150,7 @@ class Solver (object):
     if local.cluster:
       
       # if batch mode -> add job to script
-      if self.params.batch:
+      if self.parallelization.batch:
         self.add ( job, directory )
       
       # else submit job to job management system
