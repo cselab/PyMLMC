@@ -150,7 +150,7 @@ class Solver (object):
     if local.cluster:
       
       # if batch mode -> add job to script
-      if self.parallelization.batch:
+      if parallelization.batch:
         self.add ( job, directory )
       
       # else submit job to job management system
@@ -176,7 +176,7 @@ class Solver (object):
   # execute the command
   def execute (self, cmd, directory=None):
     
-    # report full submission command
+    # report command
     if self.params.verbose >= 1:
       print
       print cmd
@@ -196,18 +196,27 @@ class Solver (object):
   def add (self, cmd, directory):
     
     # add cmd to the script
-    self.scriptfile.write ( '\n' )
+    text = '\n'
     if not self.params.deterministic:
-      self.scriptfile.write ( 'cd %s\n' % directory )
-    self.scriptfile.write ( cmd + '\n' )
+      text += 'cd %s\n' % directory
+    text += cmd + '\n'
     if not self.params.deterministic:
-      self.scriptfile.write ( 'cd ..\n' )
+      text += 'cd ..\n'
+    
+    # add cmd to the script
+    self.scriptfile.write ( text )
+    
+    # report command
+    if self.params.verbose >= 1:
+      print
+      print text
+      print
   
   # execute the script
   def exit (self, level, type, parallelization):
     
     # if batch mode -> submit script
-    if local.cluster and self.params.batch:
+    if local.cluster and parallelization.batch:
       
       # close script file
       self.scriptfile.close()
