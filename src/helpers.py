@@ -63,14 +63,18 @@ def grids_3d_t (N, NS):
   return [ { 'NX' : N[l], 'NY' : N[l], 'NZ' : N[l], 'NS' : NS[l] } for l in range(len(N)) ]
 
 # integer format with multipliers K, M, etc.
-def intf (number):
+def intf (number, table=1):
+  if table:
+    template = '%3d%s'
+  else:
+    template = '%d%s'
   if number == 0:
-    return '%3d%s' % ( 0, ' ' )
+    return template % ( 0, ' ' )
   from math import log, floor
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
-  return '%3d%s' % ( number, [' ', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  return template % ( number, [' ' if table else '', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
 
 # pair two seeds into one
 def pair (a, b):

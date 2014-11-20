@@ -233,7 +233,7 @@ class MLMC (object):
     print
     print ' :: SAMPLES TO COMPUTE:',
     for count in self.config.samples.counts.additional:
-      print helpers.intf(count), 
+      print helpers.intf (count, table=0), 
     print
     for mc in self.mcs:
       mc.validate ()
