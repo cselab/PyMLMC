@@ -208,9 +208,7 @@ class Solver (object):
     
     # report command
     if self.params.verbose >= 1:
-      print
       print text
-      print
   
   # execute the script
   def exit (self, level, type, parallelization):
