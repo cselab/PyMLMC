@@ -35,6 +35,6 @@ class Static (Scheduler):
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores) 
       
       # process in batch all levels, except the 'self.separate' finest ones
-      batch = ( level <= self.L - self.separate )
+      batch = ( level - type <= self.L - self.separate )
       
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch )
