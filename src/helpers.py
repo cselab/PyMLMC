@@ -22,12 +22,12 @@ def parse ():
   parser.add_argument ('-r', '--restart',       action = "count", default = 0,  help = 'restart the simulation')
   parser.add_argument ('-i', '--interactive',   action = "count", default = 0,  help = 'if set tonot s')
   parser.add_argument ('-q', '--query',         action = "store", default = 1,  help = 'query user for the modification of the tolerance after each update', type=int)
-  #parser.add_argument ('-o', '--options',       action = "store", default = '', help = 'additional options for the solver')
-  parser.add_argument ('-v', '--verbose',       action = "store", default = 0, help = 'additional options for the solver', type=int)
-  parser.add_argument ('-s', '--simulate',      action = "count", default = 0, help = 'simulate run only - no actual execution')
-  parser.add_argument ('-f', '--force',         action = "count", default = 0, help = 'force override of existing simulation files')
-  parser.add_argument ('-b', '--batch',         action = "store", default = 1, help = 'group small jobs of the same level and type into a single batch job', type=int)
-  parser.add_argument ('-d', '--deterministic', action = "count", default = 0, help = 'deterministic simulation - no subdirectories are created')
+  parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=string)
+  parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
+  parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
+  parser.add_argument ('-f', '--force',         action = "count", default = 0,  help = 'force override of existing simulation files')
+  parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
+  parser.add_argument ('-d', '--deterministic', action = "count", default = 0,  help = 'deterministic simulation - no subdirectories are created')
   return parser.parse_args()
 
 # creates an empty nested list iterating over levels and types

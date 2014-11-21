@@ -91,6 +91,15 @@ class Solver (object):
     # number of ranks
     args ['ranks'] = parallelization.ranks
     
+    # number of cores
+    args ['cores'] = parallelization.cores
+    
+    # number of nodes
+    args ['nodes'] = parallelization.nodes
+    
+    # number of tasks
+    args ['tasks'] = parallelization.tasks
+    
     return args
   
   # assemble job command
@@ -133,10 +142,13 @@ class Solver (object):
     args ['ranks']   = parallelization.ranks
     args ['threads'] = parallelization.threads
     args ['cores']   = parallelization.cores
+    args ['nodes']   = parallelization.nodes
+    args ['tasks']   = parallelization.tasks
     args ['hours']   = parallelization.hours
     args ['minutes'] = parallelization.minutes
     args ['memory']  = parallelization.memory
     args ['label']   = label
+    args ['xopts']   = self.params.xopts
     
     # assemble submission command
     return local.submit % args

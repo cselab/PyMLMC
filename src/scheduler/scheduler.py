@@ -40,6 +40,12 @@ class Parallelization (object):
     else:
       self.ranks   = max ( 1, cores / local.threads )
       self.threads = min ( local.threads, cores )
+    
+    # compute nodes
+    self.nodes = self.cores / self.threads
+    
+    # compute tasks = ranks_per_node
+    self.tasks = self.ranks / self.nodes
   
   # convert walltime to hours and minutes
   def set_walltime (self, walltime):
