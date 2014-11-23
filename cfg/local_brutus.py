@@ -27,7 +27,7 @@ simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 # MPI run command
 mpi_job = 'mpirun -np %(ranks)d --npernode %(tasks)d --cpus-per-proc %(threads) %(cmd)s %(options)s'
 
-# batch script command
+# batch run command
 batch_job = '< %(script)s'
 
 # submit command

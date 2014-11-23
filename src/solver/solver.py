@@ -17,8 +17,10 @@ import local
 
 class Solver (object):
   
-  scriptname = 'batch_%s'
-  scriptfile = None
+  jobfilename     = 'job.sh'
+  batch           = ''
+  batchfileformat = 'batch_%s.sh'
+  
   sharedmem  = 0
   
   # common setup routines
@@ -41,13 +43,9 @@ class Solver (object):
       print
       sys.exit()
   
-  # init solver
-  # TODO: 'init' shadows the constructor argument 'init' for script
-  def begin (self, level, type, parallelization):
-    
-    # if batch mode -> init script
-    if local.cluster and self.params.batch:
-      self.scriptfile = open ( self.scriptname % self.directory (level, type), 'w' )
+  # initialize solver
+  def initialize (self, level, type, parallelization):
+    self.batch = ''
   
   # set default path from the environment variable
   def env (self, var):
@@ -64,7 +62,7 @@ class Solver (object):
   def directory (self, level, type, sample=None):
     if self.params.deterministic:
       return '.'
-    name = '%d_%d' % ( level, type )
+    name = '%d_%d' % (level, type)
     if sample != None:
       name += '_%d' % sample
     return name
@@ -139,6 +137,7 @@ class Solver (object):
     # assemble arguments for job submission
     args             = {}
     args ['job']     = job
+    args ['script']  = self.jobfilename
     args ['ranks']   = parallelization.ranks
     args ['threads'] = parallelization.threads
     args ['cores']   = parallelization.cores
@@ -162,12 +161,19 @@ class Solver (object):
     # cluster run 
     if local.cluster:
       
-      # if batch mode -> add job to script
+      # if batch mode -> add job to batch script
       if parallelization.batch:
         self.add ( job, directory )
       
       # else submit job to job management system
       else:
+        
+        # create script for (a single) job
+        # some job management systems might prefer scripts rather than inline jobs
+        with open ('%s/%s' % (directory, self.jobfilename), 'w') as f:
+          f.write (job)
+        
+        # submit
         self.execute ( self.submit (job, parallelization, self.label(directory)), directory )
     
     # node run -> execute job directly
@@ -216,24 +222,27 @@ class Solver (object):
     if not self.params.deterministic:
       text += 'cd ..\n'
     
-    # add cmd to the script
-    self.scriptfile.write ( text )
+    # add cmd to the batch script
+    self.batch += text
     
     # report command
     if self.params.verbose >= 1:
       print text
   
-  # execute the script
-  def exit (self, level, type, parallelization):
+  # finalize solver
+  def finalize (self, level, type, parallelization):
     
-    # if batch mode -> submit script
+    # if batch mode -> create and submit script
     if local.cluster and parallelization.batch:
       
-      # close script file
-      self.scriptfile.close()
+      # create batch script
+      batchfilename = self.batchfileformat % self.directory (level, type)
+      with  = open (batchfilename, 'w') as batchfile:
+        batchfile.write ('#!/bin/bash\n')
+        batchfile.write (self.batch)
       
-      # assemble batch job for the generated script
-      job = local.batch_job % { 'script' : self.scriptname % self.directory (level, type) }
+      # assemble batch job
+      job = local.batch_job % { 'script' : batchfilename, 'batch' : self.batch }
       
       # submit script to job management system
       label = self.label ( self.directory (level, type) )

@@ -28,7 +28,7 @@ simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 mpi_job = 'export OMP_NUM_THREADS=%(threads)d; mpirun -np %(ranks)d %(cmd)s %(options)s'
 
 # batch run command
-batch_job = '< %(script)s'
+batch_job = '%(batch)s'
 
 # submit command
 submit = '%(job)s'

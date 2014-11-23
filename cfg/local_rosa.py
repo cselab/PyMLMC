@@ -1,6 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for Monte Rosa cluster (CSCS)
+# Local configuration for Monte Rosa cluster
+# Cray XE6 @ Swiss Supercomputing Center (CSCS)
 # More information: http://www.cscs.ch/computers/monte_rosa/index.html
 #                   http://user.cscs.ch/computing_resources/monte_rosa/index.html
 #
@@ -28,12 +29,10 @@ simple_job = 'export OMP_NUM_THREADS=%(threads); %(cmd)s %(options)s'
 # MPI run command
 mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(cores)d -N %(threads)d -d %(threads)d %(cmd)s %(options)s'
 
-# batch script command
-# TODO
-batch_job = '%(script)s'
+# batch run command
+batch_job = '%(batch)s'
 
 # submit command
-# TODO: memory
 submit = '''echo "#!/bin/bash
 #SBATCH --job-name=%(label)s
 #SBATCH --ntasks=%(cores)d

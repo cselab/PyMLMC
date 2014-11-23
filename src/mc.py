@@ -75,15 +75,15 @@ class MC (object):
     else:
       print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
     
-    # init solver
-    config.solver.begin (config.level, config.type, self.parallelization)
+    # initialize solver
+    config.solver.initialize (config.level, config.type, self.parallelization)
     
     # run all samples
     for sample in config.samples:
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
     
-    # exit solver
-    config.solver.exit (config.level, config.type, self.parallelization)
+    # finalize solver
+    config.solver.finalize (config.level, config.type, self.parallelization)
   
   # check if results are available
   def finished (self):
