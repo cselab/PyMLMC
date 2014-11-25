@@ -66,8 +66,8 @@ class Parallelization (object):
       self.set_walltime ( self.walltime * count )
     
     # enforce minimal walltime requirements
-    if walltime.hours == 0 and walltime.minutes < local.walltime_min:
-      walltime.minutes = local.walltime_min
+    if self.hours == 0 and self.minutes < local.walltime_min:
+      self.minutes = local.walltime_min
 
 class Scheduler (object):
   
