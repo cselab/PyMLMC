@@ -151,9 +151,7 @@ class Solver (object):
     args ['xopts']   = self.params.xopts
     
     # enforce minimal walltime requiremens
-    print 'boo'
-    if ['hours'] == 0 and args ['minutes'] < local.walltime_min:
-      print 'bee'
+    if args ['hours'] == 0 and args ['minutes'] < local.walltime_min:
       args ['minutes'] = local.walltime_min
     
     # assemble submission command
