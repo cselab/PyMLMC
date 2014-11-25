@@ -184,6 +184,7 @@ class CubismMPCF (Solver):
     
     # assemble job
     job = self.job (args)
+    print job
     
     # execute/submit job
     self.launch (job, parallelization, directory)
