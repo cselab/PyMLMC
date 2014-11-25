@@ -45,7 +45,8 @@ class Solver (object):
   
   # initialize solver
   def initialize (self, level, type, parallelization):
-    self.batch = ''
+    if parallelization.batch:
+      self.batch = ''
   
   # set default path from the environment variable
   def env (self, var):
