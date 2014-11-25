@@ -22,7 +22,7 @@ def parse ():
   parser.add_argument ('-r', '--restart',       action = "count", default = 0,  help = 'restart the simulation')
   parser.add_argument ('-i', '--interactive',   action = "count", default = 0,  help = 'after launch of each update, wait for jobs to finish instead of exiting')
   parser.add_argument ('-q', '--query',         action = "store", default = 1,  help = 'query user for the modification of the tolerance after each update', type=int)
-  parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=string)
+  parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=str)
   parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
   parser.add_argument ('-f', '--force',         action = "count", default = 0,  help = 'force override of existing simulation files')
