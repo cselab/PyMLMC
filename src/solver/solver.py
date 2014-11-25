@@ -149,6 +149,10 @@ class Solver (object):
     args ['label']   = label
     args ['xopts']   = self.params.xopts
     
+    # enforce minimal walltime requiremens
+    if ['hours'] == 0 and args ['minutes'] < local.walltime_min:
+      args ['minutes'] = local.walltime_min
+    
     # assemble submission command
     return local.submit % args
   

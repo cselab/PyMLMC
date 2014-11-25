@@ -23,6 +23,9 @@ walltime  = 1
 memory    = 1024
 rack      = 1024 # nodes
 
+# contraints
+walltime_min = 5
+
 # simple run command
 simple_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d --verbose=INFO: %(cmd)s %(options)s'
 

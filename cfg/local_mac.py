@@ -21,6 +21,9 @@ threads  = 2
 walltime = None
 memory   = None
 
+# contraints
+walltime_min = None
+
 # run command
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
