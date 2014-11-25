@@ -123,6 +123,8 @@ class Solver (object):
       # assemble executable command
       args ['cmd'] = self.cmd % args
     
+    print args ['cmd']
+    
     # assemble job
     # TODO: in fact, 'and not local.cluster' is _not_ needed -
     # the only problem is with _different_ binaries 'mpcf-node' and 'mpcf-cluster'
