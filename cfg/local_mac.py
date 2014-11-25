@@ -21,7 +21,7 @@ threads  = 2
 walltime = None
 memory   = None
 
-# contraints
+# constraints
 walltime_min = None
 
 # run command

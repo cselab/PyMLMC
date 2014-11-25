@@ -23,7 +23,7 @@ threads   = 32
 walltime  = 1
 memory    = 1024
 
-# contraints
+# constraints
 walltime_min = 5
 
 # simple run command

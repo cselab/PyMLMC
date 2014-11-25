@@ -23,7 +23,7 @@ walltime  = 1
 memory    = 1024
 rack      = 1024 # nodes
 
-# contraints
+# constraints
 walltime_min = 5
 
 # simple run command
