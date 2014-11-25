@@ -149,11 +149,7 @@ class Solver (object):
     args ['memory']  = parallelization.memory
     args ['label']   = label
     args ['xopts']   = self.params.xopts
-    
-    # enforce minimal walltime requiremens
-    if args ['hours'] == 0 and args ['minutes'] < local.walltime_min:
-      args ['minutes'] = local.walltime_min
-    
+        
     # assemble submission command
     return local.submit % args
   

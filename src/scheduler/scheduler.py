@@ -61,8 +61,13 @@ class Parallelization (object):
   # setup parallelization based on the number of samples
   def setup (self, count):
     
+    # walltime is cumulative for all samples if batch mode
     if self.batch:
       self.set_walltime ( self.walltime * count )
+    
+    # enforce minimal walltime requirements
+    if walltime.hours == 0 and walltime.minutes < local.walltime_min:
+      walltime.minutes = local.walltime_min
 
 class Scheduler (object):
   
