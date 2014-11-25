@@ -200,7 +200,7 @@ class CubismMPCF (Solver):
     
     # open self.outputfile and read results
     
-    outputfile = self.directory (level, type, sample, id) + '/' + self.outputfile
+    outputfile = self.directory (level, type, sample) + '/' + self.outputfile
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )

@@ -39,7 +39,8 @@ class MC (object):
     vars (self) .update ( locals() )
     
     # setup parallelization based on the number of samples (affects only walltime)
-    parallelization.setup ( len(config.samples) )
+    if self.parallelization:
+      self.parallelization.setup ( len(config.samples) )
     
     # list of results
     self.results = [ None ] * len ( self.config.samples )
