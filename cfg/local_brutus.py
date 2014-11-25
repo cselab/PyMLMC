@@ -28,7 +28,7 @@ walltime_min = 5
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'mpirun -np %(ranks)d --npernode %(tasks)d --cpus-per-proc %(threads) %(cmd)s %(options)s'
+mpi_job = 'mpirun -np %(ranks)d --npernode %(tasks)d --cpus-per-proc %(threads)d %(cmd)s %(options)s'
 
 # batch run command
 batch_job = '< %(script)s'
