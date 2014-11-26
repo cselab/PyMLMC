@@ -135,6 +135,7 @@ class CubismMPCF (Solver):
   def validate (self, discretization, parallelization):
     
     # check if number of cells in not smaller than block size
+    # update this 'multi' here...
     ranks = parallelization.cores / local.threads
     multi = int ( ranks ** (1.0/3) )
     if discretization ['NX'] < self.bs * multi:
@@ -171,8 +172,9 @@ class CubismMPCF (Solver):
       args ['xpesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
       args ['ypesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
       args ['zpesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
-      if parallelization.ranks % 2 == 0: args ['xpesize'] *= 2
-      if parallelization.ranks % 4 == 0: args ['ypesize'] *= 2
+      remainder = parallelization.ranks / ( args ['xpesize'] * args ['ypesize'] * args ['zpesize'] )
+      if remainder % 2 == 0: args ['xpesize'] *= 2
+      if remainder % 4 == 0: args ['ypesize'] *= 2
       
       # adjust bpd*
       args ['bpdx'] /= args ['xpesize']
