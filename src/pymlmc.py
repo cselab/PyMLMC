@@ -173,7 +173,7 @@ class MLMC (object):
         return
       
       # update, report, and validate the required number of samples
-      self.config.samples.update   (self.errors)
+      self.config.samples.update   (self.errors, self.indicators)
       self.config.samples.report   ()
       self.config.samples.validate ()
       
@@ -187,7 +187,7 @@ class MLMC (object):
             self.status_save ()
             return
           # otherwise update, report, and validate the number of samples
-          self.config.samples.update   (self.errors)
+          self.config.samples.update   (self.errors, self.indicators)
           self.config.samples.report   ()
           self.config.samples.validate ()
       
