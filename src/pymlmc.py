@@ -95,6 +95,9 @@ class MLMC (object):
     
     # status file name
     self.status_file = 'status.dat'
+    
+    # submission file name
+    self.submission_file = 'submission.dat'
   
   # MLMC simulation
   def simulation (self):
@@ -237,8 +240,12 @@ class MLMC (object):
     print
     for mc in self.mcs:
       mc.validate ()
+    f = open (self.submission_file, 'wa')
     for mc in self.mcs:
+      f.write (mc.info()+'\n')
       mc.run ()
+    f.write ('\n')
+    f.close()
   
   # query user for additional information
   def query (self):

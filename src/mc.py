@@ -58,6 +58,19 @@ class MC (object):
     
     return pair ( pair (self.config.level, sample), self.config.id )
   
+  # return information string describing the MC run and the prescribed parallelization
+  def info (self):
+    
+    config = self.config
+    
+    args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores) )
+    
+    if self.parallelization.walltime:
+      args += ( self.parallelization.hours, self.parallelization.minutes, self.parallelization.scope )
+      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %2dh %2dm  |  (%s)' % args
+    else:
+      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
+  
   # launch all samples
   def run (self):
     
@@ -69,12 +82,7 @@ class MC (object):
         config.solver.check ( config.level, config.type, sample )
     
     # report information of the MC run and the prescribed parallelization
-    args = ( self.config.level, self.config.type, intf(len(self.config.samples)), intf(self.parallelization.cores) )
-    if self.parallelization.walltime:
-      args += ( self.parallelization.hours, self.parallelization.minutes, self.parallelization.scope )
-      print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %2dh %2dm  |  (%s)' % args
-    else:
-      print '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
+    print self.info()
     
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)

@@ -22,7 +22,7 @@ walltime  = 1
 memory    = 1024
 
 # constraints
-walltime_min = 5
+walltime_min = 15
 
 # simple run command
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
