@@ -48,18 +48,18 @@ class Estimated (Samples):
     
     return errors.total_relative_error <= self.tol
   
-  def update (self, errors):
+  def update (self, errors, indicators):
     
     # compute the required cumulative sampling error
     self.required_error = self.tol * errors.normalization
     
     # compute optimal number of samples
     # assuming that no samples were computed so far
-    self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error )
+    self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error, indicators )
     
     # compute optimal number of samples
     # assuming that self.counts.computed samples are already computed on each level
-    self.counts_updated = self.optimal ( self.counts.computed, self.required_error)
+    self.counts_updated = self.optimal ( self.counts.computed, self.required_error, indicators)
     
     # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
@@ -121,14 +121,14 @@ class Estimated (Samples):
     return modified
   
   # computes the optimal number of samples if some samples are already computed
-  def optimal (self, computed, required_error):
+  def optimal (self, computed, required_error, indicators):
     
     from numpy import sqrt, zeros, ceil
     
     updated = numpy.array ( computed, dtype=int, copy=True )
     
     # compute the work-weighted sum of all variances
-    variance_work_sum = sum ( sqrt ( [ self.indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
+    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
     
     # perform iterative optimization until valid number of samples is obtained
     optimize = 1
@@ -147,7 +147,7 @@ class Estimated (Samples):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( self.indicators.variance_diff [level] / self.works [level] ) * variance_work_sum )
+        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.works [level] ) * variance_work_sum )
         
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
@@ -164,10 +164,10 @@ class Estimated (Samples):
           optimize = 1
           
           # update variance_work_sum
-          variance_work_sum -= sqrt ( self.indicators.variance_diff [level] * self.works [level] )
+          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.works [level] )
           
           # update required sampling error
-          required_error = sqrt ( (required_error ** 2) - self.indicators.variance_diff [level] / computed [level] )
+          required_error = sqrt ( (required_error ** 2) - indicators.variance_diff [level] / computed [level] )
     
     return updated
  
