@@ -227,7 +227,7 @@ class MLMC (object):
   # create MC objects
   def create_MCs (self, indices):
     self.mcs = []
-    for i, (level, type) in enumerate(self.levels_types):
+    for level, type in self.levels_types:
       self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.scheduler.parallelizations [level] [type] ) )
   
   # run MC estimates
@@ -285,7 +285,7 @@ class MLMC (object):
     for stat in self.stats:
       print
       print ' :: STATISTIC: %s' % stat
-      print self.stats [stat] 
+      print self.stats [stat]
   
   # save MLMC status
   def status_save (self):
