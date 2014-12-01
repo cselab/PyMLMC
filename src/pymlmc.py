@@ -97,7 +97,7 @@ class MLMC (object):
     self.status_file = 'status.dat'
     
     # submission file name
-    self.submission_file = 'submission.dat'
+    self.submission_file = 'queue.dat'
   
   # MLMC simulation
   def simulation (self):

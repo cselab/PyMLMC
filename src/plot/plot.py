@@ -138,7 +138,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     pylab.show ()
 
 # plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, save=None):
+def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
   
   # some dynamic values
   if level  == 'finest':   level  = mlmc.L
@@ -151,20 +151,23 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   else:
     pylab.figure(figsize=(8,5))
   
-  for sample in range(len(mlmc.config.samples.counts.computed)):
+  for sample in range(mlmc.config.samples.counts.computed[level]):
     
     results = mlmc.config.solver.load ( level, type, sample )
     
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi]  )
     
-    pylab.plot  (ts, vs, styles ['mean'])
+    pylab.plot  (ts, vs, label=str(sample))
   
   pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
   
   if extent:
     pylab.ylim(*extent)
-  
+
+  if mlmc.config.samples.counts.computed[level] <= legend:
+    pylab.legend (loc='best')
+
   if infolines: plot_infolines (self)
   if save:
     pylab.savefig    (save)
