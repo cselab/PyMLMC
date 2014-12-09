@@ -169,7 +169,7 @@ class MLMC (object):
       self.errors.save    ()
       
       # check if the simulation is already finished 
-      if self.config.samples.finished (self.errors):
+      if self.config.samples.finished (self.errors) or self.params.deterministic:
         print
         print ' :: Simulation finished.'
         self.status_save ()

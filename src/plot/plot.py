@@ -137,6 +137,14 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if not frame:
     pylab.show ()
 
+# plot the first sample of the finest level and type 0
+# used mainly for deterministic runs
+def plot (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=None):
+  level  = 'finest'
+  type   = 0
+  sample = 0
+  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, frame, save)
+
 # plot results of all samples (ensemble) of the specified level and type 
 def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
   
