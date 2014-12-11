@@ -292,7 +292,8 @@ class MLMC (object):
     
     with open ( self.status_file, 'w' ) as f:
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
-      f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
+      if not params.deterministic:
+        f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
       #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
     
     print
@@ -309,11 +310,12 @@ class MLMC (object):
       self.config.samples.counts.computed = status ['samples']
       self.config.samples.make ()
       
-      if self.config.samples.tol != status ['tol']:
-        print
-        print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-        print
-      self.config.samples.tol = status ['tol']
+      if not params.deterministic:
+        if self.config.samples.tol != status ['tol']:
+          print
+          print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
+          print
+        self.config.samples.tol = status ['tol']
       
       print
       print (' :: INFO: MLMC status loaded from to status.py')
