@@ -16,6 +16,7 @@ import local
 
 import numpy
 import sys
+import os
 
 class Interpolated_Time_Series (object):
   
@@ -87,7 +88,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=16, init=None, scratch=None):
+  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=16, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -99,14 +100,10 @@ class CubismMPCF (Solver):
       self.executable = 'mpcf-node'
     
     # set path to the executable
-    if not path: self.path = self.env('MPCF_CLUSTER_PATH')
-    
-    # set path to scratch
-    if not scratch: self.scratch = local.scratch
-    if 
+    if not path: self.path = self.env ('MPCF_CLUSTER_PATH')
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d -fpath %(scratch)'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -168,8 +165,6 @@ class CubismMPCF (Solver):
     
     args ['seed'] = seed
     
-    args ['scratch'] = local.scratch
-    
     # cluster run
     if local.cluster:
       
@@ -208,7 +203,7 @@ class CubismMPCF (Solver):
     
     # open self.outputfile and read results
     
-    outputfile = self.directory (level, type, sample) + '/' + self.outputfile
+    outputfile = os.path.join ( self.directory (level, type, sample), self.outputfile )
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )

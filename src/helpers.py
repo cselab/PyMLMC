@@ -88,3 +88,5 @@ def dump (listvar, listformat, listname, filename):
       line += listformat % var + ', '
     f.write ( line + '] )\n' )
 
+# prepare scratch
+def 

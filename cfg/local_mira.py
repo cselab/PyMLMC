@@ -26,6 +26,9 @@ rack      = 1024 # nodes
 # constraints
 walltime_min = 5
 
+# scratch path
+scratch = '/projects/sukysj/pymlmc'
+
 # simple run command
 simple_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d --verbose=INFO: %(cmd)s %(options)s'
 

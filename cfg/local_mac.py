@@ -24,6 +24,9 @@ memory   = None
 # constraints
 walltime_min = None
 
+# scratch path
+scratch = None
+
 # run command
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 

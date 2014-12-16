@@ -105,12 +105,12 @@ class Example_Solver (Solver):
     directory = self.directory ( level, type, sample )
     
     # check if the output file exists
-    return os.path.exists ( self.directory + '/' + self.outputfile )
+    return os.path.exists ( os.path.join (self.directory, self.outputfile) )
   
   # open output file and read results
   def load (self, level, type, sample):
     
-    outputfile = open ( self.directory (level, type, sample) + '/' + self.outputfile, 'r' )
+    outputfile = open ( os.path.join (self.directory (level, type, sample), self.outputfile), 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
     return [ float ( lines[0] .strip() ) ]

@@ -26,6 +26,9 @@ memory    = 1024
 # constraints
 walltime_min = 5
 
+# scratch path
+scratch = '/scratch/rosa/sukysj/pymlmc'
+
 # simple run command
 simple_job = 'export OMP_NUM_THREADS=%(threads); %(cmd)s %(options)s'
 

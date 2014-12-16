@@ -20,7 +20,7 @@ class Solver (object):
   jobfilename     = 'job.sh'
   batch           = ''
   batchfileformat = 'batch_%s.sh'
-  scratchname     = 'scratch'
+  outputdir       = 'output'
   
   sharedmem  = 0
   
@@ -29,21 +29,29 @@ class Solver (object):
     
     self.params = params
     
-    # copy executable to present working directory
-    if local.cluster and self.path:
-      shutil.copy (self.path + self.executable, '.')
-    
     # prepare scratch
-    if self.scratch:
+    if local.scratch:
+      
+      # assemble sub-directory
+      runpath, rundir = os.path.split (os.getcwd())
+      scratchdir = os.path.join (local.scratch, rundir)
       
       # prepare scratch directory
-      if os.path.exists (self.scratch):
-        print ' :: INFO: cleaning scratch directory...',
-        shutil.rmtree (self.scratch)
-      os.mkdir (self.scratch)
+      if not os.path.exists (scratchdir):
+        os.mkdir (scratchdir)
       
       # create symlink to scratch
-      os.symlink (self.scratch, 'scratch')
+      if not os.path.exists (outputdir):
+        os.symlink (scratchdir, outputdir)
+    
+    # otherwise create output directory
+    else:
+      if not os.path.exists (outputdir):
+        os.mkdir (outputdir)
+    
+    # copy executable to output directory
+    if local.cluster and self.path:
+      shutil.copy (self.path + self.executable, self.outputdir)
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):
@@ -64,7 +72,7 @@ class Solver (object):
   # set default path from the environment variable
   def env (self, var):
     try:
-      return os.environ [var] + '/'
+      return os.environ [var]
     except:
       print
       print ' :: WARNING: environment variable %s not set.' % var
@@ -74,19 +82,23 @@ class Solver (object):
   
   # return the directory for a particular run
   def directory (self, level, type, sample=None):
+    
     if self.params.deterministic:
-      return '.'
-    name = '%d_%d' % (level, type)
-    if sample != None:
-      name += '_%d' % sample
-    return name
+      return self.outputdir
+    
+    else:
+      name = '%d_%d' % (level, type)
+      if sample != None:
+        name += '_%d' % sample
+      return os.path.join ( self.outputdir, name )
   
   # return the label (= name_directory) of a particular run
   def label (self, directory):
     if self.params.deterministic:
       return self.name
     else:
-      return '%s_%s' % (self.name, directory)
+      path, dir = os.path.split (directory)
+      return '%s_%s' % (self.name, dir)
   
   # assemble args
   def args (self, parallelization):
