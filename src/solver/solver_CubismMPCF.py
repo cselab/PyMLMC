@@ -87,7 +87,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=16, init=None):
+  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=16, init=None, scratch=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -101,8 +101,12 @@ class CubismMPCF (Solver):
     # set path to the executable
     if not path: self.path = self.env('MPCF_CLUSTER_PATH')
     
+    # set path to scratch
+    if not scratch: self.scratch = local.scratch
+    if 
+    
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d -fpath %(scratch)'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -163,6 +167,8 @@ class CubismMPCF (Solver):
       args ['nsteps'] = 0
     
     args ['seed'] = seed
+    
+    args ['scratch'] = local.scratch
     
     # cluster run
     if local.cluster:

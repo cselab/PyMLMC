@@ -20,6 +20,7 @@ class Solver (object):
   jobfilename     = 'job.sh'
   batch           = ''
   batchfileformat = 'batch_%s.sh'
+  scratchname     = 'scratch'
   
   sharedmem  = 0
   
@@ -31,6 +32,18 @@ class Solver (object):
     # copy executable to present working directory
     if local.cluster and self.path:
       shutil.copy (self.path + self.executable, '.')
+    
+    # prepare scratch
+    if self.scratch:
+      
+      # prepare scratch directory
+      if os.path.exists (self.scratch):
+        print ' :: INFO: cleaning scratch directory...',
+        shutil.rmtree (self.scratch)
+      os.mkdir (self.scratch)
+      
+      # create symlink to scratch
+      os.symlink (self.scratch, 'scratch')
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):

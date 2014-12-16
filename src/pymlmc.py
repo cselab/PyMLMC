@@ -292,8 +292,9 @@ class MLMC (object):
     
     with open ( self.status_file, 'w' ) as f:
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
-      if not params.deterministic:
+      if not self.params.deterministic:
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
+      f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
       #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
     
     print
@@ -310,7 +311,8 @@ class MLMC (object):
       self.config.samples.counts.computed = status ['samples']
       self.config.samples.make ()
       
-      if not params.deterministic:
+      self.params.deterministic = status ['deterministic']
+      if not self.params.deterministic:
         if self.config.samples.tol != status ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
@@ -328,4 +330,5 @@ class MLMC (object):
       print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       
+      raise
       sys.exit()
