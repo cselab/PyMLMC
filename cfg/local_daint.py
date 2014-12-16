@@ -45,7 +45,6 @@ submit = '''echo "#!/bin/bash
 #SBATCH --ntasks-per-node=%(tasks)d
 #SBATCH --cpus-per-task=%(threads)d
 #SBATCH --time=%(hours)d:%(minutes)d:00
-#SBATCH --mem=%(memory)d
 #SBATCH --output=report.%(label)s
 #SBATCH --account=s500
 ulimit -c 0
