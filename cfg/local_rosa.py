@@ -14,7 +14,7 @@
 # name
 name = 'CSCS Monte Rosa (Cray XE6)'
 
-# Piz Daint is a cluster
+# Rosa is a cluster
 cluster = 1
 
 # default configuration
@@ -33,7 +33,7 @@ scratch = '/scratch/rosa/sukysj/pymlmc'
 simple_job = 'export OMP_NUM_THREADS=%(threads); %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(cores)d -N %(threads)d -d %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
 
 # batch run command
 batch_job = '%(batch)s'
@@ -41,7 +41,7 @@ batch_job = '%(batch)s'
 # submit command
 submit = '''echo "#!/bin/bash
 #SBATCH --job-name=%(label)s
-#SBATCH --ntasks=%(cores)d
+#SBATCH --ntasks=%(ranks)d
 #SBATCH --ntasks-per-node=%(tasks)d
 #SBATCH --cpus-per-ntask=%(threads)d
 #SBATCH --time=%(hours)d:%(minutes)d:00

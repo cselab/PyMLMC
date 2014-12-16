@@ -33,7 +33,7 @@ scratch = '/scratch/daint/sukysj/pymlmc'
 simple_job = 'export OMP_NUM_THREADS=%(threads); %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(nodes)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
 
 # batch run command
 batch_job = '%(batch)s'
@@ -41,10 +41,10 @@ batch_job = '%(batch)s'
 # submit command
 submit = '''echo "#!/bin/bash
 #SBATCH --job-name=%(label)s
-#SBATCH --ntasks=%(nodes)d
+#SBATCH --ntasks=%(ranks)d
 #SBATCH --ntasks-per-node=%(tasks)d
 #SBATCH --cpus-per-task=%(threads)d
-#SBATCH --time=%(hours)d:%(minutes)d:00
+#SBATCH --time=%(hours)d:%(minutes)2d:00
 #SBATCH --mem=%(memory)d
 #SBATCH --output=report.%(label)s
 #SBATCH --account=s500
