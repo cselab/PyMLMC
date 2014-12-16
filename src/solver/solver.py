@@ -51,7 +51,7 @@ class Solver (object):
     
     # copy executable to output directory
     if local.cluster and self.path:
-      shutil.copy (self.path + self.executable, self.outputdir)
+      shutil.copy ( os.path.join (self.path, self.executable), self.outputdir)
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):
