@@ -198,15 +198,15 @@ class CubismMPCF (Solver):
     
     # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
     return 1
-    
+  
   def load (self, level, type, sample):
     
     # open self.outputfile and read results
     
     outputfile = os.path.join ( self.directory (level, type, sample), self.outputfile )
     
-    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'pow(...)', 'wall_p_max' )
-    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',        'f'          )
+    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'Req', 'wall_p_max' )
+    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',   'f'          )
     meta_keys = ( 'step', 't',  'dt' )
     
     results = Interpolated_Time_Series ()

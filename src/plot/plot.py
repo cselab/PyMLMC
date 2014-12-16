@@ -11,17 +11,31 @@
 
 # === global imports
 
+import matplotlib
+
+# for pylab.tight_layout()
+#matplotlib.use('Agg')
+
 import pylab
 import numpy
 
-import matplotlib
-matplotlib.rcParams['font.size'] = 16
-matplotlib.rcParams['legend.fontsize'] = 14
+# font configuration
+matplotlib.rcParams ['font.size'] = 16
+matplotlib.rcParams ['legend.fontsize'] = 14
+# TODO: increase line widths as well as label sizes
+
+# additional colors
+matplotlib.colors.ColorConverter.colors['a'] = (38/256.0,135/256.0,203/256.0)
+matplotlib.colors.ColorConverter.colors['b'] = (251/256.0,124/256.0,42/256.0)
+matplotlib.colors.ColorConverter.colors['d'] = (182/256.0,212/256.0,43/256.0)
+
+# default color cycle
+matplotlib.rcParams ['axes.color_cycle'] = ['a', 'b', 'd', 'c', 'y', 'm', 'g', 'r', 'burlywood', 'chartreuse', 'b', 'k']
 
 styles = {}
-styles ['mean']             = 'b-'
-styles ['std. deviation']   = 'r--'
-styles ['percentile']       = 'g--'
+styles ['mean']             = 'a-'
+styles ['std. deviation']   = 'b--'
+styles ['percentile']       = 'd--'
 
 # plot each stat
 def plot_stats (qoi, stats, extent):
@@ -117,17 +131,25 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi]  )
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  if not frame:
+    if infolines:
+      pylab.figure(figsize=(8,6))
+    else:
+      pylab.figure(figsize=(8,5))
   
-  pylab.plot  (ts, vs, styles ['mean'])
-  pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
+  pylab.plot  (ts, vs, styles ['mean'], label=qoi)
   
+  if not mlmc.params.deterministic:
+    pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
+
   if extent:
     pylab.ylim(*extent)
-  
+
+  if not frame:
+    pylab.legend (loc = 'best')
+
+  #pylab.tight_layout()
+
   if infolines: plot_infolines (self)
   if save: saveall (mlmc, save)
   if not frame:
