@@ -311,7 +311,7 @@ class MLMC (object):
       self.config.samples.counts.computed = status ['samples']
       self.config.samples.make ()
       
-      self.params.deterministic = status ['deterministic']
+      self.params.deterministic = int ( status ['deterministic'] )
       if not self.params.deterministic:
         if self.config.samples.tol != status ['tol']:
           print

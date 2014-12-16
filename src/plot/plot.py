@@ -45,7 +45,7 @@ def plot_stats (qoi, stats, extent):
       pylab.plot (ts, vs, style, label=name)
   
   if extent:
-    pylab.ylim(*extent)
+    pylab.ylim (*extent)
   
   pylab.legend (loc='best')
 
@@ -54,10 +54,15 @@ def plot_infolines (mlmc):
   #TODO
   print ' :: ERROR: plot_infolines() not implemented.'
 
-def generateTexTable (mlmc):
+def generateTexTable (mlmc, save):
   
   #TODO
   print ' :: ERROR: generateTexTable() not implemented.'
+
+def saveall (mlmc, save):
+  pylab.savefig    (save)
+  pylab.savefig    (save[:-3] + 'eps')
+  generateTexTable (mlmc, save)
 
 # plot computed MC statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
@@ -67,9 +72,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   levels = (len(mlmc.mcs) + 1) / 2
   
   if infolines:
-    pylab.figure(figsize=(levels*8,2*6))
+    pylab.figure (figsize=(levels*8, 2*6))
   else:
-    pylab.figure(figsize=(levels*8,5+6))
+    pylab.figure (figsize=(levels*8, 5+6))
   
   for mc in mlmc.mcs:
     
@@ -78,10 +83,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
     plot_stats ( qoi, mc.stats, extent )
   
   if infolines: plot_infolines (self)
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   pylab.show ()
 
 # plot computed MLMC statistics
@@ -98,10 +100,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   plot_stats (qoi, mlmc.stats, extent)
   
   if infolines: plot_infolines (self)
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   pylab.show ()
 
 # plot results of one sample of the specified level and type
@@ -130,10 +129,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     pylab.ylim(*extent)
   
   if infolines: plot_infolines (self)
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   if not frame:
     pylab.show ()
 
@@ -177,10 +173,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     pylab.legend (loc='best')
 
   if infolines: plot_infolines (self)
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   pylab.show ()
 
 # plot indicators
@@ -249,10 +242,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   
   pylab.show()
 
@@ -307,10 +297,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   
   pylab.show()
 
@@ -359,9 +346,6 @@ def plot_errors (mlmc, infolines=False, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save:
-    pylab.savefig    (save)
-    pylab.savefig    (save[:-3] + 'eps')
-    generateTexTable (save)
+  if save: saveall (mlmc, save)
   
   pylab.show()
