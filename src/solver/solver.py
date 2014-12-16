@@ -41,13 +41,13 @@ class Solver (object):
         os.mkdir (scratchdir)
       
       # create symlink to scratch
-      if not os.path.exists (outputdir):
-        os.symlink (scratchdir, outputdir)
+      if not os.path.exists (self.outputdir):
+        os.symlink (scratchdir, self.outputdir)
     
     # otherwise create output directory
     else:
-      if not os.path.exists (outputdir):
-        os.mkdir (outputdir)
+      if not os.path.exists (self.outputdir):
+        os.mkdir (self.outputdir)
     
     # copy executable to output directory
     if local.cluster and self.path:
