@@ -41,10 +41,12 @@ batch_job = '%(batch)s'
 # submit command
 submit = '''echo "#!/bin/bash
 #SBATCH --job-name=%(label)s
+#SBATCH --nodes=%(nodes)d
 #SBATCH --ntasks=%(ranks)d
 #SBATCH --ntasks-per-node=%(tasks)d
 #SBATCH --cpus-per-task=%(threads)d
 #SBATCH --time=%(hours)d:%(minutes)d:00
+#SBATCH --mem=%(memory)d
 #SBATCH --output=report.%(label)s
 #SBATCH --account=s500
 ulimit -c 0
