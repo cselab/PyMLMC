@@ -214,9 +214,8 @@ class Solver (object):
       os.mkdir ( directory )
     
     # copy needed input files
-    if not self.params.deterministic:
-      for inputfile in self.inputfiles:
-        shutil.copy ( inputfile, directory + '/' )
+    for inputfile in self.inputfiles:
+      shutil.copy ( inputfile, directory + '/' )
   
   # execute the command
   def execute (self, cmd, directory=None):
