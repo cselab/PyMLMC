@@ -69,6 +69,14 @@ class Parallelization (object):
     if self.hours == 0 and self.minutes < local.walltime_min:
       self.minutes = local.walltime_min
 
+  # distribute ranks for ndims dimensions
+  def reshape (self, ndims):
+    counts = [1 for dim in range(ndims)]
+    dim = 0
+    while prod(counts) != self.ranks:
+      counts [ dim % ndims ] *= 2
+    return counts
+
 class Scheduler (object):
   
   def setup (self, levels, levels_types, works, ratios, sharedmem):
