@@ -167,7 +167,7 @@ class CubismMPCF (Solver):
     
     # cluster run
     if local.cluster:
-      
+      print parallelization.ranks
       # compute *pesizes
       # increment *pesizes iteratively to allow ranks as powers of 2
       args ['xpesize'] = int ( numpy.floor (parallelization.ranks ** (1.0/3) ) )
