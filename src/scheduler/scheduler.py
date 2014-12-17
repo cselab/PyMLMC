@@ -73,7 +73,8 @@ class Parallelization (object):
   def reshape (self, ndims):
     counts = [1 for dim in range(ndims)]
     dim = 0
-    while prod(counts) != self.ranks:
+    from operator import mul
+    while reduce(mul, counts, 1) != self.ranks:
       counts [ dim % ndims ] *= 2
     return counts
 
