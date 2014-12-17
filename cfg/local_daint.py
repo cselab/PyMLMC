@@ -48,7 +48,7 @@ submit = '''echo "#!/bin/bash
 #SBATCH --time=%(hours)d:%(minutes)d:00
 #SBATCH --mem=%(memory)d
 #SBATCH --output=report.%(label)s
-#SBATCH --account=s500
+#SBATCH --account=s448
 ulimit -c 0
 %(xopts)s
 %(job)s" | sbatch
