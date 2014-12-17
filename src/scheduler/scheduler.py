@@ -76,7 +76,7 @@ class Parallelization (object):
     from operator import mul
     while reduce(mul, counts, 1) != self.ranks:
       counts [ dim % ndims ] *= 2
-      dim++
+      dim += 1
     return counts
 
 class Scheduler (object):
