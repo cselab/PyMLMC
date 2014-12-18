@@ -37,6 +37,10 @@ styles ['mean']             = 'a-'
 styles ['std. deviation']   = 'b--'
 styles ['percentile']       = 'd--'
 
+# show plots
+def show ():
+  pylab.show()
+
 # plot each stat
 def plot_stats (qoi, stats, extent):
   
@@ -98,7 +102,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   
   if infolines: plot_infolines (self)
   if save: saveall (mlmc, save)
-  pylab.show ()
+  pylab.draw ()
 
 # plot computed MLMC statistics
 def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
@@ -115,7 +119,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   
   if infolines: plot_infolines (self)
   if save: saveall (mlmc, save)
-  pylab.show ()
+  pylab.draw ()
 
 # plot results of one sample of the specified level and type
 def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, frame=False, save=None):
@@ -147,13 +151,13 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
   if not frame:
     pylab.legend (loc = 'best')
-
+  
   #pylab.tight_layout()
-
+  
   if infolines: plot_infolines (self)
   if save: saveall (mlmc, save)
   if not frame:
-    pylab.show ()
+    pylab.draw ()
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
@@ -196,7 +200,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
 
   if infolines: plot_infolines (self)
   if save: saveall (mlmc, save)
-  pylab.show ()
+  pylab.draw ()
 
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, save=None):
@@ -266,7 +270,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   
   if save: saveall (mlmc, save)
   
-  pylab.show()
+  pylab.draw()
 
 # plot samples
 def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
@@ -321,7 +325,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
   
   if save: saveall (mlmc, save)
   
-  pylab.show()
+  pylab.draw()
 
 # plot errors
 def plot_errors (mlmc, infolines=False, save=None):
@@ -370,4 +374,4 @@ def plot_errors (mlmc, infolines=False, save=None):
   
   if save: saveall (mlmc, save)
   
-  pylab.show()
+  pylab.draw()
