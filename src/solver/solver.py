@@ -87,17 +87,21 @@ class Solver (object):
       return self.outputdir
     
     else:
-      name = '%d_%d' % (level, type)
+      dir = '%d_%d' % (level, type)
       if sample != None:
-        name += '_%d' % sample
-      return os.path.join ( self.outputdir, name )
+        dir += '/%d' % sample
+      return os.path.join ( self.outputdir, dir )
   
-  # return the label (= name_directory) of a particular run
-  def label (self, directory):
+  # return the label of a particular run
+  def label (self, level, type, sample=None):
+    
     if self.params.deterministic:
       return self.name
+    
     else:
-      path, dir = os.path.split (directory)
+      dir = '%d_%d' % (level, type)
+      if sample != None:
+        dir += '/%d' % sample
       return '%s_%s' % (self.name, dir)
   
   # assemble args
@@ -138,9 +142,9 @@ class Solver (object):
       
       # assemble excutable command
       if self.params.deterministic:
-        args ['cmd'] = ( './' + self.cmd) % args
+        args ['cmd'] = os.path.join ('.',  self.cmd) % args
       else:
-        args ['cmd'] = ('../' + self.cmd) % args
+        args ['cmd'] = os.path.join ('..', self.cmd) % args
     
     # node run
     else:
@@ -158,7 +162,7 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label):
+  def submit (self, job, parallelization, directory, label):
     
     # assemble arguments for job submission
     args             = {}
@@ -178,8 +182,16 @@ class Solver (object):
     # assemble submission command
     return local.submit % args
   
-  # launch a job - be it run immediately, submitted as is, or combined into a single script
-  def launch (self, job, parallelization, directory):
+  # launch a job from the specified 'args' and 'parallelization'
+  # depending on parameters, job will be run immediately or will be submitted to a queueing system
+  # for parallelization.batch = 1, all jobs (for specified level and type) are combined into a single script
+  def launch (self, args, parallelization, level, type, sample):
+    
+    # assemble job
+    job = self.job (args)
+    
+    # get directory
+    directory = self.directory (level, type, sample)
     
     # prepare solver
     self.prepare (directory)
@@ -188,19 +200,23 @@ class Solver (object):
     if local.cluster:
       
       # if batch mode -> add job to batch script
+      # all jobs are combined into a single script
       if parallelization.batch:
-        self.add ( job, directory )
+        self.add ( job, sample )
       
       # else submit job to job management system
       else:
         
         # create script for (a single) job
         # some job management systems might prefer scripts rather than inline jobs
-        with open ('%s/%s' % (directory, self.jobfilename), 'w') as f:
+        with open ( os.path.join (directory, self.jobfilename), 'w') as f:
           f.write (job)
         
+        # generate label
+        label = self.label (level, type, sample)
+        
         # submit
-        self.execute ( self.submit (job, parallelization, self.label(directory)), directory )
+        self.execute ( self.submit (job, parallelization, directory, label), directory )
     
     # node run -> execute job directly
     else:
@@ -211,14 +227,14 @@ class Solver (object):
     
     # create directory
     if not self.params.deterministic and not os.path.exists (directory):
-      os.mkdir ( directory )
+      os.makedirs ( directory )
     
     # copy needed input files
     for inputfile in self.inputfiles:
-      shutil.copy ( inputfile, directory + '/' )
+      shutil.copy ( inputfile, directory )
   
   # execute the command
-  def execute (self, cmd, directory=None):
+  def execute (self, cmd, directory='.'):
     
     # report command
     if self.params.verbose >= 1:
@@ -228,7 +244,7 @@ class Solver (object):
     
     # set stdout based on verbosity level
     if self.params.verbose >= 2:
-      stdout = None
+      stdout = subprocess.STDOUT
     else:
       stdout = open ( os.devnull, 'w' )
     
@@ -236,16 +252,14 @@ class Solver (object):
     if not self.params.simulate:
       subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
-  # add command to script
-  def add (self, cmd, directory):
+  # add cmd to script
+  def add (self, job, sample):
     
     # add cmd to the script
     text = '\n'
-    if not self.params.deterministic:
-      text += 'cd %s\n' % directory
-    text += cmd + '\n'
-    if not self.params.deterministic:
-      text += 'cd ..\n'
+    text += 'cd %s\n' % sample
+    text += job + '\n'
+    text += 'cd ..\n'
     
     # add cmd to the batch script
     self.batch += text
@@ -262,13 +276,14 @@ class Solver (object):
       
       # create batch script
       batchfilename = self.batchfileformat % self.directory (level, type)
-      with open (batchfilename, 'w') as batchfile:
-        batchfile.write ('#!/bin/bash\n')
-        batchfile.write (self.batch)
+      with open ( os.path.join (outputdir, batchfilename), 'w') as f:
+        f.write ('#!/bin/bash\n')
+        f.write (self.batch)
       
       # assemble batch job
       job = local.batch_job % { 'script' : batchfilename, 'batch' : self.batch }
       
       # submit script to job management system
-      label = self.label ( self.directory (level, type) )
-      self.execute ( self.submit (job, parallelization, label) )
+      directory = self.directory (level, type)
+      label     = self.label     (level, type)
+      self.execute ( self.submit (job, parallelization, directory, label), directory )

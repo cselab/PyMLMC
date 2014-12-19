@@ -41,3 +41,7 @@ batch_job = '%(batch)s'
 # submit command
 # TODO: project
 submit = 'qsub -A %(project)s -t=%(hours)d:%(minutes)d:00 -n %(nodes)d -O %(label)s --mode script %(xopts) %(script)s'
+
+# @ job_type = bluegene
+# @ bgsize = %(nodes)s
+# @ job_name = LoadL_Sample_1
