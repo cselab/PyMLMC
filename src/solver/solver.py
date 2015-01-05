@@ -163,7 +163,7 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, directory, label):
+  def submit (self, job, parallelization, label):
     
     # assemble arguments for job submission
     args             = {}
@@ -217,7 +217,7 @@ class Solver (object):
         label = self.label (level, type, sample)
         
         # submit
-        self.execute ( self.submit (job, parallelization, directory, label), directory )
+        self.execute ( self.submit (job, parallelization, label), directory )
     
     # node run -> execute job directly
     else:
@@ -276,8 +276,9 @@ class Solver (object):
     if local.cluster and parallelization.batch:
       
       # create batch script
+      directory = self.directory (level, type)
       batchfilename = self.batchfileformat % (level, type)
-      with open ( os.path.join (self.outputdir, batchfilename), 'w') as f:
+      with open ( os.path.join ( os.path.join (self.outputdir, directory), batchfilename), 'w') as f:
         f.write ('#!/bin/bash\n')
         f.write (self.batch)
       
@@ -285,6 +286,5 @@ class Solver (object):
       job = local.batch_job % { 'script' : batchfilename, 'batch' : self.batch }
       
       # submit script to job management system
-      directory = self.directory (level, type)
       label     = self.label     (level, type)
-      self.execute ( self.submit (job, parallelization, directory, label), directory )
+      self.execute ( self.submit (job, parallelization, label), directory )
