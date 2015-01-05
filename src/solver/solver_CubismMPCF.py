@@ -177,7 +177,7 @@ class CubismMPCF (Solver):
       args ['bpdz'] /= args ['zpesize']
     
     # execute/submit job
-    self.launch (job, args, parallelization, level, type, sample)
+    self.launch (args, parallelization, level, type, sample)
   
   def finished (self, level, type, sample):
     

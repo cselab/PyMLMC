@@ -89,7 +89,7 @@ class Example_Solver (Solver):
     # args ['seed'] = seed
     
     # execute/submit job
-    self.launch (job, args, parallelization, level, type, sample)
+    self.launch (args, parallelization, level, type, sample)
   
   # check if the job is finished
   # (required only for non-interactive sessions on clusters)
