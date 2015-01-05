@@ -277,7 +277,7 @@ class Solver (object):
       
       # create batch script
       batchfilename = self.batchfileformat % self.directory (level, type)
-      with open ( os.path.join (outputdir, batchfilename), 'w') as f:
+      with open ( os.path.join (self.outputdir, batchfilename), 'w') as f:
         f.write ('#!/bin/bash\n')
         f.write (self.batch)
       
