@@ -134,6 +134,10 @@ class Solver (object):
   # assemble job command
   def job (self, args):
     
+    # if input directory does not exist, create it
+    if os.path.exists (self.inputdir):
+      os.mkdir (self.inputdir)
+    
     # if specified, execute the initialization function
     if self.init:
       self.init ( args ['seed'] )
