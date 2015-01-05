@@ -145,7 +145,7 @@ class Solver (object):
       if self.params.deterministic:
         args ['cmd'] = os.path.join ('.',  self.cmd) % args
       else:
-        args ['cmd'] = os.path.join ('..', self.cmd) % args
+        args ['cmd'] = os.path.join (os.path.join ('..','..'), self.cmd) % args
     
     # node run
     else:
