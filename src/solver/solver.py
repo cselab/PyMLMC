@@ -20,6 +20,7 @@ class Solver (object):
   jobfilename     = 'job.sh'
   batch           = ''
   batchfileformat = 'batch_%s.sh'
+  inputdir        = 'input'
   outputdir       = 'output'
   
   sharedmem  = 0

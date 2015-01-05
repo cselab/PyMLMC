@@ -176,14 +176,8 @@ class CubismMPCF (Solver):
       args ['bpdy'] /= args ['ypesize']
       args ['bpdz'] /= args ['zpesize']
     
-    # get directory
-    directory = self.directory ( level, type, sample )
-    
-    # assemble job
-    job = self.job (args)
-    
     # execute/submit job
-    self.launch (job, parallelization, directory)
+    self.launch (job, args, parallelization, level, type, sample)
   
   def finished (self, level, type, sample):
     
