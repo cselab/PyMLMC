@@ -19,7 +19,7 @@ class Solver (object):
   
   jobfilename     = 'job.sh'
   batch           = ''
-  batchfileformat = 'batch_%s.sh'
+  batchfileformat = 'batch_%d_%d.sh'
   inputdir        = 'input'
   outputdir       = 'output'
   
@@ -276,7 +276,7 @@ class Solver (object):
     if local.cluster and parallelization.batch:
       
       # create batch script
-      batchfilename = self.batchfileformat % self.directory (level, type)
+      batchfilename = self.batchfileformat % (level, type)
       with open ( os.path.join (self.outputdir, batchfilename), 'w') as f:
         f.write ('#!/bin/bash\n')
         f.write (self.batch)
