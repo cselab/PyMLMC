@@ -22,7 +22,7 @@ walltime  = 1
 memory    = 1024
 
 # constraints
-walltime_min = 15
+bootup = 5
 
 # scratch path
 scratch = '/cluster/scratch_xp/public/sukysj/pymlmc'
@@ -37,4 +37,4 @@ mpi_job = 'mpirun -np %(ranks)d --npernode %(tasks)d --cpus-per-proc %(threads)d
 batch_job = '< %(script)s'
 
 # submit command
-submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(xopts)s %(job)s'
+submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.txt %(xopts)s %(job)s'

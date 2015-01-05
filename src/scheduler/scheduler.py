@@ -65,10 +65,10 @@ class Parallelization (object):
     if self.batch:
       self.set_walltime ( self.walltime * count )
     
-    # enforce minimal walltime requirements
-    if self.hours == 0 and self.minutes < local.walltime_min:
-      self.minutes = local.walltime_min
-
+    # take bootup time into account
+    if self.hours == 0 and self.minutes < 2 * local.bootup:
+      self.minutes += local.bootup
+  
   # distribute ranks for ndims dimensions
   def reshape (self, ndims):
     counts = [1 for dim in range(ndims)]

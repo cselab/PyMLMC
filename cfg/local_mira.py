@@ -24,7 +24,7 @@ memory    = 1024
 rack      = 1024 # nodes
 
 # constraints
-walltime_min = 5
+bootup = 5
 
 # scratch path
 scratch = '/projects/sukysj/pymlmc'

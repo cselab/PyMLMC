@@ -24,7 +24,7 @@ walltime  = 1
 memory    = 4096
 
 # constraints
-walltime_min = 5
+bootup = 5
 
 # scratch path
 scratch = '/scratch/daint/sukysj/pymlmc'

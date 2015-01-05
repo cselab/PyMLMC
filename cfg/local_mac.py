@@ -22,7 +22,7 @@ walltime = None
 memory   = None
 
 # constraints
-walltime_min = None
+bootup = None
 
 # scratch path
 scratch = None
