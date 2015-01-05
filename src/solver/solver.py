@@ -233,7 +233,7 @@ class Solver (object):
     # copy needed input files
     if os.path.exists (self.inputdir):
       for inputfile in os.listdir (self.inputdir):
-        shutil.copy ( inputfile, directory )
+        shutil.copy ( os.path.join (self.inputdir, inputfile), directory )
   
   # execute the command
   def execute (self, cmd, directory='.'):
