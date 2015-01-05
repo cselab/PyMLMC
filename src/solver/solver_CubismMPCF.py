@@ -88,7 +88,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', inputfiles=[], path=None, points=1000, bs=16, init=None):
+  def __init__ (self, options='', path=None, points=1000, bs=16, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -133,6 +133,7 @@ class CubismMPCF (Solver):
     
     return d1 ['NX'] / d2 ['NX'] * d1 ['NY'] / d2 ['NY'] * d1 ['NZ'] / d2 ['NZ']
   
+  # validate the proposed parallelization for the specified discretization
   def validate (self, discretization, parallelization):
     
     # check if number of cells in not smaller than block size
@@ -145,7 +146,9 @@ class CubismMPCF (Solver):
       print ' :: ERROR: mesh resolution NY / multi is smaller than block size: %d < %d.' % ( discretization ['NY'] / multi, self.bs )
     if discretization ['NZ'] < self.bs * multi:
       print ' :: ERROR: mesh resolution NZ / multi is smaller than block size: %d < %d.' % ( discretization ['NZ'] / multi, self.bs )
-  
+
+  # run the specified deterministic simulation (level, type, sample)
+  # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
   def run (self, level, type, sample, seed, discretization, params, parallelization):
     
     # initialize arguments for the specified parallelization

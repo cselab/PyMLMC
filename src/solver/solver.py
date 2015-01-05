@@ -231,8 +231,9 @@ class Solver (object):
       os.makedirs ( directory )
     
     # copy needed input files
-    for inputfile in self.inputfiles:
-      shutil.copy ( inputfile, directory )
+    if os.path.exists (self.inputdir):
+      for inputfile in os.listdir (self.inputdir):
+        shutil.copy ( inputfile, directory )
   
   # execute the command
   def execute (self, cmd, directory='.'):

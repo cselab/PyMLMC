@@ -29,10 +29,9 @@ class Example_Solver (Solver):
   
   # constructor for the example solver
   # 'options'       options for the solver
-  # 'inputfiles'    list of required input files that will be copied to subdirectories
   # 'path'          path to the executable; if local.cluster = 1 and path != None, a local copy of the executable is created
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', inputfiles=[], path=None, init=None):
+  def __init__ (self, options='', path=None, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -75,6 +74,7 @@ class Example_Solver (Solver):
     return 1
   
   # run the specified deterministic simulation (level, type, sample)
+  # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
   def run (self, level, type, sample, seed, discretization, params, paralellization):
     
     # initialize arguments for the specified parallelization
