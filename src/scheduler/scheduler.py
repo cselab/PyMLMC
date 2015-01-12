@@ -42,7 +42,10 @@ class Parallelization (object):
       self.threads = min ( local.threads, cores )
     
     # compute nodes
-    self.nodes = self.cores / self.threads
+    if sharedmem:
+      self.nodes = self.cores / self.threads
+    else:
+      self.nodes = self.cores
     
     # compute tasks = ranks_per_node
     self.tasks = self.ranks / self.nodes

@@ -88,7 +88,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', path=None, points=1000, bs=16, init=None):
+  def __init__ (self, options='', path=None, points=1000, bs=32, init=None):
     
     # save configuration
     vars (self) .update ( locals() )

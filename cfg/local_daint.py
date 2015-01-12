@@ -30,7 +30,7 @@ bootup = 5
 scratch = '/scratch/daint/sukysj/pymlmc'
 
 # simple run command
-simple_job = 'export OMP_NUM_THREADS=%(threads); %(cmd)s %(options)s'
+simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
 
 # MPI run command
 mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'

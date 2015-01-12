@@ -46,13 +46,13 @@ class MLMC_Config (object):
 class MLMC (object):
   
   # initialize MLMC
-  def __init__ (self, config):
+  def __init__ (self, config, deterministic=0):
     
     # store configuration
     vars (self) .update ( locals() )
     
     # parse input parameters
-    self.params = helpers.parse()
+    self.params = helpers.parse (deterministic)
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
