@@ -11,6 +11,7 @@
 
 from scheduler import *
 import local
+from numpy import round
 
 class Static (Scheduler):
   
@@ -38,4 +39,9 @@ class Static (Scheduler):
       # process in batch all levels, except the 'self.separate' finest ones
       batch = ( level - type <= self.L - self.separate )
       
+      # set maximal batch size such that the required walltime does not exceed specified walltime
+      batchmax = int ( round ( self.walltime / walltime ) )
+      
+      # construct parallelization according to all computed parameters
+      #self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch, batchmax )
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch )
