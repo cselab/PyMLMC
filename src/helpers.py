@@ -35,7 +35,7 @@ def level_type_list (levels):
   return [ [None, None] for level in levels ]
 
 # generates hierarchical grids specifying the coarsest grid and the additional number of levels L
-def grids (N0, L):
+def grids (N0, L=0):
   return [ N0 * (2 ** level) for level in range (L+1) ]
 
 # generates 1D grids with specified numbers of cells N

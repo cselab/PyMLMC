@@ -14,7 +14,7 @@ import local
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem, batch):
+  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None):
     
     # save configuration
     vars (self) .update ( locals() )

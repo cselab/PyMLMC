@@ -43,5 +43,4 @@ class Static (Scheduler):
       batchmax = int ( round ( self.walltime / walltime ) )
       
       # construct parallelization according to all computed parameters
-      #self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch, batchmax )
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch )
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, batch, batchmax )

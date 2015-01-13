@@ -19,7 +19,8 @@ class Solver (object):
   
   jobfilename     = 'job.sh'
   batch           = ''
-  batchfileformat = 'batch_%d_%d.sh'
+  batchfileformat = 'batch.sh'
+  bathfiles       = []
   inputdir        = 'input'
   outputdir       = 'output'
   
@@ -69,6 +70,7 @@ class Solver (object):
   def initialize (self, level, type, parallelization):
     if parallelization.batch:
       self.batch = ''
+      self.batchfiles = []
   
   # set default path from the environment variable
   def env (self, var):
@@ -282,7 +284,7 @@ class Solver (object):
       
       # create batch script
       directory = self.directory (level, type)
-      batchfilename = self.batchfileformat % (level, type)
+      batchfilename = self.batchfileformat
       with open (os.path.join (directory, batchfilename), 'w') as f:
         f.write ('#!/bin/bash\n')
         f.write (self.batch)
