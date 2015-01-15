@@ -17,8 +17,9 @@ name = 'Argonne Mira (BlueGene/Q)'
 cluster = 1
 
 # default configuration
+# todo: differentiate between cores and threads? on BG/Q that is different.. also memory should be computed per core, right?
 cores     = 16
-threads   = 16
+threads   = 64
 walltime  = 1
 memory    = 1024
 rack      = 1024 # nodes

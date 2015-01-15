@@ -293,5 +293,5 @@ class Solver (object):
       job = local.batch_job % { 'script' : batchfilename, 'batch' : self.batch }
       
       # submit script to job management system
-      label     = self.label     (level, type)
+      label = self.label (level, type)
       self.execute ( self.submit (job, parallelization, label), directory )

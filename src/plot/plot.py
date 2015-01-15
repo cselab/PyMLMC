@@ -20,9 +20,10 @@ import pylab
 import numpy
 
 # font configuration
-matplotlib.rcParams ['font.size'] = 16
+matplotlib.rcParams ['font.size']       = 16
 matplotlib.rcParams ['legend.fontsize'] = 14
-# TODO: increase line widths as well as label sizes
+matplotlib.rcParams ['lines.linewidth'] = 3
+# TODO: increase label sizes
 
 # additional colors
 matplotlib.colors.ColorConverter.colors['a'] = (38/256.0,135/256.0,203/256.0)
@@ -77,10 +78,32 @@ def generateTexTable (mlmc, save):
   #TODO
   print ' :: ERROR: generateTexTable() not implemented.'
 
+# generate figure name using the format 'figpath/pwd_suffix.extension'
+def figname (suffix, extension='pdf'):
+  import os
+  figpath = 'fig'
+  if not os.path.exists (figpath):
+    os.mkdir (figpath)
+  runpath, rundir = os.path.split (os.getcwd())
+  return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
+
+def figure (infolines=False):
+  if infolines:
+    pylab.figure(figsize=(8,6))
+  else:
+    pylab.figure(figsize=(8,5))
+
 def saveall (mlmc, save):
   pylab.savefig    (save)
   pylab.savefig    (save[:-3] + 'eps')
   generateTexTable (mlmc, save)
+
+def draw (mlmc, save, legend=False, loc='best'):
+  if legend:
+    pylab.legend (loc = loc)
+  if save:
+    saveall (mlmc, save)
+  pylab.draw ()
 
 # plot computed MC statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
@@ -101,8 +124,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
     plot_stats ( qoi, mc.stats, extent )
   
   if infolines: plot_infolines (self)
-  if save: saveall (mlmc, save)
-  pylab.draw ()
+  draw (mlmc, save)
 
 # plot computed MLMC statistics
 def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
@@ -118,8 +140,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   plot_stats (qoi, mlmc.stats, extent)
   
   if infolines: plot_infolines (self)
-  if save: saveall (mlmc, save)
-  pylab.draw ()
+  draw (mlmc, save)
 
 # plot results of one sample of the specified level and type
 def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, frame=False, save=None):
@@ -149,15 +170,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if extent:
     pylab.ylim(*extent)
 
-  if not frame:
-    pylab.legend (loc = 'best')
-  
-  #pylab.tight_layout()
-  
   if infolines: plot_infolines (self)
-  if save: saveall (mlmc, save)
+  #pylab.tight_layout()
+
   if not frame:
-    pylab.draw ()
+    draw (mlmc, save, legend=True, loc='best')
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
@@ -199,8 +216,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     pylab.legend (loc='best')
 
   if infolines: plot_infolines (self)
-  if save: saveall (mlmc, save)
-  pylab.draw ()
+  draw (mlmc, save)
 
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, save=None):
@@ -268,9 +284,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save: saveall (mlmc, save)
-  
-  pylab.draw()
+  draw (mlmc, save)
 
 # plot samples
 def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
@@ -323,9 +337,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save: saveall (mlmc, save)
-  
-  pylab.draw()
+  draw (mlmc, save)
 
 # plot errors
 def plot_errors (mlmc, infolines=False, save=None):
@@ -372,6 +384,37 @@ def plot_errors (mlmc, infolines=False, save=None):
   else:
     pylab.subplots_adjust(bottom=0.15)
   
-  if save: saveall (mlmc, save)
+  draw (mlmc, save)
+
+def rp_approximation (r, p1, p2, rho):
+  tc = 0.914681 * r * numpy.sqrt ( rho / (p1 - p2) )
+  rp = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
+  ts = numpy.linspace (0, tc, 10000)
+  rs = rp(ts)
+  return ts, rs
+
+def rp_integrated (r, p1, p2, rho, mu=0, S=0):
+  import rp
+  if mu > 0:
+    Exception (' :: ERROR: mu > 0 is not yet implemented.')
+    raise
+  if S > 0:
+    Exception (' :: ERROR: S > 0 is not yet implemented.')
+    raise
+  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho)
+  return ts, rs, ps, drs
+
+# plot Rayleigh Plesset
+def plot_rp (mlmc, r, p1, p2, rho, approximation=False, frame=False, save=None):
   
-  pylab.draw()
+  if approximation:
+    ts, rs = rp_approximation (r, p1, p2, rho)
+    label = 'Rayleigh-Plesset (approx.)'
+  else:
+    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho)
+    label = 'Rayleigh-Plesset'
+
+  pylab.plot (ts, rs, 'k-', label=label)
+
+  if not frame:
+    draw (mlmc, save, legend=True, loc='best')
