@@ -37,6 +37,8 @@ styles = {}
 styles ['mean']             = 'a-'
 styles ['std. deviation']   = 'b--'
 styles ['percentile']       = 'd--'
+styles ['rp_approximated']  = 'k--'
+styles ['rp_integrated']    = 'k-'
 
 # show plots
 def show ():
@@ -386,35 +388,32 @@ def plot_errors (mlmc, infolines=False, save=None):
   
   draw (mlmc, save)
 
-def rp_approximation (r, p1, p2, rho):
+def rp_approximated (r, p1=100, p2=0.0234, rho=1000):
   tc = 0.914681 * r * numpy.sqrt ( rho / (p1 - p2) )
+  print ' Collapse time: %f' % tc
   rp = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
   ts = numpy.linspace (0, tc, 10000)
   rs = rp(ts)
   return ts, rs
 
-def rp_integrated (r, p1, p2, rho, mu=0, S=0):
+def rp_integrated (r, p1=100, p2=0.0234, rho=1000, mu=0, S=0):
   import rp
-  if mu > 0:
-    Exception (' :: ERROR: mu > 0 is not yet implemented.')
-    raise
-  if S > 0:
-    Exception (' :: ERROR: S > 0 is not yet implemented.')
-    raise
-  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho)
+  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho, mu, S)
   return ts, rs, ps, drs
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p1, p2, rho, approximation=False, frame=False, save=None):
+def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=False, frame=False, save=None):
   
   if approximation:
-    ts, rs = rp_approximation (r, p1, p2, rho)
+    ts, rs = rp_approximated (r, p1, p2, rho)
     label = 'Rayleigh-Plesset (approx.)'
+    style = styles ['rp_approximated']
   else:
-    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho)
+    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, mu, S)
     label = 'Rayleigh-Plesset'
-
-  pylab.plot (ts, rs, 'k-', label=label)
+    style = styles ['rp_integrated']
+  
+  pylab.plot (ts, rs, style, alpha=0.5, label=label)
 
   if not frame:
     draw (mlmc, save, legend=True, loc='best')

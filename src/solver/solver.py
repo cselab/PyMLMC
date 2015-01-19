@@ -15,6 +15,12 @@ import shutil
 
 import local
 
+# start timer
+timer_start = 'START=$(date +%s)'
+
+# stop timer
+timer_stop = 'TIME=$(($(date +%s)-START)); echo Total time: $TIME seconds'
+
 class Solver (object):
   
   jobfilename     = 'job.sh'
@@ -169,11 +175,14 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label):
+  def submit (self, job, parallelization, label, timer=True):
     
     # assemble arguments for job submission
     args             = {}
-    args ['job']     = job
+    if timer:
+      args ['job']   = timer_start + '\n\n' + job + '\n' + timer_stop
+    else:
+      args ['job']   = job
     args ['script']  = self.jobfilename
     args ['ranks']   = parallelization.ranks
     args ['threads'] = parallelization.threads
