@@ -16,10 +16,10 @@ import shutil
 import local
 
 # start timer
-timer_start = 'START=$(date +%s)'
+timer_start = 'START=$(/bin/date +%s)'
 
 # stop timer
-timer_stop = 'TIME=$(($(date +%s)-START)); echo Total time: $TIME seconds'
+timer_stop = 'TIME=$(($(/bin/date +%s)-START)); echo Total time: $TIME seconds'
 
 class Solver (object):
   
