@@ -15,12 +15,6 @@ import shutil
 
 import local
 
-# start timer
-timer_start = 'START=$(/bin/date +%s)'
-
-# stop timer
-timer_stop = 'TIME=$(($(/bin/date +%s)-START)); echo Total time: $TIME seconds'
-
 class Solver (object):
   
   jobfilename     = 'job.sh'
@@ -175,12 +169,12 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, timer=True):
+  def submit (self, job, parallelization, label):
     
     # assemble arguments for job submission
     args             = {}
-    if timer:
-      args ['job']   = timer_start + '\n\n' + job + '\n' + timer_stop
+    if local.timer:
+      args ['job']   = local.timer_start + '\n\n' + job + '\n' + local.timer_stop
     else:
       args ['job']   = job
     args ['script']  = self.jobfilename
@@ -194,7 +188,7 @@ class Solver (object):
     args ['memory']  = parallelization.memory
     args ['label']   = label
     args ['xopts']   = self.params.xopts
-        
+    
     # assemble submission command
     return local.submit % args
   
@@ -290,6 +284,9 @@ class Solver (object):
     
     # if batch mode -> create and submit script
     if local.cluster and parallelization.batch:
+      
+      # add timer
+      self.batch = local.timer_start + '\n\n' + self.batch + '\n' + local.timer_stop
       
       # create batch script
       directory = self.directory (level, type)

@@ -38,3 +38,8 @@ batch_job = '< %(script)s'
 
 # submit command
 submit = 'export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.txt %(xopts)s %(job)s'
+
+# timer is disabled (for non-batch jobs)
+timer       = 0
+timer_start = 'START=$(/bin/date +%s)'
+timer_stop  = 'TIME=$(($(/bin/date +%s)-START)); echo Total time: $TIME seconds'

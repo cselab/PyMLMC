@@ -396,21 +396,29 @@ def rp_approximated (r, p1=100, p2=0.0234, rho=1000):
   rs = rp(ts)
   return ts, rs
 
-def rp_integrated (r, p1=100, p2=0.0234, rho=1000, mu=0, S=0):
+def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
   import rp
-  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho, mu, S)
+  dr0 = 0
+  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho, tend, dr0, mu, S)
   return ts, rs, ps, drs
 
 # plot Rayleigh Plesset
 def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=False, frame=False, save=None):
+  
+  # determine tend
+  results = mlmc.config.solver.load ( mlmc.L, 0, 1 )
+  ts = numpy.array ( results.meta ['t'] )
+  tend = ts [-1]
   
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
     label = 'Rayleigh-Plesset (approx.)'
     style = styles ['rp_approximated']
   else:
-    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, mu, S)
+    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, tend, mu, S)
     label = 'Rayleigh-Plesset'
+    if mu:
+      label += ' + dissipation'
     style = styles ['rp_integrated']
   
   pylab.plot (ts, rs, style, alpha=0.5, label=label)
