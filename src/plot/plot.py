@@ -37,8 +37,8 @@ styles = {}
 styles ['mean']             = 'a-'
 styles ['std. deviation']   = 'b--'
 styles ['percentile']       = 'd--'
-styles ['rp_approximated']  = 'k--'
 styles ['rp_integrated']    = 'k-'
+styles ['rp_approximated']  = 'k--'
 
 # show plots
 def show ():
@@ -406,7 +406,7 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
 def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=False, frame=False, save=None):
   
   # determine tend
-  results = mlmc.config.solver.load ( mlmc.L, 0, 1 )
+  results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
   ts = numpy.array ( results.meta ['t'] )
   tend = ts [-1]
   

@@ -49,5 +49,5 @@ submit = 'qsub -A %(project)s -t=%(hours)d:%(minutes)d:00 -n %(nodes)d -O %(labe
 
 # timer is disabled (for non-batch jobs)
 timer       = 0
-timer_start = 'START=$(/bin/date +%s)'
-timer_stop  = 'TIME=$(($(/bin/date +%s)-START)); echo Total time: $TIME seconds'
+timer_start = 'START="$(/bin/date +%s)"'
+timer_stop  = 'TIME="$(($(/bin/date +%s)-START))"; echo Total time: "$TIME" seconds'
