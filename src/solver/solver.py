@@ -174,7 +174,7 @@ class Solver (object):
     # assemble arguments for job submission
     args             = {}
     if local.timer:
-      args ['job']   = local.timer_start + '\n' + job + '\n' + local.timer_stop
+      args ['job']   = local.timer + ' ' + job
     else:
       args ['job']   = job
     args ['script']  = self.jobfilename
@@ -286,7 +286,8 @@ class Solver (object):
     if local.cluster and parallelization.batch:
       
       # add timer
-      self.batch = local.timer_start + '\n' + self.batch + '\n' + local.timer_stop
+      if local.timer:
+        self.batch = local.timer + ' ' + self.batch
       
       # create batch script
       directory = self.directory (level, type)
