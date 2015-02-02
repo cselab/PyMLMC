@@ -1,8 +1,8 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for Mira cluster
-# BlueGene/Q @ Argonne National Laboratory
-# More information: http://www.alcf.anl.gov/user-guides/blue-geneq-versus-blue-genep
+# Local configuration for JUQUEEN cluster
+# Jülich Supercomputing Centre (JSC)
+# More information: http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JUQUEEN
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
@@ -11,9 +11,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Argonne Mira (BlueGene/Q)'
+name = 'Julich JUQUEEN (BlueGene/Q)'
 
-# Mira is a cluster
+# JUQUEEN is a cluster
 cluster = 1
 
 # default configuration
@@ -27,8 +27,8 @@ rack      = 1024 # nodes
 # constraints
 bootup = 5
 
-# scratch path
-scratch = '/projects/sukysj/pymlmc'
+# scratch path (not required - we use $WORK)
+scratch = None
 
 # simple run command
 simple_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d --verbose=INFO: %(cmd)s %(options)s'
@@ -40,8 +40,7 @@ mpi_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d
 batch_job = '%(batch)s'
 
 # submit command
-# TODO: project
-submit = 'qsub -A %(project)s -t=%(hours)d:%(minutes)d:00 -n %(nodes)d -O %(label)s --mode script %(xopts) %(script)s'
+submit = 'llsubmit %(script)s'
 
 # @ job_type = bluegene
 # @ bgsize = %(nodes)s

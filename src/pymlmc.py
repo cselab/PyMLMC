@@ -320,13 +320,13 @@ class MLMC (object):
         self.config.samples.tol = status ['tol']
       
       print
-      print (' :: INFO: MLMC status loaded from to status.py')
+      print (' :: INFO: MLMC status loaded from %s' % self.status_file)
       print
     
     except:
       
       print
-      print (' :: ERROR: MLMC status could not be loaded')
+      print (' :: ERROR: MLMC status could not be loaded from %s' % self.status_file)
       print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       

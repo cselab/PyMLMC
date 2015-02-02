@@ -27,18 +27,24 @@ matplotlib.rcParams ['lines.linewidth'] = 3
 
 # additional colors
 matplotlib.colors.ColorConverter.colors['a'] = (38/256.0,135/256.0,203/256.0)
-matplotlib.colors.ColorConverter.colors['b'] = (251/256.0,124/256.0,42/256.0)
-matplotlib.colors.ColorConverter.colors['d'] = (182/256.0,212/256.0,43/256.0)
+matplotlib.colors.ColorConverter.colors['i'] = (251/256.0,124/256.0,42/256.0)
+matplotlib.colors.ColorConverter.colors['j'] = (182/256.0,212/256.0,43/256.0)
 
 # default color cycle
-matplotlib.rcParams ['axes.color_cycle'] = ['a', 'b', 'd', 'c', 'y', 'm', 'g', 'r', 'burlywood', 'chartreuse', 'b', 'k']
+matplotlib.rcParams ['axes.color_cycle'] = ['a', 'i', 'j', 'c', 'y', 'm', 'g', 'r', 'burlywood', 'chartreuse', 'b', 'k']
 
 styles = {}
 styles ['mean']             = 'a-'
-styles ['std. deviation']   = 'b--'
-styles ['percentile']       = 'd--'
+styles ['std. deviation']   = 'i--'
+styles ['percentile']       = 'j--'
+
 styles ['rp_integrated']    = 'k-'
 styles ['rp_approximated']  = 'k--'
+
+styles ['Req']              = 'a-'
+styles ['p_max']            = 'i-'
+styles ['ke']               = 'j-'
+styles ['mach_max']         = 'c-'
 
 # show plots
 def show ():
@@ -98,6 +104,7 @@ def figure (infolines=False):
 def saveall (mlmc, save):
   pylab.savefig    (save)
   pylab.savefig    (save[:-3] + 'eps')
+  pylab.savefig    (save[:-3] + 'png')
   generateTexTable (mlmc, save)
 
 def draw (mlmc, save, legend=False, loc='best'):
@@ -164,7 +171,12 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     else:
       pylab.figure(figsize=(8,5))
   
-  pylab.plot  (ts, vs, styles ['mean'], label=qoi)
+  if qoi in styles:
+    style = styles [qoi]
+  else:
+    style = styles ['mean']
+
+  pylab.plot  (ts, vs, style, label=qoi)
   
   if not mlmc.params.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
@@ -207,7 +219,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi]  )
     
-    pylab.plot  (ts, vs, label=str(sample))
+    pylab.plot  (ts, vs, label=str(sample), linewidth=1)
   
   pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
   

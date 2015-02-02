@@ -40,27 +40,27 @@ def grids (N0, L=0):
 
 # generates 1D grids with specified numbers of cells N
 def grids_1d (N):
-  return [ { 'NX' : N[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n } for n in N ]
 
 # generates 1D grids with specified numbers of cells N and time steps NS
 def grids_1d_t (N, NS):
-  return [ { 'NX' : N[l], 'NS' : NS[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n, 'NS' : n } for n in N ]
 
 # generates 2D grids with specified numbers of cells N
 def grids_2d (N):
-  return [ { 'NX' : N[l], 'NY': N[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n, 'NY' : n } for n in N ]
 
 # generates 2D grids with specified numbers of cells N and time steps NS
 def grids_2d_t (N, NS):
-  return [ { 'NX' : N[l], 'NY' : N[l], 'NS' : NS[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n, 'NY' : n, 'NS' : n } for n in N ]
  
 # generates 3D grids with specified numbers of cells N
 def grids_3d (N):
-  return [ { 'NX' : N[l], 'NY' : N[l], 'NZ' : N[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n, 'NY' : n, 'NZ' : n } for n in N ]
 
 # generates 3D grids with specified numbers of cells N and time steps NS
 def grids_3d_t (N, NS):
-  return [ { 'NX' : N[l], 'NY' : N[l], 'NZ' : N[l], 'NS' : NS[l] } for l in range(len(N)) ]
+  return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
 # integer format with multipliers K, M, etc.
 def intf (number, table=1):
