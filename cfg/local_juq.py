@@ -1,7 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for JUQUEEN cluster
-# Jülich Supercomputing Centre (JSC)
+# Julich Supercomputing Centre (JSC)
 # More information: http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JUQUEEN
 #
 # Jonas Sukys

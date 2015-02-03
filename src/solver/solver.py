@@ -165,9 +165,6 @@ class Solver (object):
       args ['cmd'] = self.cmd % args
     
     # assemble job
-    # TODO: in fact, 'and not local.cluster' is _not_ needed -
-    # the only problem is with _different_ binaries 'mpcf-node' and 'mpcf-cluster'
-    # also, 'export OMP_NUM_THREADS=%(threads)d;' in front of binary does not work with LSF, for instance
     if args ['ranks'] == 1 and not local.cluster:
       return local.simple_job % args
     else:
@@ -182,7 +179,7 @@ class Solver (object):
     
     # create jobfile
     with open ( os.path.join (directory, self.jobfile), 'w') as f:
-      f.write ('#!/bin/bash\n\n')
+      f.write ('#!/bin/bash\n')
       f.write (job)
     
     # assemble arguments for job submission
@@ -282,7 +279,7 @@ class Solver (object):
     
     # execute command
     if not self.params.simulate:
-      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, shell=True, env=os.environ.copy() )
   
   # add cmd to script
   def add (self, job, sample):
