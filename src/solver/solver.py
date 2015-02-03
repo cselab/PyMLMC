@@ -210,7 +210,6 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
-        print
     
     # assemble submission command
     return local.submit % args
@@ -268,6 +267,7 @@ class Solver (object):
       print 'DIR: ' + directory
       print 'CMD: ' + cmd
       print '==='
+      print
     
     # set stdout based on verbosity level
     if self.params.verbose >= 2:
