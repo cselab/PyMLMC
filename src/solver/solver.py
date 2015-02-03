@@ -207,7 +207,9 @@ class Solver (object):
         f.write ( args ['script'] )
       if self.params.verbose >= 1:
         print
+        print '=== SCRIPT ==='
         print args ['script']
+        print '==='
     
     # assemble submission command
     return local.submit % args
@@ -261,8 +263,9 @@ class Solver (object):
     # report command
     if self.params.verbose >= 1:
       print
+      print '=== EXECUTE ==='
       print cmd
-      print
+      print '==='
     
     # set stdout based on verbosity level
     if self.params.verbose >= 2:
