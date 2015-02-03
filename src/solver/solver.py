@@ -282,7 +282,7 @@ class Solver (object):
     
     # execute command
     if not self.params.simulate:
-      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDERR, shell=True, env=os.environ.copy() )
+      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
   
   # add cmd to script
   def add (self, job, sample):
