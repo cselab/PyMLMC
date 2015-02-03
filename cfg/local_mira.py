@@ -30,14 +30,14 @@ bootup = 5
 # scratch path
 scratch = '/projects/sukysj/pymlmc'
 
+# default environment variables
+envs = ''
+
 # simple run command
 simple_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d --verbose=INFO: %(cmd)s %(options)s'
 
 # MPI run command
 mpi_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d --verbose=INFO: %(cmd)s %(options)s'
-
-# batch run command
-batch_job = '%(batch)s'
 
 # submit command
 # TODO: project

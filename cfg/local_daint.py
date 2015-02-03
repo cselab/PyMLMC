@@ -29,17 +29,17 @@ bootup = 5
 # scratch path
 scratch = '/scratch/daint/sukysj/pymlmc'
 
+# default environment variables
+envs = ''
+
 # simple run command
-simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
+simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; aprun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s aprun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
 
-# batch run command
-batch_job = '%(batch)s'
-
-# submit command
-submit = '''echo "#!/bin/bash
+# submission script template
+script = '''#!/bin/bash
 #SBATCH --job-name=%(label)s
 #SBATCH --nodes=%(nodes)d
 #SBATCH --ntasks=%(ranks)d
@@ -49,10 +49,13 @@ submit = '''echo "#!/bin/bash
 #SBATCH --mem=%(memory)d
 #SBATCH --output=report.%(label)s
 #SBATCH --account=s500
-ulimit -c 0
 %(xopts)s
-%(job)s" | sbatch
+ulimit -c 0
+%(job)s
 '''
+
+# submit command
+submit = 'sbatch %(jobfile)s'
 
 # timer
 timer = 'time'

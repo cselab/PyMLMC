@@ -17,14 +17,15 @@ import local
 
 class Solver (object):
   
-  jobfilename     = 'job.sh'
-  batch           = ''
-  batchfileformat = 'batch.sh'
-  bathfiles       = []
-  inputdir        = 'input'
-  outputdir       = 'output'
+  jobfile    = 'job.sh'
+  scriptfile = 'submit.sh'
+  inputdir   = 'input'
+  outputdir  = 'output'
   
   sharedmem  = 0
+  
+  batch         = ''
+  bathfiles     = []
   
   # common setup routines
   def setup (self, params):
@@ -131,6 +132,9 @@ class Solver (object):
     # number of tasks
     args ['tasks'] = parallelization.tasks
     
+    # custom environment variables
+    args ['envs'] = local.envs
+    
     return args
   
   # assemble job command
@@ -169,25 +173,41 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label):
+  def submit (self, job, parallelization, label, directory='.'):
+    
+    # add timer
+    if local.timer:
+      job = local.timer + ' ' + job
+    
+    # create jobfile
+    with open ( os.path.join (directory, self.jobfile), 'w') as f:
+      f.write ('#!/bin/bash\n\n')
+      f.write (job)
     
     # assemble arguments for job submission
-    args             = {}
-    if local.timer:
-      args ['job']   = local.timer + ' ' + job
-    else:
-      args ['job']   = job
-    args ['script']  = self.jobfilename
-    args ['ranks']   = parallelization.ranks
-    args ['threads'] = parallelization.threads
-    args ['cores']   = parallelization.cores
-    args ['nodes']   = parallelization.nodes
-    args ['tasks']   = parallelization.tasks
-    args ['hours']   = parallelization.hours
-    args ['minutes'] = parallelization.minutes
-    args ['memory']  = parallelization.memory
-    args ['label']   = label
-    args ['xopts']   = self.params.xopts
+    args              = {}
+    args ['job']      = job
+    args ['jobfile']  = self.jobfile
+    args ['ranks']    = parallelization.ranks
+    args ['threads']  = parallelization.threads
+    args ['cores']    = parallelization.cores
+    args ['nodes']    = parallelization.nodes
+    args ['tasks']    = parallelization.tasks
+    args ['hours']    = parallelization.hours
+    args ['minutes']  = parallelization.minutes
+    args ['memory']   = parallelization.memory
+    args ['label']    = label
+    args ['xopts']    = self.params.xopts
+    
+    # assemble submission script (if enabled)
+    if local.script:
+      args ['script']     = local.script % args
+      args ['scriptfile'] = self.scriptfile
+      with open (os.path.join (directory, self.scriptfile), 'w') as f:
+        f.write ( args ['script'] )
+      if self.params.verbose >= 1:
+        print
+        print args ['script']
     
     # assemble submission command
     return local.submit % args
@@ -217,16 +237,9 @@ class Solver (object):
       # else submit job to job management system
       else:
         
-        # create script for (a single) job
-        # some job management systems might prefer scripts rather than inline jobs
-        with open ( os.path.join (directory, self.jobfilename), 'w') as f:
-          f.write (job)
-        
-        # generate label
-        label = self.label (level, type, sample)
-        
         # submit
-        self.execute ( self.submit (job, parallelization, label), directory )
+        label = self.label (level, type, sample)
+        self.execute ( self.submit (job, parallelization, label, directory), directory )
     
     # node run -> execute job directly
     else:
@@ -282,23 +295,12 @@ class Solver (object):
   # finalize solver
   def finalize (self, level, type, parallelization):
     
-    # if batch mode -> create and submit script
+    # if batch mode -> submit batch job
     if local.cluster and parallelization.batch:
       
-      # add timer
-      if local.timer:
-        self.batch = local.timer + ' ' + self.batch
-      
-      # create batch script
+      # get directory
       directory = self.directory (level, type)
-      batchfilename = self.batchfileformat
-      with open (os.path.join (directory, batchfilename), 'w') as f:
-        f.write ('#!/bin/bash\n')
-        f.write (self.batch)
       
-      # assemble batch job
-      job = local.batch_job % { 'script' : batchfilename, 'batch' : self.batch }
-      
-      # submit script to job management system
+      # submit
       label = self.label (level, type)
-      self.execute ( self.submit (job, parallelization, label), directory )
+      self.execute ( self.submit (self.batch, parallelization, label, directory), directory )

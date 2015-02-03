@@ -27,14 +27,17 @@ bootup = None
 # scratch path
 scratch = None
 
+# default environment variables
+envs = ''
+
 # run command
-simple_job = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; %(cmd)s %(options)s'
+simple_job = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; mpirun -np %(ranks)d %(cmd)s %(options)s'
+mpi_job = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; %(envs)s mpirun -np %(ranks)d %(cmd)s %(options)s'
 
-# batch run command
-batch_job = '%(batch)s'
+# submission script template
+script = None
 
 # submit command
 submit = '%(job)s'
