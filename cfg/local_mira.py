@@ -41,7 +41,7 @@ mpi_job = 'runjob --np %(ranks)d -p %(tasks)d --envs OMP_NUM_THREADS=%(threads)d
 
 # submit command
 # TODO: project
-submit = 'qsub -A %(project)s -t=%(hours)d:%(minutes)d:00 -n %(nodes)d -O %(label)s --mode script %(xopts) %(script)s'
+submit = 'qsub -A %(project)s -t=%(hours).2d:%(minutes).2d:00 -n %(nodes)d -O %(label)s --mode script %(xopts) %(script)s'
 
 # @ job_type = bluegene
 # @ bgsize = %(nodes)s
