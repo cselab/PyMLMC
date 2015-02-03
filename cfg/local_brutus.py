@@ -43,7 +43,7 @@ ulimit -c 0
 '''
 
 # submit command
-submit = 'bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.txt %(xopts)s < %(scriptfile)s'
+submit = 'bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours)d:%(minutes)d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(xopts)s < %(scriptfile)s'
 
 # timer
 timer = 'time'
