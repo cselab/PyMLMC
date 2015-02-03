@@ -105,7 +105,7 @@ class Solver (object):
     else:
       dir = '%d_%d' % (level, type)
       if sample != None:
-        dir += '/%d' % sample
+        dir += '_%d' % sample
       return '%s_%s' % (self.name, dir)
   
   # assemble args
@@ -210,6 +210,7 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
+        print
     
     # assemble submission command
     return local.submit % args
