@@ -17,9 +17,9 @@ import local
 
 class Solver (object):
   
-  jobfile    = 'job.sh'
-  scriptfile = 'script.sh'
-  submitfile = 'submit.sh'
+  jobfile    = 'job_%s.sh'
+  scriptfile = 'script_%s.sh'
+  submitfile = 'submit_%s.sh'
   inputdir   = 'input'
   outputdir  = 'output'
   
@@ -178,14 +178,14 @@ class Solver (object):
       job = '%s (%s)' % (local.timer, job)
     
     # create jobfile
-    with open ( os.path.join (directory, self.jobfile), 'w') as f:
+    with open ( os.path.join (directory, self.jobfile % label), 'w') as f:
       f.write ('#!/bin/bash\n')
       f.write (job)
     
     # assemble arguments for job submission
     args              = {}
     args ['job']      = job
-    args ['jobfile']  = self.jobfile
+    args ['jobfile']  = self.jobfile % label
     args ['ranks']    = parallelization.ranks
     args ['threads']  = parallelization.threads
     args ['cores']    = parallelization.cores
@@ -200,8 +200,8 @@ class Solver (object):
     # assemble submission script (if enabled)
     if local.script:
       args ['script']     = local.script % args
-      args ['scriptfile'] = self.scriptfile
-      with open (os.path.join (directory, self.scriptfile), 'w') as f:
+      args ['scriptfile'] = self.scriptfile % label
+      with open (os.path.join (directory, self.scriptfile % label), 'w') as f:
         f.write ( args ['script'] )
       if self.params.verbose >= 1:
         print
@@ -210,7 +210,7 @@ class Solver (object):
         print '==='
   
     # create submit script
-    with open (os.path.join (directory, self.submitfile), 'w') as f:
+    with open (os.path.join (directory, self.submitfile % label), 'w') as f:
       f.write ( local.submit % args )
     
     # assemble submission command
