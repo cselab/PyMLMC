@@ -94,6 +94,7 @@ script = '''
 %(xopts)s
 # @ queue
 
+ulimit -c 0
 %(job)s
 '''
 

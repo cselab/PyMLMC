@@ -210,6 +210,7 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
+        print
     
     # assemble submission command
     return local.submit % args
