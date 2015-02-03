@@ -236,8 +236,6 @@ class Solver (object):
       
       # else submit job to job management system
       else:
-        
-        # submit
         label = self.label (level, type, sample)
         self.execute ( self.submit (job, parallelization, label, directory), directory )
     

@@ -59,3 +59,8 @@ submit = 'sbatch %(jobfile)s'
 
 # timer
 timer = 'time'
+
+# timer is disabled (for non-batch jobs)
+#timer       = 0
+#timer_start = 'START="$(/bin/date +%s)"'
+#timer_stop  = 'TIME="$(($(/bin/date +%s)-START))"; echo Total time: "$TIME" seconds'
