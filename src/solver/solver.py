@@ -265,7 +265,8 @@ class Solver (object):
     if self.params.verbose >= 1:
       print
       print '=== EXECUTE ==='
-      print cmd
+      print 'DIR: ' + directory
+      print 'CMD: ' + cmd
       print '==='
     
     # set stdout based on verbosity level
