@@ -18,7 +18,8 @@ import local
 class Solver (object):
   
   jobfile    = 'job.sh'
-  scriptfile = 'submit.sh'
+  scriptfile = 'script.sh'
+  submitfile = 'submit.sh'
   inputdir   = 'input'
   outputdir  = 'output'
   
@@ -210,6 +211,10 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
+  
+    # create submit script
+    with open (os.path.join (directory, self.submitfile), 'w') as f:
+      f.write ( local.submit % args )
     
     # assemble submission command
     return local.submit % args
