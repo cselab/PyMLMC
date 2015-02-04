@@ -273,7 +273,7 @@ class Solver (object):
     
     # set stdout and stderr based on verbosity level
     if self.params.verbose >= 2:
-      stdout = subprocess.STDOUT
+      stdout = None
       stderr = None
     else:
       stdout = open ( os.devnull, 'w' )
