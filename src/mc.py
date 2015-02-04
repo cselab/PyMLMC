@@ -63,13 +63,16 @@ class MC (object):
     
     config = self.config
     
-    args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores) )
+    if self.parallelization.cores % local.cores:
+      args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
+    else:
+      args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
     
     if self.parallelization.walltime:
       args += ( self.parallelization.hours, self.parallelization.minutes, self.parallelization.scope )
-      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores  |  %2dh %2dm  |  (%s)' % args
+      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  (%s)' % args
     else:
-      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s cores' % args
+      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s' % args
   
   # launch all samples
   def run (self):
