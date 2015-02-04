@@ -271,15 +271,17 @@ class Solver (object):
       print '==='
       print
     
-    # set stdout based on verbosity level
+    # set stdout and stderr based on verbosity level
     if self.params.verbose >= 2:
       stdout = subprocess.STDOUT
+      stderr = None
     else:
       stdout = open ( os.devnull, 'w' )
+      stderr = subprocess.STDOUT
     
     # execute command
     if not self.params.simulate:
-      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=subprocess.STDOUT, shell=True, env=os.environ.copy() )
+      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy() )
   
   # add cmd to script
   def add (self, job, sample):
