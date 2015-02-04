@@ -45,7 +45,7 @@ mpi_job = 'ulimit -c 0; %(envs)s mpirun -np %(ranks)d --npernode %(tasks)d --cpu
 script = None
 
 # submit command
-submit = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours).2d:%(minutes).2d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.txt %(xopts)s < %(jobfile)s'
+submit = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours).2d:%(minutes).2d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(xopts)s < %(jobfile)s'
 
 # timer
 timer = 'time'
