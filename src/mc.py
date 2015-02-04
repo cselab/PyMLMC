@@ -63,7 +63,7 @@ class MC (object):
     
     config = self.config
     
-    if self.parallelization.cores % local.cores:
+    if self.parallelization.cores % local.cores == 0:
       args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
     else:
       args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
