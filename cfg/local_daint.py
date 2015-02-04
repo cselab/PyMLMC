@@ -18,13 +18,17 @@ name = 'CSCS Piz Daint (Cray XC30)'
 cluster = 1
 
 # default configuration
-cores     = 8
-threads   = 8
-walltime  = 1
-memory    = 4096
+cores     = 8    # per node
+threads   = 1    # per core
+walltime  = 1    # h
+memory    = 4096 # GB per core
 
 # constraints
-bootup = 5
+bootup = 5 # min
+
+# theoretical performance figures per node
+peakflops = 0.0 # TFLOP/s
+bandwidth = 0.0 # GB/s
 
 # scratch path
 scratch = '/scratch/daint/sukysj/pymlmc'
@@ -55,7 +59,12 @@ ulimit -c 0
 '''
 
 # submit command
-submit = 'sbatch %(scriptfile)s'
+submit = 'sbatch %(jobfile)s'
 
 # timer
 timer = 'time'
+
+# timer is disabled (for non-batch jobs)
+#timer       = 0
+#timer_start = 'START="$(/bin/date +%s)"'
+#timer_stop  = 'TIME="$(($(/bin/date +%s)-START))"; echo Total time: "$TIME" seconds'

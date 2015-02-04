@@ -18,13 +18,17 @@ name = 'CSCS Monte Rosa (Cray XE6)'
 cluster = 1
 
 # default configuration
-cores     = 32
-threads   = 32
-walltime  = 1
-memory    = 1024
+cores     = 32   # per node
+threads   = 1    # per core
+walltime  = 1    # h
+memory    = 1024 # GB per core
 
 # constraints
-bootup = 5
+bootup = 5 # min
+
+# theoretical performance figures per node
+peakflops = 0.0 # TFLOP/s
+bandwidth = 0.0 # GB/s
 
 # scratch path
 scratch = '/scratch/rosa/sukysj/pymlmc'
@@ -55,7 +59,7 @@ ulimit -c 0
 '''
 
 # submit command
-submit = 'sbatch %(scriptfile)s'
+submit = 'sbatch %(jobfile)s'
 
 # timer
 timer = 'time'

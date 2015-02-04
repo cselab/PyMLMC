@@ -1,8 +1,8 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for Mira cluster
-# BlueGene/Q @ Argonne National Laboratory
-# More information: http://www.alcf.anl.gov/user-guides/blue-geneq-versus-blue-genep
+# Local configuration for FERMI cluster
+# Cineca
+# More information: http://www.hpc.cineca.it/content/ibm-fermi-user-guide
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
@@ -11,9 +11,9 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Argonne Mira (BlueGene/Q)'
+name = 'Cineca FERMI (BlueGene/Q)'
 
-# Mira is a cluster
+# FERMI is a cluster
 cluster = 1
 
 # default configuration
@@ -68,7 +68,7 @@ simple_job = '''runjob \
   '''
 
 # MPI run command
-mpi_job = '''runjob \
+mpi_job = '''runjob
   --np %(ranks)d \
   --ranks-per-node %(tasks)d \
   --cwd $PWD \
@@ -89,6 +89,7 @@ script = '''
   # @ notification = never
   # @ notify_user = jonas.sukys@mavt.ethz.ch
   # @ job_type = bluegene
+  # @ account_no = Pra09_2376
   # @ bg_size = %(nodes)d
   %(xopts)s
   # @ queue

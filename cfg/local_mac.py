@@ -16,13 +16,17 @@ name = 'Mac'
 cluster = 1
 
 # default configuration
-cores    = 2
-threads  = 2
-walltime = None
-memory   = None
+cores     = 2    # per node
+threads   = 1    # per core
+walltime  = None # h
+memory    = None # GB per core
 
 # constraints
-bootup = None
+bootup = None # min
+
+# theoretical performance figures per node
+peakflops = 0.0 # TFLOP/s
+bandwidth = 0.0 # GB/s
 
 # scratch path
 scratch = None

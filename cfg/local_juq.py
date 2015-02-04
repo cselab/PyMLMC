@@ -17,11 +17,10 @@ name = 'Julich JUQUEEN (BlueGene/Q)'
 cluster = 1
 
 # default configuration
-# todo: differentiate between cores and threads? on BG/Q that is different..! also memory should be computed per core, right?
-cores     = 16
-threads   = 64
+cores     = 16   # per node
+threads   = 4    # per core
 walltime  = 1    # h
-memory    = 1024 # GB
+memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
@@ -65,7 +64,7 @@ simple_job = '''runjob \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
   %(envs)s \
-  --verbose=INFO: %(cmd)s %(options)s'
+  : %(cmd)s %(options)s
   '''
 
 # MPI run command
@@ -76,27 +75,27 @@ mpi_job = '''runjob \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
   %(envs)s \
-  --verbose=INFO: %(cmd)s %(options)s'
+  : %(cmd)s %(options)s
   '''
 
 # submission script template
 script = '''
-# @ job_name = %(label)s
-# @ comment = "pymlmc"
-# @ error = report.%(label)s
-# @ output = report.%(label)s
-# @ environment = COPY_ALL
-# @ wall_clock_limit = %(hours).2d:%(minutes).2d:00
-# @ notification = allways
-# @ notify_user = jonas.sukys@mavt.ethz.ch
-# @ job_type = bluegene
-# @ bg_size = %(nodes)d
-%(xopts)s
-# @ queue
-
-ulimit -c 0
-%(job)s
-'''
+  # @ job_name = %(label)s
+  # @ comment = "pymlmc"
+  # @ error = report.%(label)s
+  # @ output = report.%(label)s
+  # @ environment = COPY_ALL
+  # @ wall_clock_limit = %(hours).2d:%(minutes).2d:00
+  # @ notification = never
+  # @ notify_user = jonas.sukys@mavt.ethz.ch
+  # @ job_type = bluegene
+  # @ bg_size = %(nodes)d
+  %(xopts)s
+  # @ queue
+  
+  ulimit -c 0
+  %(job)s
+  '''
 
 # submit command
 submit = 'llsubmit %(scriptfile)s'

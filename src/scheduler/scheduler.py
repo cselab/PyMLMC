@@ -31,21 +31,18 @@ class Parallelization (object):
     # memory usage is per core
     self.memory  = local.memory
     
-    # if shared memory is not available, use one rank per core
-    if not sharedmem:
-      self.ranks   = cores
-      self.threads = 1
-    
-    # otherwise, use one rank per node
-    else:
-      self.ranks   = max ( 1, cores / local.threads )
-      self.threads = min ( local.threads, cores )
-    
     # compute nodes
+    self.nodes = max ( 1, self.cores / local.cores )
+    
+    # if shared memory is available, use one rank per node
     if sharedmem:
-      self.nodes = self.cores / self.threads
+      self.ranks   = self.nodes
+      self.threads = local.threads * min ( local.cores, cores )
+    
+    # otherwise, use 'local.threads' ranks per core
     else:
-      self.nodes = self.cores
+      self.ranks   = self.cores * local.threads
+      self.threads = 1
     
     # compute tasks = ranks_per_node
     self.tasks = self.ranks / self.nodes
@@ -94,18 +91,18 @@ class Scheduler (object):
     # if 'cores' is not provided
     if self.cores == None:
 
-      # default value is used
+      # 'cores' is computed from 'nodes'
       if self.nodes == None:
-        self.cores = local.cores
-        self.nodes = 1
+        self.cores = local.cores * self.nodes
       
-      # or 'cores' is computed from 'nodes'
+      # or 1 node is used
       else:
-        self.cores = local.threads * self.nodes
+        self.nodes = 1
+        self.cores = local.cores
     
     # if 'cores' is provided, 'nodes' is ignored and is computed from 'cores'
     else:
-      self.nodes = max ( 1, self.cores / self.threads )
+      self.nodes = max ( 1, self.cores / local.cores )
     
     # if 'walltime' is not provided, default value is used
     if self.walltime == None:
