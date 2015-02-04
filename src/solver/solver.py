@@ -23,11 +23,6 @@ class Solver (object):
   inputdir   = 'input'
   outputdir  = 'output'
   
-  sharedmem  = 0
-  
-  batch         = ''
-  bathfiles     = []
-  
   # common setup routines
   def setup (self, params):
     
@@ -71,8 +66,7 @@ class Solver (object):
   # initialize solver
   def initialize (self, level, type, parallelization):
     if parallelization.batch:
-      self.batch = ''
-      self.batchfiles = []
+      self.batch = []
   
   # set default path from the environment variable
   def env (self, var):
@@ -283,31 +277,47 @@ class Solver (object):
     if not self.params.simulate:
       subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy() )
   
-  # add cmd to script
+  # add job to batch
   def add (self, job, sample):
     
     # add cmd to the script
-    text = '\n'
-    text += 'cd %s\n' % sample
-    text += job + '\n'
-    text += 'cd ..\n'
+    cmd = '\n'
+    cmd += 'cd %s\n' % sample
+    cmd += job + '\n'
+    cmd += 'cd ..\n'
     
-    # add cmd to the batch script
-    self.batch += text
+    # add cmd to the batch
+    self.batch.append (cmd)
     
     # report command
     if self.params.verbose >= 1:
-      print text
+      print cmd
   
   # finalize solver
   def finalize (self, level, type, parallelization):
     
-    # if batch mode -> submit batch job
+    # if batch mode -> submit batch job(s)
     if local.cluster and parallelization.batch:
       
       # get directory
       directory = self.directory (level, type)
       
-      # submit
-      label = self.label (level, type)
-      self.execute ( self.submit (self.batch, parallelization, label, directory), directory )
+      # determine required size of one part of the batch job
+      # might be > 1 in order to keep total walltime under control
+      if parallelization.batchmax != None:
+        size = parallelization.batchmax
+      else:
+        size = len (self.batch)
+      
+      # split batch job into parts
+      parts = [ self.batch [i:i+size] for i in range (0, len(self.batch), size) ]
+
+      # submit each part of the batch job
+      for i, part in enumerate(parts):
+        
+        # extract required part of the batch job
+        batch = ''.join (part)
+        
+        # submit
+        label = self.label (level, type) + '_b%d' % (i+1)
+        self.execute ( self.submit (batch, parallelization, label, directory), directory )
