@@ -92,7 +92,7 @@ class Scheduler (object):
     if self.cores == None:
 
       # 'cores' is computed from 'nodes'
-      if self.nodes == None:
+      if self.nodes != None:
         self.cores = local.cores * self.nodes
       
       # or 1 node is used
