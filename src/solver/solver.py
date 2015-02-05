@@ -191,6 +191,10 @@ class Solver (object):
     args ['label']    = label
     args ['xopts']    = self.params.xopts
     
+    # take bootup time into account
+    if args ['hours'] == 0 and args ['minutes'] < 2 * local.bootup:
+      args ['minutes'] += local.bootup
+
     # assemble submission script (if enabled)
     if local.script:
       args ['script']     = local.script % args
@@ -305,13 +309,17 @@ class Solver (object):
       # determine required size of one part of the batch job
       # might be > 1 in order to keep total walltime under control
       if parallelization.batchmax != None:
-        size = parallelization.batchmax
+        batchsize = parallelization.batchmax
       else:
-        size = len (self.batch)
+        batchsize = len (self.batch)
       
       # split batch job into parts
-      parts = [ self.batch [i:i+size] for i in range (0, len(self.batch), size) ]
-
+      parts = [ self.batch [i:i+batchsize] for i in range (0, len(self.batch), batchsize) ]
+  
+      # adjust parallelization walltime based w.r.t. 'batchsize'
+      if parallelization.walltime != None:
+        parallelization.set_walltime ( parallelization.walltime * batchsize )
+      
       # submit each part of the batch job
       for i, part in enumerate(parts):
         

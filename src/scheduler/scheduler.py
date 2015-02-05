@@ -58,17 +58,6 @@ class Parallelization (object):
       self.hours   = None
       self.minutes = None
   
-  # setup parallelization based on the number of samples
-  def setup (self, count):
-    
-    # walltime is cumulative for all samples if batch mode
-    if self.batch:
-      self.set_walltime ( self.walltime * count )
-    
-    # take bootup time into account
-    if self.hours == 0 and self.minutes < 2 * local.bootup:
-      self.minutes += local.bootup
-  
   # distribute ranks for ndims dimensions
   def reshape (self, ndims):
     counts = [1 for dim in range(ndims)]

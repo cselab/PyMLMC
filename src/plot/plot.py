@@ -115,7 +115,7 @@ def draw (mlmc, save, legend=False, loc='best'):
   pylab.draw ()
 
 # plot computed MC statistics
-def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
+def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -132,11 +132,14 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, save=None):
     pylab.title ( 'estimated statistics for %s (level %d, type %d)' % (qoi, mc.config.level, mc.config.type) )
     plot_stats ( qoi, mc.stats, extent )
   
-  if infolines: plot_infolines (self)
-  draw (mlmc, save)
+  if infolines:
+    plot_infolines (self)
+  
+  if not frame:
+    draw (mlmc, save)
 
 # plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
+def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -148,8 +151,11 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, save=None):
   pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent)
   
-  if infolines: plot_infolines (self)
-  draw (mlmc, save)
+  if infolines:
+    plot_infolines (self)
+
+  if not frame:
+    draw (mlmc, save)
 
 # plot results of one sample of the specified level and type
 def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, frame=False, save=None):
@@ -301,7 +307,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   draw (mlmc, save)
 
 # plot samples
-def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
+def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False, save=None):
   
   # === load all required data
   
@@ -339,7 +345,8 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
   pylab.xlabel ('mesh level')
   pylab.ylim   (ymin=0.7)
   #TODO: add light gray lines at y = 1, 2, 4
-  pylab.legend (loc='upper right')
+  if not frame:
+    pylab.legend (loc='upper right')
   
   pylab.subplots_adjust(top=0.94)
   pylab.subplots_adjust(right=0.95)
@@ -350,8 +357,9 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, save=None):
     pylab.subplots_adjust(bottom=0.28)
   else:
     pylab.subplots_adjust(bottom=0.15)
-  
-  draw (mlmc, save)
+
+  if not frame:
+    draw (mlmc, save)
 
 # plot errors
 def plot_errors (mlmc, infolines=False, save=None):
@@ -436,4 +444,5 @@ def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=Fals
   pylab.plot (ts, rs, style, alpha=0.5, label=label)
 
   if not frame:
+    pylab.label (loc='best')
     draw (mlmc, save, legend=True, loc='best')

@@ -38,10 +38,6 @@ class MC (object):
     # store configuration
     vars (self) .update ( locals() )
     
-    # setup parallelization based on the number of samples (affects only walltime)
-    if self.parallelization:
-      self.parallelization.setup ( len(config.samples) )
-    
     # list of results
     self.results = [ None ] * len ( self.config.samples )
     
@@ -69,8 +65,11 @@ class MC (object):
       args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
     
     if self.parallelization.walltime:
-      args += ( self.parallelization.hours, self.parallelization.minutes, self.parallelization.scope )
-      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  (%s)' % args
+      scope = self.parallelization.scope
+      if self.parallelization.batch and self.parallelization.batchmax != None and len(config.samples) > self.parallelization.batchmax:
+        scope += ' of %d' % self.parallelization.batchmax
+      args += ( self.parallelization.hours, self.parallelization.minutes, scope )
+      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
     else:
       return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s' % args
   
@@ -84,9 +83,6 @@ class MC (object):
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample )
     
-    # report information of the MC run and the prescribed parallelization
-    print self.info()
-    
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)
     
@@ -96,6 +92,9 @@ class MC (object):
     
     # finalize solver
     config.solver.finalize (config.level, config.type, self.parallelization)
+    
+    # report information of the MC run and the prescribed parallelization
+    print self.info()
   
   # check if results are available
   def finished (self):
