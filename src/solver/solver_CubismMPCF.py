@@ -33,7 +33,7 @@ class Interpolated_Time_Series (object):
     
     from numpy import loadtxt
     table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
-    records = { name : table [name] for name in names }
+    records = dict ( (name, table [name]) for name in names )
     
     outputfile.close()
     
