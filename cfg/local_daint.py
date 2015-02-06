@@ -62,7 +62,7 @@ ulimit -c 0
 '''
 
 # submit command
-submit = 'sbatch %(jobfile)s'
+submit = 'sbatch %(scriptfile)s'
 
 # timer
 timer = 'time'
