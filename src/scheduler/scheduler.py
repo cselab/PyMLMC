@@ -79,11 +79,11 @@ class Parallelization (object):
     if self.batchmax != None:
       self.batchsize = self.batchmax
     else:
-      batchsize = count
+      self.batchsize = count
     
     # adjust 'walltime' according to 'batchsize'
     if self.walltime != None:
-      self.set_walltime ( self.walltime * batchsize )
+      self.set_walltime ( self.walltime * self.batchsize )
   
   # distribute ranks for ndims dimensions
   def reshape (self, ndims):
