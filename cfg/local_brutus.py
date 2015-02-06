@@ -2,6 +2,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for Brutus cluster
 # More information: http://www.clusterwiki.ethz.ch/brutus/Brutus_wiki
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland

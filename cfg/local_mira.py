@@ -3,6 +3,7 @@
 # Local configuration for Mira cluster
 # BlueGene/Q @ Argonne National Laboratory
 # More information: http://www.alcf.anl.gov/user-guides/blue-geneq-versus-blue-genep
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland

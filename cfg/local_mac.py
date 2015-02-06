@@ -1,6 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for Mac
+# Local configuration for MacBook Pro (2014)
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
@@ -9,11 +10,10 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Mac'
+name = 'MacBook Pro (2014)'
 
-# Mac is (usually) not a cluster
-#TODO: this was modified for testing purposes
-cluster = 1
+# Mac is not a cluster
+cluster = 0
 
 # default configuration
 cores     = 2    # per node

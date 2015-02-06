@@ -4,6 +4,7 @@
 # Cray XC30 @ Swiss Supercomputing Center (CSCS)
 # More information: http://www.cscs.ch/computers/piz_daint/index.html
 #                   http://user.cscs.ch/computing_resources/piz_daint/index.html
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland

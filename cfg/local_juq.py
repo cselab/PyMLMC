@@ -3,6 +3,7 @@
 # Local configuration for JUQUEEN cluster
 # Julich Supercomputing Centre (JSC)
 # More information: http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JUQUEEN
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland

@@ -3,6 +3,7 @@
 # Local configuration for FERMI cluster
 # Cineca
 # More information: http://www.hpc.cineca.it/content/ibm-fermi-user-guide
+# For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
