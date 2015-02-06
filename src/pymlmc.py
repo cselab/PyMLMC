@@ -233,18 +233,28 @@ class MLMC (object):
   
   # run MC estimates
   def run (self):
+    
+    # create MC simulations
     self.create_MCs (self.config.samples.indices.additional)
+    
+    # report samples that will be computed
     print
     print ' :: SAMPLES TO COMPUTE:',
     for count in self.config.samples.counts.additional:
       print helpers.intf (count, table=0), 
-    print
+    
+    # validate MC simulations
     for mc in self.mcs:
       mc.validate ()
+    
+    # run MC simulations
+    for mc in self.mcs:
+      mc.run ()
+    
+    # generate submission file
     f = open (self.submission_file, 'wa')
     for mc in self.mcs:
       f.write (mc.info()+'\n')
-      mc.run ()
     f.write ('\n')
     f.close()
   

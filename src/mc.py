@@ -66,10 +66,11 @@ class MC (object):
     else:
       args = ( config.level, typestr, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
     
-    if self.parallelization.walltime:
+    if self.parallelization.walltime and local.cluster:
       scope = self.parallelization.scope
-      if self.parallelization.batch and self.parallelization.batchmax != None and len(config.samples) > self.parallelization.batchmax:
-        scope += ' of %d' % self.parallelization.batchmax
+      if self.parallelization.batch and self.parallelization.batchmax != None:
+          if len(config.samples) > self.parallelization.batchmax:
+            scope += ' of %d' % self.parallelization.batchmax
       args += ( self.parallelization.hours, self.parallelization.minutes, scope )
       return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
     else:
@@ -78,12 +79,19 @@ class MC (object):
   # launch all samples
   def run (self):
     
+    print
     config = self.config
     
     # check if nothing is overwritten
     if not self.params.force:
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample )
+    
+    # adjust parallelization according to the number of samples
+    self.parallelization.adjust ( len (config.samples) )
+    
+    # report information of the MC run and the prescribed parallelization
+    print self.info()
     
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)
@@ -94,9 +102,6 @@ class MC (object):
     
     # finalize solver
     config.solver.finalize (config.level, config.type, self.parallelization)
-    
-    # report information of the MC run and the prescribed parallelization
-    print self.info()
   
   # check if results are available
   def finished (self):
