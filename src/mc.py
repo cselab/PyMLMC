@@ -59,19 +59,21 @@ class MC (object):
     
     config = self.config
     
+    typestr = ['  FINE', 'COARSE'] [config.type]
+    
     if self.parallelization.cores % local.cores == 0:
-      args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
+      args = ( config.level, typestr, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
     else:
-      args = ( config.level, config.type, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
+      args = ( config.level, typestr, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
     
     if self.parallelization.walltime:
       scope = self.parallelization.scope
       if self.parallelization.batch and self.parallelization.batchmax != None and len(config.samples) > self.parallelization.batchmax:
         scope += ' of %d' % self.parallelization.batchmax
       args += ( self.parallelization.hours, self.parallelization.minutes, scope )
-      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
+      return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
     else:
-      return '  :  level %2d  |  type %d  |  %s sample(s)  |  %s %s' % args
+      return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s' % args
   
   # launch all samples
   def run (self):
