@@ -67,7 +67,7 @@ class MLMC (object):
     # setup required pairs of levels and types
     levels_types_fine   = [ [level, self.FINE]   for level in self.levels [1:] ]
     levels_types_coarse = [ [level, self.COARSE] for level in self.levels [1:] ]
-    self.levels_types   = [ [0, self.COARSE] ]  + [level_type for levels_types in zip (levels_types_fine,levels_types_coarse) for level_type in levels_types]
+    self.levels_types   = [ [0, self.FINE] ]  + [level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types]
     
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
