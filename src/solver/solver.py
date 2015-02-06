@@ -127,6 +127,9 @@ class Solver (object):
     # number of tasks
     args ['tasks'] = parallelization.tasks
     
+    # number of cores per node
+    args ['cpucores'] = parallelization.cpucores
+    
     # custom environment variables
     args ['envs'] = local.envs
     
@@ -193,6 +196,7 @@ class Solver (object):
     args ['hours']    = parallelization.hours
     args ['minutes']  = parallelization.minutes
     args ['memory']   = parallelization.memory
+    args ['cpucores'] = parallelization.cpucores
     args ['label']    = label
     args ['xopts']    = self.params.xopts
     

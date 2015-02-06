@@ -39,13 +39,16 @@ class Parallelization (object):
     
     # if shared memory is available, use one rank per node
     if sharedmem:
-      self.ranks   = self.nodes
-      self.threads = local.threads * min ( local.cores, cores )
+      self.ranks    = self.nodes
+      self.threads  = local.threads * min ( local.cores, cores )
     
     # otherwise, use 'local.threads' ranks per core
     else:
       self.ranks   = self.cores * local.threads
       self.threads = 1
+    
+    # set number of cores per cpu
+    self.cpucores = local.cores
     
     # compute tasks = ranks_per_node
     self.tasks = self.ranks / self.nodes
