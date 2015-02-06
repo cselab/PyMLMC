@@ -30,10 +30,13 @@ class Static (Scheduler):
     for level, type in self.levels_types:
       
       required = self.cores / float (self.ratios [level - type])
-      cores = max ( min ( local.cores, self.cores ), int ( round ( required ) ) )
+      cores = max ( min ( local.min_cores, self.cores ), int ( round ( required ) ) )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
+      
+      # respect the minimal walltime of the machine
+      walltime = max ( local.min_walltime, walltime )
       
       # process in batch all levels, except the 'self.separate' finest ones
       batch = ( level - type <= self.L - self.separate )

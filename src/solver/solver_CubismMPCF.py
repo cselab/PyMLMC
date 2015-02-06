@@ -136,8 +136,10 @@ class CubismMPCF (Solver):
   # validate the proposed parallelization for the specified discretization
   def validate (self, discretization, parallelization):
     
-    # check if number of cells in not smaller than block size
+    # get parallelization configuration
     xpesize, ypesize, zpesize = parallelization.reshape (3)
+    
+    # check if number of cells in not smaller than block size
     if discretization ['NX'] < self.bs * xpesize:
       print ' :: ERROR: mesh resolution NX / xpesize is smaller than block size: %d < %d.' % ( discretization ['NX'] / xpesize, self.bs )
       sys.exit()
@@ -147,7 +149,16 @@ class CubismMPCF (Solver):
     if discretization ['NZ'] < self.bs * zpesize:
       print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d < %d.' % ( discretization ['NZ'] / zpesize, self.bs )
       sys.exit()
-
+  
+    # check if number of blocks is not smaller than available threads
+    blocks_x = discretization ['NX'] / self.bs
+    blocks_y = discretization ['NY'] / self.bs
+    blocks_z = discretization ['NZ'] / self.bs
+    blocks   = blocks_x * blocks_y * blocks_z
+    if blocks < parallelization.threads:
+      print ' :: ERROR: number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
+      sys.exit()
+  
   # run the specified deterministic simulation (level, type, sample)
   # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
   def run (self, level, type, sample, seed, discretization, params, parallelization):

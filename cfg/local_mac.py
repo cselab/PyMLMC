@@ -18,11 +18,14 @@ cluster = 1
 # default configuration
 cores     = 2    # per node
 threads   = 1    # per core
-walltime  = None # h
+walltime  = None # hours
 memory    = None # GB per core
 
 # constraints
-bootup = None # min
+bootup       = None
+min_walltime = None
+max_walltime = None
+min_cores    = 1
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s

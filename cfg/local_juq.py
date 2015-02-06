@@ -19,12 +19,15 @@ cluster = 1
 # default configuration
 cores     = 16   # per node
 threads   = 4    # per core
-walltime  = 1    # h
+walltime  = 1    # hours
 memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
-bootup = 5 # min
+bootup       = 5   # minutes
+min_walltime = 0.5 # hours
+max_walltime = 24  # hours
+min_cores    = 512 * cores
 
 # theoretical performance figures per node
 peakflops = 12.8 # TFLOP/s
