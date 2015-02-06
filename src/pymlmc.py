@@ -116,10 +116,12 @@ class MLMC (object):
     # initialize, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.validate ()
-    self.config.samples.save     ()
+    if not self.config.params.deterministic:
+      self.config.samples.save     ()
     
     # initialize errors
-    self.errors.init ()
+    if not self.config.params.deterministic:
+      self.errors.init ()
     
     # make indices for the required number of samples
     self.config.samples.make ()
@@ -159,6 +161,12 @@ class MLMC (object):
       # load results
       self.load ()
       
+      # deterministic simulations are not suppossed to be updated
+      if self.params.deterministic:
+        print
+        print ' :: Deterministic simulation finished.'
+        return
+      
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs)
       self.indicators.report  ()
@@ -170,7 +178,7 @@ class MLMC (object):
       self.errors.save    ()
       
       # check if the simulation is already finished 
-      if self.config.samples.finished (self.errors) or self.params.deterministic:
+      if self.config.samples.finished (self.errors):
         print
         print ' :: Simulation finished.'
         self.status_save ()
@@ -253,11 +261,12 @@ class MLMC (object):
       mc.run ()
     
     # generate submission file
-    f = open (self.submission_file, 'wa')
-    for mc in self.mcs:
-      f.write (mc.info()+'\n')
-    f.write ('\n')
-    f.close()
+    if not self.config.params.deterministic:
+      f = open (self.submission_file, 'wa')
+      for mc in self.mcs:
+        f.write (mc.info()+'\n')
+      f.write ('\n')
+      f.close()
   
   # query user for additional information
   def query (self):
