@@ -116,11 +116,11 @@ class MLMC (object):
     # initialize, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.validate ()
-    if not self.config.params.deterministic:
+    if not self.params.deterministic:
       self.config.samples.save     ()
     
     # initialize errors
-    if not self.config.params.deterministic:
+    if not self.params.deterministic:
       self.errors.init ()
     
     # make indices for the required number of samples
@@ -261,7 +261,7 @@ class MLMC (object):
       mc.run ()
     
     # generate submission file
-    if not self.config.params.deterministic:
+    if not self.params.deterministic:
       f = open (self.submission_file, 'wa')
       for mc in self.mcs:
         f.write (mc.info()+'\n')
