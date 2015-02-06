@@ -50,7 +50,12 @@ class Solver (object):
     
     # copy executable to output directory
     if local.cluster and self.path:
-      shutil.copy ( os.path.join (self.path, self.executable), self.outputdir)
+      executablepath = os.path.join (self.path, self.executable)
+      if os.path.exists ( executablepath ):
+        shutil.copy ( executablepath, self.outputdir)
+      else:
+        print ' :: ERROR: executable not found at ' + executablepath
+        sys.exit()
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):
