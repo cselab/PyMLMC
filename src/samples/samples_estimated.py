@@ -38,11 +38,6 @@ class Estimated (Samples):
     
     # set simulation type (deterministic or stochastic)
     self.deterministic = ( self.warmup_factor == 1 and self.L == 0 )
-    
-    # initialize samples file
-    with open ( self.samples_file, 'w') as f:
-      f.write ( 'computed   = []\n' )
-      f.write ( 'additional = []\n' )
   
   def finished (self, errors):
     

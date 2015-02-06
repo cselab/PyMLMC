@@ -27,6 +27,7 @@ class Samples (object):
   
   tol          = None
   samples_file = 'samples.dat'
+  file_init    = False
   
   def setup (self, levels, works):
     
@@ -46,9 +47,16 @@ class Samples (object):
   
   def save (self):
     
-    from helpers import dump
-    dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
-    dump (self.counts.additional, '%d', 'additional', self.samples_file)
+    # initialize samples file
+    if not self.file_init:
+      with open ( self.samples_file, 'w') as f:
+        f.write ( 'computed   = []\n' )
+        f.write ( 'additional = []\n' )
+
+    else:
+      from helpers import dump
+      dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
+      dump (self.counts.additional, '%d', 'additional', self.samples_file)
   
   def make (self):
     
