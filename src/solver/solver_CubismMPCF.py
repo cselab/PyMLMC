@@ -103,7 +103,7 @@ class CubismMPCF (Solver):
     if not path: self.path = self.env ('MPCF_CLUSTER_PATH')
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps %(nsteps)d -ncores %(cpucores)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -seed %(seed)d -nsteps -ncores %(cpucores)d'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -173,10 +173,12 @@ class CubismMPCF (Solver):
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
     
+    '''
     if 'NS' in discretization:
       args ['nsteps'] = discretization ['NS']
     else:
       args ['nsteps'] = 0
+    '''
     
     args ['seed'] = seed
     
