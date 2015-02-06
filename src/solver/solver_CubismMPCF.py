@@ -141,15 +141,12 @@ class CubismMPCF (Solver):
     
     # check if number of cells in not smaller than block size
     if discretization ['NX'] < self.bs * xpesize:
-      print
       print ' :: ERROR: mesh resolution NX / xpesize is smaller than block size: %d < %d.' % ( discretization ['NX'] / xpesize, self.bs )
       sys.exit()
     if discretization ['NY'] < self.bs * ypesize:
-      print
       print ' :: ERROR: mesh resolution NY / ypesize is smaller than block size: %d < %d.' % ( discretization ['NY'] / ypesize, self.bs )
       sys.exit()
     if discretization ['NZ'] < self.bs * zpesize:
-      print
       print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d < %d.' % ( discretization ['NZ'] / zpesize, self.bs )
       sys.exit()
   

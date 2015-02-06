@@ -79,7 +79,6 @@ class MC (object):
   # launch all samples
   def run (self):
     
-    print
     config = self.config
     
     # check if nothing is overwritten

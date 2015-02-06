@@ -242,6 +242,7 @@ class MLMC (object):
     print ' :: SAMPLES TO COMPUTE:',
     for count in self.config.samples.counts.additional:
       print helpers.intf (count, table=0), 
+    print
     
     # validate MC simulations
     for mc in self.mcs:
