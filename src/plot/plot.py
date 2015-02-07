@@ -171,11 +171,10 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi]  )
   
-  if not frame:
-    if infolines:
-      pylab.figure(figsize=(8,6))
-    else:
-      pylab.figure(figsize=(8,5))
+  if infolines:
+    pylab.figure(figsize=(8,6))
+  else:
+    pylab.figure(figsize=(8,5))
   
   if qoi in styles:
     style = styles [qoi]
