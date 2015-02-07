@@ -274,7 +274,6 @@ class MLMC (object):
   
   # check if MC estimates are already available
   def join (self):
-    self.create_MCs (self.config.samples.indices.computed)
     for mc in self.mcs:
       if not mc.finished ():
         Exception ( ':: ERROR: MC simulations are not yet available')
@@ -339,6 +338,8 @@ class MLMC (object):
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
           print
         self.config.samples.tol = status ['tol']
+      
+      self.create_MCs (self.config.samples.indices.computed)
       
       print
       print (' :: INFO: MLMC status loaded from %s' % self.status_file)
