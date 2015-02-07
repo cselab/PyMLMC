@@ -66,4 +66,4 @@ ulimit -c 0
 submit = 'sbatch %(scriptfile)s'
 
 # timer
-timer = 'time'
+timer = 'date; time'

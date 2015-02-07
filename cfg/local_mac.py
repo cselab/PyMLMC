@@ -50,4 +50,4 @@ script = None
 submit = '%(job)s'
 
 # timer
-timer = 'time'
+timer = 'date; time'

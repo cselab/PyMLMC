@@ -106,4 +106,4 @@ script = '''
 submit = 'llsubmit %(scriptfile)s'
 
 # timer
-timer = 'time'
+timer = 'date; time'
