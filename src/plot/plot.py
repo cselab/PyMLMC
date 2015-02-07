@@ -424,17 +424,12 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
 # plot Rayleigh Plesset
 def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=False, frame=False, save=None):
   
-  # determine tend
-  results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
-  ts = numpy.array ( results.meta ['t'] )
-  tend = ts [-1]
-  
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
     label = 'Rayleigh-Plesset (approx.)'
     style = styles ['rp_approximated']
   else:
-    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, tend, mu, S)
+    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, None, mu, S)
     label = 'Rayleigh-Plesset'
     if mu:
       label += ' + dissipation'
