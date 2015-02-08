@@ -274,9 +274,25 @@ class MLMC (object):
   
   # check if MC estimates are already available
   def join (self):
+    
+    print
+    print ' :: STATUS:'
+    
+    format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
+    
+    finished = 1
     for mc in self.mcs:
-      if not mc.finished ():
-        Exception ( ':: ERROR: MC simulations are not yet available')
+      args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
+      pending = mc.pending()
+      if pending == 0:
+        print format % ( args + ( 'completed', ) )
+      else:
+        finished = 0
+        print format % ( args + ( 'pending: %d' % pending, ) )
+
+    if not finished:
+      print ' :: ERROR: Some MC simulations are still pending (not finished)'
+      sys.exit()
   
   # load the results from MC simulations
   def load (self):
@@ -343,7 +359,6 @@ class MLMC (object):
       
       print
       print (' :: INFO: MLMC status loaded from %s' % self.status_file)
-      print
     
     except:
       
@@ -352,5 +367,4 @@ class MLMC (object):
       print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       
-      raise
       sys.exit()

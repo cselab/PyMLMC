@@ -196,14 +196,6 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.launch (args, parallelization, level, type, sample)
   
-  def finished (self, level, type, sample):
-    
-    # get directory
-    directory = self.directory ( level, type, sample )
-    
-    # TODO: open lsf.* file (rename to some status file?) and grep '<mpcf_0_0_0> Done'
-    return 1
-  
   def load (self, level, type, sample):
     
     # open self.outputfile and read results

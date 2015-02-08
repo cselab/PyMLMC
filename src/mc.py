@@ -102,14 +102,11 @@ class MC (object):
     # finalize solver
     config.solver.finalize (config.level, config.type, self.parallelization)
   
-  # check if results are available
-  def finished (self):
+  # check how many runs are still pending
+  def pending (self):
     
     config = self.config
-    for sample in config.samples:
-      if not config.solver.finished ( config.level, config.type, sample ):
-        return 0
-    return 1
+    return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
   
   # load the results
   def load (self):

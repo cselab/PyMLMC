@@ -91,16 +91,6 @@ class Example_Solver (Solver):
     # execute/submit job
     self.launch (args, parallelization, level, type, sample)
   
-  # check if the job is finished
-  # (required only for non-interactive sessions on clusters)
-  def finished (self, level, type, sample):
-    
-    # get directory
-    directory = self.directory ( level, type, sample )
-    
-    # check if the output file exists
-    return os.path.exists ( os.path.join (self.directory, self.outputfile) )
-  
   # open output file and read results
   def load (self, level, type, sample):
     

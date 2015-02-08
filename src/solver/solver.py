@@ -20,6 +20,7 @@ class Solver (object):
   jobfile    = 'job_%s.sh'
   scriptfile = 'script_%s.sh'
   submitfile = 'submit_%s.sh'
+  statusfile = 'status_%s.dat'
   inputdir   = 'input'
   outputdir  = 'output'
   
@@ -168,9 +169,9 @@ class Solver (object):
     
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
-      return local.simple_job % args
+      return = local.simple_job % args
     else:
-      return local.mpi_job % args
+      return = local.mpi_job % args
   
   # assemble the submission command
   def submit (self, job, parallelization, label, directory='.'):
@@ -239,6 +240,12 @@ class Solver (object):
     # get directory
     directory = self.directory (level, type, sample)
     
+    # get label
+    label = self.label (level, type, sample)
+    
+    # append command to create status file
+    job += '\n' + 'touch %s' % ( self.statusfile % label )
+    
     # prepare solver
     self.prepare (directory)
     
@@ -252,7 +259,6 @@ class Solver (object):
       
       # else submit job to job management system
       else:
-        label = self.label (level, type, sample)
         self.execute ( self.submit (job, parallelization, label, directory), directory )
     
     # node run -> execute job directly
@@ -332,3 +338,16 @@ class Solver (object):
         # submit
         label = self.label (level, type) + '_b%d' % (i+1)
         self.execute ( self.submit (batch, parallelization, label, directory), directory )
+
+  # check if the job is finished
+  # (required only for non-interactive sessions on clusters)
+  def finished (self, level, type, sample):
+    
+    # get directory
+    directory = self.directory ( level, type, sample )
+
+    # get label
+    label = self.label ( level, type, sample )
+
+    # check if the status file exists
+    return os.path.exists ( os.path.join (directory, self.statusfile % label) )
