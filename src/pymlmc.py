@@ -360,7 +360,6 @@ class MLMC (object):
         if self.config.samples.tol != status ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-          print
         self.config.samples.tol = status ['tol']
       
       self.create_MCs (self.config.samples.indices.computed)
