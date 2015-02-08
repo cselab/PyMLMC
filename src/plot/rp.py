@@ -58,10 +58,8 @@ def integrate (req, pinf, pb0, ro, tend=None, dr0=0, mu=0, S=0):
         times.append(time)
 
         if((R[-1])[0]<1e-6*req):
-            print "reached mininum radius...no more integration"
             break
-    
-    print ' Collapse time: %f' % time
+
     return times, [x[0] for x in R[:]], pressure, [x[1] for x in R[:]]
 
 if __name__ == "__main__":

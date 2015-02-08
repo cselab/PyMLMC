@@ -409,7 +409,6 @@ def plot_errors (mlmc, infolines=False, save=None):
 
 def rp_approximated (r, p1=100, p2=0.0234, rho=1000):
   tc = 0.914681 * r * numpy.sqrt ( rho / (p1 - p2) )
-  print ' Collapse time: %f' % tc
   rp = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
   ts = numpy.linspace (0, tc, 10000)
   rs = rp(ts)
@@ -434,6 +433,9 @@ def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=Fals
     if mu:
       label += ' + dissipation'
     style = styles ['rp_integrated']
+  
+  print
+  print ' :: Rayleigh-Plesset collapse time: %f' % ts [-1]
   
   pylab.plot (ts, rs, style, alpha=0.5, label=label)
 

@@ -109,7 +109,13 @@ class MLMC (object):
     
     # recursive updating phase
     self.update()
-  
+    
+    # query user for further action
+    print
+    input = raw_input ( ' :: QUERY: continue with data analysis? [enter \'y\' or press ENTER]' ) or 'y' )
+    if input != 'y':
+      sys.exit()
+    
   # initial phase
   def init (self):
     
@@ -289,7 +295,7 @@ class MLMC (object):
       else:
         finished = 0
         print format % ( args + ( 'pending: %d' % pending, ) )
-
+    
     if not finished:
       print
       print ' :: ERROR: Some MC simulations are still pending'
