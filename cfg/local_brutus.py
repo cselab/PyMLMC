@@ -24,9 +24,9 @@ memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
-bootup       = 5 # minutes
-min_walltime = 0 # hours
-max_walltime = 8 # hours (could be more (36h and 7d), but then there is a limit on cores)
+bootup       = 5  # minutes
+min_walltime = 0  # hours
+max_walltime = 36 # hours (could be more (7d), but then there is a limit on cores)
 min_cores    = 1
 
 # theoretical performance figures per node

@@ -178,7 +178,7 @@ class Solver (object):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime:
-      print ' :: ERROR: \'walltime\' exceeds \'max_walltime\' in \'local.py\': %.2f > %.2f' + (parallelization.walltime, local.max_walltime)
+      print ' :: ERROR: \'walltime\' exceeds \'max_walltime\' in \'local.py\': %.2f > %.2f' % (parallelization.walltime, local.max_walltime)
       sys.exit()
     
     # add timer
