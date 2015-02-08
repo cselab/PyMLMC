@@ -276,7 +276,7 @@ class MLMC (object):
   def join (self):
     
     print
-    print ' :: STATUS:'
+    print ' :: STATUS of MC simulations:'
     
     format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
     
@@ -292,7 +292,8 @@ class MLMC (object):
 
     if not finished:
       print
-      print ' :: ERROR: Some MC simulations are still pending (not finished)'
+      print ' :: ERROR: Some MC simulations are still pending'
+      print
       sys.exit()
   
   # load the results from MC simulations
