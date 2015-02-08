@@ -79,12 +79,14 @@ def plot_stats (qoi, stats, extent):
 def plot_infolines (mlmc):
   
   #TODO
-  print ' :: ERROR: plot_infolines() not implemented.'
+  return None
+  #print ' :: ERROR: plot_infolines() not implemented.'
 
 def generateTexTable (mlmc, save):
   
   #TODO
-  print ' :: ERROR: generateTexTable() not implemented.'
+  return None
+  #print ' :: ERROR: generateTexTable() not implemented.'
 
 # generate figure name using the format 'figpath/pwd_suffix.extension'
 def figname (suffix, extension='pdf'):
