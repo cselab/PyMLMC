@@ -88,6 +88,9 @@ class MLMC (object):
     # setup scheduler
     self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
     
+    # setup solver
+    self.config.solver.setup (self.params)
+    
     # MLMC results
     self.stats = {}
     
@@ -131,9 +134,6 @@ class MLMC (object):
     
     # distribute initial samples
     self.config.scheduler.distribute ()
-    
-    # setup solver
-    self.config.solver.setup (self.params)
     
     # compute initial samples
     self.run ()
