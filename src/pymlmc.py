@@ -291,6 +291,7 @@ class MLMC (object):
         print format % ( args + ( 'pending: %d' % pending, ) )
 
     if not finished:
+      print
       print ' :: ERROR: Some MC simulations are still pending (not finished)'
       sys.exit()
   
