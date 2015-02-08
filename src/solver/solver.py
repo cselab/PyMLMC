@@ -169,9 +169,9 @@ class Solver (object):
     
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
-      return = local.simple_job % args
+      return local.simple_job % args
     else:
-      return = local.mpi_job % args
+      return local.mpi_job % args
   
   # assemble the submission command
   def submit (self, job, parallelization, label, directory='.'):
