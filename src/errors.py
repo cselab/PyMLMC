@@ -16,6 +16,7 @@ class Errors (object):
   def __init__ (self, levels):
     
     self.levels      = levels
+    self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
   
   def init (self):
@@ -25,7 +26,8 @@ class Errors (object):
       f.write ( 'relative_error = []\n' )
       f.write ( 'total_relative_error = []\n' )
       f.write ( 'total_error = []\n' )
-  
+
+  # compute errors
   def compute (self, indicators, counts):
     
     # save configuration
@@ -60,6 +62,17 @@ class Errors (object):
     for level in self.levels:
       print '%.1e' % self.relative_error [level],
     print
+  
+  # compute and report speedup (MLMC vs MC)
+  def speedup (self, works):
+    
+    work_mlmc = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )
+    variance = numpy.mean ( [ self.indicators.variance [level] [0] for level in self.levels ] )
+    work_mc   = works [self.L] * variance / (self.total_error ** 2)
+    self.speedup = work_mc / work_mlmc
+    
+    print
+    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup
   
   def save (self):
     

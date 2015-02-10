@@ -110,7 +110,8 @@ class Estimated (Samples):
   def query (self):
     
     print
-    tol = float ( raw_input ( ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol ) or str(self.tol) )
+    print ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol
+    tol = float ( raw_input ( '  : ' ) or str(self.tol) )
     modified = tol != self.tol
     self.tol = tol
     return modified

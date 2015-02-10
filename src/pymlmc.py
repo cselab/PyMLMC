@@ -24,11 +24,11 @@ import local
 
 # === additional Python paths
 
-sys.path.append ( os.path.dirname(__file__) + "/solver" )
-sys.path.append ( os.path.dirname(__file__) + "/samples" )
-sys.path.append ( os.path.dirname(__file__) + "/scheduler" )
-sys.path.append ( os.path.dirname(__file__) + "/stats" )
-sys.path.append ( os.path.dirname(__file__) + "/plot" )
+sys.path.append ( os.path.dirname(__file__) + '/solver' )
+sys.path.append ( os.path.dirname(__file__) + '/samples' )
+sys.path.append ( os.path.dirname(__file__) + '/scheduler' )
+sys.path.append ( os.path.dirname(__file__) + '/stats' )
+sys.path.append ( os.path.dirname(__file__) + '/plot' )
 
 # === classes
 
@@ -112,7 +112,8 @@ class MLMC (object):
     
     # query user for further action
     print
-    input = raw_input ( ' :: QUERY: continue with data analysis? [enter \'y\' or press ENTER]' ) or 'y'
+    print ' :: QUERY: continue with data analysis? [enter \'y\' or press ENTER]'
+    input = raw_input ( '  : ' ) or 'y'
     if input != 'y':
       sys.exit()
     
@@ -160,8 +161,8 @@ class MLMC (object):
       # load status of MLMC simulation
       self.status_load ()
       
-      # for clusters: if non-interactive session -> wait for jobs to finish
-      if local.cluster and not self.params.interactive:
+      # if non-interactive session -> wait for jobs to finish
+      if not self.params.interactive:
         self.join ()
       
       # load results
@@ -182,6 +183,9 @@ class MLMC (object):
       self.errors.compute (self.indicators, self.config.samples.counts)
       self.errors.report  (self.config.samples.tol)
       self.errors.save    ()
+      
+      # report speedup (MLMC vs MC)
+      self.errors.speedup (self.works)
       
       # check if the simulation is already finished 
       if self.config.samples.finished (self.errors):

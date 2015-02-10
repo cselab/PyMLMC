@@ -339,9 +339,9 @@ class Solver (object):
         # submit
         label = self.label (level, type) + '_b%d' % (i+1)
         self.execute ( self.submit (batch, parallelization, label, directory), directory )
-
+  
   # check if the job is finished
-  # (required only for non-interactive sessions on clusters)
+  # (required only for non-interactive sessions)
   def finished (self, level, type, sample):
     
     # get directory
