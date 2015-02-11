@@ -34,8 +34,8 @@ min_cores    = 512 * cores
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
-# scratch path (not required - we use $WORK)
-scratch = None
+# scratch path
+scratch = '/projects/CloudPredict/sukysj/pymlmc'
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
