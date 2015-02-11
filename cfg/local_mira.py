@@ -89,7 +89,7 @@ mpi_job = '''ulimit -c 0; runjob \
 script = None
 
 # submit command
-submit = 'qsub -A CloudPredict -n %(nodes)d -t %(hours).2d:%(minutes).2d:00 -O report.%(label)s %(xopts)s --mode script %(jobfile)s'
+submit = 'qsub --project CloudPredict -nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s %(xopts)s --mode script %(jobfile)s'
 
 # timer
 timer = 'date; time'
