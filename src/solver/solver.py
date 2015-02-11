@@ -222,7 +222,7 @@ class Solver (object):
     if local.script:
       args ['script']     = local.script % args
       args ['scriptfile'] = self.scriptfile % label
-      scriptfile = open (os.path.join (directory, self.scriptfile % label)
+      scriptfile = os.path.join (directory, self.scriptfile % label)
       with open (scriptfile, 'w') as f:
         f.write ( args ['script'] )
         self.chmodx (scriptfile)
