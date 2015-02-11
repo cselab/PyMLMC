@@ -58,10 +58,13 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
   --envs PAMID_ASYNC_PROGRESS=1 \
-  --mapping TABCDE'''
+  --envs DARSHAN_DISABLE=1 \
+  --mapping TABCDE \
+  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
+  '''
 
 # simple run command
-simple_job = '''runjob \
+simple_job = '''ulimit -c 0; runjob \
   --np %(ranks)d \
   --ranks-per-node %(tasks)d \
   --cwd $PWD \
@@ -72,7 +75,7 @@ simple_job = '''runjob \
   '''
 
 # MPI run command
-mpi_job = '''runjob \
+mpi_job = '''ulimit -c 0; runjob \
   --np %(ranks)d \
   --ranks-per-node %(tasks)d \
   --cwd $PWD \
@@ -83,26 +86,10 @@ mpi_job = '''runjob \
   '''
 
 # submission script template
-script = '''
-  # @ job_name = %(label)s
-  # @ comment = "pymlmc"
-  # @ error = report.%(label)s
-  # @ output = report.%(label)s
-  # @ environment = COPY_ALL
-  # @ wall_clock_limit = %(hours).2d:%(minutes).2d:00
-  # @ notification = never
-  # @ notify_user = jonas.sukys@mavt.ethz.ch
-  # @ job_type = bluegene
-  # @ bg_size = %(nodes)d
-  %(xopts)s
-  # @ queue
-  
-  ulimit -c 0
-  %(job)s
-  '''
+script = None
 
 # submit command
-submit = 'llsubmit %(scriptfile)s'
+submit = 'qsub -A CloudPredict -n %(nodes)d -t %(hours).2d:%(minutes).2d:00 -o report.%(label)s %(xopts)s --mode script %(jobfile)s'
 
 # timer
 timer = 'date; time'
