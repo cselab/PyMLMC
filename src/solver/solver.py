@@ -12,6 +12,7 @@ import os
 import sys
 import subprocess
 import shutil
+import stat
 
 import local
 
@@ -85,7 +86,11 @@ class Solver (object):
       print '  : -> Using path = None'
       print
       return None
-  
+
+  # make file executable
+  def chmodx (self, filename):
+    os.chmod (filename, os.stat (filename) .st_mode | stat.S_IEXEC)
+
   # return the directory for a particular run
   def directory (self, level, type, sample=None):
     
@@ -187,9 +192,11 @@ class Solver (object):
       job = '%s (%s)' % (local.timer, job)
     
     # create jobfile
-    with open ( os.path.join (directory, self.jobfile % label), 'w') as f:
+    jobfile = os.path.join (directory, self.jobfile % label)
+    with open ( jobfile, 'w') as f:
       f.write ('#!/bin/bash\n')
       f.write (job)
+      self.chmodx (jobfile)
     
     # assemble arguments for job submission
     args              = {}
@@ -215,8 +222,10 @@ class Solver (object):
     if local.script:
       args ['script']     = local.script % args
       args ['scriptfile'] = self.scriptfile % label
-      with open (os.path.join (directory, self.scriptfile % label), 'w') as f:
+      scriptfile = open (os.path.join (directory, self.scriptfile % label)
+      with open (scriptfile, 'w') as f:
         f.write ( args ['script'] )
+        self.chmodx (scriptfile)
       if self.params.verbose >= 1:
         print
         print '=== SCRIPT ==='
@@ -224,8 +233,10 @@ class Solver (object):
         print '==='
   
     # create submit script
-    with open (os.path.join (directory, self.submitfile % label), 'w') as f:
+    submitfile = os.path.join (directory, self.submitfile % label)
+    with open (submitfile, 'w') as f:
       f.write ( local.submit % args )
+      self.chmodx (submitfile)
     
     # assemble submission command
     return local.submit % args
