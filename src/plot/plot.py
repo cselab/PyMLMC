@@ -53,11 +53,11 @@ def show ():
   pylab.show()
 
 # plot each stat
-def plot_stats (qoi, stats, extent, legend=True):
+def plot_stats (qoi, stats, extent, legend=True, time='t'):
   
   for name, stat in stats.iteritems():
     
-    ts = numpy.array ( stat.meta ['t'] )
+    ts = numpy.array ( stat.meta [time] )
     vs = numpy.array ( stat.data [qoi]  )
     
     style = styles [name] if name in styles else ''
@@ -72,6 +72,8 @@ def plot_stats (qoi, stats, extent, legend=True):
     # general plotting
     else:
       pylab.plot (ts, vs, style, label=name)
+  
+  pylab.xlabel (time)
   
   if extent:
     pylab.ylim (*extent)
@@ -139,7 +141,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
     plot_stats ( qoi, mc.stats, extent, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
+  #pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
+  pylab.subplot (2, levels, 1 + levels)
+  pylab.legend (handles, labels, loc='center')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
@@ -368,7 +372,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False,
   
   pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.08)
+  pylab.subplots_adjust(left=0.12)
   
   if infolines:
     show_info(self)
