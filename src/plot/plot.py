@@ -55,8 +55,6 @@ def show ():
 # plot each stat
 def plot_stats (qoi, stats, extent, legend=True):
   
-  lines = []
-  
   for name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta ['t'] )
@@ -68,22 +66,18 @@ def plot_stats (qoi, stats, extent, legend=True):
     # stat-specific plotting
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      line = pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
-      lines.append (line)
+      pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
       pylab.plot (ts, ms - vs, style)
     
     # general plotting
     else:
-      line = pylab.plot (ts, vs, style, label=name)
-      lines.append (line)
+      pylab.plot (ts, vs, style, label=name)
   
   if extent:
     pylab.ylim (*extent)
   
   if legend:
     pylab.legend (loc='best')
-
-  return lines
 
 def plot_infolines (mlmc):
   
@@ -133,18 +127,18 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   levels = (len(mlmc.mcs) + 1) / 2
   
   if infolines:
-    fig = pylab.figure (figsize=(levels*6, 2*5))
+    pylab.figure (figsize=(levels*6, 4+5))
   else:
-    fig = pylab.figure (figsize=(levels*6, 4+5))
+    pylab.figure (figsize=(levels*6, 2*4))
   
   for mc in mlmc.mcs:
     
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    lines = plot_stats ( qoi, mc.stats, extent, legend=False )
+    plot_stats ( qoi, mc.stats, extent, legend=False )
   
-  fig.legend (lines, ('mean', '0.05', '0.95'), 'lower left')
+  pylab.figlegend (loc='lower left')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
@@ -302,7 +296,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   if exact:
     pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],           color='k', linestyle='-',  alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
   pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],           color='m', linestyle='--', alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Estimated relative level means for Q = %s' % qoi)
+  pylab.title  ('Relative level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   pylab.legend (loc='upper right')
@@ -312,7 +306,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   pylab.subplot(122)
   pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION,        color='a', linestyle='-',  marker='x', label='rel. level standard deviations')
   pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1],            color='m', linestyle='--', alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Estimated rel. level standard deviations for Q = %s' % qoi)
+  pylab.title  ('Relative level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   pylab.legend (loc='best')
@@ -413,7 +407,7 @@ def plot_errors (mlmc, infolines=False, save=None):
   
   pylab.semilogy (levels, relative_error, color='a', linestyle='-', marker='x', label='relative sampling errors')
   pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color='m', linestyle='--', alpha=0.6, label='required TOL = %1.1e' % TOL )
-  pylab.title  ('Estimated relative sampling errors for Q = %s' % qoi)
+  pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
   pylab.ylim   (ymax=1.5*TOL)
