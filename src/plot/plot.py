@@ -37,8 +37,8 @@ matplotlib.rcParams ['axes.color_cycle'] = ['a', 'i', 'j', 'c', 'y', 'm', 'g', '
 
 styles = {}
 styles ['mean']             = 'a-'
-styles ['percentile']       = 'i--'
-styles ['std. deviation']   = 'j--'
+styles ['percentile']       = 'i-'
+styles ['std. deviation']   = 'j-'
 
 styles ['rp_integrated']    = 'k-'
 styles ['rp_approximated']  = 'k--'
@@ -47,6 +47,11 @@ styles ['Req']              = 'a-'
 styles ['p_max']            = 'i-'
 styles ['ke']               = 'j-'
 styles ['mach_max']         = 'c-'
+
+colors = {}
+colors ['mean']             = 'a'
+colors ['percentile']       = 'i'
+colors ['std. deviation']   = 'j'
 
 # set levels extent
 def levels_extent (levels):
@@ -116,6 +121,8 @@ def show ():
 # plot each stat
 def plot_stats (qoi, stats, extent, legend=True, time='t'):
   
+  percentiles = []
+  
   for name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta [time] )
@@ -124,15 +131,30 @@ def plot_stats (qoi, stats, extent, legend=True, time='t'):
     style = styles [name] if name in styles else ''
     if 'percentile' in name: style = styles ['percentile']
     
-    # stat-specific plotting
+    color = colors [name] if name in colors else ''
+    if 'percentile' in name: color = colors ['percentile']
+    
+    # stat-specific plotting: std. deviation
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
       pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
       pylab.plot (ts, ms - vs, style)
+      color = colors [name]
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.5)
     
     # general plotting
     else:
       pylab.plot (ts, vs, style, label=name)
+    
+    # collect percentiles for later fill
+    if 'percentile' in name:
+      percentiles.append ([ts, vs])
+  
+  # plot percentiles
+  lower = percentiles [0] [1]
+  upper = percentiles [1] [1]
+  color = colors ['percentile']
+  pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.5)
   
   if extent:
     pylab.ylim (*extent)
