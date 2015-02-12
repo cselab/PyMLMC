@@ -140,7 +140,7 @@ def plot_stats (qoi, stats, extent, legend=True, time='t'):
       pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
       pylab.plot (ts, ms - vs, style)
       color = colors [name]
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.5)
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2)
     
     # general plotting
     else:
@@ -154,7 +154,7 @@ def plot_stats (qoi, stats, extent, legend=True, time='t'):
   lower = percentiles [0] [1]
   upper = percentiles [1] [1]
   color = colors ['percentile']
-  pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.5)
+  pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2)
   
   if extent:
     pylab.ylim (*extent)
