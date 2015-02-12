@@ -132,7 +132,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   for mc in mlmc.mcs:
     
-    typestr = ['FINE', 'COARSE'] [mc.config.type]
+    typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d, %s' % (mc.config.level, typestr) )
     plot_stats ( qoi, mc.stats, extent )
