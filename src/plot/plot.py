@@ -70,12 +70,12 @@ def plot_stats (qoi, stats, extent, legend=True):
       ms = numpy.array ( stats ['mean'] .data [qoi] )
       line = pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
       lines.append (line)
-      line = pylab.plot (ts, ms - vs, style)
-      lines.append (line)
+      pylab.plot (ts, ms - vs, style)
     
     # general plotting
     else:
-      pylab.plot (ts, vs, style, label=name)
+      line = pylab.plot (ts, vs, style, label=name)
+      lines.append (line)
   
   if extent:
     pylab.ylim (*extent)
