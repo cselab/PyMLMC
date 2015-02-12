@@ -30,24 +30,25 @@ class Solver (object):
     
     self.params = params
     
-    # prepare scratch
-    if local.scratch:
-      
-      # assemble sub-directory
-      runpath, rundir = os.path.split (os.getcwd())
-      scratchdir = os.path.join (local.scratch, rundir)
-      
-      # prepare scratch directory
-      if not os.path.exists (scratchdir):
-        os.mkdir (scratchdir)
-      
-      # create symlink to scratch
-      if not os.path.exists (self.outputdir):
-        os.symlink (scratchdir, self.outputdir)
+    # create output directory
+    if not os.path.exists (self.outputdir):
     
-    # otherwise create output directory
-    else:
-      if not os.path.exists (self.outputdir):
+      # prepare scratch
+      if local.scratch:
+      
+        # assemble sub-directory
+        runpath, rundir = os.path.split (os.getcwd())
+        scratchdir = os.path.join (local.scratch, rundir)
+        
+        # prepare scratch directory
+        if not os.path.exists (scratchdir):
+          os.mkdir (scratchdir)
+        
+        # create symlink to scratch
+        os.symlink (scratchdir, self.outputdir)
+      
+      # otherwise create output directory
+      else:
         os.mkdir (self.outputdir)
     
     # copy executable to output directory
