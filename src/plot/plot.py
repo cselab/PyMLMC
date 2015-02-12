@@ -297,9 +297,9 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   pylab.xlabel ('mesh level')
   pylab.legend (loc='best')
   
-  pylab.subplots_adjust(top=0.94)
+  pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.07)
+  pylab.subplots_adjust(left=0.08)
   
   if infolines:
     plot_infolines (self)
@@ -351,9 +351,9 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False,
   if not frame:
     pylab.legend (loc='upper right')
   
-  pylab.subplots_adjust(top=0.94)
+  pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.07)
+  pylab.subplots_adjust(left=0.08)
   
   if infolines:
     show_info(self)
@@ -399,9 +399,9 @@ def plot_errors (mlmc, infolines=False, save=None):
   pylab.ylim   (ymax=1.5*TOL)
   pylab.legend (loc='lower left')
   
-  pylab.subplots_adjust(top=0.94)
+  pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.07)
+  pylab.subplots_adjust(left=0.08)
   
   if infolines:
     show_info(self)
