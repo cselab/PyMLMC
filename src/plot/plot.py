@@ -75,7 +75,7 @@ def adjust (infolines, subplots=1):
   pylab.subplots_adjust(right=0.95)
   
   if subplots == 1:
-    pylab.subplots_adjust(left=0.13)
+    pylab.subplots_adjust(left=0.14)
   else:
     pylab.subplots_adjust(left=0.08)
 
