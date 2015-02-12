@@ -69,12 +69,16 @@ def figure (infolines=False, subplots=1):
     pylab.figure(figsize=(subplots*8,5))
 
 # adjust subplot margins
-def adjust (infolines):
+def adjust (infolines, subplots=1):
   
   pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.12)
   
+  if subplots == 1:
+    pylab.subplots_adjust(left=0.13)
+  else:
+    pylab.subplots_adjust(left=0.08)
+
   if infolines:
     pylab.subplots_adjust(bottom=0.28)
   else:
@@ -331,7 +335,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   levels_extent (levels)
   pylab.legend (loc='best')
   
-  adjust (infolines)
+  adjust (infolines, subplots=2)
   
   if infolines:
     show_info(self)
