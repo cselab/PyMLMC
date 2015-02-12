@@ -140,7 +140,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   lines  = pylab.gcf().gca().lines
   #labels = pylab.gcf().gca().labels
-  pylab.figlegend (lines, loc='lower left')
+  pylab.gcf().legend (lines, loc='lower left')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
