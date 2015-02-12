@@ -304,6 +304,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   pylab.title  ('Relative level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
+  pylab.xlim ([-0.5, levels[-1]+0.5])
   pylab.legend (loc='upper right')
   
   # plot SIGMA
@@ -314,6 +315,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   pylab.title  ('Relative level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
+  pylab.xlim ([-0.5, levels[-1]+0.5])
   pylab.legend (loc='best')
   
   pylab.subplots_adjust(top=0.92)
@@ -365,6 +367,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False,
   pylab.title  ('Estimated number of samples')
   pylab.ylabel ('number of samples')
   pylab.xlabel ('mesh level')
+  pylab.xlim ([-0.5, levels[-1]+0.5])
   pylab.ylim   (ymin=0.7)
   #TODO: add light gray lines at y = 1, 2, 4
   if not frame:
@@ -415,6 +418,7 @@ def plot_errors (mlmc, infolines=False, save=None):
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
+  pylab.xlim ([-0.5, levels[-1]+0.5])
   pylab.ylim   (ymax=1.5*TOL)
   pylab.legend (loc='lower left')
   
