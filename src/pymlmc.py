@@ -112,7 +112,7 @@ class MLMC (object):
     
     # query user for further action
     print
-    print ' :: QUERY: continue with data analysis? [enter \'y\' or press ENTER]'
+    print ' :: QUERY: Continue with data analysis? [enter \'y\' or press ENTER]'
     input = raw_input ( '  : ' ) or 'y'
     if input != 'y':
       print '  : exiting'
