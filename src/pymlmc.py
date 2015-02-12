@@ -115,7 +115,11 @@ class MLMC (object):
     print ' :: QUERY: continue with data analysis? [enter \'y\' or press ENTER]'
     input = raw_input ( '  : ' ) or 'y'
     if input != 'y':
+      print '  : exiting'
+      print
       sys.exit()
+    else:
+      print '  : continuing'
     
   # initial phase
   def init (self):
