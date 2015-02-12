@@ -437,7 +437,7 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
   import rp
   dr0 = 0
   [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho, tend, dr0, mu, S)
-  return ts, rs, ps, drs
+  return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs)
 
 # plot Rayleigh Plesset
 def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, approximation=False, frame=False, save=None):
