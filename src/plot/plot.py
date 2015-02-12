@@ -24,7 +24,7 @@ matplotlib.rcParams ['font.size']             = 16
 matplotlib.rcParams ['legend.fontsize']       = 14
 matplotlib.rcParams ['lines.linewidth']       = 3
 matplotlib.rcParams ['lines.markeredgewidth'] = 3
-matplotlib.rcParams ['lines.markersize']      = 8
+matplotlib.rcParams ['lines.markersize']      = 12
 # TODO: increase label sizes
 
 # additional colors

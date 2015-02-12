@@ -54,7 +54,7 @@ class Errors (object):
     
     print '    -> Relative total sampling error is %.1e' % self.total_relative_error,
     if tol:
-      print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * (self.total_relative_error ** 2) / (tol ** 2) ) / 10, tol )
+      print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
     else:
       print
     print '       Relative level sampling errors:'
