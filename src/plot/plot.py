@@ -53,6 +53,58 @@ def levels_extent (levels):
   pylab.xlim ( [ -0.2, levels[-1]+0.2 ] )
   pylab.xticks (levels)
 
+# generate figure name using the format 'figpath/pwd_suffix.extension'
+def figname (suffix, extension='pdf'):
+  import os
+  figpath = 'fig'
+  if not os.path.exists (figpath):
+    os.mkdir (figpath)
+  runpath, rundir = os.path.split (os.getcwd())
+  return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
+
+def figure (infolines=False):
+  if infolines:
+    pylab.figure(figsize=(8,6))
+  else:
+    pylab.figure(figsize=(8,5))
+
+# adjust subplot margins
+def adjust (infolines):
+  
+  pylab.subplots_adjust(top=0.95)
+  pylab.subplots_adjust(right=0.97)
+  pylab.subplots_adjust(left=0.05)
+  
+  if infolines:
+    pylab.subplots_adjust(bottom=0.28)
+  else:
+    pylab.subplots_adjust(bottom=0.15)
+
+def plot_infolines (mlmc):
+  
+  #TODO
+  return None
+#print ' :: ERROR: plot_infolines() not implemented.'
+
+def generateTexTable (mlmc, save):
+  
+  #TODO
+  return None
+#print ' :: ERROR: generateTexTable() not implemented.'
+
+def saveall (mlmc, save):
+  pylab.savefig    (save)
+  pylab.savefig    (save[:-3] + 'eps')
+  pylab.savefig    (save[:-3] + 'png')
+  generateTexTable (mlmc, save)
+
+def draw (mlmc, save, legend=False, loc='best'):
+  if legend:
+    pylab.legend (loc = loc)
+  if save:
+    saveall (mlmc, save)
+  pylab.draw ()
+
 # show plots
 def show ():
   pylab.show()
@@ -86,46 +138,6 @@ def plot_stats (qoi, stats, extent, legend=True, time='t'):
   if legend:
     pylab.legend (loc='best')
 
-def plot_infolines (mlmc):
-  
-  #TODO
-  return None
-  #print ' :: ERROR: plot_infolines() not implemented.'
-
-def generateTexTable (mlmc, save):
-  
-  #TODO
-  return None
-  #print ' :: ERROR: generateTexTable() not implemented.'
-
-# generate figure name using the format 'figpath/pwd_suffix.extension'
-def figname (suffix, extension='pdf'):
-  import os
-  figpath = 'fig'
-  if not os.path.exists (figpath):
-    os.mkdir (figpath)
-  runpath, rundir = os.path.split (os.getcwd())
-  return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
-
-def figure (infolines=False):
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
-
-def saveall (mlmc, save):
-  pylab.savefig    (save)
-  pylab.savefig    (save[:-3] + 'eps')
-  pylab.savefig    (save[:-3] + 'png')
-  generateTexTable (mlmc, save)
-
-def draw (mlmc, save, legend=False, loc='best'):
-  if legend:
-    pylab.legend (loc = loc)
-  if save:
-    saveall (mlmc, save)
-  pylab.draw ()
-
 # plot computed MC statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=None):
   
@@ -156,7 +168,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.28)
+    pylab.subplots_adjust(bottom=0.20)
   else:
     pylab.subplots_adjust(bottom=0.15)
   
@@ -179,15 +191,10 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=N
   pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent)
   
-  pylab.subplots_adjust(top=0.95)
-  pylab.subplots_adjust(right=0.97)
-  pylab.subplots_adjust(left=0.05)
-  
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.28)
-  else:
-    pylab.subplots_adjust(bottom=0.15)
+
+  adjust (infolines)
 
   if not frame:
     draw (mlmc, save)
@@ -223,9 +230,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
   if extent:
     pylab.ylim(*extent)
-
-  if infolines: plot_infolines (self)
-  #pylab.tight_layout()
+  
+  if infolines:
+    plot_infolines (self)
+  
+  adjust (infolines)
 
   if not frame:
     draw (mlmc, save, legend=True, loc='best')
@@ -268,8 +277,12 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
 
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
-
-  if infolines: plot_infolines (self)
+  
+  if infolines:
+    plot_infolines (self)
+  
+  adjust (infolines)
+  
   draw (mlmc, save)
 
 # plot indicators
