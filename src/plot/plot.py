@@ -130,12 +130,11 @@ def plot_stats (qoi, stats, extent, legend=True, time='t'):
     else:
       pylab.plot (ts, vs, style, label=name)
   
-  pylab.xlabel (time)
-  
   if extent:
     pylab.ylim (*extent)
   
   if legend:
+    pylab.xlabel (time)
     pylab.legend (loc='best')
 
 # plot computed MC statistics
