@@ -158,8 +158,11 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   #pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
-  pylab.subplot (2, levels, 1 + levels)
+  axes = pylab.subplot (2, levels, 1 + levels)
   pylab.legend (handles, labels, loc='center')
+  for group in axes:
+    for x in group:
+      x.set_visible (False)
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
