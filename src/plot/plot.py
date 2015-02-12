@@ -53,7 +53,9 @@ def show ():
   pylab.show()
 
 # plot each stat
-def plot_stats (qoi, stats, extent):
+def plot_stats (qoi, stats, extent, legend=True):
+  
+  lines = []
   
   for name, stat in stats.iteritems():
     
@@ -66,17 +68,22 @@ def plot_stats (qoi, stats, extent):
     # stat-specific plotting
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
-      pylab.plot (ts, ms - vs, style)
+      line = pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
+      lines.append (line)
+      line = pylab.plot (ts, ms - vs, style)
+      lines.append (line)
     
     # general plotting
-    else:  
+    else:
       pylab.plot (ts, vs, style, label=name)
   
   if extent:
     pylab.ylim (*extent)
   
-  pylab.legend (loc='best')
+  if legend:
+    pylab.legend (loc='best')
+
+  return lines
 
 def plot_infolines (mlmc):
   
@@ -126,16 +133,18 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   levels = (len(mlmc.mcs) + 1) / 2
   
   if infolines:
-    pylab.figure (figsize=(levels*6, 2*5))
+    fig = pylab.figure (figsize=(levels*6, 2*5))
   else:
-    pylab.figure (figsize=(levels*6, 4+5))
+    fig = pylab.figure (figsize=(levels*6, 4+5))
   
   for mc in mlmc.mcs:
     
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
-    pylab.title ( 'level %d, %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent )
+    pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
+    lines = plot_stats ( qoi, mc.stats, extent, legend=False )
+  
+  fig.legend (lines, ('mean', '0.05', '0.95'), 'lower left')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
