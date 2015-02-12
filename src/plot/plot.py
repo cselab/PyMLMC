@@ -137,15 +137,15 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
     pylab.title ( 'level %d, %s' % (mc.config.level, typestr) )
     plot_stats ( qoi, mc.stats, extent )
   
-  pylab.subplots_adjust(top=0.96)
+  pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
   pylab.subplots_adjust(left=0.05)
   
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.28)
-  else:
     pylab.subplots_adjust(bottom=0.15)
+  else:
+    pylab.subplots_adjust(bottom=0.05)
   
   if infolines:
     plot_infolines (self)
