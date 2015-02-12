@@ -62,18 +62,18 @@ def figname (suffix, extension='pdf'):
   runpath, rundir = os.path.split (os.getcwd())
   return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
 
-def figure (infolines=False):
+def figure (infolines=False, subplots=1):
   if infolines:
-    pylab.figure(figsize=(8,6))
+    pylab.figure(figsize=(subplots*8,6))
   else:
-    pylab.figure(figsize=(8,5))
+    pylab.figure(figsize=(subplots*8,5))
 
 # adjust subplot margins
 def adjust (infolines):
   
-  pylab.subplots_adjust(top=0.95)
-  pylab.subplots_adjust(right=0.97)
-  pylab.subplots_adjust(left=0.05)
+  pylab.subplots_adjust(top=0.92)
+  pylab.subplots_adjust(right=0.95)
+  pylab.subplots_adjust(left=0.12)
   
   if infolines:
     pylab.subplots_adjust(bottom=0.28)
@@ -158,11 +158,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   #pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
-  axes = pylab.subplot (2, levels, 1 + levels)
+  pylab.subplot (2, levels, 1 + levels)
   pylab.legend (handles, labels, loc='center')
-  for group in axes:
-    for x in group:
-      x.set_visible (False)
+  pylab.axis('off')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
@@ -170,9 +168,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.20)
+    pylab.subplots_adjust(bottom=0.10)
   else:
-    pylab.subplots_adjust(bottom=0.15)
+    pylab.subplots_adjust(bottom=0.05)
   
   if infolines:
     plot_infolines (self)
@@ -185,10 +183,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=N
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  figure (infolines, subplots=1)
   
   pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent)
@@ -215,10 +210,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi]  )
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  figure (infolines, subplots=1)
   
   if qoi in styles:
     style = styles [qoi]
@@ -258,10 +250,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  figure (infolines, subplots=1)
   
   for sample in range(mlmc.config.samples.counts.computed[level]):
     
@@ -316,10 +305,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   
   # === plot
   
-  if infolines:
-    pylab.figure(figsize=(2*8,6))
-  else:
-    pylab.figure(figsize=(2*8,5))
+  figure (infolines, subplots=2)
   
   # plot EPSILON
   
@@ -345,16 +331,11 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   levels_extent (levels)
   pylab.legend (loc='best')
   
-  pylab.subplots_adjust(top=0.92)
-  pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.08)
+  adjust (infolines)
   
   if infolines:
-    plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.28)
-  else:
-    pylab.subplots_adjust(bottom=0.15)
-  
+    show_info(self)
+
   draw (mlmc, save)
 
 # plot samples
@@ -379,10 +360,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False,
   
   # === plot
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  figure (infolines, subplots=1)
   
   # plot number of samples
   
@@ -400,15 +378,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, frame=False,
   if not frame:
     pylab.legend (loc='upper right')
   
-  pylab.subplots_adjust(top=0.92)
-  pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.12)
+  adjust (infolines)
   
   if infolines:
     show_info(self)
-    pylab.subplots_adjust(bottom=0.28)
-  else:
-    pylab.subplots_adjust(bottom=0.15)
 
   if not frame:
     draw (mlmc, save)
@@ -433,10 +406,7 @@ def plot_errors (mlmc, infolines=False, save=None):
   
   # === plot
   
-  if infolines:
-    pylab.figure(figsize=(8,6))
-  else:
-    pylab.figure(figsize=(8,5))
+  figure (infolines, subplots=1)
   
   # plot relative sampling error
   
@@ -449,15 +419,10 @@ def plot_errors (mlmc, infolines=False, save=None):
   pylab.ylim   (ymax=1.5*TOL)
   pylab.legend (loc='lower left')
   
-  pylab.subplots_adjust(top=0.92)
-  pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.15)
+  adjust (infolines)
   
   if infolines:
     show_info(self)
-    pylab.subplots_adjust(bottom=0.28)
-  else:
-    pylab.subplots_adjust(bottom=0.15)
   
   draw (mlmc, save)
 
