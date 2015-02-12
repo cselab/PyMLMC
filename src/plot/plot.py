@@ -156,9 +156,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.15)
+    pylab.subplots_adjust(bottom=0.28)
   else:
-    pylab.subplots_adjust(bottom=0.05)
+    pylab.subplots_adjust(bottom=0.15)
   
   if infolines:
     plot_infolines (self)
@@ -179,8 +179,15 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=N
   pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent)
   
+  pylab.subplots_adjust(top=0.95)
+  pylab.subplots_adjust(right=0.97)
+  pylab.subplots_adjust(left=0.05)
+  
   if infolines:
     plot_infolines (self)
+    pylab.subplots_adjust(bottom=0.28)
+  else:
+    pylab.subplots_adjust(bottom=0.15)
 
   if not frame:
     draw (mlmc, save)
@@ -306,7 +313,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   if exact:
     pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],           color='k', linestyle='-',  alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
   pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],           color='m', linestyle='--', alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Relative level means for Q = %s' % qoi)
+  pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   levels_extent (levels)
@@ -317,7 +324,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, save=None):
   pylab.subplot(122)
   pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION,        color='a', linestyle='-',  marker='x', label='rel. level standard deviations')
   pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1],            color='m', linestyle='--', alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Relative level standard deviations for Q = %s' % qoi)
+  pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   levels_extent (levels)
@@ -429,7 +436,7 @@ def plot_errors (mlmc, infolines=False, save=None):
   
   pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
-  pylab.subplots_adjust(left=0.08)
+  pylab.subplots_adjust(left=0.15)
   
   if infolines:
     show_info(self)
