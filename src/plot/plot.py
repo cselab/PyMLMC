@@ -139,7 +139,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
     plot_stats ( qoi, mc.stats, extent, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  pylab.gcf().legend (handles, labels, loc='lower left')
+  pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
@@ -440,7 +440,7 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
   return ts, rs, ps, drs
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=False, frame=False, save=None):
+def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, approximation=False, frame=False, save=None):
   
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
@@ -456,8 +456,12 @@ def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, approximation=Fals
   print
   print ' :: Rayleigh-Plesset collapse time: %f' % ts [-1]
   
-  pylab.plot (ts, rs, style, alpha=0.5, label=label)
+  # compute equivalent radius of simultaneously collapsing multiple bubbles
+  if count != None:
+    rs *= count ** (1.0 / 3.0)
 
+  pylab.plot (ts, rs, style, alpha=0.5, label=label)
+  
   if not frame:
     pylab.label (loc='best')
     draw (mlmc, save, legend=True, loc='best')
