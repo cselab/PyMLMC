@@ -126,15 +126,26 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
   levels = (len(mlmc.mcs) + 1) / 2
   
   if infolines:
-    pylab.figure (figsize=(levels*8, 2*6))
+    pylab.figure (figsize=(levels*6, 2*5))
   else:
-    pylab.figure (figsize=(levels*8, 5+6))
+    pylab.figure (figsize=(levels*6, 4+5))
   
   for mc in mlmc.mcs:
     
+    typestr = ['FINE', 'COARSE'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
-    pylab.title ( '%s | level %d, type %d' % (qoi, mc.config.level, mc.config.type) )
+    pylab.title ( 'level %d, %s' % (mc.config.level, typestr) )
     plot_stats ( qoi, mc.stats, extent )
+  
+  pylab.subplots_adjust(top=0.96)
+  pylab.subplots_adjust(right=0.97)
+  pylab.subplots_adjust(left=0.05)
+  
+  if infolines:
+    plot_infolines (self)
+    pylab.subplots_adjust(bottom=0.28)
+  else:
+    pylab.subplots_adjust(bottom=0.15)
   
   if infolines:
     plot_infolines (self)
