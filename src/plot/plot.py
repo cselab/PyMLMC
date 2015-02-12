@@ -392,7 +392,7 @@ def plot_errors (mlmc, infolines=False, save=None):
   # plot relative sampling error
   
   pylab.semilogy (levels, relative_error, color='a', linestyle='-', marker='x', label='relative sampling errors')
-  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color='m', linestyle='--', alpha=0.6, label='required sampling tolerance' )
+  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color='m', linestyle='--', alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Estimated relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
