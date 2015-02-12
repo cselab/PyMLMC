@@ -138,9 +138,8 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, frame=False, save=Non
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
     plot_stats ( qoi, mc.stats, extent, legend=False )
   
-  lines  = pylab.gcf().gca().lines
-  #labels = pylab.gcf().gca().labels
-  pylab.gcf().legend (lines, loc='lower left')
+  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+  pylab.gcf().legend (handles, labels, loc='lower left')
   
   pylab.subplots_adjust(top=0.95)
   pylab.subplots_adjust(right=0.97)
