@@ -300,8 +300,7 @@ class MLMC (object):
       args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
       if pending == 0:
-        time = mc.timer (self.config.scheduler.batch)
-        timestr = time.strftime ( '%H:%M:%S', time.gmtime (time) )
+        timestr = time.strftime ( '%H:%M:%S', time.gmtime ( mc.timer (self.config.scheduler.batch) ) )
         print format % ( args + ( 'completed in ' + timestr, ) )
       else:
         finished = 0
