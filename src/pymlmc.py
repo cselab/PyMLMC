@@ -13,7 +13,7 @@
 
 import sys
 import time
-import datetime
+import time
 
 # === local imports
 
@@ -301,7 +301,7 @@ class MLMC (object):
       pending = mc.pending()
       if pending == 0:
         time = mc.timer (self.config.scheduler.batch)
-        timestr = datetime.timedelta (seconds=time) .strftime('%H:%M:%S')
+        timestr = time.strftime ( '%H:%M:%S', time.gmtime (time) )
         print format % ( args + ( 'completed in ' + timestr, ) )
       else:
         finished = 0
