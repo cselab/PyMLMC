@@ -22,6 +22,7 @@ class Solver (object):
   scriptfile = 'script_%s.sh'
   submitfile = 'submit_%s.sh'
   statusfile = 'status_%s.dat'
+  timerfile  = 'timerfile_%s.dat'
   inputdir   = 'input'
   outputdir  = 'output'
   
@@ -190,7 +191,7 @@ class Solver (object):
     
     # add timer
     if local.timer:
-      job = '%s (%s)' % (local.timer, job)
+      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -364,3 +365,29 @@ class Solver (object):
 
     # check if the status file exists
     return os.path.exists ( os.path.join (directory, self.statusfile % label) )
+
+  # report timer results
+  def timer (self, level, type, sample, batch):
+    
+    if batch:
+      
+      # get directory
+      directory = self.directory ( level, type )
+      
+      # get label
+      label = self.label ( level, type ) + '_b1'
+    
+    else:
+      
+      # get directory
+      directory = self.directory ( level, type, sample )
+      
+      # get label
+      label = self.label ( level, type, sample )
+    
+    # read timer file
+    with open ( os.path.join (directory, self.timerfile % label), 'r' ) as f:
+      line = f.readlines() [0]
+      time = line.strip().split(' ') [0]
+      
+    return float(time)

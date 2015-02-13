@@ -108,6 +108,13 @@ class MC (object):
     config = self.config
     return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
   
+  # report timer results
+  def timer (self, batch):
+    
+    config = self.config
+    time = numpy.mean ( [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ] )
+    return time
+  
   # load the results
   def load (self):
     

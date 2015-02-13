@@ -13,6 +13,7 @@
 
 import sys
 import time
+import datetime
 
 # === local imports
 
@@ -299,7 +300,9 @@ class MLMC (object):
       args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
       if pending == 0:
-        print format % ( args + ( 'completed', ) )
+        time = mc.timer (self.config.scheduler.batch)
+        timestr = str (datetime.timedelta (seconds=time) )
+        print format % ( args + ( 'completed in ~ ' + timestr, ) )
       else:
         finished = 0
         print format % ( args + ( 'pending: %d' % pending, ) )
@@ -347,6 +350,7 @@ class MLMC (object):
       if not self.params.deterministic:
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
       f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
+      f.write ( 'batch = %s' % str ( self.config.scheduler.batch ) )
       #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
     
     print
@@ -369,6 +373,8 @@ class MLMC (object):
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
         self.config.samples.tol = status ['tol']
+      
+      self.config.scheduler.batch = status ['batch']
       
       self.create_MCs (self.config.samples.indices.computed)
       
