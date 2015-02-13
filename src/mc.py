@@ -112,9 +112,12 @@ class MC (object):
   def timer (self, batch):
     
     config = self.config
-    time = numpy.mean ( [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ] )
-    return time
-  
+    time = sum ( [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ] )
+    if batch:
+      return time
+    else:
+      return float(time) / len (config.samples)
+
   # load the results
   def load (self):
     
