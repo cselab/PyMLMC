@@ -302,7 +302,7 @@ class MLMC (object):
       if pending == 0:
         time = mc.timer (self.config.scheduler.batch)
         timestr = str (datetime.timedelta (seconds=time) )
-        print format % ( args + ( 'completed in ~ ' + timestr, ) )
+        print format % ( args + ( 'completed in ' + timestr, ) )
       else:
         finished = 0
         print format % ( args + ( 'pending: %d' % pending, ) )
