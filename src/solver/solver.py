@@ -390,7 +390,7 @@ class Solver (object):
     if os.path.exists (timerfilepath):
       with open ( os.path.join (directory, self.timerfile % label), 'r' ) as f:
         line = f.readlines() [0]
-        time = line.strip().split(' ') [0]
+        time = line.strip().split(' ') [-1]
     else:
       time = 0
     
