@@ -52,4 +52,4 @@ script = None
 submit = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours).2d:%(minutes).2d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(xopts)s < %(jobfile)s'
 
 # timer
-timer = 'date; time'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

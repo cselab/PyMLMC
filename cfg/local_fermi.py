@@ -106,4 +106,4 @@ script = '''
 submit = 'llsubmit %(scriptfile)s'
 
 # timer
-timer = 'date; time'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

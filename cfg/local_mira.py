@@ -92,4 +92,4 @@ script = None
 submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s %(xopts)s --mode script %(jobfile)s'
 
 # timer
-timer = 'date; time'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
