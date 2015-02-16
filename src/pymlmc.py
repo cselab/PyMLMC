@@ -47,6 +47,7 @@ class MLMC_Config (object):
   grids     = helpers.grids_3d ( helpers.grids (1) )
   samples   = Estimated ()
   scheduler = Static ()
+  root      = '.'
   
   def __init__ (self, id=0):
     vars (self) .update ( locals() )
@@ -102,7 +103,7 @@ class MLMC (object):
     self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
     
     # setup solver
-    self.config.solver.setup (self.params)
+    self.config.solver.setup (self.params, self.root)
     
     # MLMC results
     self.stats = {}
@@ -112,6 +113,12 @@ class MLMC (object):
     
     # submission file name
     self.submission_file = 'queue.dat'
+  
+  # change root of the MLMC simulation
+  def chroot (self, root):
+    
+    self.config.root = root
+    self.config.solver.root = root
   
   # MLMC simulation
   def simulation (self):
@@ -356,7 +363,7 @@ class MLMC (object):
   # save MLMC status
   def status_save (self):
     
-    with open ( self.status_file, 'w' ) as f:
+    with open ( os.path.join (self.config.root, self.status_file), 'w' ) as f:
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
       if not self.params.deterministic:
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
@@ -365,7 +372,7 @@ class MLMC (object):
       #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
     
     print
-    print (' :: INFO: MLMC status saved to status.py') 
+    print (' :: INFO: MLMC status saved to %s' % os.path.join (self.config.root, self.status_file))
   
   # load MLMC status
   def status_load (self):
@@ -373,7 +380,7 @@ class MLMC (object):
     try:
       
       status = {}
-      execfile (self.status_file, globals(), status)
+      execfile ( os.path.join (self.config.root, self.status_file), globals(), status )
       
       self.config.samples.counts.computed = status ['samples']
       self.config.samples.make ()
@@ -390,12 +397,12 @@ class MLMC (object):
       self.create_MCs (self.config.samples.indices.computed)
       
       print
-      print (' :: INFO: MLMC status loaded from %s' % self.status_file)
+      print (' :: INFO: MLMC status loaded from %s' % os.path.join (self.config.root, self.status_file))
     
     except:
       
       print
-      print (' :: ERROR: MLMC status could not be loaded from %s' % self.status_file)
+      print (' :: ERROR: MLMC status could not be loaded from %s' % os.path.join (self.config.root, self.status_file))
       print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       

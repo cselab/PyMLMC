@@ -27,9 +27,10 @@ class Solver (object):
   outputdir  = 'output'
   
   # common setup routines
-  def setup (self, params):
+  def setup (self, params, root):
     
     self.params = params
+    self.root   = root
     
     # create output directory
     if not os.path.exists (self.outputdir):
@@ -97,13 +98,13 @@ class Solver (object):
   def directory (self, level, type, sample=None):
     
     if self.params.deterministic:
-      return self.outputdir
+      return os.path.join (self.root, self.outputdir)
     
     else:
       dir = '%d_%d' % (level, type)
       if sample != None:
         dir += '/%d' % sample
-      return os.path.join ( self.outputdir, dir )
+      return os.path.join (os.path.join (self.root, self.outputdir), dir)
   
   # return the label of a particular run
   def label (self, level, type, sample=None):

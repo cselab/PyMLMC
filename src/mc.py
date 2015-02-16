@@ -29,6 +29,7 @@ class MC_Config (object):
     self.solver         = mlmc_config.solver
     self.discretization = mlmc_config.discretizations [level - type]
     self.id             = mlmc_config.id
+    self.root           = mlmc_config.root
 
 class MC (object):
   
