@@ -56,6 +56,9 @@ class Parallelization (object):
   # convert walltime to hours and minutes
   def set_walltime (self, walltime):
     
+    if walltime == None and local.walltime != None:
+      walltime = local.walltime
+    
     self.walltime = walltime
     
     if walltime:

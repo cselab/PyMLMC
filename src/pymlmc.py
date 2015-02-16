@@ -31,10 +31,22 @@ sys.path.append ( os.path.dirname(__file__) + '/scheduler' )
 sys.path.append ( os.path.dirname(__file__) + '/stats' )
 sys.path.append ( os.path.dirname(__file__) + '/plot' )
 
+# === default MLMC configuration
+
+from solver_example    import Example_Solver
+from samples_estimated import Estimated
+from scheduler_static  import Static
+
 # === classes
 
 # configuration class for MLMC simulations
 class MLMC_Config (object):
+  
+  # default configuration
+  solver    = ExampleSolver ()
+  grids     = helpers.grids_3d ( helpers.grids (1) )
+  samples   = Estimated ()
+  scheduler = Static ()
   
   def __init__ (self, id=0):
     vars (self) .update ( locals() )
