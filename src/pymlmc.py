@@ -392,7 +392,8 @@ class MLMC (object):
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
         self.config.samples.tol = status ['tol']
       
-      self.config.scheduler.batch = status ['batch']
+      if not self.params.deterministic:
+        self.config.scheduler.batch = status ['batch']
       
       self.create_MCs (self.config.samples.indices.computed)
       
