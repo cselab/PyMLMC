@@ -103,7 +103,7 @@ class MLMC (object):
     self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
     
     # setup solver
-    self.config.solver.setup (self.params, self.root)
+    self.config.solver.setup (self.params, self.config.root)
     
     # MLMC results
     self.stats = {}
