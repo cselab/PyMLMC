@@ -25,11 +25,11 @@ import local
 
 # === additional Python paths
 
-sys.path.append ( os.path.dirname(__file__) + '/solver' )
-sys.path.append ( os.path.dirname(__file__) + '/samples' )
-sys.path.append ( os.path.dirname(__file__) + '/scheduler' )
-sys.path.append ( os.path.dirname(__file__) + '/stats' )
-sys.path.append ( os.path.dirname(__file__) + '/plot' )
+sys.path.append ( sys.path.join (os.path.dirname(__file__), 'solver' ) )
+sys.path.append ( sys.path.join (os.path.dirname(__file__), 'samples' ) )
+sys.path.append ( sys.path.join (os.path.dirname(__file__), 'scheduler' ) )
+sys.path.append ( sys.path.join (os.path.dirname(__file__), 'stats' ) )
+sys.path.append ( sys.path.join (os.path.dirname(__file__), 'plot' ) )
 
 # === default MLMC configuration
 

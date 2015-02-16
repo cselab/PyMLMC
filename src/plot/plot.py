@@ -466,18 +466,20 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
   return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs)
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, approximation=False, frame=False, save=None):
+def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=None, approximation=False, frame=False, save=None):
   
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
     label = 'Rayleigh-Plesset (approx.)'
-    style = styles ['rp_approximated']
+    if style == None:
+      style = styles ['rp_approximated']
   else:
     ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, None, mu, S)
     label = 'Rayleigh-Plesset'
     if mu:
       label += ' + dissipation'
-    style = styles ['rp_integrated']
+    if style == None:
+      style = styles ['rp_integrated']
   
   print
   print ' :: Rayleigh-Plesset collapse time: %f' % ts [-1]
