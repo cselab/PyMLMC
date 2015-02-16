@@ -43,7 +43,7 @@ from scheduler_static  import Static
 class MLMC_Config (object):
   
   # default configuration
-  solver    = ExampleSolver ()
+  solver    = Example_Solver ()
   grids     = helpers.grids_3d ( helpers.grids (1) )
   samples   = Estimated ()
   scheduler = Static ()

@@ -43,6 +43,9 @@ styles ['std. deviation']   = 'j-'
 styles ['rp_integrated']    = 'k-'
 styles ['rp_approximated']  = 'k--'
 
+styles ['rp_integrated_2']    = 'c-'
+styles ['rp_approximated_2']  = 'c--'
+
 styles ['Req']              = 'a-'
 styles ['p_max']            = 'i-'
 styles ['ke']               = 'j-'
