@@ -10,6 +10,7 @@
 
 # === global imports
 
+import os
 import sys
 import subprocess
 import argparse
@@ -53,7 +54,7 @@ def grids_2d (N):
 # generates 2D grids with specified numbers of cells N and time steps NS
 def grids_2d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NS' : n } for n in N ]
- 
+
 # generates 3D grids with specified numbers of cells N
 def grids_3d (N):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n } for n in N ]
@@ -87,3 +88,11 @@ def dump (listvar, listformat, listname, filename):
     for var in listvar:
       line += listformat % var + ', '
     f.write ( line + '] )\n' )
+
+# load MLMC simulation from a different directory
+def load (dir):
+  path = '../bubble_nu=0_005'
+  sys.path.append ( os.path.join (os.path.dirname(__file__), dir )
+  from script import mlmc
+  mlmc.chroot (dir)
+  return mlmc
