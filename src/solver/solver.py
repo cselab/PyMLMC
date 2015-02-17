@@ -66,7 +66,7 @@ class Solver (object):
   # check if nothing will be overwritten
   def check (self, level, type, sample):
     directory = self.directory (level, type, sample)
-    if not self.params.deterministic and os.path.exists (directory):
+    if os.path.exists (directory):
       print
       print ' :: ERROR: working directory is NOT clean!'
       print '  : -> Remove all directories like "%s".' % directory
