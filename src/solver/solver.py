@@ -145,6 +145,9 @@ class Solver (object):
     # number of cores per node
     args ['cpucores'] = parallelization.cpucores
     
+    # email for notification
+    args ['email'] = parallelization.email
+    
     # custom environment variables
     args ['envs'] = local.envs
     
@@ -215,6 +218,7 @@ class Solver (object):
     args ['memory']   = parallelization.memory
     args ['cpucores'] = parallelization.cpucores
     args ['label']    = label
+    args ['email']    = parallelization.email
     args ['xopts']    = self.params.xopts
     
     # take bootup time into account

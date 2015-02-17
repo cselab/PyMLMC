@@ -15,11 +15,12 @@ from numpy import round, floor, ceil
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None, separate=2 ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=2 ):
     
     self.walltime = walltime
     self.nodes    = nodes
     self.cores    = cores
+    self.email    = email
     self.separate = separate
   
   def distribute (self):
@@ -45,4 +46,4 @@ class Static (Scheduler):
       batchmax = int ( floor ( self.walltime / float(walltime) ) )
       
       # construct parallelization according to all computed parameters
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax )
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, email )

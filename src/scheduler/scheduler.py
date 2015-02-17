@@ -16,7 +16,7 @@ import sys
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None):
+  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None, email=''):
     
     # save configuration
     vars (self) .update ( locals() )
