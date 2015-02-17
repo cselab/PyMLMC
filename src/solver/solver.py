@@ -66,7 +66,7 @@ class Solver (object):
   # check if nothing will be overwritten
   def check (self, level, type, sample):
     directory = self.directory (level, type, sample)
-    if self.params.deterministic:
+    if not self.params.deterministic:
       present = os.path.exists (directory)
     else:
       label = self.label (level, type, sample)
