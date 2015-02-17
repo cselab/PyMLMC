@@ -93,6 +93,6 @@ def dump (listvar, listformat, listname, filename):
 def load (dir):
   path = '../bubble_nu=0_005'
   sys.path.append ( os.path.join (os.path.dirname(__file__), dir )
-  from script import mlmc
-  mlmc.chroot (dir)
-  return mlmc
+  import script
+  script.mlmc.chroot (dir)
+  return script.mlmc
