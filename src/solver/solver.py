@@ -388,6 +388,7 @@ class Solver (object):
     
     # read timer file
     timerfilepath = os.path.join (directory, self.timerfile % label)
+    print timerfilepath
     if os.path.exists (timerfilepath):
       with open ( os.path.join (directory, self.timerfile % label), 'r' ) as f:
         line = f.readlines() [-3]
