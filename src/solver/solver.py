@@ -370,7 +370,7 @@ class Solver (object):
   # report timer results
   def timer (self, level, type, sample, batch):
     
-    if batch:
+    if batch [level] [type]:
       
       # get directory
       directory = self.directory ( level, type )
@@ -388,7 +388,6 @@ class Solver (object):
     
     # read timer file
     timerfilepath = os.path.join (directory, self.timerfile % label)
-    print timerfilepath
     if os.path.exists (timerfilepath):
       with open ( os.path.join (directory, self.timerfile % label), 'r' ) as f:
         line = f.readlines() [-3]
