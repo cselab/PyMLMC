@@ -73,7 +73,7 @@ styles [1] ['epsilon']          = 'm-'
 styles [1] ['sigma']            = 'g-'
 styles [1] ['samples']          = 'r-'
 styles [1] ['errors']           = 'b-'
-styles [0] ['error']            = 'k-'
+styles [1] ['error']            = 'k-'
 styles [1] ['tol']              = 'm--'
 
 # default colors
@@ -154,11 +154,11 @@ def show ():
   pylab.show()
 
 # plot each stat
-def plot_stats (qoi, stats, extent, legend=True, time='t', run=0):
+def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   
   percentiles = []
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   
   for name, stat in stats.iteritems():
     
@@ -201,7 +201,7 @@ def plot_stats (qoi, stats, extent, legend=True, time='t', run=0):
     pylab.legend (loc='best')
 
 # plot computed MC statistics
-def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False, save=None):
+def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -217,7 +217,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False, s
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent, legend=False )
+    plot_stats ( qoi, mc.stats, extent, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   #pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
@@ -242,14 +242,14 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False, s
     draw (mlmc, save)
 
 # plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False, save=None):
+def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
   figure (infolines, subplots=1)
   
   pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats, extent)
+  plot_stats (qoi, mlmc.stats, extent, run)
   
   if infolines:
     plot_infolines (self)
@@ -260,7 +260,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False,
     draw (mlmc, save)
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=0, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.L
@@ -275,7 +275,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   figure (infolines, subplots=1)
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   if qoi in styles:
     style = styles [run] [qoi]
   else:
@@ -299,7 +299,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, run=0, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
   level  = 'finest'
   type   = 0
   sample = 0
@@ -341,7 +341,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   draw (mlmc, save)
 
 # plot indicators
-def plot_indicators (mlmc, exact=None, infolines=False, run=0, frame=False, save=None):
+def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save=None):
   
   # === load all required data
   
@@ -352,7 +352,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=0, frame=False, save
   levels        = mlmc.levels
   qoi           = mlmc.config.solver.qoi
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   
   # === compute error using the exact solution mean_exact
   
@@ -398,7 +398,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=0, frame=False, save
     draw (mlmc, save)
 
 # plot samples
-def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=0, frame=False, save=None):
+def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, save=None):
   
   # === load all required data
   
@@ -409,7 +409,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=0, frame
   TOL              = mlmc.config.samples.tol
   levels           = mlmc.levels
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   
   # === plot
   
@@ -440,7 +440,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=0, frame
     draw (mlmc, save)
 
 # plot errors
-def plot_errors (mlmc, infolines=False, run=0, frame=False, save=None):
+def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   # === load all required data
   
@@ -449,7 +449,7 @@ def plot_errors (mlmc, infolines=False, run=0, frame=False, save=None):
   levels           = mlmc.levels
   qoi              = mlmc.config.solver.qoi
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   
   # === plot
   
@@ -488,9 +488,9 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
   return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs)
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=None, approximation=False, run=0, frame=False, save=None):
+def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=None, approximation=False, run=1, frame=False, save=None):
   
-  run = run % len (styles)
+  run = (run-1) % len (styles)
   
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
