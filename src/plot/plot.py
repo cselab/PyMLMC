@@ -192,10 +192,11 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, s
   
   levels = (len(mlmc.mcs) + 1) / 2
   
-  if infolines:
-    pylab.figure (figsize=(levels*6, 4+5))
-  else:
-    pylab.figure (figsize=(levels*6, 2*4))
+  if not frame:
+    if infolines:
+      pylab.figure (figsize=(levels*6, 4+5))
+    else:
+      pylab.figure (figsize=(levels*6, 2*4))
   
   for mc in mlmc.mcs:
     
@@ -231,7 +232,8 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  figure (infolines, subplots=1)
+  if not frame:
+    figure (infolines, subplots=1)
   
   pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent, run)
@@ -258,7 +260,8 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
   
-  figure (infolines, subplots=1)
+  if not frame:
+    figure (infolines, subplots=1)
   
   run = (run-1) % len (styles)
   if qoi in styles:
@@ -299,7 +302,8 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  figure (infolines, subplots=1)
+  if not frame:
+    figure (infolines, subplots=1)
   
   for sample in range(mlmc.config.samples.counts.computed[level]):
     
@@ -348,7 +352,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   
   # === plot
   
-  figure (infolines, subplots=2)
+  if not frame:
+    figure (infolines, subplots=2)
   
   # plot EPSILON
   
@@ -398,7 +403,8 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # === plot
   
-  figure (infolines, subplots=1)
+  if not frame:
+    figure (infolines, subplots=1)
   
   # plot number of samples
   
@@ -438,7 +444,8 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   # === plot
   
-  figure (infolines, subplots=1)
+  if not frame:
+    figure (infolines, subplots=1)
   
   # plot relative sampling error
   
@@ -476,6 +483,9 @@ def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
 def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=None, approximation=False, run=1, frame=False, save=None):
   
   run = (run-1) % len (styles)
+  
+  if not frame:
+    figure (infolines=False, subplots=1)
   
   if approximation:
     ts, rs = rp_approximated (r, p1, p2, rho)
