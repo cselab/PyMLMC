@@ -92,7 +92,7 @@ def dump (listvar, listformat, listname, filename):
 # load MLMC simulation from a different directory
 def load (dir):
   path = '../bubble_nu=0_005'
-  sys.path.append ( os.path.join (os.path.dirname(__file__), dir ) )
+  sys.path.insert ( 0, os.path.join (os.path.dirname(__file__), dir ) )
   import script
   script.mlmc.chroot (dir)
   return script
