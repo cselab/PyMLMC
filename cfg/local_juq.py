@@ -57,10 +57,9 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs OMP_PROC_BIND=FALSE \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
+  --envs PAMID_ASYNC_PROGRESS=1 \
   --mapping TABCDE \
   '''
-
-# --envs PAMID_ASYNC_PROGRESS=1 \
 
 # simple run command
 simple_job = '''runjob \
