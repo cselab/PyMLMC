@@ -370,7 +370,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   pylab.subplot(121)
   pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], style [run] ['epsilon'], marker='x', label='relative level means')
   if exact:
-    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],    style [run] ['error'],   alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+    #pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],    style [run] ['error'],   alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+    pylab.axhline (error, levels[0], levels[-1], None, style [run] ['error'],   alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
   pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],    style [run] ['tol'],     alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
