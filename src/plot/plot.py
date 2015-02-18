@@ -247,7 +247,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
     draw (mlmc, save)
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.L
@@ -287,11 +287,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
   level  = 'finest'
   type   = 0
   sample = 0
-  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, run, frame, save)
+  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, run, label, frame, save)
 
 # plot results of all samples (ensemble) of the specified level and type 
 def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
