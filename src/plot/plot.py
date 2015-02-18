@@ -268,8 +268,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     style = styles [run] [qoi]
   else:
     style = styles [run] ['mean']
-
-  pylab.plot  (ts, vs, style, label=qoi)
+  
+  if not label:
+    label = qoi
+  
+  pylab.plot  (ts, vs, style, label=label)
   
   if not mlmc.params.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
