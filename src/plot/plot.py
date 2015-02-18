@@ -76,18 +76,6 @@ styles [1] ['errors']           = 'b-'
 styles [1] ['error']            = 'k-'
 styles [1] ['tol']              = 'm--'
 
-# default colors
-
-colors = [{}, {}]
-
-colors [0] ['mean']             = 'a'
-colors [0] ['percentile']       = 'i'
-colors [0] ['std. deviation']   = 'j'
-
-colors [1] ['mean']             = 'm'
-colors [1] ['percentile']       = 'g'
-colors [1] ['std. deviation']   = 'r'
-
 # set levels extent
 def levels_extent (levels):
   pylab.xlim ( [ -0.2, levels[-1]+0.2 ] )
@@ -168,15 +156,12 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
     style = styles [run] [name] if name in styles [run] else ''
     if 'percentile' in name: style = styles [run] ['percentile']
     
-    color = colors [run] [name] if name in colors [run] else ''
-    if 'percentile' in name: color = colors [run] ['percentile']
-    
     # stat-specific plotting: std. deviation
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
       pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
       pylab.plot (ts, ms - vs, style)
-      color = colors [run] [name]
+      color = colors [run] ['std. deviation'] [0]
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2)
     
     # general plotting
@@ -190,7 +175,7 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   # plot percentiles
   lower = percentiles [0] [1]
   upper = percentiles [1] [1]
-  color = colors [run] ['percentile']
+  color = styles [run] ['percentile'] [0]
   pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2)
   
   if extent:
@@ -370,9 +355,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   pylab.subplot(121)
   pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], style [run] ['epsilon'], marker='x', label='relative level means')
   if exact:
-    #pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1],    style [run] ['error'],   alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-    pylab.axhline (error, levels[0], levels[-1], None, style [run] ['error'],   alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1],    style [run] ['tol'],     alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color = style [run] ['error'] [0], linestyle = style [run] ['error'] [1:], alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color = style [run] ['tol']   [0], linestyle = style [run] ['tol']   [1:], alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -383,7 +367,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   
   pylab.subplot(122)
   pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, style [run] ['sigma'], marker='x', label='rel. level standard deviations')
-  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], style [run] ['tol'], alpha=0.6, label='TOL = %1.1e' % TOL)
+  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color = style [run] ['tol'] [0], linestyle = style [run] ['tol'] [1:], alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -459,7 +443,7 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   # plot relative sampling error
   
   pylab.semilogy (levels, relative_error, style [run] ['errors'], marker='x', label='relative sampling errors')
-  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], style [run] ['tol'], alpha=0.6, label='required TOL = %1.1e' % TOL )
+  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color = style [run] ['tol'] [0], linestyle = style [run] ['tol'] [1:], alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
