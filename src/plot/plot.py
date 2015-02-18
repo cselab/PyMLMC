@@ -264,7 +264,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     figure (infolines, subplots=1)
   
   run = (run-1) % len (styles)
-  if qoi in styles:
+  if qoi in styles [run]:
     style = styles [run] [qoi]
   else:
     style = styles [run] ['mean']
