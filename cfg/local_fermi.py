@@ -41,7 +41,7 @@ scratch = None
 envs = '''  --envs PAMI_DEVICE=B \
   --envs BG_MEMSIZE=16384 \
   --envs BG_THREADLAYOUT=2 \
-  --envs OMP_STACKSIZE=512K \
+  --envs OMP_STACKSIZE=4M \
   --envs OMP_SCHEDULE="dynamic,1" \
   --envs PAMID_COLLECTIVES=1 \
   --envs PAMI_MEMORY_OPTIMIZED=1 \
@@ -57,8 +57,9 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs OMP_PROC_BIND=FALSE \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
-  --envs PAMID_ASYNC_PROGRESS=1 \
   --mapping TABCDE'''
+
+#--envs PAMID_ASYNC_PROGRESS=1 \
 
 # simple run command
 simple_job = '''runjob \
