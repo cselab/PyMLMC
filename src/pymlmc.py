@@ -328,7 +328,7 @@ class MLMC (object):
     if not finished:
       print
       print ' :: WARNING: Some MC simulations are still pending'
-      print ' :: QUERY: Ignore and continue with data analysis? [enter \'y\' or press ENTER]'
+      print ' :: QUERY: Ignore and continue nevertheless? [enter \'y\' or press ENTER]'
       input = raw_input ( '  : ' ) or 'y'
       if input != 'y':
         print '  : EXIT'
