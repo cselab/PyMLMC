@@ -327,9 +327,15 @@ class MLMC (object):
     
     if not finished:
       print
-      print ' :: ERROR: Some MC simulations are still pending'
-      print
-      sys.exit()
+      print ' :: WARNING: Some MC simulations are still pending'
+      print ' :: QUERY: Ignore and continue anyway with data analysis? [enter \'y\' or press ENTER]'
+      input = raw_input ( '  : ' ) or 'y'
+      if input != 'y':
+        print '  : EXIT'
+        print
+        sys.exit()
+      else:
+        print '  : CONTINUE'
   
   # load the results from MC simulations
   def load (self):
