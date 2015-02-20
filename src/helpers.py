@@ -97,6 +97,7 @@ def load (dir):
   sys.path.insert ( 0, os.path.join (os.getcwd(), dir ) )
   import script
   script.mlmc.chroot (dir)
+  script.mlmc.load ()
   print
   print ' :: LOADED successfully'
   return script
