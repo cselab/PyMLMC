@@ -201,6 +201,10 @@ class CubismMPCF (Solver):
     # open self.outputfile and read results
     
     outputfile = os.path.join ( self.directory (level, type, sample), self.outputfile )
+    if not os.path.exists (outputfile):
+      print
+      print ' :: ERROR: Output file does not exist:'
+      print '  : %s' % outputfile
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'Req', 'wall_p_max', 'kin_ke', 'rho_min', 'p_min' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',   'f',          'f',      'f',       'f'     )
