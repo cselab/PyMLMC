@@ -404,12 +404,14 @@ class MLMC (object):
       self.create_MCs (self.config.samples.indices.computed)
       
       print
-      print (' :: INFO: MLMC status loaded from %s' % os.path.join (self.config.root, self.status_file))
+      print (' :: INFO: MLMC status loaded from')
+      print ('  : %s' % os.path.join (self.config.root, self.status_file))
     
     except:
       
       print
-      print (' :: ERROR: MLMC status could not be loaded from %s' % os.path.join (self.config.root, self.status_file))
+      print (' :: ERROR: MLMC status could not be loaded from')
+      print ('  : %s' % os.path.join (self.config.root, self.status_file))
       print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
       print
       
