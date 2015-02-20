@@ -205,6 +205,7 @@ class CubismMPCF (Solver):
       print
       print ' :: ERROR: Output file does not exist:'
       print '  : %s' % outputfile
+      sys.exit()
     
     names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'Req', 'wall_p_max', 'kin_ke', 'rho_min', 'p_min' )
     formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',   'f',          'f',      'f',       'f'     )
