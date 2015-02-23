@@ -25,7 +25,6 @@ matplotlib.rcParams ['legend.fontsize']       = 14
 matplotlib.rcParams ['lines.linewidth']       = 3
 matplotlib.rcParams ['lines.markeredgewidth'] = 3
 matplotlib.rcParams ['lines.markersize']      = 10
-# TODO: increase label sizes
 
 # additional colors
 matplotlib.colors.ColorConverter.colors['a'] = (38/256.0,135/256.0,203/256.0)
@@ -112,17 +111,103 @@ def adjust (infolines, subplots=1):
   else:
     pylab.subplots_adjust(bottom=0.15)
 
-def plot_infolines (mlmc):
+# compute parameters needed for the generation of the TexTable
+def getTexTableConfig (mlmc):
   
-  #TODO
-  return None
-#print ' :: ERROR: plot_infolines() not implemented.'
+  # config
+  
+  keys     =  ['L',    'grid_size', 'cores', 'runtime', 'cluster']
+  captions =  [r'$L$', 'grid size', 'cores', 'runtime', 'cluster']
+  
+  # aggregation of information
+  
+  import time
+  
+  values               = {}
+  values ['L']         = mlmc.L
+  values ['grid_size'] = 'x'.join ( [ '%d' for parameter in mlmc.config.discretizations [-1] .values() ] )
+  values ['cores']     = mlmc.status ['parallelization']
+  values ['cluster']   = mlmc.status ['cluster']
+  values ['runtime']   = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
+  
+  return [keys, captions, values]
 
+# generate TeX code with the table including information about the simulation
 def generateTexTable (mlmc, save):
   
-  #TODO
-  return None
-#print ' :: ERROR: generateTexTable() not implemented.'
+  # get the config
+  
+  [keys, captions, opts] = getTexTableConfig (mlmc)
+  
+  # TeX code generation
+  
+  columns =  '|' + 'c|' * len(keys)
+  
+  text =  '\n'
+  text += r'\begin{tabular}{%s}' % columns + '\n'
+  
+  text += r'\hline' + '\n'
+  text += (r'%s & ' * len(captions))[0:-2] % tuple(captions) + r'\\' + '\n'
+  text += r'\hline' + '\n'
+  text += (r'%s & ' * len(keys))[0:-2] % tuple([opts[key] for key in keys]) + r'\\' + '\n'
+  text += r'\hline' + '\n'
+  
+  text += r'\end{tabular}' + '\n'
+  
+  # saving
+  f = open(save[0:-4] + '.tex', 'w')
+  f.write(text)
+  f.close()
+
+# plot infolines with information about the simulation
+def plot_infolines (mlmc):
+  
+  # text formatter
+  def format_text (text, subplots):
+    if not subplots and len(text) > 65:
+      cut_pos = len(text)/2
+      cut_pos = text.find(' ', cut_pos)
+      text = text[:cut_pos] + '\n' + ' ' * 9 + text[cut_pos:]
+    return text
+  
+  # CONF
+  text  = prefix + format_text('CONF:' + ???, subplots) + '\n'
+  
+  # OPTS
+  text += prefix + format_text('OPTS:' + mlmc.options, subplots) + '\n'
+  
+  # INFO
+  [keys, captions, values] = getTexTableConfig (mlmc)
+  
+  string_info  = ' CLUSTER: ' + config ['cluster']
+  string_info += ', cores: ' + str(helpers.intf(int(config ['cores'])))
+  string_info += ', runtime: ' + config ['runtime']
+
+  text += prefix + format_text('INFO:' + string_info, subplots)
+  
+  # SAMPLES
+  samples_available = self.samples and (self.i.L != 0 or self.i.ML != 1 or self.i.READ_NUMBER_OF_SAMPLES_FROM_FILE)
+  if samples_available:
+    text += '\n' + prefix + 'SAMPLES: ' + str(self.samples[::-1])[1:-1]
+  
+  # MESH_LEVEL and TYPE
+  if level != None:
+    text += ' (only the %d-sample MC estimate from MESH_LEVEL=%d and TYPE=%d is displayed)' % (self.samples[level+type], level, type)
+  
+  # default parallelization
+  if self.default_parallelization:
+    if samples_available:
+      text += ' | '
+    else:
+      text += '\n'
+    text += 'PARALLELIZATION:'
+    for level in range(len(self.default_parallelization)):
+      text += ' ' + str(self.default_parallelization[level][3]) + 'x(' + str(self.default_parallelization[level][0])
+      if self.i.NY > 1: text += 'x' + str(self.default_parallelization[level][1])
+      if self.i.NZ > 1: text += 'x' + str(self.default_parallelization[level][2])
+      text += ')'
+  
+  return text
 
 def saveall (mlmc, save):
   pylab.savefig    (save)

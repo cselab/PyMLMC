@@ -114,6 +114,9 @@ class MLMC (object):
     # submission file name
     self.submission_file = 'queue.dat'
   
+    # name of the cluster
+    self.cluster = local.name
+  
   # change root of the MLMC simulation
   def chroot (self, root):
     
@@ -374,8 +377,9 @@ class MLMC (object):
       if not self.params.deterministic:
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
       f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
-      f.write ( 'batch = %s' % str ( self.config.scheduler.batch ) )
-      #f.write ( 'finished = %d' % int(self.config.samples.finished(self.errors)) )
+      f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
+      f.write ( 'cluster = %s' % local.name  + '\n' )
+      f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (self.config.root, self.status_file))
@@ -400,6 +404,17 @@ class MLMC (object):
       
       if not self.params.deterministic:
         self.config.scheduler.batch = status ['batch']
+    
+      self.status = {}
+      if 'cluster' in status:
+        self.status ['cluster'] = status ['cluster']
+      else:
+        self.status ['cluster'] = 'unknown'
+      
+      if 'parallelization' in status:
+        self.status ['parallelization'] = status ['parallelization']
+      else:
+        self.status ['parallelization'] = 'unknown'
       
       self.create_MCs (self.config.samples.indices.computed)
       
