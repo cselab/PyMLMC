@@ -125,7 +125,7 @@ def getTexTableConfig (mlmc):
   
   values               = {}
   values ['L']         = mlmc.L
-  values ['grid_size'] = 'x'.join ( [ '%d' for parameter in mlmc.config.discretizations [-1] .values() ] )
+  values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [-1] .values() ] )
   values ['cores']     = mlmc.status ['parallelization']
   values ['cluster']   = mlmc.status ['cluster']
   values ['runtime']   = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
@@ -162,6 +162,7 @@ def generateTexTable (mlmc, save):
 # plot infolines with information about the simulation
 def plot_infolines (mlmc):
   
+  '''
   # text formatter
   def format_text (text, subplots):
     if not subplots and len(text) > 65:
@@ -174,7 +175,7 @@ def plot_infolines (mlmc):
   text  = prefix + format_text('CONF:' + ???, subplots) + '\n'
   
   # OPTS
-  text += prefix + format_text('OPTS:' + mlmc.options, subplots) + '\n'
+  text += prefix + format_text('OPTS: ' + mlmc.options, subplots) + '\n'
   
   # INFO
   [keys, captions, values] = getTexTableConfig (mlmc)
@@ -208,6 +209,8 @@ def plot_infolines (mlmc):
       text += ')'
   
   return text
+  '''
+  return None
 
 def saveall (mlmc, save):
   pylab.savefig    (save)
