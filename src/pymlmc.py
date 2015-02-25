@@ -378,7 +378,7 @@ class MLMC (object):
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
       f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
       f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
-      f.write ( 'cluster = %s' % local.name  + '\n' )
+      f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
     
     print
