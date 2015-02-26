@@ -116,19 +116,25 @@ def getTexTableConfig (mlmc):
   
   # config
   
-  keys     =  ['L',    'grid_size', 'cores', 'runtime', 'cluster']
-  captions =  [r'$L$', 'grid size', 'cores', 'runtime', 'cluster']
+  keys     =  ['grid_size', 'cores', 'runtime', 'cluster']
+  captions =  ['grid size', 'cores', 'runtime', 'cluster']
   
   # aggregation of information
   
   import time
   
   values               = {}
-  values ['L']         = mlmc.L
   values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [-1] .values() ] )
   values ['cores']     = mlmc.status ['parallelization']
   values ['cluster']   = mlmc.status ['cluster']
   values ['runtime']   = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
+  
+  # number of levels
+
+  if mlmc.L != 0:
+    keys = ['L'] + keys
+    captions = [r'$L$'] + captions
+    values ['L'] = mlmc.L
   
   return [keys, captions, values]
 
