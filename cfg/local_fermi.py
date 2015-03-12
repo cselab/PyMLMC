@@ -75,7 +75,7 @@ simple_job = '''runjob \
   '''
 
 # MPI run command
-mpi_job = '''runjob
+mpi_job = '''runjob \
   --np %(ranks)d \
   --ranks-per-node %(tasks)d \
   --cwd $PWD \
