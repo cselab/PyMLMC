@@ -589,7 +589,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   run = (run-1) % len (styles)
   
   if r == None:
-    ts = numpy.array ( mlmc.config.solver.load ( mlmc.L, 0, 0 ) .data ['Req'] ) [0]
+    r = numpy.array ( mlmc.config.solver.load ( mlmc.L, 0, 0 ) .data ['Req'] ) [0]
   
   if not frame:
     figure (infolines=False, subplots=1)
