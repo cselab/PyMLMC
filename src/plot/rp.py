@@ -57,12 +57,6 @@ class OptPL2 (object):
   # evaluate the right hand side of the ODE for the second derivative of bubble radius
   def rhs (self, R, dR, R0, p0_l, p0_g, rho_l, rho0_g, gamma, mu, S):
     
-    # compatibility checks
-    if mu != 0:
-      print ' :: WARNING: mu > 0 is NOT implemented for OptPL+'
-    if S != 0:
-      print ' :: WARNING: S > 0 is NOT implemented for OptPL+'
-    
     # compute required parameters
     c_l     = numpy.sqrt (1.0 * p0_l / rho_l)                 # invariant speed of sound in liquid
     R_eq    = R0 * (1.0 * p0_g / p0_l) ** (1.0 / 3.0)         # equillibrium radius (assuming adiabaticity)
@@ -88,6 +82,14 @@ class OptPL2 (object):
     ddR -= 1.5 * dR * dR * (1.0 + 23.0 / 75.0 * dR / c_l)
     #print ddR
     ddR /= factor
+    
+    # diffusion
+    if mu != 0:
+      ddR += - 4 * mu * dR / (R ** 2)
+    
+    # surface tension
+    if S != 0:
+      ddR += - 2 * S / (rho_l * R ** 2)
     
     return ddR
 
