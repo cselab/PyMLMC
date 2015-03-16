@@ -75,6 +75,8 @@ styles [1] ['errors']           = 'b-'
 styles [1] ['error']            = 'k-'
 styles [1] ['tol']              = 'm--'
 
+units = {'t' : 'ms', 'Req' : r'$\mu$m', 'p_max' : 'bar', 'ke' : 'J', 'mach_max' : '-'}
+
 # set levels extent
 def levels_extent (levels):
   pylab.xlim ( [ -0.2, levels[-1]+0.2 ] )
@@ -370,7 +372,10 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   if not mlmc.params.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
-
+  
+  pylab.xlabel ('t [%s]' % units ['t'])
+  pylab.ylabel ('%s [%s]' % (qoi, units [qoi]) )
+  
   if extent:
     pylab.ylim(*extent)
   
@@ -515,7 +520,8 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=0.7)
-  #TODO: add light gray lines at y = 1, 2, 4
+  #TODO: add light gray lines at y = 1, 2, 4 (OR: label data points)
+  #OR: change to barplot, labeling data points
   if not frame:
     pylab.legend (loc='upper right')
   
@@ -563,21 +569,22 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   if not frame:
     draw (mlmc, save)
 
-def rp_approximated (r, p1=100, p2=0.0234, rho=1000):
-  tc = 0.914681 * r * numpy.sqrt ( rho / (p1 - p2) )
+import rp
+
+def rp_approximated (r, p0_l=100, p0_g=0.0234, rho_l=1000):
+  tc = 0.914681 * r * numpy.sqrt ( rho_l / (p0_l - p0_g) )
   rp = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
   ts = numpy.linspace (0, tc, 10000)
   rs = rp(ts)
   return ts, rs
 
-def rp_integrated (r, p1=100, p2=0.0234, rho=1000, tend=None, mu=0, S=0):
-  import rp
+def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0):
   dr0 = 0
-  [ts, rs, ps, drs] = rp.integrate (r, p1, p2, rho, tend, dr0, mu, S)
-  return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs)
+  [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S)
+  return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=None, approximation=False, run=1, frame=False, save=None):
+def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, style=None, approximation=False, run=1, frame=False, save=None):
   
   run = (run-1) % len (styles)
   
@@ -585,20 +592,24 @@ def plot_rp (mlmc, r, p1=100, p2=0.0234, rho=1000, mu=0, S=0, count=1, style=Non
     figure (infolines=False, subplots=1)
   
   if approximation:
-    ts, rs = rp_approximated (r, p1, p2, rho)
+    ts, rs = rp_approximated (r, p0_l, p0_g, rho_l)
     label = 'Rayleigh-Plesset (approx.)'
     if style == None:
       style = styles [run] ['rp_approximated']
   else:
-    ts, rs, ps, drs = rp_integrated (r, p1, p2, rho, None, mu, S)
-    label = 'Rayleigh-Plesset'
+    results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
+    ts = numpy.array ( results.meta ['t'] )
+    tend = ts [-1]
+    ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S)
+    label = name
     if mu:
       label += ' + dissipation'
     if style == None:
       style = styles [run] ['rp_integrated']
   
+  # report approximate collapse time
   print
-  print ' :: Rayleigh-Plesset collapse time: %f' % ts [-1]
+  print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
   
   # compute equivalent radius of simultaneously collapsing multiple bubbles
   if count != None:
