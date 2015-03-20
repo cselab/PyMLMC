@@ -129,7 +129,11 @@ def getTexTableConfig (mlmc):
   values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [-1] .values() ] )
   values ['cores']     = mlmc.status ['parallelization']
   values ['cluster']   = mlmc.status ['cluster']
-  values ['runtime']   = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
+  
+  if mlmc.finished:
+    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
+  else:
+    values ['runtime'] = mlmc.status ['walltime']
   
   # number of levels
 
@@ -591,7 +595,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   if r == None:
     r = numpy.array ( mlmc.config.solver.load ( mlmc.L, 0, 0 ) .data ['Req'] ) [0]
     if count != None:
-      r /= count
+      r /= count ** (1.0/3.0)
   
   if not frame:
     figure (infolines=False, subplots=1)

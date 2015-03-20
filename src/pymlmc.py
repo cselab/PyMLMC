@@ -317,7 +317,7 @@ class MLMC (object):
     
     format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
     
-    finished = 1
+    self.finished = 1
     for mc in self.mcs:
       args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
@@ -325,10 +325,10 @@ class MLMC (object):
         timestr = time.strftime ( '%H:%M:%S', time.gmtime ( mc.timer (self.config.scheduler.batch) ) )
         print format % ( args + ( 'completed in ' + timestr, ) )
       else:
-        finished = 0
+        self.finished = 0
         print format % ( args + ( 'pending: %d' % pending, ) )
     
-    if not finished:
+    if not self.finished:
       print
       print ' :: WARNING: Some MC simulations are still pending'
       print ' :: QUERY: Ignore and continue nevertheless? [enter \'y\' or press ENTER]'
@@ -380,6 +380,7 @@ class MLMC (object):
       f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
       f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
+      f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime  + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (self.config.root, self.status_file))
@@ -415,6 +416,11 @@ class MLMC (object):
         self.status ['parallelization'] = status ['parallelization']
       else:
         self.status ['parallelization'] = 'unknown'
+      
+      if 'walltime' in status:
+        self.status ['walltime'] = status ['walltime']
+      else:
+        self.status ['walltime'] = 'unknown'
       
       self.create_MCs (self.config.samples.indices.computed)
       
