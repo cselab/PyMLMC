@@ -34,7 +34,7 @@ min_cores    = 64 * cores
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
-# scratch path ($WORK is NOT sufficient - quota is only 1TB)
+# scratch path ($WORK and $SCRATCH quotas are now 50 TB)
 scratch = '/gpfs/scratch/userexternal/jsukys00/pymlmc'
 
 # default environment variables
