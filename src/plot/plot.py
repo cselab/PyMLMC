@@ -582,13 +582,13 @@ def rp_approximated (r, p0_l=100, p0_g=0.0234, rho_l=1000):
   rs = rp(ts)
   return ts, rs
 
-def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0):
+def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0. model=rp.OptPL2()):
   dr0 = 0
-  [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S)
+  [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S, model)
   return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, style=None, approximation=False, run=1, frame=False, save=None):
+def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, style=None, approximation=False, model=rp.OptPL2(), run=1, frame=False, save=None):
   
   run = (run-1) % len (styles)
   
@@ -609,7 +609,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
     ts = numpy.array ( results.meta ['t'] )
     tend = ts [-1]
-    ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S)
+    ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model)
     label = name
     if mu:
       label += ' + dissipation'
