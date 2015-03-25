@@ -609,7 +609,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
     ts = numpy.array ( results.meta ['t'] )
     tend = ts [-1]
-    model_class = getattr (numpy, model)
+    model_class = getattr (rp, model)
     ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
     label = name
     if mu:
