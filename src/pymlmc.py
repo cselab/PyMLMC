@@ -380,10 +380,11 @@ class MLMC (object):
       f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
       f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
-        f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
+        f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores + '\n' )
+        f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime + '\n' )
       except:
         f.write ( 'parallelization = %s' % self.status ['parallelization'] + '\n' )
-      f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime  + '\n' )
+        f.write ( 'walltime = %s' % self.status ['walltime'] + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (self.config.root, self.status_file))
