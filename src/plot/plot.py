@@ -389,7 +389,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   adjust (infolines)
 
   if not frame:
-    draw (mlmc, save, legend=True, loc='best')
+    draw (mlmc, save, legend=False, loc='best')
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs

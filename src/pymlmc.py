@@ -379,7 +379,10 @@ class MLMC (object):
       f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
       f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
       f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
-      f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
+      try:
+        f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores  + '\n' )
+      except:
+        f.write ( 'parallelization = %s' % status ['parallelization'] + '\n' )
       f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime  + '\n' )
     
     print
