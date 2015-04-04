@@ -382,9 +382,9 @@ class MLMC (object):
       try:
         f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores + '\n' )
       except:
-        f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime + '\n' )
-      try:
         f.write ( 'parallelization = %s' % self.status ['parallelization'] + '\n' )
+      try:
+        f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime + '\n' )
       except:
         f.write ( 'walltime = %s' % self.status ['walltime'] + '\n' )
     
