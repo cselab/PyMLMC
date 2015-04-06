@@ -17,6 +17,7 @@ import time
 
 # === local imports
 
+from config import *
 from status import *
 from mc import *
 from indicators import *
@@ -24,6 +25,7 @@ from errors import *
 import helpers
 import local
 
+'''
 # === additional Python paths
 
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'solver' ) )
@@ -38,8 +40,6 @@ from solver_example    import Example_Solver
 from samples_estimated import Estimated
 from scheduler_static  import Static
 
-# === classes
-
 # configuration class for MLMC simulations
 class MLMC_Config (object):
   
@@ -52,30 +52,18 @@ class MLMC_Config (object):
   deterministic   = 0
   
   def __init__ (self, id=0):
+    
     vars (self) .update ( locals() )
   
-  # used to set solver, discretizations, samples and scheduler
-  def set (self, name, value):
-    vars (self) .update ( { name : value } )
-
-# MLMC class
-class MLMC (object):
-  
-  # initialize MLMC
-  def __init__ (self, config):
-    
-    # store configuration
-    vars (self) .update ( locals() )
-    
-    # parse input parameters
-    self.params = helpers.parse ()
+  # setup remaining variables
+  def setup (self):
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
     self.COARSE = 1
     
     # determine levels
-    self.levels = range ( len ( config.discretizations ) )
+    self.levels = range ( len ( self.discretizations ) )
     
     # determine finest level
     self.L = len (self.levels) - 1
@@ -83,29 +71,46 @@ class MLMC (object):
     # setup required pairs of levels and types
     levels_types_fine   = [ [level, self.FINE]   for level in self.levels [1:] ]
     levels_types_coarse = [ [level, self.COARSE] for level in self.levels [1:] ]
-    self.levels_types   = [ [0, self.FINE] ]  + [level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types]
-    
-    # status
-    self.status = Status (self.levels)
-    
-    # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
-    
-    # errors
-    self.errors = Errors (self.levels)
+    self.levels_types   = [ [0, self.FINE] ]  + [ level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types ]
     
     # works
     # TODO: take into account _differences_ on all levels except the coarsest
-    self.works = [ config.solver.work (discretization) for discretization in config.discretizations ]
+    self.works = [ self.solver.work (discretization) for discretization in self.discretizations ]
     
     # core ratios
-    self.ratios = [ config.solver.ratio (config.discretizations [self.L], discretization) for discretization in config.discretizations ]
+    self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
+'''
+
+# === MLMC class
+
+class MLMC (object):
+  
+  # initialize MLMC
+  def __init__ (self, config):
+    
+    # store configuration
+    self.config = config
+    
+    # finalize configuration setup
+    self.config.setup ()
+    
+    # parse input parameters
+    self.params = helpers.parse ()
+    
+    # status
+    self.status = Status ()
+    
+    # indicators
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
+    
+    # errors
+    self.errors = Errors (self.config.levels)
     
     # setup samples
-    self.config.samples.setup ( self.levels, self.works )
+    self.config.samples.setup ( self.config.levels, self.config.works )
     
     # setup scheduler
-    self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
+    self.config.scheduler.setup (self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
     
     # setup solver
     self.config.solver.setup (self.params, self.config.root, self.config.deterministic)
@@ -114,12 +119,7 @@ class MLMC (object):
     self.stats = {}
     
     # submission file name
-    # TODO: this should not be here!
     self.submission_file = 'queue.dat'
-  
-    # name of the cluster
-    # TODO: do we need this here?
-    self.cluster = local.name
   
   # change root of the MLMC simulation
   def chroot (self, root):
@@ -219,7 +219,7 @@ class MLMC (object):
       self.errors.save    ()
       
       # report speedup (MLMC vs MC)
-      self.errors.speedup (self.works)
+      self.errors.speedup (self.config.works)
       
       # check if the simulation is already finished 
       if self.config.samples.finished (self.errors):
@@ -280,7 +280,7 @@ class MLMC (object):
   # create MC objects
   def create_MCs (self, indices):
     self.mcs = []
-    for level, type in self.levels_types:
+    for level, type in self.config.levels_types:
       self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.scheduler.parallelizations [level] [type] ) )
   
   # run MC estimates

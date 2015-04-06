@@ -113,12 +113,10 @@ class MC (object):
   def timer (self, batch):
     
     config = self.config
-    time = sum ( [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ] )
-    if batch:
-      return time
-    else:
-      return float(time) / len (config.samples)
-
+    runtimes = [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ]
+    runtime = max ( runtimes )
+    return float (runtime)
+  
   # load the results
   def load (self):
     

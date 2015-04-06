@@ -126,21 +126,21 @@ def getTexTableConfig (mlmc):
   import time
   
   values               = {}
-  values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [-1] .values() ] )
-  values ['cores']     = mlmc.status ['parallelization']
-  values ['cluster']   = mlmc.status ['cluster']
+  values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [mlmc.config.L] .values() ] )
+  values ['cores']     = mlmc.status.status ['parallelization']
+  values ['cluster']   = mlmc.status.status ['cluster']
   
   if mlmc.finished:
-    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[-1].timer (mlmc.config.scheduler.batch) ) )
+    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[mlmc.config.L].timer (mlmc.config.scheduler.batch) ) )
   else:
-    values ['runtime'] = mlmc.status ['walltime']
+    values ['runtime'] = mlmc.status.status ['walltimes'] [-1] [0]
   
   # number of levels
 
-  if mlmc.L != 0:
+  if mlmc.config.L != 0:
     keys = ['L'] + keys
     captions = [r'$L$'] + captions
-    values ['L'] = mlmc.L
+    values ['L'] = mlmc.config.L
   
   return [keys, captions, values]
 
@@ -350,7 +350,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
 def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
   
   # some dynamic values
-  if level  == 'finest':   level = mlmc.L
+  if level  == 'finest':   level = mlmc.config.L
   if level  == 'coarsest': level = 0
   
   if not qoi: qoi = mlmc.config.solver.qoi
@@ -403,7 +403,7 @@ def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, label=None, frame
 def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
   
   # some dynamic values
-  if level  == 'finest':   level  = mlmc.L
+  if level  == 'finest':   level  = mlmc.config.L
   if level  == 'coarsest': level  = 0
   
   if not qoi: qoi = mlmc.config.solver.qoi
@@ -444,7 +444,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   SIGMA         = mlmc.indicators.variance_diff
   TOL           = mlmc.config.samples.tol
   NORMALIZATION = mlmc.errors.normalization
-  levels        = mlmc.levels
+  levels        = mlmc.config.levels
   qoi           = mlmc.config.solver.qoi
   
   run = (run-1) % len (styles)
@@ -503,7 +503,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   #counts_optimal   = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction
   TOL              = mlmc.config.samples.tol
-  levels           = mlmc.levels
+  levels           = mlmc.config.levels
   
   run = (run-1) % len (styles)
   
@@ -544,7 +544,7 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   relative_error   = mlmc.errors.relative_error
   TOL              = mlmc.config.samples.tol
-  levels           = mlmc.levels
+  levels           = mlmc.config.levels
   qoi              = mlmc.config.solver.qoi
   
   run = (run-1) % len (styles)
@@ -593,7 +593,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   run = (run-1) % len (styles)
   
   if r == None:
-    r = numpy.array ( mlmc.config.solver.load ( mlmc.L, 0, 0 ) .data ['Req'] ) [0]
+    r = numpy.array ( mlmc.config.solver.load ( mlmc.config.L, 0, 0 ) .data ['Req'] ) [0]
     if count != 1:
       r /= count ** (1.0/3.0)
   
@@ -606,7 +606,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     if style == None:
       style = styles [run] ['rp_approximated']
   else:
-    results = mlmc.config.solver.load ( mlmc.L, 0, 0 )
+    results = mlmc.config.solver.load ( mlmc.config.L, 0, 0 )
     ts = numpy.array ( results.meta ['t'] )
     tend = ts [-1]
     model_class = getattr (rp, model)

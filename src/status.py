@@ -23,8 +23,6 @@ class Status (object):
   
   def __init__ (self, levels):
     
-    self.levels      = levels
-    self.L           = len(levels) - 1
     self.status_file = 'status.dat'
   
   # save status
@@ -32,7 +30,7 @@ class Status (object):
   
     with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
       
-      f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
+      f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed [level]) + ', ' for level in config.levels ] ) + ']\n' )
       if not config.deterministic:
         f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
@@ -41,13 +39,14 @@ class Status (object):
       else:
         f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
-        f.write ( 'parallelization = \'%s\'' % config.scheduler.parallelizations [self.L] [0] .cores + '\n' )
+        f.write ( 'parallelization = \'%s\'' % config.scheduler.parallelizations [config.L] [config.FINE] .cores + '\n' )
       except:
         f.write ( 'parallelization = \'%s\'' % self.status ['parallelization'] + '\n' )
       try:
-        f.write ( 'walltime = \'%s\'' % config.scheduler.parallelizations [self.L] [0] .walltime + '\n' )
+        walltimes = [ config.scheduler.parallelizations [config.L] [config.FINE] .walltime for level, type in config.levels_types ]
+        f.write ( 'walltimes = %s' % walltimes + '\n' )
       except:
-        f.write ( 'walltime = \'%s\'' % self.status ['walltime'] + '\n' )
+        f.write ( 'walltimes = %s' % self.status ['walltimes'] + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, self.status_file))
@@ -78,8 +77,8 @@ class Status (object):
       if 'parallelization' not in self.status:
         self.status ['parallelization'] = 'unknown'
       
-      if 'walltime' not in self.status:
-        self.status ['walltime'] = 'unknown'
+      if 'walltimes' not in self.status:
+        self.status ['walltimes'] = [ 'unknown' for level, type in config.levels_types ]
       
       print
       print (' :: INFO: MLMC status loaded from')
