@@ -18,7 +18,7 @@ import argparse
 # === functions
 
 # parse command line arguments
-def parse (deterministic):
+def parse ():
   parser = argparse.ArgumentParser()
   parser.add_argument ('-r', '--restart',       action = "count", default = 0,  help = 'restart the simulation')
   parser.add_argument ('-i', '--interactive',   action = "count", default = 0,  help = 'after launch of each update, wait for jobs to finish instead of exiting')
@@ -28,7 +28,7 @@ def parse (deterministic):
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
   parser.add_argument ('-f', '--force',         action = "count", default = 0,  help = 'force override of existing simulation files')
   parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
-  parser.add_argument ('-d', '--deterministic', action = "count", default = deterministic,  help = 'deterministic simulation - no subdirectories are created')
+#  parser.add_argument ('-d', '--deterministic', action = "count", default = deterministic,  help = 'deterministic simulation - no subdirectories are created')
   return parser.parse_args()
 
 # creates an empty nested list iterating over levels and types

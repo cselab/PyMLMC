@@ -17,6 +17,7 @@ import time
 
 # === local imports
 
+from status import *
 from mc import *
 from indicators import *
 from errors import *
@@ -43,11 +44,12 @@ from scheduler_static  import Static
 class MLMC_Config (object):
   
   # default configuration
-  solver    = Example_Solver ()
-  grids     = helpers.grids_3d ( helpers.grids (1) )
-  samples   = Estimated ()
-  scheduler = Static ()
-  root      = '.'
+  solver          = Example_Solver ()
+  discretizations = helpers.grids_3d ( helpers.grids (1) )
+  samples         = Estimated ()
+  scheduler       = Static ()
+  root            = '.'
+  deterministic   = 0
   
   def __init__ (self, id=0):
     vars (self) .update ( locals() )
@@ -60,13 +62,13 @@ class MLMC_Config (object):
 class MLMC (object):
   
   # initialize MLMC
-  def __init__ (self, config, deterministic=0):
+  def __init__ (self, config):
     
     # store configuration
     vars (self) .update ( locals() )
     
     # parse input parameters
-    self.params = helpers.parse (deterministic)
+    self.params = helpers.parse ()
     
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
@@ -76,12 +78,15 @@ class MLMC (object):
     self.levels = range ( len ( config.discretizations ) )
     
     # determine finest level
-    self.L = len(self.levels) - 1
+    self.L = len (self.levels) - 1
     
     # setup required pairs of levels and types
     levels_types_fine   = [ [level, self.FINE]   for level in self.levels [1:] ]
     levels_types_coarse = [ [level, self.COARSE] for level in self.levels [1:] ]
     self.levels_types   = [ [0, self.FINE] ]  + [level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types]
+    
+    # status
+    self.status = Status (levels)
     
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
@@ -108,13 +113,12 @@ class MLMC (object):
     # MLMC results
     self.stats = {}
     
-    # status file name
-    self.status_file = 'status.dat'
-    
     # submission file name
+    # TODO: this should not be here!
     self.submission_file = 'queue.dat'
   
     # name of the cluster
+    # TODO: do we need this here?
     self.cluster = local.name
   
   # change root of the MLMC simulation
@@ -170,7 +174,7 @@ class MLMC (object):
     self.config.samples.append ()
 
     # save status of MLMC simulation
-    self.status_save ()
+    self.status.save (self.config)
     
     # for clusters: if non-interactive session -> exit
     if local.cluster and not self.params.interactive:
@@ -186,7 +190,7 @@ class MLMC (object):
     while True:
       
       # load status of MLMC simulation
-      self.status_load ()
+      self.status.load (self.config)
       
       # if non-interactive session -> wait for jobs to finish
       if not self.params.interactive:
@@ -218,7 +222,7 @@ class MLMC (object):
       if self.config.samples.finished (self.errors):
         print
         print ' :: Simulation finished.'
-        self.status_save ()
+        self.status.save (self.config)
         return
       
       # update, report, and validate the required number of samples
@@ -233,7 +237,7 @@ class MLMC (object):
           if self.config.samples.finished (self.errors):
             print
             print ' :: Simulation finished.'
-            self.status_save ()
+            self.status.save (self.config)
             return
           # otherwise update, report, and validate the number of samples
           self.config.samples.update   (self.errors, self.indicators)
@@ -256,7 +260,7 @@ class MLMC (object):
       self.config.samples.append ()
       
       # save status of MLMC simulation
-      self.status_save ()
+      self.status.save (self.config)
       
       # for clusters: if non-interactive session -> exit
       if local.cluster and not self.params.interactive:
@@ -368,7 +372,8 @@ class MLMC (object):
       print
       print ' :: STATISTIC: %s' % stat
       print self.stats [stat]
-  
+
+  '''
   # save MLMC status
   def status_save (self):
     
@@ -443,3 +448,4 @@ class MLMC (object):
       print
       
       sys.exit()
+  '''
