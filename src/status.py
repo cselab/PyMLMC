@@ -85,10 +85,10 @@ class Status (object):
 
     #except:
       
-      print
-      print (' :: ERROR: MLMC status could not be loaded from')
-      print ('  : %s' % os.path.join (config.root, self.status_file))
-      print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
-      print
-      
-      sys.exit()
+    print
+    print (' :: ERROR: MLMC status could not be loaded from')
+    print ('  : %s' % os.path.join (config.root, self.status_file))
+    print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
+    print
+    
+    sys.exit()
