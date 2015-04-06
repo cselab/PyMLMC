@@ -25,6 +25,7 @@ class Status (object):
   def __init__ (self):
     
     self.status_file = 'status.dat'
+    self.list        = {}
   
   # save status
   def save (self, config):

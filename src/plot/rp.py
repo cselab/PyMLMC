@@ -58,8 +58,8 @@ class OptPL2 (object):
   def rhs (self, R, dR, R0, p0_l, p0_g, rho_l, rho0_g, gamma, mu, S):
     
     # compute required parameters
-    c_l     = numpy.sqrt (1.0 * p0_l / rho_l)                 # invariant speed of sound in liquid
-    R_eq    = R0 * (1.0 * p0_g / p0_l) ** (1.0 / 3.0)         # equillibrium radius (assuming adiabaticity)
+    c_l     = numpy.sqrt (1.0 * p0_l / rho_l)           # invariant speed of sound in liquid
+    R_eq    = R0 * (1.0 * p0_g / p0_l) ** (1.0 / 3.0)   # equillibrium radius (assuming adiabaticity)
     rho_eq  = density (rho0_g, R0, R_eq)                # gas density at ambient equilibrium
     P0      = p0_l * ( (R / R_eq) ** -(3 * gamma) - 1 ) # according to the definition
     dP0     = p0_l / (R_eq ** -(3 * gamma))             # derivative of p0 w.r.t R (constants)
