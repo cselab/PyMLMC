@@ -313,8 +313,8 @@ class MLMC (object):
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = self.config.solver.DataClass ()
       for mc in self.mcs:
-        if mc.config.type == self.FINE:   self.stats [ name ] += mc.stats [ name ]
-        if mc.config.type == self.COARSE: self.stats [ name ] -= mc.stats [ name ]
+        if mc.config.type == self.config.FINE:   self.stats [ name ] += mc.stats [ name ]
+        if mc.config.type == self.config.COARSE: self.stats [ name ] -= mc.stats [ name ]
     
     return self.stats
   
