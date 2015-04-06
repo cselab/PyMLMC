@@ -55,36 +55,36 @@ class Status (object):
   # load status
   def load (self, config):
     
-    #try:
+    try:
       
-    self.status = {}
-    execfile ( os.path.join (config.root, self.status_file), globals(), self.status )
+      self.status = {}
+      execfile ( os.path.join (config.root, self.status_file), globals(), self.status )
+      
+      config.samples.counts.computed = self.status ['samples']
+      config.samples.make ()
+      
+      if not config.deterministic:
+        if config.samples.tol != self.status ['tol']:
+          print
+          print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
+          print ('  : -> Tolerance from the status file will be used.')
+        config.samples.tol = self.status ['tol']
+      
+      config.scheduler.batch = self.status ['batch']
+      
+      if 'cluster' not in self.status:
+        self.status ['cluster'] = 'unknown'
+      
+      if 'parallelization' not in self.status:
+        self.status ['parallelization'] = 'unknown'
+      
+      if 'walltime' not in self.status:
+        self.status ['walltime'] = 'unknown'
+      
+      print
+      print (' :: INFO: MLMC status loaded from')
+      print ('  : %s' % os.path.join (config.root, self.status_file))
     
-    config.samples.counts.computed = self.status ['samples']
-    config.samples.make ()
-    
-    if not config.deterministic:
-      if config.samples.tol != self.status ['tol']:
-        print
-        print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-        print ('  : -> Tolerance from the status file will be used.')
-      config.samples.tol = self.status ['tol']
-    
-    config.scheduler.batch = self.status ['batch']
-    
-    if 'cluster' not in self.status:
-      self.status ['cluster'] = 'unknown'
-    
-    if 'parallelization' not in self.status:
-      self.status ['parallelization'] = 'unknown'
-    
-    if 'walltime' not in self.status:
-      self.status ['walltime'] = 'unknown'
-    
-    print
-    print (' :: INFO: MLMC status loaded from')
-    print ('  : %s' % os.path.join (config.root, self.status_file))
-'''
     except:
       
       print
@@ -94,4 +94,3 @@ class Status (object):
       print
       
       sys.exit()
-'''
