@@ -277,7 +277,7 @@ class MLMC (object):
         runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
         walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
         if walltime != 'unknown':
-          percent = round ( runtime / walltime )
+          percent = round ( 100 * (runtime / 3600) / walltime )
           print format % ( args + ( 'completed in ' + runtimestr + (' [%3d%%]' % percent), ) )
         else:
           print format % ( args + ( 'completed in ' + runtimestr, ) )
