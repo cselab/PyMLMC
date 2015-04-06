@@ -59,32 +59,32 @@ class Status (object):
     
     try:
     
-      self.status = {}
-      execfile ( os.path.join (config.root, self.status_file), globals(), self.status )
+      self.list = {}
+      execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
       
-      config.samples.counts.computed = self.status ['samples']
+      config.samples.counts.computed = self.list ['samples']
       config.samples.make ()
       
       if not config.deterministic:
-        if config.samples.tol != self.status ['tol']:
+        if config.samples.tol != self.list ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
           print ('  : -> Tolerance from the status file will be used.')
-        config.samples.tol = self.status ['tol']
+        config.samples.tol = self.list ['tol']
       
-      config.scheduler.batch = self.status ['batch']
+      config.scheduler.batch = self.list ['batch']
       
-      if 'cluster' not in self.status:
-        self.status ['cluster'] = 'unknown'
+      if 'cluster' not in self.list:
+        self.list ['cluster'] = 'unknown'
       
-      if 'parallelization' not in self.status:
-        self.status ['parallelization'] = 'unknown'
+      if 'parallelization' not in self.list:
+        self.list ['parallelization'] = 'unknown'
       
-      if 'walltimes' not in self.status:
+      if 'walltimes' not in self.list:
         walltimes = helpers.level_type_list (config.levels)
         for level, type in config.levels_types:
           walltimes [level] [type] = 'unknown'
-        self.status ['walltimes'] = walltimes
+        self.list ['walltimes'] = walltimes
       
       print
       print (' :: INFO: MLMC status loaded from')

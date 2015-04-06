@@ -127,13 +127,13 @@ def getTexTableConfig (mlmc):
   
   values               = {}
   values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [mlmc.config.L] .values() ] )
-  values ['cores']     = mlmc.status.status ['parallelization']
-  values ['cluster']   = mlmc.status.status ['cluster']
+  values ['cores']     = mlmc.status.list ['parallelization']
+  values ['cluster']   = mlmc.status.list ['cluster']
   
   if mlmc.finished:
     values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[mlmc.config.L].timer (mlmc.config.scheduler.batch) ) )
   else:
-    values ['runtime'] = mlmc.status.status ['walltimes'] [-1] [0]
+    values ['runtime'] = mlmc.status.list ['walltimes'] [-1] [0]
   
   # number of levels
 
