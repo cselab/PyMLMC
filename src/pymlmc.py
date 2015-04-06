@@ -274,7 +274,7 @@ class MLMC (object):
       pending = mc.pending()
       if pending == 0:
         runtime    = mc.timer (self.config.scheduler.batch)
-        runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime)
+        runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
         percent    = round ( runtime / mc.parallelization.walltime )
         print format % ( args + ( 'completed in ' + runtimestr + (' [%3d\%]' % percent), ) )
       else:
