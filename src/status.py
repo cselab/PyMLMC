@@ -16,6 +16,7 @@ import sys
 # === local imports
 
 import local
+import helpers
 
 # === Status class
 
@@ -43,7 +44,9 @@ class Status (object):
       except:
         f.write ( 'parallelization = \'%s\'' % self.status ['parallelization'] + '\n' )
       try:
-        walltimes = [ config.scheduler.parallelizations [config.L] [config.FINE] .walltime for level, type in config.levels_types ]
+        walltimes = helpers.level_type_list (config.levels)
+        for level, type in config.levels_types:
+          walltimes [level] [type] = config.scheduler.parallelizations [config.L] [config.FINE] .walltime
         f.write ( 'walltimes = %s' % walltimes + '\n' )
       except:
         f.write ( 'walltimes = %s' % self.status ['walltimes'] + '\n' )
@@ -78,7 +81,10 @@ class Status (object):
         self.status ['parallelization'] = 'unknown'
       
       if 'walltimes' not in self.status:
-        self.status ['walltimes'] = [ 'unknown' for level, type in config.levels_types ]
+        walltimes = helpers.level_type_list (config.levels)
+        for level, type in config.levels_types:
+          walltimes [level] [type] = 'unknown'
+        self.status ['walltimes'] = walltimes
       
       print
       print (' :: INFO: MLMC status loaded from')
