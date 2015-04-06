@@ -239,8 +239,7 @@ def draw (mlmc, save, legend=False, loc='best'):
 
 # show plots
 def show ():
-  if not mlmc.local.cluster:
-    pylab.show()
+  pylab.show()
 
 # plot each stat
 def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
