@@ -40,7 +40,7 @@ class Status (object):
       try:
         f.write ( 'parallelization = %s' % config.scheduler.parallelizations [self.L] [0] .cores + '\n' )
       except:
-        f.write ( 'parallelization = %s' % status ['parallelization'] + '\n' )
+        f.write ( 'parallelization = %s' % self.status ['parallelization'] + '\n' )
       try:
         f.write ( 'walltime = %s' % config.scheduler.parallelizations [self.L] [0] .walltime + '\n' )
       except:
