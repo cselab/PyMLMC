@@ -86,7 +86,7 @@ class MLMC (object):
     self.levels_types   = [ [0, self.FINE] ]  + [level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types]
     
     # status
-    self.status = Status (levels)
+    self.status = Status (self.levels)
     
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.levels, self.levels_types )
@@ -108,7 +108,7 @@ class MLMC (object):
     self.config.scheduler.setup (self.levels, self.levels_types, self.works, self.ratios, config.solver.sharedmem )
     
     # setup solver
-    self.config.solver.setup (self.params, self.config.root)
+    self.config.solver.setup (self.params, self.config.root, self.config.deterministic)
     
     # MLMC results
     self.stats = {}
@@ -154,11 +154,11 @@ class MLMC (object):
     # initialize, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.validate ()
-    if not self.params.deterministic:
+    if not self.config.deterministic:
       self.config.samples.save     ()
     
     # initialize errors
-    if not self.params.deterministic:
+    if not self.config.deterministic:
       self.errors.init ()
     
     # make indices for the required number of samples
@@ -200,7 +200,7 @@ class MLMC (object):
       self.load ()
       
       # deterministic simulations are not suppossed to be updated
-      if self.params.deterministic:
+      if self.config.deterministic:
         print
         print ' :: Deterministic simulation finished.'
         return
@@ -302,7 +302,7 @@ class MLMC (object):
       mc.run ()
     
     # generate submission file
-    if not self.params.deterministic:
+    if not self.config.deterministic:
       f = open (self.submission_file, 'wa')
       for mc in self.mcs:
         f.write (mc.info()+'\n')
@@ -379,9 +379,9 @@ class MLMC (object):
     
     with open ( os.path.join (self.config.root, self.status_file), 'w' ) as f:
       f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
-      if not self.params.deterministic:
+      if not self.config.deterministic:
         f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
-      f.write ( 'deterministic = ' + str (self.params.deterministic) + '\n' )
+      f.write ( 'deterministic = ' + str (self.config.deterministic) + '\n' )
       f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
       f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
@@ -407,14 +407,14 @@ class MLMC (object):
       self.config.samples.counts.computed = status ['samples']
       self.config.samples.make ()
       
-      self.params.deterministic = int ( status ['deterministic'] )
-      if not self.params.deterministic:
+      self.config.deterministic = int ( status ['deterministic'] )
+      if not self.config.deterministic:
         if self.config.samples.tol != status ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
         self.config.samples.tol = status ['tol']
       
-      if not self.params.deterministic:
+      if not self.config.deterministic:
         self.config.scheduler.batch = status ['batch']
     
       self.status = {}

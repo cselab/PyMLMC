@@ -34,7 +34,6 @@ class Status (object):
       f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
       if not config.deterministic:
         f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
-      #f.write ( 'deterministic = ' + str (params.deterministic) + '\n' )
       f.write ( 'batch = %s' % str ( config.scheduler.batch )  + '\n' )
       f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
@@ -60,7 +59,6 @@ class Status (object):
       config.samples.counts.computed = self.status ['samples']
       config.samples.make ()
       
-      #params.deterministic = int ( self.status ['deterministic'] )
       if not config.deterministic:
         if config.samples.tol != self.status ['tol']:
           print

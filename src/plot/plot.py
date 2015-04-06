@@ -374,7 +374,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   pylab.plot  (ts, vs, style, label=label)
   
-  if not mlmc.params.deterministic:
+  if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
   
   pylab.xlabel ('t [%s]' % units ['t'])

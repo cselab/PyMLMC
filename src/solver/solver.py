@@ -27,7 +27,7 @@ class Solver (object):
   outputdir  = 'output'
   
   # common setup routines
-  def setup (self, params, root):
+  def setup (self, params, root, deterministic):
     
     self.params = params
     self.root   = root
@@ -66,7 +66,7 @@ class Solver (object):
   # check if nothing will be overwritten
   def check (self, level, type, sample):
     directory = self.directory (level, type, sample)
-    if not self.params.deterministic:
+    if not self.deterministic:
       present = os.path.exists (directory)
     else:
       label = self.label (level, type, sample)
@@ -102,7 +102,7 @@ class Solver (object):
   # return the directory for a particular run
   def directory (self, level, type, sample=None):
     
-    if self.params.deterministic:
+    if self.deterministic:
       return os.path.join (self.root, self.outputdir)
     
     else:
@@ -114,7 +114,7 @@ class Solver (object):
   # return the label of a particular run
   def label (self, level, type, sample=None):
     
-    if self.params.deterministic:
+    if self.deterministic:
       return self.name
     
     else:
@@ -173,7 +173,7 @@ class Solver (object):
     if local.cluster:
       
       # assemble excutable command
-      if self.params.deterministic:
+      if self.deterministic:
         args ['cmd'] = os.path.join ('.',  self.cmd) % args
       else:
         args ['cmd'] = os.path.join (os.path.join ('..','..'), self.cmd) % args
@@ -293,7 +293,7 @@ class Solver (object):
   def prepare (self, directory):
     
     # create directory
-    if not self.params.deterministic and not os.path.exists (directory):
+    if not self.deterministic and not os.path.exists (directory):
       os.makedirs ( directory )
     
     # copy needed input files
