@@ -56,7 +56,7 @@ class Status (object):
   def load (self, config):
     
     try:
-      
+    
       self.status = {}
       execfile ( os.path.join (config.root, self.status_file), globals(), self.status )
       
