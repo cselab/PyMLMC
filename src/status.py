@@ -52,38 +52,38 @@ class Status (object):
   # load status
   def load (self, config):
     
-    try:
-      
-      self.status = {}
-      execfile ( os.path.join (self.config.root, self.status_file), globals(), self.status )
-      
-      config.samples.counts.computed = self.status ['samples']
-      config.samples.make ()
-      
-      if not config.deterministic:
-        if config.samples.tol != self.status ['tol']:
-          print
-          print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-        config.samples.tol = self.status ['tol']
-      
-      config.scheduler.batch = self.status ['batch']
-      
-      if not 'cluster' in self.status:
-        self.status ['cluster'] = 'unknown'
+    #try:
+    
+    self.status = {}
+    execfile ( os.path.join (self.config.root, self.status_file), globals(), self.status )
+    
+    config.samples.counts.computed = self.status ['samples']
+    config.samples.make ()
+    
+    if not config.deterministic:
+      if config.samples.tol != self.status ['tol']:
+        print
+        print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
+      config.samples.tol = self.status ['tol']
+    
+    config.scheduler.batch = self.status ['batch']
+    
+    if not 'cluster' in self.status:
+      self.status ['cluster'] = 'unknown'
 
-      if not 'parallelization' in status:
-        self.status ['parallelization'] = 'unknown'
+    if not 'parallelization' in status:
+      self.status ['parallelization'] = 'unknown'
 
-      if not 'walltime' in status:
-        self.status ['walltime'] = 'unknown'
-      
-      self.create_MCs (config.samples.indices.computed)
+    if not 'walltime' in status:
+      self.status ['walltime'] = 'unknown'
+    
+    self.create_MCs (config.samples.indices.computed)
 
-      print
-      print (' :: INFO: MLMC status loaded from')
-      print ('  : %s' % os.path.join (config.root, self.status_file))
+    print
+    print (' :: INFO: MLMC status loaded from')
+    print ('  : %s' % os.path.join (config.root, self.status_file))
 
-    except:
+    #except:
       
       print
       print (' :: ERROR: MLMC status could not be loaded from')
