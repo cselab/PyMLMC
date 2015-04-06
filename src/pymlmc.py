@@ -278,7 +278,7 @@ class MLMC (object):
         if self.status.walltimes [mc.config.level] [mc.config.type] != 'unknown':
           percent = round ( runtime / self.status.walltimes [mc.config.level] [mc.config.type] )
           print format % ( args + ( 'completed in ' + runtimestr + (' [%3d\%]' % percent), ) )
-        else
+        else:
           print format % ( args + ( 'completed in ' + runtimestr, ) )
       else:
         self.finished = 0
