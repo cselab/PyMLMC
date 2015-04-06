@@ -368,87 +368,10 @@ class MLMC (object):
     
     return self.stats
   
-  # report computed statistics
+  # report computed statistics (mostly used only for debugging)
   def report (self):
     
     for stat in self.stats:
       print
       print ' :: STATISTIC: %s' % stat
       print self.stats [stat]
-
-  '''
-  # save MLMC status
-  def status_save (self):
-    
-    with open ( os.path.join (self.config.root, self.status_file), 'w' ) as f:
-      f.write ( 'samples  = [ ' + ''.join ( [ str(self.config.samples.counts.computed [level]) + ', ' for level in self.levels ] ) + ']\n' )
-      if not self.config.deterministic:
-        f.write ( 'tol      = ' + str (self.config.samples.tol) + '\n' )
-      f.write ( 'deterministic = ' + str (self.config.deterministic) + '\n' )
-      f.write ( 'batch = %s' % str ( self.config.scheduler.batch )  + '\n' )
-      f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
-      try:
-        f.write ( 'parallelization = %s' % self.config.scheduler.parallelizations [-1] [0] .cores + '\n' )
-      except:
-        f.write ( 'parallelization = %s' % self.status ['parallelization'] + '\n' )
-      try:
-        f.write ( 'walltime = %s' % self.config.scheduler.parallelizations [-1] [0] .walltime + '\n' )
-      except:
-        f.write ( 'walltime = %s' % self.status ['walltime'] + '\n' )
-    
-    print
-    print (' :: INFO: MLMC status saved to %s' % os.path.join (self.config.root, self.status_file))
-  
-  # load MLMC status
-  def status_load (self):
-    
-    try:
-      
-      status = {}
-      execfile ( os.path.join (self.config.root, self.status_file), globals(), status )
-      
-      self.config.samples.counts.computed = status ['samples']
-      self.config.samples.make ()
-      
-      self.config.deterministic = int ( status ['deterministic'] )
-      if not self.config.deterministic:
-        if self.config.samples.tol != status ['tol']:
-          print
-          print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-        self.config.samples.tol = status ['tol']
-      
-      if not self.config.deterministic:
-        self.config.scheduler.batch = status ['batch']
-    
-      self.status = {}
-      if 'cluster' in status:
-        self.status ['cluster'] = status ['cluster']
-      else:
-        self.status ['cluster'] = 'unknown'
-      
-      if 'parallelization' in status:
-        self.status ['parallelization'] = status ['parallelization']
-      else:
-        self.status ['parallelization'] = 'unknown'
-      
-      if 'walltime' in status:
-        self.status ['walltime'] = status ['walltime']
-      else:
-        self.status ['walltime'] = 'unknown'
-      
-      self.create_MCs (self.config.samples.indices.computed)
-      
-      print
-      print (' :: INFO: MLMC status loaded from')
-      print ('  : %s' % os.path.join (self.config.root, self.status_file))
-    
-    except:
-      
-      print
-      print (' :: ERROR: MLMC status could not be loaded from')
-      print ('  : %s' % os.path.join (self.config.root, self.status_file))
-      print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
-      print
-      
-      sys.exit()
-  '''
