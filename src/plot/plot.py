@@ -245,8 +245,6 @@ def show ():
 # plot each stat
 def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   
-  print ' :: INFO: Plotting statistics...',
-  
   percentiles = []
   
   run = (run-1) % len (styles)
@@ -287,8 +285,6 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   if legend:
     pylab.xlabel (time)
     pylab.legend (loc='best')
-
-  print ' done.'
 
 # plot computed MC statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
