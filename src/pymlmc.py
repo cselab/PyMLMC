@@ -91,7 +91,8 @@ class MLMC (object):
       sys.exit()
     else:
       print '  : CONTINUE'
-    
+      print
+  
   # initial phase
   def init (self):
     
