@@ -245,6 +245,8 @@ def show ():
 # plot each stat
 def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   
+  print ' :: INFO: Plotting statistics...',
+  
   percentiles = []
   
   run = (run-1) % len (styles)
@@ -286,8 +288,12 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
     pylab.xlabel (time)
     pylab.legend (loc='best')
 
+  print ' done.'
+
 # plot computed MC statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+  
+  print ' :: INFO: Plotting MC estimates...',
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -328,8 +334,12 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, s
   if not frame:
     draw (mlmc, save)
 
+  print ' done.'
+
 # plot computed MLMC statistics
 def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+  
+  print ' :: INFO: Plotting MLMC estimates...',
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -346,6 +356,8 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
 
   if not frame:
     draw (mlmc, save)
+
+  print ' done.'
 
 # plot results of one sample of the specified level and type
 def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
@@ -395,13 +407,21 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
 def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
+  
+  print ' :: INFO: Plotting first sample of finest level...',
+  
   level  = 'finest'
   type   = 0
   sample = 0
+  
   plot_sample (mlmc, level, type, sample, qoi, infolines, extent, run, label, frame, save)
+  
+  print ' done.'
 
 # plot results of all samples (ensemble) of the specified level and type 
 def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
+  
+  print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
   
   # some dynamic values
   if level  == 'finest':   level  = mlmc.config.L
@@ -435,9 +455,13 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   adjust (infolines)
   
   draw (mlmc, save)
+  
+  print ' done.'
 
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save=None):
+  
+  print ' :: INFO: Plotting indicators...',
   
   # === load all required data
   
@@ -494,8 +518,12 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   if not frame:
     draw (mlmc, save)
 
+  print ' done.'
+
 # plot samples
 def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, save=None):
+  
+  print ' :: INFO: Plotting samples...',
   
   # === load all required data
   
@@ -538,8 +566,12 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   if not frame:
     draw (mlmc, save)
 
+  print ' done.'
+
 # plot errors
 def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
+  
+  print ' :: INFO: Plotting errors...',
   
   # === load all required data
   
@@ -573,6 +605,8 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   if not frame:
     draw (mlmc, save)
+
+  print ' done.'
 
 import rp
 
@@ -621,6 +655,11 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   # report approximate collapse time
   print
   print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
+  
+  # report maximum pressure
+  if not approximation:
+    print
+    print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
   
   # compute equivalent radius of simultaneously collapsing multiple bubbles
   if count != 1:
