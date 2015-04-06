@@ -36,7 +36,10 @@ class Status (object):
       if not config.deterministic:
         f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str ( config.scheduler.batch )  + '\n' )
-      f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
+      if 'cluster' in self.status:
+        f.write ( 'cluster = \'%s\'' % self.status ['cluster']  + '\n' )
+      else:
+        f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
         f.write ( 'parallelization = %s' % config.scheduler.parallelizations [self.L] [0] .cores + '\n' )
       except:
@@ -71,10 +74,10 @@ class Status (object):
       
       if not 'cluster' in self.status:
         self.status ['cluster'] = 'unknown'
-
+      
       if not 'parallelization' in self.status:
         self.status ['parallelization'] = 'unknown'
-
+      
       if not 'walltime' in self.status:
         self.status ['walltime'] = 'unknown'
       
