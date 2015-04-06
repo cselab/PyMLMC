@@ -192,6 +192,9 @@ class MLMC (object):
       # load status of MLMC simulation
       self.status.load (self.config)
       
+      # recreate MC simulations
+      self.create_MCs (self.config.samples.indices.computed)
+      
       # if non-interactive session -> wait for jobs to finish
       if not self.params.interactive:
         self.join ()
