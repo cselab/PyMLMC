@@ -64,6 +64,7 @@ class Status (object):
         if config.samples.tol != self.status ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
+          print ('  : -> Tolerance from the status file will be used.')
         config.samples.tol = self.status ['tol']
       
       config.scheduler.batch = self.status ['batch']
@@ -71,10 +72,10 @@ class Status (object):
       if not 'cluster' in self.status:
         self.status ['cluster'] = 'unknown'
 
-      if not 'parallelization' in status:
+      if not 'parallelization' in self.status:
         self.status ['parallelization'] = 'unknown'
 
-      if not 'walltime' in status:
+      if not 'walltime' in self.status:
         self.status ['walltime'] = 'unknown'
       
       print
