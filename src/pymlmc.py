@@ -25,62 +25,6 @@ from errors import *
 import helpers
 import local
 
-'''
-# === additional Python paths
-
-sys.path.append ( os.path.join (os.path.dirname(__file__), 'solver' ) )
-sys.path.append ( os.path.join (os.path.dirname(__file__), 'samples' ) )
-sys.path.append ( os.path.join (os.path.dirname(__file__), 'scheduler' ) )
-sys.path.append ( os.path.join (os.path.dirname(__file__), 'stats' ) )
-sys.path.append ( os.path.join (os.path.dirname(__file__), 'plot' ) )
-
-# === default MLMC configuration
-
-from solver_example    import Example_Solver
-from samples_estimated import Estimated
-from scheduler_static  import Static
-
-# configuration class for MLMC simulations
-class MLMC_Config (object):
-  
-  # default configuration
-  solver          = Example_Solver ()
-  discretizations = helpers.grids_3d ( helpers.grids (1) )
-  samples         = Estimated ()
-  scheduler       = Static ()
-  root            = '.'
-  deterministic   = 0
-  
-  def __init__ (self, id=0):
-    
-    vars (self) .update ( locals() )
-  
-  # setup remaining variables
-  def setup (self):
-    
-    # enumeration of fine and coarse mesh levels in one level difference
-    self.FINE   = 0
-    self.COARSE = 1
-    
-    # determine levels
-    self.levels = range ( len ( self.discretizations ) )
-    
-    # determine finest level
-    self.L = len (self.levels) - 1
-    
-    # setup required pairs of levels and types
-    levels_types_fine   = [ [level, self.FINE]   for level in self.levels [1:] ]
-    levels_types_coarse = [ [level, self.COARSE] for level in self.levels [1:] ]
-    self.levels_types   = [ [0, self.FINE] ]  + [ level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types ]
-    
-    # works
-    # TODO: take into account _differences_ on all levels except the coarsest
-    self.works = [ self.solver.work (discretization) for discretization in self.discretizations ]
-    
-    # core ratios
-    self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
-'''
-
 # === MLMC class
 
 class MLMC (object):
@@ -100,11 +44,8 @@ class MLMC (object):
     # status
     self.status = Status ()
     
-    # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
-    
-    # errors
-    self.errors = Errors (self.config.levels)
+    # setup solver
+    self.config.solver.setup (self.params, self.config.root, self.config.deterministic)
     
     # setup samples
     self.config.samples.setup ( self.config.levels, self.config.works )
@@ -112,8 +53,11 @@ class MLMC (object):
     # setup scheduler
     self.config.scheduler.setup (self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
     
-    # setup solver
-    self.config.solver.setup (self.params, self.config.root, self.config.deterministic)
+    # indicators
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
+    
+    # errors
+    self.errors = Errors (self.config.levels)
     
     # MLMC results
     self.stats = {}
@@ -329,8 +273,10 @@ class MLMC (object):
       args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
       if pending == 0:
-        timestr = time.strftime ( '%H:%M:%S', time.gmtime ( mc.timer (self.config.scheduler.batch) ) )
-        print format % ( args + ( 'completed in ' + timestr, ) )
+        runtime    = mc.timer (self.config.scheduler.batch)
+        runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime)
+        percent    = round ( runtime / mc.parallelization.walltime )
+        print format % ( args + ( 'completed in ' + runtimestr + (' [%3d\%]' % percent), ) )
       else:
         self.finished = 0
         print format % ( args + ( 'pending: %d' % pending, ) )
