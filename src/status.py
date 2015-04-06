@@ -36,7 +36,7 @@ class Status (object):
         f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
       if 'cluster' in self.list:
-        f.write ( 'cluster = \'%s\'' % self.status ['cluster']  + '\n' )
+        f.write ( 'cluster = \'%s\'' % self.list ['cluster']  + '\n' )
       else:
         f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
