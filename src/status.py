@@ -21,7 +21,7 @@ import local
 
 class Status (object):
   
-  def __init__ (self, levels):
+  def __init__ (self):
     
     self.status_file = 'status.dat'
   
