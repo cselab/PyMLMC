@@ -29,8 +29,9 @@ class Solver (object):
   # common setup routines
   def setup (self, params, root, deterministic):
     
-    self.params = params
-    self.root   = root
+    self.params        = params
+    self.root          = root
+    self.deterministic = deterministic
     
     # create output directory
     if not os.path.exists (self.outputdir):
