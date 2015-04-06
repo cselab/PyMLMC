@@ -41,13 +41,13 @@ class Status (object):
       else:
         f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
-        f.write ( 'parallelization = %s' % config.scheduler.parallelizations [self.L] [0] .cores + '\n' )
+        f.write ( 'parallelization = \'%s\'' % config.scheduler.parallelizations [self.L] [0] .cores + '\n' )
       except:
-        f.write ( 'parallelization = %s' % self.status ['parallelization'] + '\n' )
+        f.write ( 'parallelization = \'%s\'' % self.status ['parallelization'] + '\n' )
       try:
-        f.write ( 'walltime = %s' % config.scheduler.parallelizations [self.L] [0] .walltime + '\n' )
+        f.write ( 'walltime = \'%s\'' % config.scheduler.parallelizations [self.L] [0] .walltime + '\n' )
       except:
-        f.write ( 'walltime = %s' % self.status ['walltime'] + '\n' )
+        f.write ( 'walltime = \'%s\'' % self.status ['walltime'] + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, self.status_file))
@@ -72,13 +72,13 @@ class Status (object):
     
     config.scheduler.batch = self.status ['batch']
     
-    if not 'cluster' in self.status:
+    if 'cluster' not in self.status:
       self.status ['cluster'] = 'unknown'
     
-    if not 'parallelization' in self.status:
+    if 'parallelization' not in self.status:
       self.status ['parallelization'] = 'unknown'
     
-    if not 'walltime' in self.status:
+    if 'walltime' not in self.status:
       self.status ['walltime'] = 'unknown'
     
     print
