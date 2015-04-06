@@ -35,21 +35,21 @@ class Status (object):
       if not config.deterministic:
         f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
-      if 'cluster' in self.status:
+      if 'cluster' in self.list:
         f.write ( 'cluster = \'%s\'' % self.status ['cluster']  + '\n' )
       else:
         f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
       try:
         f.write ( 'parallelization = \'%s\'' % config.scheduler.parallelizations [config.L] [config.FINE] .cores + '\n' )
       except:
-        f.write ( 'parallelization = \'%s\'' % self.status ['parallelization'] + '\n' )
+        f.write ( 'parallelization = \'%s\'' % self.list ['parallelization'] + '\n' )
       try:
         walltimes = helpers.level_type_list (config.levels)
         for level, type in config.levels_types:
           walltimes [level] [type] = config.scheduler.parallelizations [config.L] [config.FINE] .walltime
         f.write ( 'walltimes = %s' % walltimes + '\n' )
       except:
-        f.write ( 'walltimes = %s' % self.status ['walltimes'] + '\n' )
+        f.write ( 'walltimes = %s' % self.list ['walltimes'] + '\n' )
     
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, self.status_file))
