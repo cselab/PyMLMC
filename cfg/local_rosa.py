@@ -66,4 +66,4 @@ ulimit -c 0
 submit = 'sbatch %(scriptfile)s'
 
 # timer
-timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tail -n 3 | tee %(timerfile)s'

@@ -66,9 +66,4 @@ ulimit -c 0
 submit = 'sbatch %(scriptfile)s'
 
 # timer
-timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
-
-# timer is disabled (for non-batch jobs)
-#timer       = 0
-#timer_start = 'START="$(/bin/date +%s)"'
-#timer_stop  = 'TIME="$(($(/bin/date +%s)-START))"; echo Total time: "$TIME" seconds'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tail -n 3 | tee %(timerfile)s'
