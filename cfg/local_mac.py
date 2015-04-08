@@ -50,4 +50,4 @@ script = None
 submit = '%(job)s'
 
 # timer
-timer = 'date; (time -p (%(job)s)) 2>&1 | tail -n 3 | tee %(timerfile)s'
+timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s; cat %(timerfile)s | tail -n 3 >> %(timerfile)s'
