@@ -61,7 +61,9 @@ class Solver (object):
         if os.path.exists ( executablepath ):
           shutil.copy ( executablepath, self.outputdir)
         else:
+          print
           print ' :: ERROR: executable not found at ' + executablepath
+          print
           sys.exit()
   
   # check if nothing will be overwritten
