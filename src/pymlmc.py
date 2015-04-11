@@ -265,13 +265,19 @@ class MLMC (object):
   def join (self):
     
     print
-    print ' :: STATUS of MC simulations:'
-    
-    format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
+    if self.config.deterministic:
+      print ' :: STATUS of simulation:'
+      format = '  : %s'
+    else:
+      print ' :: STATUS of MC simulations:'
+      format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
     
     self.finished = 1
     for mc in self.mcs:
-      args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
+      if self.config.deterministic:
+        args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
+      else:
+        args = tuple()
       pending = mc.pending()
       if pending == 0:
         runtime    = mc.timer (self.config.scheduler.batch)
@@ -284,7 +290,10 @@ class MLMC (object):
           print format % ( args + ( 'completed in ' + runtimestr, ) )
       else:
         self.finished = 0
-        print format % ( args + ( 'pending: %d' % pending, ) )
+        if self.config.deterministic:
+          print format % ( args + ( 'pending: %d' % pending, ) )
+        else:
+          print format % ( args + ( 'pending', ) )
     
     if not self.finished:
       print
