@@ -275,9 +275,9 @@ class MLMC (object):
     self.finished = 1
     for mc in self.mcs:
       if self.config.deterministic:
-        args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
-      else:
         args = tuple()
+      else:
+        args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
       if pending == 0:
         runtime    = mc.timer (self.config.scheduler.batch)
@@ -291,9 +291,9 @@ class MLMC (object):
       else:
         self.finished = 0
         if self.config.deterministic:
-          print format % ( args + ( 'pending: %d' % pending, ) )
-        else:
           print format % ( args + ( 'pending', ) )
+        else:
+          print format % ( args + ( 'pending: %d' % pending, ) )
     
     if not self.finished:
       print
