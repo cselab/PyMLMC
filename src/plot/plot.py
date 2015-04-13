@@ -649,12 +649,18 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
 
   # report approximate collapse time
   print
-  print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
-  
+  if count != 1:
+    print ' :: Approximated (Rayleigh-Plesset) collapse time (for count = %d): %f' % (count, rp.approximate_collapse_time (r, p0_l, p0_g, rho_l) )
+  else:
+    print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
+
   # report maximum pressure
   if not approximation:
     print
-    print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
+    if count != 1:
+      print ' :: Approximated (%s) maximum pressure (for count = %d): %f' % ( model, count, numpy.max(ps) )
+    else:
+      print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
   
   # compute equivalent radius of simultaneously collapsing multiple bubbles
   if count != 1:
