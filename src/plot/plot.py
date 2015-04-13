@@ -661,6 +661,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
       print ' :: Approximated (%s) maximum pressure (for count = %d): %f' % ( model, count, numpy.max(ps) )
     else:
       print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
+    print '  : -> Amplification factor \'p_max / p0_l\' is: %.1f' % numpy.max(ps) / p0_l
   
   # compute equivalent radius of simultaneously collapsing multiple bubbles
   if count != 1:
