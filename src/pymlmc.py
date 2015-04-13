@@ -149,8 +149,6 @@ class MLMC (object):
       
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
-        print
-        print ' :: Deterministic simulation finished.'
         return
       
       # compute, report, and save error indicators
