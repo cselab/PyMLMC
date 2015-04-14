@@ -82,8 +82,9 @@ class MC (object):
     
     config = self.config
     
+    # if the simulation is not supposed to continue,
     # check if nothing is overwritten
-    if not self.params.force:
+    if not self.params.continue:
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample )
     

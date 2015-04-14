@@ -26,7 +26,7 @@ def parse ():
   parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=str)
   parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
-  parser.add_argument ('-f', '--force',         action = "count", default = 0,  help = 'force override of existing simulation files')
+  parser.add_argument ('-c', '--continue',      action = "count", default = 0,  help = 'continue simulations (can override existing files)')
   parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
 #  parser.add_argument ('-d', '--deterministic', action = "count", default = deterministic,  help = 'deterministic simulation - no subdirectories are created')
   return parser.parse_args()
