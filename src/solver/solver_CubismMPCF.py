@@ -27,13 +27,13 @@ class Interpolated_Time_Series (object):
     self.meta = {}
     self.data = {}
   
-  def load (self, filename, names, formats, meta_keys):
+  def load_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
     
     outputfile = open ( filename, 'r' )
     
     from numpy import loadtxt
-    table = loadtxt ( outputfile, dtype = { 'names' : names, 'formats' : formats } )
-    records = dict ( (name, table [name]) for name in names )
+    table = loadtxt ( outputfile, dtype = { 'names' : meta_keys + data_keys, 'formats' : meta_formats + data_formats } )
+    records = dict ( (key, table [key]) for key in meta_keys + data_keys )
     
     outputfile.close()
     
@@ -43,6 +43,23 @@ class Interpolated_Time_Series (object):
       self.meta [key] = records [key]
       del records [key]
     self.data = records
+  
+  def load (self, filename, meta_keys):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import genfromtxt
+    data = genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
+    records = dict ( (key, data [key]) for key in data.dtype.names )
+    
+    outputfile.close()
+    
+    # split metadata from actual data
+    
+    for key in meta_keys:
+      self.meta [key] = records [key]
+      del records [key]
+      self.data = records
   
   def interpolate (self, points):
     
@@ -119,7 +136,8 @@ class CubismMPCF (Solver):
     self.sharedmem = 1
     
     # set files, default quantity of interest, and indicator
-    self.outputfile = 'integrals.dat'
+    self.outputfile = 'statistics.dat'
+    self.outputfile_v1 = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
   
@@ -203,26 +221,45 @@ class CubismMPCF (Solver):
     # open self.outputfile and read results
     
     outputfile = os.path.join ( self.directory (level, type, sample), self.outputfile )
-    if not os.path.exists (outputfile):
+    outputfile_v1 = os.path.join ( self.directory (level, type, sample), self.outputfile_v1 )
+    if os.path.exists (outputfile):
+      version = 2
+    elif os.path.exists (outputfile_v1):
+      version = 1
+    else:
       print
-      print ' :: ERROR: Output file does not exist:'
+      print ' :: ERROR: Output file does not exist (version 1.0 also absent):'
       print '  : %s' % outputfile
       print
       sys.exit()
     
-    names   = ( 'step', 't',  'dt', 'rInt', 'uInt', 'vInt', 'wInt', 'eInt', 'vol', 'ke', 'r2Int', 'mach_max', 'p_max', 'Req', 'wall_p_max', 'kin_ke', 'rho_min', 'p_min' )
-    formats = ( 'i',    'f',  'f',  'f',    'f',    'f',    'f',    'f',    'f',   'f',  'f',     'f',        'f',     'f',   'f',          'f',      'f',       'f'     )
-    meta_keys = ( 'step', 't',  'dt' )
-    
     results = Interpolated_Time_Series ()
-    results .load ( outputfile, names, formats, meta_keys )
     
+    # meta data
+    meta_keys    = ( 'step', 't',  'dt' )
+    
+    # version 1.0 (integrals.dat)
+    if version == 1:
+      
+      meta_formats = ( 'i',    'f',  'f'  )
+      data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_int', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
+      data_formats = ( 'f', ) * len (data_keys)
+      results .load_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+    
+    # version 2.0 (statistics.dat)
+    else:
+      
+      results .load ( outputfile, meta_keys )
+    
+    # for non-deterministic simulations,
     # interpolate time dependent results using linear interpolation
     # this is needed since number of time steps and time step sizes
-    # are usually different for every deterministic simulation
-    results .interpolate ( self.points + 1 )
-    
-    # compute meta parameters for interpolation 
-    results.meta ['dt'] = numpy.diff (results.meta['t'])
+    # are usually different for every simulation
+    if not self.deterministic:
+      
+      results .interpolate ( self.points + 1 )
+      
+      # compute meta parameters for interpolation
+      results.meta ['dt'] = numpy.diff (results.meta['t'])
     
     return results

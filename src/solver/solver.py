@@ -78,7 +78,7 @@ class Solver (object):
       print
       print ' :: ERROR: working directory is NOT clean!'
       print '  : -> Remove all directories like "%s".' % directory
-      print '  : -> Alternatively, run PyMLMC with or \'-c\' option to continue simulations.' 
+      print '  : -> Alternatively, run PyMLMC with \'-p\' option to proceed with simulations.'
       print
       sys.exit()
   

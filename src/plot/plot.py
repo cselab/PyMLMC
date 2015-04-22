@@ -27,55 +27,137 @@ matplotlib.rcParams ['lines.markeredgewidth'] = 3
 matplotlib.rcParams ['lines.markersize']      = 10
 
 # additional colors
-matplotlib.colors.ColorConverter.colors['a'] = (38/256.0,135/256.0,203/256.0)
-matplotlib.colors.ColorConverter.colors['i'] = (251/256.0,124/256.0,42/256.0)
-matplotlib.colors.ColorConverter.colors['j'] = (182/256.0,212/256.0,43/256.0)
+matplotlib.colors.ColorConverter.colors['custom_blue'] = (38/256.0,135/256.0,203/256.0)
+matplotlib.colors.ColorConverter.colors['custom_orange'] = (251/256.0,124/256.0,42/256.0)
+matplotlib.colors.ColorConverter.colors['custom_green'] = (182/256.0,212/256.0,43/256.0)
 
 # default color cycle
-matplotlib.rcParams ['axes.color_cycle'] = ['a', 'i', 'j', 'c', 'y', 'm', 'g', 'r', 'b', 'burlywood', 'chartreuse', 'k']
+matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
 
-# default styles
-styles = [{}, {}]
+# === colors (specified by the stat, param or qoi)
 
-styles [0] ['mean']             = 'a-'
-styles [0] ['percentile']       = 'i-'
-styles [0] ['std. deviation']   = 'j-'
+# statistical estimators
 
-styles [1] ['mean']             = 'm-'
-styles [1] ['percentile']       = 'g-'
-styles [1] ['std. deviation']   = 'r-'
+colors_stats = {}
 
-styles [0] ['rp_integrated']    = 'k-'
-styles [0] ['rp_approximated']  = 'k--'
+colors_stats ['default']          = 'custom_blue'
 
-styles [1] ['rp_integrated']    = 'j-'
-styles [1] ['rp_approximated']  = 'j--'
+colors_stats ['mean']             = 'custom_blue'
+colors_stats ['percentile']       = 'custom_orange'
+colors_stats ['std. deviation']   = 'custom_green'
 
-styles [0] ['Req']              = 'a-'
-styles [0] ['p_max']            = 'i-'
-styles [0] ['ke']               = 'j-'
-styles [0] ['mach_max']         = 'c-'
+def color_stats (name):
+  color = colors_stats [name] if name in colors_stats else colors_stats ['default']
+  if 'percentile' in name: color = colors_stats ['percentile']
+  return color
 
-styles [1] ['Req']              = 'm-'
-styles [1] ['p_max']            = 'g-'
-styles [1] ['ke']               = 'r-'
-styles [1] ['mach_max']         = 'b-'
+# MLMC parameters
 
-styles [0] ['epsilon']          = 'a-'
-styles [0] ['sigma']            = 'i-'
-styles [0] ['samples']          = 'j-'
-styles [0] ['errors']           = 'c-'
-styles [0] ['error']            = 'k-'
-styles [0] ['tol']              = 'm--'
+colors_params = {}
 
-styles [1] ['epsilon']          = 'm-'
-styles [1] ['sigma']            = 'g-'
-styles [1] ['samples']          = 'r-'
-styles [1] ['errors']           = 'b-'
-styles [1] ['error']            = 'k-'
-styles [1] ['tol']              = 'm--'
+colors_params ['default'] = 'custom_blue'
 
-units = {'t' : 'ms', 'Req' : r'$\mu$m', 'p_max' : 'bar', 'ke' : 'J', 'mach_max' : '-'}
+colors_params ['epsilon'] = 'custom_blue'
+colors_params ['sigma']   = 'custom_orange'
+colors_params ['samples'] = 'custom_green'
+colors_params ['warmup']  = 'saddlebrown'
+colors_params ['optimal'] = 'yellowgreen'
+colors_params ['errors']  = 'coral'
+colors_params ['error']   = 'lightskyblue'
+colors_params ['tol']     = 'darkorchid'
+
+def color_params (name):
+  color = colors_params [name] if name in colors_params else colors_params ['default']
+  return color
+
+# quantities of interest from simulation
+
+colors = {}
+
+colors ['default'] = 'custom_blue'
+
+colors ['r']   = 'saddlebrown'
+colors ['r2']  = 'burlywood'
+colors ['u']   = 'red'
+colors ['v']   = 'green'
+colors ['w']   = 'blue'
+colors ['m']   = 'darkgoldenrod'
+colors ['ke']  = 'custom_green'
+colors ['e']   = 'cyan'
+colors ['W']   = 'coral'
+colors ['p']   = 'custom_orange'
+colors ['pw']   = 'orangered'
+colors ['c']   = 'darkorchid'
+colors ['M']   = 'darkturquoise'
+colors ['V2']  = 'custom_blue'
+colors ['Req'] = 'custom_blue'
+colors ['Vc']  = 'lightskyblue'
+
+# other
+
+colors ['rp_integrated']    = 'black'
+colors ['rp_approximated']  = 'black'
+
+# parser for base qoi
+
+def base (qoi):
+  
+  if qoi in colors.keys()
+    return qoi
+  elif len (qoi) > 3 and qoi [2] == '_' and qoi [:2] in colors.keys():
+    return qoi [:2]
+  elif len (qoi) > 2 and qoi [1] == '_' and qoi [0] in colors.keys():
+    return qoi [0]
+  else
+    return 'unrecognized'
+
+def color (qoi):
+  base_qoi = base (qoi)
+  if base_qoi in colors.keys():
+    return colors [base_qoi]
+  else
+    return colors ['default']
+
+# === styles (specified by the run)
+
+styles = ['-', '--', ':', '-.']
+
+def style (run):
+  if (run - 1) < len (styles):
+    return styles [run-1]
+  else:
+    return '-'
+
+# === units
+
+units = {}
+
+units ['t']   = r'$ms$'
+units ['r']   = r'$kg/m^3$' # check
+units ['r2']  = r'$kg/m^3$' # check
+units ['u']   = r'$\mu m/ms$'
+units ['v']   = r'$\mu m/ms$'
+units ['w']   = r'$\mu m/ms$'
+units ['m']   = r'$\mu m/ms$'
+units ['ke']  = r'$J$' # check
+units ['W']   = r'$ms^{-1}$'
+units ['e']   = r'$J$' # check
+units ['p']   = r'$bar$'
+units ['pw']  = r'$bar$'
+units ['c']   = r'$\mu m/ms$'
+units ['M']   = r'$-$'
+units ['V2']  = r'$\mu m^3$'
+units ['Req'] = r'$\mu m$'
+units ['Vc']  = r'$\mu m^3$'
+
+def unit (qoi):
+  base_qoi = base (qoi)
+  if base_qoi in units.keys():
+    return units [base_qoi]
+  else:
+    return r'$???$'
+
+# === helper routines
 
 # set levels extent
 def levels_extent (levels):
@@ -241,42 +323,42 @@ def draw (mlmc, save, legend=False, loc='best'):
 def show ():
   pylab.show()
 
+# === plotting routines
+
 # plot each stat
 def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   
   percentiles = []
-  
-  run = (run-1) % len (styles)
   
   for name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta [time] )
     vs = numpy.array ( stat.data [qoi]  )
     
-    style = styles [run] [name] if name in styles [run] else ''
-    if 'percentile' in name: style = styles [run] ['percentile']
+    color = color_stats (name)
     
     # stat-specific plotting: std. deviation
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      pylab.plot (ts, ms + vs, style, label='mean +/- std. dev.')
-      pylab.plot (ts, ms - vs, style)
-      color = colors [run] ['std. deviation'] [0]
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2)
+      #pylab.plot (ts, ms + vs, color=color, linestyle=style(run), label='mean +/- std. dev.')
+      #pylab.plot (ts, ms - vs, color=color, linestyle=style(run))
+      color = color_stats ('std. deviation')
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2, label='mean +/- std. dev.')
+    
+    # collect percentiles for later fill
+    elif 'percentile' in name:
+      percentiles.append ([ts, vs])
     
     # general plotting
     else:
-      pylab.plot (ts, vs, style, label=name)
-    
-    # collect percentiles for later fill
-    if 'percentile' in name:
-      percentiles.append ([ts, vs])
+      pylab.plot (ts, vs, color=color, linestyle=style(run), label=name)
   
   # plot percentiles
-  lower = percentiles [0] [1]
-  upper = percentiles [1] [1]
-  color = styles [run] ['percentile'] [0]
-  pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2)
+  if percentiles != []:
+    lower = percentiles [0] [1]
+    upper = percentiles [1] [1]
+    color = color_stats ('percentile')
+    pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2)
   
   if extent:
     pylab.ylim (*extent)
@@ -308,20 +390,19 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, s
     plot_stats ( qoi, mc.stats, extent, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  #pylab.gcf().legend (handles, labels, loc=(0.05,0.25))
   pylab.subplot (2, levels, 1 + levels)
   pylab.legend (handles, labels, loc='center')
   pylab.axis('off')
   
-  pylab.subplots_adjust(top=0.95)
-  pylab.subplots_adjust(right=0.97)
-  pylab.subplots_adjust(left=0.05)
+  pylab.subplots_adjust (top=0.95)
+  pylab.subplots_adjust (right=0.97)
+  pylab.subplots_adjust (left=0.05)
   
   if infolines:
     plot_infolines (self)
-    pylab.subplots_adjust(bottom=0.10)
+    pylab.subplots_adjust (bottom=0.10)
   else:
-    pylab.subplots_adjust(bottom=0.05)
+    pylab.subplots_adjust (bottom=0.05)
   
   if infolines:
     plot_infolines (self)
@@ -371,16 +452,10 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if not frame:
     figure (infolines, subplots=1)
   
-  run = (run-1) % len (styles)
-  if qoi in styles [run]:
-    style = styles [run] [qoi]
-  else:
-    style = styles [run] ['mean']
-  
   if not label:
     label = qoi
   
-  pylab.plot  (ts, vs, style, label=label)
+  pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
   
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
@@ -467,8 +542,6 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   levels        = mlmc.config.levels
   qoi           = mlmc.config.solver.qoi
   
-  run = (run-1) % len (styles)
-  
   # === compute error using the exact solution mean_exact
   
   if exact:
@@ -484,10 +557,10 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   # plot EPSILON
   
   pylab.subplot(121)
-  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], styles [run] ['epsilon'], marker='x', label='relative level means')
+  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyles=style(run), marker='x', label='relative level means')
   if exact:
-    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color = styles [run] ['error'] [0], linestyle = styles [run] ['error'] [1:], alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color = styles [run] ['tol']   [0], linestyle = styles [run] ['tol']   [1:], alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -497,8 +570,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   # plot SIGMA
   
   pylab.subplot(122)
-  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, styles [run] ['sigma'], marker='x', label='rel. level standard deviations')
-  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color = styles [run] ['tol'] [0], linestyle = styles [run] ['tol'] [1:], alpha=0.6, label='TOL = %1.1e' % TOL)
+  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, color=color_params('sigma'), linestyle=style(run), marker='x', label='rel. level standard deviations')
+  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -522,14 +595,12 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # === load all required data
   
-  warmup_samples   = mlmc.config.samples.warmup
+  warmup           = mlmc.config.samples.warmup
   samples          = mlmc.config.samples.counts.computed
-  #counts_optimal   = mlmc.config.samples.counts_optimal
+  #optimal          = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction
   TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
-  
-  run = (run-1) % len (styles)
   
   # === plot
   
@@ -539,10 +610,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   # plot number of samples
   
   #if warmup:
-  #  pylab.semilogy (levels, warmup_samples, color='r', linestyle='--', marker='+', label='warmup')
-  pylab.semilogy (levels, samples, styles [run] ['samples'], marker='x', label='estimated for TOL=%1.1e' % TOL)
+  #  pylab.semilogy (levels, warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   #if optimal:
-  #  pylab.semilogy (levels, counts_optimal, color='g', linestyle='--', marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
+  #  pylab.semilogy (levels, optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
   pylab.title  ('Estimated number of samples')
   pylab.ylabel ('number of samples')
   pylab.xlabel ('mesh level')
@@ -584,8 +655,8 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   # plot relative sampling error
   
-  pylab.semilogy (levels, relative_error, styles [run] ['errors'], marker='x', label='relative sampling errors')
-  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color = styles [run] ['tol'] [0], linestyle = styles [run] ['tol'] [1:], alpha=0.6, label='required TOL = %1.1e' % TOL )
+  pylab.semilogy (levels, relative_error, color=color_params('errors'), linestyle=style(run), marker='x', label='relative sampling errors')
+  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
@@ -618,9 +689,7 @@ def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, te
   return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
 
 # plot Rayleigh Plesset
-def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, style=None, approximation=False, model='OptPL2', run=1, frame=False, save=None):
-  
-  run = (run-1) % len (styles)
+def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, color=None, approximation=False, model='OptPL2', run=1, frame=False, save=None):
   
   if r == None:
     r = numpy.array ( mlmc.config.solver.load ( mlmc.config.L, 0, 0 ) .data ['Req'] ) [0]
@@ -633,8 +702,8 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   if approximation:
     ts, rs = rp_approximated (r, p0_l, p0_g, rho_l)
     label = 'Rayleigh-Plesset (approx.)'
-    if style == None:
-      style = styles [run] ['rp_approximated']
+    if color == None:
+      color = color_params('rp_approximated')
   else:
     results = mlmc.config.solver.load ( mlmc.config.L, 0, 0 )
     ts = numpy.array ( results.meta ['t'] )
@@ -644,8 +713,8 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     label = name
     if mu:
       label += ' + dissipation'
-    if style == None:
-      style = styles [run] ['rp_integrated']
+    if color == None:
+      color = color_params('rp_integrated')
 
   # report approximate collapse time
   print
@@ -668,7 +737,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     label += ' (%d)' % count
     rs *= count ** (1.0 / 3.0)
 
-  pylab.plot (ts, rs, style, alpha=0.5, label=label)
+  pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=0.5, label=label)
   
   if not frame:
     pylab.label (loc='best')
