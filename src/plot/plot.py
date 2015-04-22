@@ -102,7 +102,7 @@ colors ['rp_approximated']  = 'black'
 
 def base (qoi):
   
-  if qoi in colors.keys()
+  if qoi in colors.keys():
     return qoi
   elif len (qoi) > 3 and qoi [2] == '_' and qoi [:2] in colors.keys():
     return qoi [:2]

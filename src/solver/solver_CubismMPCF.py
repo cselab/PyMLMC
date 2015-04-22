@@ -32,8 +32,8 @@ class Interpolated_Time_Series (object):
     outputfile = open ( filename, 'r' )
     
     from numpy import loadtxt
-    table = loadtxt ( outputfile, dtype = { 'names' : meta_keys + data_keys, 'formats' : meta_formats + data_formats } )
-    records = dict ( (key, table [key]) for key in meta_keys + data_keys )
+    data = loadtxt ( outputfile, dtype = { 'names' : meta_keys + data_keys, 'formats' : meta_formats + data_formats } )
+    records = dict ( (key, data [key]) for key in meta_keys + data_keys )
     
     outputfile.close()
     
@@ -43,6 +43,44 @@ class Interpolated_Time_Series (object):
       self.meta [key] = records [key]
       del records [key]
     self.data = records
+  
+  def insert_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import loadtxt
+    data = loadtxt ( outputfile, dtype = { 'names' : meta_keys + data_keys, 'formats' : meta_formats + data_formats } )
+    records = dict ( (key, data [key]) for key in meta_keys + data_keys )
+    
+    outputfile.close()
+    
+    count = len (records (data_keys[0]))
+    nan_array = numpy.empty ( (count, 1) )
+    nan_array [:] = numpy.NAN
+    
+    # append metadata
+    
+    for key in meta_keys:
+      if key in self.meta.keys():
+        self.meta [key] = numpy.hstack ( records [key], self.meta [key] )
+    
+    # append data
+    
+    for key in data_keys:
+      if key in self.data.keys():
+        self.data [key] = numpy.hstack ( records [key], self.data [key] )
+
+    # fill in remaining metadata
+    
+    for key in self.meta.keys():
+      if key not in meta_keys:
+        self.meta [key] = numpy.hstack ( nan_array, self.meta [key] )
+
+  # fill in remaining data
+
+  for key in self.data.keys():
+    if key not in data_keys:
+      self.data [key] = numpy.hstack ( nan_array, self.data [key] )
   
   def load (self, filename, meta_keys):
     
@@ -237,26 +275,28 @@ class CubismMPCF (Solver):
     
     # meta data
     meta_keys    = ( 'step', 't',  'dt' )
+    meta_formats = ( 'i',    'f',  'f'  )
+    data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_int', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
+    data_formats = ( 'f', ) * len (data_keys)
     
-    # version 1.0 (integrals.dat)
+    # version 1.0 (only integrals.dat exists)
     if version == 1:
-      
-      meta_formats = ( 'i',    'f',  'f'  )
-      data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_int', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
-      data_formats = ( 'f', ) * len (data_keys)
       results .load_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # version 2.0 (statistics.dat)
+    # version 2.0 (statistics.dat exists)
     else:
-      
       results .load ( outputfile, meta_keys )
+      
+      # insert version 1.0 to version 2.0 (integrals.dat also exists)
+      if os.path.exists (outputfile_v1):
+        results .insert_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # for non-deterministic simulations,
-    # interpolate time dependent results using linear interpolation
-    # this is needed since number of time steps and time step sizes
-    # are usually different for every simulation
+    # for non-deterministic simulations
     if not self.deterministic:
       
+      # interpolate time dependent results using linear interpolation
+      # this is needed since number of time steps and time step sizes
+      # are usually different for every simulation
       results .interpolate ( self.points + 1 )
       
       # compute meta parameters for interpolation
