@@ -76,11 +76,11 @@ class Interpolated_Time_Series (object):
       if key not in meta_keys:
         self.meta [key] = numpy.hstack ( nan_array, self.meta [key] )
 
-  # fill in remaining data
+    # fill in remaining data
 
-  for key in self.data.keys():
-    if key not in data_keys:
-      self.data [key] = numpy.hstack ( nan_array, self.data [key] )
+    for key in self.data.keys():
+      if key not in data_keys:
+        self.data [key] = numpy.hstack ( nan_array, self.data [key] )
   
   def load (self, filename, meta_keys):
     
