@@ -18,6 +18,10 @@ import matplotlib
 
 import pylab
 import numpy
+import sys
+
+# matplotlib system configuration
+matplotlib.rcParams ['figure.max_open_warning'] = False
 
 # font configuration
 matplotlib.rcParams ['font.size']             = 16
@@ -108,14 +112,14 @@ def base (qoi):
     return qoi [:2]
   elif len (qoi) > 2 and qoi [1] == '_' and qoi [0] in colors.keys():
     return qoi [0]
-  else
+  else:
     return 'unrecognized'
 
 def color (qoi):
   base_qoi = base (qoi)
   if base_qoi in colors.keys():
     return colors [base_qoi]
-  else
+  else:
     return colors ['default']
 
 # === styles (specified by the run)
@@ -133,6 +137,7 @@ def style (run):
 units = {}
 
 units ['t']   = r'$ms$'
+units ['pos'] = r'$\mu m$'
 units ['r']   = r'$kg/m^3$' # check
 units ['r2']  = r'$kg/m^3$' # check
 units ['u']   = r'$\mu m/ms$'
@@ -151,6 +156,10 @@ units ['Req'] = r'$\mu m$'
 units ['Vc']  = r'$\mu m^3$'
 
 def unit (qoi):
+  if 'pos' in qoi:
+    return units ['pos']
+  if qoi in units.keys():
+    return units [qoi]
   base_qoi = base (qoi)
   if base_qoi in units.keys():
     return units [base_qoi]
@@ -165,13 +174,16 @@ def levels_extent (levels):
   pylab.xticks (levels)
 
 # generate figure name using the format 'figpath/pwd_suffix.extension'
-def figname (suffix, extension='pdf'):
+def figname (suffix='', extension='pdf'):
   import os
   figpath = 'fig'
   if not os.path.exists (figpath):
     os.mkdir (figpath)
   runpath, rundir = os.path.split (os.getcwd())
-  return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
+  if suffix == '':
+    return os.path.join (figpath, rundir + '.' + extension)
+  else:
+    return os.path.join (figpath, rundir + '_' + suffix + '.' + extension)
 
 def figure (infolines=False, subplots=1):
   if infolines:
@@ -227,7 +239,7 @@ def getTexTableConfig (mlmc):
   return [keys, captions, values]
 
 # generate TeX code with the table including information about the simulation
-def generateTexTable (mlmc, save):
+def generateTexTable (mlmc, base):
   
   # get the config
   
@@ -249,9 +261,9 @@ def generateTexTable (mlmc, save):
   text += r'\end{tabular}' + '\n'
   
   # saving
-  f = open(save[0:-4] + '.tex', 'w')
-  f.write(text)
-  f.close()
+  f = open (base + '.tex', 'w')
+  f.write (text)
+  f.close ()
 
 # plot infolines with information about the simulation
 def plot_infolines (mlmc):
@@ -306,17 +318,21 @@ def plot_infolines (mlmc):
   '''
   return None
 
-def saveall (mlmc, save):
-  pylab.savefig    (save)
-  pylab.savefig    (save[:-3] + 'eps')
-  pylab.savefig    (save[:-3] + 'png')
-  generateTexTable (mlmc, save)
+def saveall (mlmc, save, qoi=None):
+  base = save[:-4]
+  if qoi != None:
+    base += '_' + qoi
+  pylab.savefig    (base + '.' + save[-3:])
+  pylab.savefig    (base + '.' + 'eps')
+  pylab.savefig    (base + '.' + 'png')
+  pylab.savefig    (base + '.' + 'pdf')
+  generateTexTable (mlmc, base)
 
-def draw (mlmc, save, legend=False, loc='best'):
+def draw (mlmc, save, qoi=None, legend=False, loc='best'):
   if legend:
     pylab.legend (loc = loc)
   if save:
-    saveall (mlmc, save)
+    saveall (mlmc, save, qoi)
   pylab.draw ()
 
 # show plots
@@ -326,9 +342,10 @@ def show ():
 # === plotting routines
 
 # plot each stat
-def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
+def plot_stats (qoi, stats, extent, yorigin, run=1, legend=True, time='t'):
   
   percentiles = []
+  import re
   
   for name, stat in stats.iteritems():
     
@@ -347,7 +364,7 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
     
     # collect percentiles for later fill
     elif 'percentile' in name:
-      percentiles.append ([ts, vs])
+      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : re.findall (name) [0] } )
     
     # general plotting
     else:
@@ -355,20 +372,35 @@ def plot_stats (qoi, stats, extent, run=1, legend=True, time='t'):
   
   # plot percentiles
   if percentiles != []:
-    lower = percentiles [0] [1]
-    upper = percentiles [1] [1]
-    color = color_stats ('percentile')
-    pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2)
+
+    if len (percentiles) != 2:
+      print
+      print ' :: ERROR: Only two percentiles can be plotted at a time.'
+      print
+      print sys.exit()
+    
+    lower  = percentiles [0] ['vs']
+    upper  = percentiles [1] ['vs']
+    ts     = percentiles [0] ['ts']
+    label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
+    color  = color_stats ('percentile')
+    
+    pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2, label=label)
   
   if extent:
     pylab.ylim (*extent)
+  
+  elif yorigin:
+    ylim = list (pylab.ylim())
+    ylim [0] = 0
+    pylab.ylim (ylim)
   
   if legend:
     pylab.xlabel (time)
     pylab.legend (loc='best')
 
 # plot computed MC statistics
-def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+def plot_mc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MC estimates...',
   
@@ -387,7 +419,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, s
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent, run, legend=False )
+    plot_stats ( qoi, mc.stats, extent, yorigin, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -408,12 +440,12 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, s
     plot_infolines (self)
   
   if not frame:
-    draw (mlmc, save)
+    draw (mlmc, save, qoi)
 
   print ' done.'
 
 # plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False, save=None):
+def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MLMC estimates...',
   
@@ -423,7 +455,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
     figure (infolines, subplots=1)
   
   pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats, extent, run)
+  plot_stats (qoi, mlmc.stats, extent, yorigin, run)
   
   if infolines:
     plot_infolines (self)
@@ -431,12 +463,12 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, run=1, frame=False,
   adjust (infolines)
 
   if not frame:
-    draw (mlmc, save)
+    draw (mlmc, save, qoi)
 
   print ' done.'
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, yorigin=True, run=1, label=None, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.config.L
@@ -460,11 +492,16 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
   
-  pylab.xlabel ('t [%s]' % units ['t'])
-  pylab.ylabel ('%s [%s]' % (qoi, units [qoi]) )
+  pylab.xlabel ('t [%s]' % unit ('t'))
+  pylab.ylabel ('%s [%s]' % (qoi, unit (qoi)) )
   
   if extent:
     pylab.ylim(*extent)
+
+  elif yorigin:
+    ylim = list (pylab.ylim())
+    ylim [0] = 0
+    pylab.ylim (ylim)
   
   if infolines:
     plot_infolines (self)
@@ -472,24 +509,24 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   adjust (infolines)
 
   if not frame:
-    draw (mlmc, save, legend=False, loc='best')
+    draw (mlmc, save, qoi, legend=False, loc='best')
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, run=1, label=None, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, label=None, frame=False, save=None):
   
-  print ' :: INFO: Plotting first sample of finest level...',
+  print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
   
   level  = 'finest'
   type   = 0
   sample = 0
   
-  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, run, label, frame, save)
+  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, yorigin, run, label, frame, save)
   
   print ' done.'
 
 # plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, legend=4, save=None):
+def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, yorigin=True, legend=4, save=None):
   
   print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
   
@@ -515,6 +552,11 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if extent:
     pylab.ylim(*extent)
+  
+  elif yorigin:
+    ylim = list (pylab.ylim())
+    ylim [0] = 0
+    pylab.ylim (ylim)
 
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
@@ -524,7 +566,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   adjust (infolines)
   
-  draw (mlmc, save)
+  draw (mlmc, save, qoi)
   
   print ' done.'
 
@@ -584,7 +626,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
     show_info(self)
   
   if not frame:
-    draw (mlmc, save)
+    draw (mlmc, save, qoi)
 
   print ' done.'
 
@@ -601,6 +643,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   #optimal_fraction = mlmc.config.samples.optimal_fraction
   TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
+  qoi              = mlmc.config.solver.qoi
   
   # === plot
   
@@ -630,7 +673,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
     show_info(self)
 
   if not frame:
-    draw (mlmc, save)
+    draw (mlmc, save, qoi)
 
   print ' done.'
 
@@ -670,7 +713,7 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
     show_info(self)
   
   if not frame:
-    draw (mlmc, save)
+    draw (mlmc, save, qoi)
 
   print ' done.'
 
