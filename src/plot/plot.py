@@ -22,7 +22,7 @@ import sys
 
 # figure configuration
 matplotlib.rcParams ['figure.max_open_warning'] = 100
-matplotlib.rcParams ['figure.dpi']              = 300
+matplotlib.rcParams ['savefig.dpi']             = 300
 
 # font configuration
 matplotlib.rcParams ['font.size']             = 16
