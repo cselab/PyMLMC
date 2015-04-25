@@ -387,7 +387,7 @@ def saveall (mlmc, save, qoi=None):
   generateTexTable (mlmc, base)
 
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
-  if legend:
+  if legend or (qoi != None and '_pos' in qoi):
     pylab.legend (loc = loc)
   if save:
     saveall (mlmc, save, qoi)
@@ -397,7 +397,34 @@ def draw (mlmc, save, qoi=None, legend=False, loc='best'):
 def show ():
   pylab.show()
 
+# === domain related constants
+
+extent  = None
+surface = None
+
+def set_extent (e):
+  global extent
+  extent = e
+
+def set_surface (s):
+  global surface
+  surface = s
+
 # === plotting routines
+
+# plot a line indicating position
+def plot_helper_lines (qoi):
+  
+  if surface == None:
+    print
+    print
+    print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
+    print
+    sys.exit()
+  
+  if '_pos_d' in qoi:
+    ts = numpy.array ( stat.meta ['t'] )
+    pylab.axhline (y=surface, xmin=ts[0], xmax=ts[-1], color='black', linestyle='--', alpha=0.6, label='surface')
 
 # plot each stat
 def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
@@ -407,8 +434,13 @@ def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
   
   for name, stat in stats.iteritems():
     
-    ts = numpy.array ( stat.meta [time] )
-    vs = numpy.array ( stat.data [qoi]  )
+    ts = numpy.array ( stat.meta ['t'] )
+    vs = numpy.array ( stat.data [qoi] )
+    
+    # exclude first data point, if we are dealing with positions
+    if '_pos' in qoi:
+      ts = ts [1:]
+      vs = vs [1:]
     
     color = color_stats (name)
     
@@ -451,10 +483,14 @@ def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
   elif yorigin:
     ylim = list (pylab.ylim())
     ylim [0] = 0
+    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
+      ylim [1] = extent
     pylab.ylim (ylim)
   
   pylab.xlabel (xlabel)
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+  
+  plot_helper_lines (qoi)
   
   if legend:
     pylab.legend (loc='best')
@@ -519,7 +555,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1
   xlabel = '%s [%s]' % (name('t'), unit('t'))
   #pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent, yorigin, xlabel, run)
-  
+
   if infolines:
     plot_infolines (self)
 
@@ -544,10 +580,17 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
   
+  # exclude first data point, if we are dealing with positions
+  if '_pos' in qoi:
+    ts = ts [1:]
+    vs = vs [1:]
+  
   if not frame:
     figure (infolines, subplots=1)
   
-  if not label:
+  if frame:
+    label = None
+  elif not label:
     label = name (qoi)
   
   pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
@@ -564,8 +607,12 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   elif yorigin:
     ylim = list (pylab.ylim())
     ylim [0] = 0
+    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
+      ylim [1] = extent
     pylab.ylim (ylim)
-  
+
+  plot_helper_lines (qoi)
+
   if infolines:
     plot_infolines (self)
   
@@ -609,6 +656,11 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi]  )
     
+    # exclude first data point, if we are dealing with positions
+    if '_pos' in qoi:
+      ts = ts [1:]
+      vs = vs [1:]
+    
     pylab.plot  (ts, vs, label=str(sample), linewidth=1)
   
   pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
@@ -619,10 +671,14 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   elif yorigin:
     ylim = list (pylab.ylim())
     ylim [0] = 0
+    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
+      ylim [1] = extent
     pylab.ylim (ylim)
   
   pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+  
+  plot_helper_lines (qoi)
   
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
