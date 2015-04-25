@@ -113,7 +113,7 @@ def base (qoi):
   elif len (qoi) > 2 and qoi [1] == '_' and qoi [0] in colors.keys():
     return qoi [0]
   else:
-    return 'unrecognized'
+    return qoi
 
 def color (qoi):
   base_qoi = base (qoi)
@@ -158,13 +158,66 @@ units ['Vc']  = r'$\mu m^3$'
 def unit (qoi):
   if 'pos' in qoi:
     return units ['pos']
-  if qoi in units.keys():
-    return units [qoi]
   base_qoi = base (qoi)
   if base_qoi in units.keys():
     return units [base_qoi]
   else:
     return r'$???$'
+
+# === names
+
+names = {}
+
+names ['t']   = 'time'
+names ['r']   = 'density'
+names ['r2']  = 'gas density'
+names ['u']   = 'x-velocity'
+names ['v']   = 'y-velocity'
+names ['w']   = 'z-velocity'
+names ['m']   = 'velocity magnitude'
+names ['ke']  = 'kinetic energy'
+names ['W']   = 'vorticity magnitude'
+names ['e']   = 'total energy'
+names ['p']   = 'pressure'
+names ['pw']  = 'wall pressure'
+names ['c']   = 'speed of sound'
+names ['M']   = 'Mach number'
+names ['V2']  = 'gas volume'
+names ['Req'] = 'equivalent radius'
+names ['Vc']  = 'cloud volume'
+
+def name (qoi):
+  
+  base_qoi = base (qoi)
+  
+  if base_qoi in names.keys():
+    name_ = names [base_qoi]
+  else:
+    name_ = base_qoi
+
+  if '_avg' in qoi:
+    name_ = 'avg ' + name_
+  if '_min' in qoi:
+    name_ = 'min ' + name_
+  if '_max' in qoi:
+    name_ = 'max ' + name_
+  if '_pos_x' in qoi:
+    name_ = 'x-pos. of ' + name_
+  if '_pos_y' in qoi:
+    name_ = 'y-pos. of ' + name_
+  if '_pos_z' in qoi:
+    name_ = 'z-pos. of ' + name_
+  if '_pos_d' in qoi:
+    if not '_pos_d_x' in qoi and not '_pos_d_y' in qoi and not '_pos_d_z' in qoi:
+      name_ = 'dist. of ' + name_
+  if '_pos_d_x' in qoi:
+    name_ = 'x-dist. of ' + name_
+  if '_pos_d_y' in qoi:
+    name_ = 'y-dist. of ' + name_
+  if '_pos_d_z' in qoi:
+    name_ = 'z-dist. of ' + name_
+
+  return name_
 
 # === helper routines
 
@@ -342,7 +395,7 @@ def show ():
 # === plotting routines
 
 # plot each stat
-def plot_stats (qoi, stats, extent, yorigin, run=1, legend=True, time='t'):
+def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
   
   percentiles = []
   import re
@@ -395,8 +448,10 @@ def plot_stats (qoi, stats, extent, yorigin, run=1, legend=True, time='t'):
     ylim [0] = 0
     pylab.ylim (ylim)
   
+  pylab.xlabel (xlabel)
+  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+  
   if legend:
-    pylab.xlabel (time)
     pylab.legend (loc='best')
 
 # plot computed MC statistics
@@ -414,12 +469,14 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, 
     else:
       pylab.figure (figsize=(levels*6, 2*4))
   
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+  
   for mc in mlmc.mcs:
     
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent, yorigin, run, legend=False )
+    plot_stats ( qoi, mc.stats, extent, yorigin, xlabel, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -454,8 +511,9 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1
   if not frame:
     figure (infolines, subplots=1)
   
-  pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats, extent, yorigin, run)
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+  #pylab.title ( 'estimated statistics for %s' % qoi )
+  plot_stats (qoi, mlmc.stats, extent, yorigin, xlabel, run)
   
   if infolines:
     plot_infolines (self)
@@ -485,15 +543,15 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     figure (infolines, subplots=1)
   
   if not label:
-    label = qoi
+    label = name (qoi)
   
   pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
   
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
-  
-  pylab.xlabel ('t [%s]' % unit ('t'))
-  pylab.ylabel ('%s [%s]' % (qoi, unit (qoi)) )
+
+  pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
+  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
   if extent:
     pylab.ylim(*extent)
@@ -557,7 +615,10 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     ylim = list (pylab.ylim())
     ylim [0] = 0
     pylab.ylim (ylim)
-
+  
+  pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
+  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+  
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
   
@@ -781,6 +842,9 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     rs *= count ** (1.0 / 3.0)
 
   pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=0.5, label=label)
+  
+  pylab.xlabel ('%s [%s]' % (name('t'),   unit('t')))
+  pylab.ylabel ('%s [%s]' % (name('Req'), unit('Req')))
   
   if not frame:
     pylab.label (loc='best')
