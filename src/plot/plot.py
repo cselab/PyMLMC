@@ -20,8 +20,9 @@ import pylab
 import numpy
 import sys
 
-# matplotlib system configuration
+# figure configuration
 matplotlib.rcParams ['figure.max_open_warning'] = 100
+matplotlib.rcParams ['figure.figure.dpi']       = 300
 
 # font configuration
 matplotlib.rcParams ['font.size']             = 16
@@ -379,10 +380,10 @@ def saveall (mlmc, save, qoi=None):
   base = save[:-4]
   if qoi != None:
     base += '_' + qoi
-  pylab.savefig    (base + '.' + save[-3:], dpi=300)
-  pylab.savefig    (base + '.' + 'eps', dpi=300)
-  pylab.savefig    (base + '.' + 'png', dpi=300)
-  pylab.savefig    (base + '.' + 'pdf', dpi=300)
+  pylab.savefig    (base + '.' + save[-3:])
+  pylab.savefig    (base + '.' + 'eps')
+  pylab.savefig    (base + '.' + 'png')
+  pylab.savefig    (base + '.' + 'pdf')
   generateTexTable (mlmc, base)
 
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
