@@ -380,6 +380,9 @@ def saveall (mlmc, save, qoi=None):
   base = save[:-4]
   if qoi != None:
     base += '_' + qoi
+  # bug workaround
+  if base_qoi (qoi) == 'm' or base_qoi (qoi) == 'w':
+    base += _
   pylab.savefig    (base + '.' + save[-3:])
   pylab.savefig    (base + '.' + 'eps')
   pylab.savefig    (base + '.' + 'png')
@@ -423,8 +426,13 @@ def plot_helper_lines (qoi):
     sys.exit()
   
   if '_pos_d' in qoi:
-    ts = numpy.array ( stat.meta ['t'] )
-    pylab.axhline (y=surface, xmin=ts[0], xmax=ts[-1], color='black', linestyle='--', alpha=0.6, label='surface')
+    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=0.6, label='surface')
+    ylim = list (pylab.ylim())
+    ylim [1] = max (1.05 * surface, ylim [1])
+    pylab.ylim ( ylim )
+
+  if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
+    pylab.ylim ( [0, extent] )
 
 # plot each stat
 def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
