@@ -381,7 +381,7 @@ def saveall (mlmc, save, qoi=None):
   if qoi != None:
     base += '_' + qoi
   # bug workaround
-  if base_qoi (qoi) == 'm' or base_qoi (qoi) == 'w':
+  if base (qoi) == 'm' or base (qoi) == 'w':
     base += _
   pylab.savefig    (base + '.' + save[-3:])
   pylab.savefig    (base + '.' + 'eps')
