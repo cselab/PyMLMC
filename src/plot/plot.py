@@ -377,17 +377,17 @@ def plot_infolines (mlmc):
   return None
 
 def saveall (mlmc, save, qoi=None):
-  base = save[:-4]
+  base_name = save[:-4]
   if qoi != None:
-    base += '_' + qoi
+    base_name += '_' + qoi
   # bug workaround
   if base (qoi) == 'm' or base (qoi) == 'w':
-    base += _
-  pylab.savefig    (base + '.' + save[-3:])
-  pylab.savefig    (base + '.' + 'eps')
-  pylab.savefig    (base + '.' + 'png')
-  pylab.savefig    (base + '.' + 'pdf')
-  generateTexTable (mlmc, base)
+    base_name += '_'
+  pylab.savefig    (base_name + '.' + save[-3:])
+  pylab.savefig    (base_name + '.' + 'eps')
+  pylab.savefig    (base_name + '.' + 'png')
+  pylab.savefig    (base_name + '.' + 'pdf')
+  generateTexTable (mlmc, base_name)
 
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
   if legend or (qoi != None and '_pos' in qoi):
