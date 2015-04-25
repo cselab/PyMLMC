@@ -39,6 +39,19 @@ matplotlib.colors.ColorConverter.colors['custom_green'] = (182/256.0,212/256.0,4
 # default color cycle
 matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
 
+# === parser for base qoi
+
+def base (qoi):
+  
+  if qoi in colors.keys() or qoi == None:
+    return qoi
+  elif len (qoi) > 3 and qoi [2] == '_' and qoi [:2] in colors.keys():
+    return qoi [:2]
+  elif len (qoi) > 2 and qoi [1] == '_' and qoi [0] in colors.keys():
+    return qoi [0]
+  else:
+    return qoi
+
 # === colors (specified by the stat, param or qoi)
 
 # statistical estimators
@@ -103,19 +116,6 @@ colors ['Vc']  = 'lightskyblue'
 
 colors ['rp_integrated']    = 'black'
 colors ['rp_approximated']  = 'black'
-
-# parser for base qoi
-
-def base (qoi):
-  
-  if qoi in colors.keys():
-    return qoi
-  elif len (qoi) > 3 and qoi [2] == '_' and qoi [:2] in colors.keys():
-    return qoi [:2]
-  elif len (qoi) > 2 and qoi [1] == '_' and qoi [0] in colors.keys():
-    return qoi [0]
-  else:
-    return qoi
 
 def color (qoi):
   if '_pos' in qoi:
