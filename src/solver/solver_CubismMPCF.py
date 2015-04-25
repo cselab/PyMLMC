@@ -276,7 +276,7 @@ class CubismMPCF (Solver):
     # meta data
     meta_keys    = ( 'step', 't',  'dt' )
     meta_formats = ( 'i',    'f',  'f'  )
-    data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_int', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
+    data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_avg', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
     data_formats = ( 'f', ) * len (data_keys)
     
     # version 1.0 (only integrals.dat exists)
