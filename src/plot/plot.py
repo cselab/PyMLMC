@@ -21,7 +21,7 @@ import numpy
 import sys
 
 # matplotlib system configuration
-matplotlib.rcParams ['figure.max_open_warning'] = False
+matplotlib.rcParams ['figure.max_open_warning'] = 100
 
 # font configuration
 matplotlib.rcParams ['font.size']             = 16
@@ -79,6 +79,7 @@ def color_params (name):
 colors = {}
 
 colors ['default'] = 'custom_blue'
+colors ['pos'] = 'olive'
 
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
@@ -116,6 +117,8 @@ def base (qoi):
     return qoi
 
 def color (qoi):
+  if '_pos' in qoi:
+    return colors ['pos']
   base_qoi = base (qoi)
   if base_qoi in colors.keys():
     return colors [base_qoi]
@@ -138,6 +141,7 @@ units = {}
 
 units ['t']   = r'$ms$'
 units ['pos'] = r'$\mu m$'
+
 units ['r']   = r'$kg/m^3$' # check
 units ['r2']  = r'$kg/m^3$' # check
 units ['u']   = r'$\mu m/ms$'
