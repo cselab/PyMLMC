@@ -402,12 +402,20 @@ def show ():
 
 # === domain related constants
 
-extent  = None
-surface = None
+extent_x = None
+extent_y = None
+extent_z = None
+surface  = None
 
-def set_extent (e):
-  global extent
-  extent = e
+def set_extent (e_x, e_y=None, e_z=None):
+  global extent_x
+  global extent_y
+  global extent_z
+  extent_x = e_x
+  if e_y == None:
+    extent_y = extent_x
+  if e_z == None:
+    extent_z = extent_x
 
 def set_surface (s):
   global surface
@@ -430,9 +438,13 @@ def plot_helper_lines (qoi):
     ylim = list (pylab.ylim())
     ylim [1] = max (1.05 * surface, ylim [1])
     pylab.ylim ( ylim )
-
-  if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-    pylab.ylim ( [0, extent] )
+  
+  if '_pos_x' in qoi and extent_x != None:
+    pylab.ylim ( [0, extent_x] )
+  if '_pos_y' in qoi and extent_y != None:
+    pylab.ylim ( [0, extent_y] )
+  if '_pos_z' in qoi and extent_z != None:
+    pylab.ylim ( [0, extent_z] )
 
 # plot each stat
 def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
