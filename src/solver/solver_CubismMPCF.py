@@ -348,6 +348,17 @@ class CubismMPCF (Solver):
       if os.path.exists (outputfile_v1):
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
+    # obtain sorting order
+    order = numpy.argsort (self.meta ['t'])
+    
+    # sort metadata
+    for key in self.meta.keys():
+      self.meta [key] = self.meta [key] [order]
+    
+    # sort data
+    for key in self.data.keys():
+      self.data [key] = self.data [key] [order]
+    
     # for non-deterministic simulations
     if not self.deterministic:
       
