@@ -44,7 +44,7 @@ class Interpolated_Time_Series (object):
       del records [key]
     self.data = records
   
-  def insert_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
+  def append_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
     
     outputfile = open ( filename, 'r' )
     
@@ -54,7 +54,9 @@ class Interpolated_Time_Series (object):
     
     outputfile.close()
     
-    count = len (records (data_keys[0]))
+    # array of NaN's for filling the gaps
+    
+    count = len (records.values() [0])
     nan_array = numpy.empty ( (count, 1) )
     nan_array [:] = numpy.NAN
     
@@ -62,25 +64,25 @@ class Interpolated_Time_Series (object):
     
     for key in meta_keys:
       if key in self.meta.keys():
-        self.meta [key] = numpy.hstack ( records [key], self.meta [key] )
+        self.meta [key] = numpy.hstack ( self.meta [key], records [key] )
     
     # append data
     
     for key in data_keys:
       if key in self.data.keys():
-        self.data [key] = numpy.hstack ( records [key], self.data [key] )
+        self.data [key] = numpy.hstack ( self.data [key], records [key] )
 
     # fill in remaining metadata
     
     for key in self.meta.keys():
       if key not in meta_keys:
-        self.meta [key] = numpy.hstack ( nan_array, self.meta [key] )
-
+        self.meta [key] = numpy.hstack ( self.meta [key], nan_array )
+  
     # fill in remaining data
 
     for key in self.data.keys():
       if key not in data_keys:
-        self.data [key] = numpy.hstack ( nan_array, self.data [key] )
+        self.data [key] = numpy.hstack ( self.data [key], nan_array )
   
   def load (self, filename, meta_keys):
     
@@ -91,13 +93,60 @@ class Interpolated_Time_Series (object):
     records = dict ( (key, data [key]) for key in data.dtype.names )
     
     outputfile.close()
-    
+  
     # split metadata from actual data
     
     for key in meta_keys:
       self.meta [key] = records [key]
-      del records [key]
-      self.data = records
+        del records [key]
+    self.data = records
+  
+  def append_v2 (self, filename, meta_keys):
+
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import genfromtxt
+    data = genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
+    records = dict ( (key, data [key]) for key in data.dtype.names )
+    
+    outputfile.close()
+    
+    # split metadata from actual data
+    
+    meta = {}
+    for key in meta_keys:
+      meta [key] = records [key]
+        del records [key]
+    
+    # array of NaN's for filling the gaps
+    
+    count = len (records.values[0])
+    nan_array = numpy.empty ( (count, 1) )
+    nan_array [:] = numpy.NAN
+    
+    # append metadata
+    
+    for key in meta.keys():
+      if key in self.meta.keys():
+        self.meta [key] = numpy.hstack ( self.meta [key], meta [key] )
+    
+    # append data
+    
+    for key in records.keys():
+      if key in self.data.keys():
+        self.data [key] = numpy.hstack ( self.data [key], records [key] )
+  
+    # fill in remaining metadata
+    
+    for key in self.meta.keys():
+      if key not in meta.keys():
+        self.meta [key] = numpy.hstack ( self.meta [key], nan_array )
+
+    # fill in remaining data
+
+    for key in self.data.keys():
+      if key not in records.keys():
+        self.data [key] = numpy.hstack ( self.data [key], nan_array )
   
   def interpolate (self, points):
     
@@ -174,7 +223,8 @@ class CubismMPCF (Solver):
     self.sharedmem = 1
     
     # set files, default quantity of interest, and indicator
-    self.outputfile = 'statistics.dat'
+    self.outputfile    = 'statistics.dat'
+    self.outputfile_v2 = 'statistics_legacy.dat'
     self.outputfile_v1 = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
@@ -258,15 +308,18 @@ class CubismMPCF (Solver):
     
     # open self.outputfile and read results
     
-    outputfile = os.path.join ( self.directory (level, type, sample), self.outputfile )
+    outputfile    = os.path.join ( self.directory (level, type, sample), self.outputfile    )
     outputfile_v1 = os.path.join ( self.directory (level, type, sample), self.outputfile_v1 )
+    outputfile_v2 = os.path.join ( self.directory (level, type, sample), self.outputfile_v2 )
     if os.path.exists (outputfile):
+      version = 3
+    elif os.path.exists (outputfile_v2):
       version = 2
     elif os.path.exists (outputfile_v1):
       version = 1
     else:
       print
-      print ' :: ERROR: Output file does not exist (version 1.0 also absent):'
+      print ' :: ERROR: Output file does not exist (versions 1.0 and 2.0 also absent):'
       print '  : %s' % outputfile
       print
       sys.exit()
@@ -279,17 +332,21 @@ class CubismMPCF (Solver):
     data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_avg', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
     data_formats = ( 'f', ) * len (data_keys)
     
-    # version 1.0 (only integrals.dat exists)
+    # version 1.0 (only iself.outputfile_v1 exists)
     if version == 1:
       results .load_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # version 2.0 (statistics.dat exists)
+    # version 3.0 (self.outputfile exists)
     else:
       results .load ( outputfile, meta_keys )
       
-      # insert version 1.0 to version 2.0 (integrals.dat also exists)
+      # append version 2.0 to version 3.0 (self.outputfile_v2 also exists)
+      if os.path.exists (outputfile_v2):
+        results .append_v2 ( outputfile_v2, meta_keys )
+      
+      # append version 1.0 to version 3.0 (self.outputfile_v1 also exists)
       if os.path.exists (outputfile_v1):
-        results .insert_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+        results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
     # for non-deterministic simulations
     if not self.deterministic:
