@@ -27,6 +27,23 @@ class Interpolated_Time_Series (object):
     self.meta = {}
     self.data = {}
   
+  def load (self, filename, meta_keys):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import genfromtxt
+    data = genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
+    records = dict ( (key, data [key]) for key in data.dtype.names )
+    
+    outputfile.close()
+    
+    # split metadata from actual data
+    
+    for key in meta_keys:
+      self.meta [key] = records [key]
+      del records [key]
+    self.data = records
+  
   def load_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
     
     outputfile = open ( filename, 'r' )
@@ -84,23 +101,6 @@ class Interpolated_Time_Series (object):
       if key not in data_keys:
         self.data [key] = numpy.hstack ( self.data [key], nan_array )
   
-  def load (self, filename, meta_keys):
-    
-    outputfile = open ( filename, 'r' )
-    
-    from numpy import genfromtxt
-    data = genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
-    records = dict ( (key, data [key]) for key in data.dtype.names )
-    
-    outputfile.close()
-  
-    # split metadata from actual data
-    
-    for key in meta_keys:
-      self.meta [key] = records [key]
-      del records [key]
-    self.data = records
-  
   def append_v2 (self, filename, meta_keys):
 
     outputfile = open ( filename, 'r' )
@@ -120,7 +120,7 @@ class Interpolated_Time_Series (object):
     
     # array of NaN's for filling the gaps
     
-    count = len (records.values[0])
+    count = len (records.values()[0])
     nan_array = numpy.empty ( (count, 1) )
     nan_array [:] = numpy.NAN
     
