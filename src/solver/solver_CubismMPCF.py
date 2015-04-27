@@ -147,6 +147,19 @@ class Interpolated_Time_Series (object):
     for key in self.data.keys():
       if key not in records.keys():
         self.data [key] = numpy.append ( self.data [key], nan_array )
+
+  def sort (self, key):
+    
+    # obtain sorting order
+    order = numpy.argsort (self.meta [key])
+
+    # sort metadata
+    for key in self.meta.keys():
+      self.meta [key] = self.meta [key] [order]
+    
+    # sort data
+    for key in self.data.keys():
+      self.data [key] = self.data [key] [order]
   
   def interpolate (self, points):
     
@@ -348,16 +361,8 @@ class CubismMPCF (Solver):
       if os.path.exists (outputfile_v1):
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # obtain sorting order
-    order = numpy.argsort (self.meta ['t'])
-    
-    # sort metadata
-    for key in self.meta.keys():
-      self.meta [key] = self.meta [key] [order]
-    
-    # sort data
-    for key in self.data.keys():
-      self.data [key] = self.data [key] [order]
+    # sort results by time
+    results.sort ('t')
     
     # for non-deterministic simulations
     if not self.deterministic:
