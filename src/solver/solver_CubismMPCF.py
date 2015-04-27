@@ -72,11 +72,12 @@ class Interpolated_Time_Series (object):
     outputfile.close()
     
     # filter out existing entries
-    for step in records ['step']:
+    positions = []
+    for position, step in enumerate (records ['step']):
       if step in self.meta ['step']:
-        position = numpy.where (self.meta['step'] == step)
-        for key in records.keys():
-          records [key] = numpy.delete ( records [key], position )
+        positions .append (position)
+    for key in records.keys():
+      records [key] = numpy.delete ( records [key], positions )
     
     # array of NaN's for filling the gaps
     
@@ -101,7 +102,7 @@ class Interpolated_Time_Series (object):
     for key in self.meta.keys():
       if key not in meta_keys:
         self.meta [key] = numpy.append ( self.meta [key], nan_array )
-  
+
     # fill in remaining data
 
     for key in self.data.keys():
@@ -119,11 +120,12 @@ class Interpolated_Time_Series (object):
     outputfile.close()
     
     # filter out existing entries
-    for step in records ['step']:
+    positions = []
+    for position, step in enumerate (records ['step']):
       if step in self.meta ['step']:
-        position = numpy.where (self.meta['step'] == step)
-        for key in records.keys():
-          records [key]  = numpy.delete ( records [key], position )
+        positions .append (position)
+    for key in records.keys():
+      records [key] = numpy.delete ( records [key], positions )
     
     # split metadata from actual data
     
@@ -368,12 +370,13 @@ class CubismMPCF (Solver):
       results .load ( outputfile, meta_keys )
       
       # append version 2.0 to version 3.0 (self.outputfile_v2 also exists)
+      # LEGACY, to be removed
       if os.path.exists (outputfile_v2):
         results .append_v2 ( outputfile_v2, meta_keys )
       
       # append version 1.0 to version 3.0 (self.outputfile_v1 also exists)
-      #if os.path.exists (outputfile_v1):
-      #  results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+      if os.path.exists (outputfile_v1):
+        results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
     # sort results by time
     results.sort ('step')
