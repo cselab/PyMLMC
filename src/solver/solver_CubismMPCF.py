@@ -81,25 +81,25 @@ class Interpolated_Time_Series (object):
     
     for key in meta_keys:
       if key in self.meta.keys():
-        self.meta [key] = numpy.hstack ( self.meta [key], records [key] )
+        self.meta [key] = numpy.append ( self.meta [key], records [key] )
     
     # append data
     
     for key in data_keys:
       if key in self.data.keys():
-        self.data [key] = numpy.hstack ( self.data [key], records [key] )
+        self.data [key] = numpy.append ( self.data [key], records [key] )
 
     # fill in remaining metadata
     
     for key in self.meta.keys():
       if key not in meta_keys:
-        self.meta [key] = numpy.hstack ( self.meta [key], nan_array )
+        self.meta [key] = numpy.append ( self.meta [key], nan_array )
   
     # fill in remaining data
 
     for key in self.data.keys():
       if key not in data_keys:
-        self.data [key] = numpy.hstack ( self.data [key], nan_array )
+        self.data [key] = numpy.append ( self.data [key], nan_array )
   
   def append_v2 (self, filename, meta_keys):
 
@@ -128,25 +128,25 @@ class Interpolated_Time_Series (object):
     
     for key in meta.keys():
       if key in self.meta.keys():
-        self.meta [key] = numpy.hstack ( self.meta [key], meta [key] )
+        self.meta [key] = numpy.append ( self.meta [key], meta [key] )
     
     # append data
     
     for key in records.keys():
       if key in self.data.keys():
-        self.data [key] = numpy.hstack ( self.data [key], records [key] )
+        self.data [key] = numpy.append ( self.data [key], records [key] )
   
     # fill in remaining metadata
     
     for key in self.meta.keys():
       if key not in meta.keys():
-        self.meta [key] = numpy.hstack ( self.meta [key], nan_array )
+        self.meta [key] = numpy.append ( self.meta [key], nan_array )
 
     # fill in remaining data
 
     for key in self.data.keys():
       if key not in records.keys():
-        self.data [key] = numpy.hstack ( self.data [key], nan_array )
+        self.data [key] = numpy.append ( self.data [key], nan_array )
   
   def interpolate (self, points):
     
