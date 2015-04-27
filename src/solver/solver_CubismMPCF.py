@@ -76,7 +76,7 @@ class Interpolated_Time_Series (object):
       if step in self.meta ['step']:
         position = numpy.where (self.meta['step'] == step)
         for key in records.keys():
-          records [key]  = numpy.delete ( records [key], position )
+          records [key] = numpy.delete ( records [key], position )
     
     # array of NaN's for filling the gaps
     
@@ -363,7 +363,7 @@ class CubismMPCF (Solver):
     if version == 1:
       results .load_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # version 3.0 (self.outputfile exists)
+    # version 2.0 or 3.0 (self.outputfile or self.outputfile_v2 exist)
     else:
       results .load ( outputfile, meta_keys )
       
@@ -372,8 +372,8 @@ class CubismMPCF (Solver):
         results .append_v2 ( outputfile_v2, meta_keys )
       
       # append version 1.0 to version 3.0 (self.outputfile_v1 also exists)
-      if os.path.exists (outputfile_v1):
-        results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+      #if os.path.exists (outputfile_v1):
+      #  results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
     # sort results by time
     results.sort ('step')
