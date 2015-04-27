@@ -98,7 +98,7 @@ class Interpolated_Time_Series (object):
     
     for key in meta_keys:
       self.meta [key] = records [key]
-        del records [key]
+      del records [key]
     self.data = records
   
   def append_v2 (self, filename, meta_keys):
@@ -116,7 +116,7 @@ class Interpolated_Time_Series (object):
     meta = {}
     for key in meta_keys:
       meta [key] = records [key]
-        del records [key]
+      del records [key]
     
     # array of NaN's for filling the gaps
     
