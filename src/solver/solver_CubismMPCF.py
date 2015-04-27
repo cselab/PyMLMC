@@ -71,6 +71,13 @@ class Interpolated_Time_Series (object):
     
     outputfile.close()
     
+    # filter out existing entries
+    for step in records ['step']:
+      if step in self.meta ['step']:
+        position = numpy.where (self.meta['step'] == step)
+        for key in records.keys():
+          records [key]  = numpy.delete ( records [key], position )
+    
     # array of NaN's for filling the gaps
     
     count = len (records.values() [0])
@@ -110,6 +117,13 @@ class Interpolated_Time_Series (object):
     records = dict ( (key, data [key]) for key in data.dtype.names )
     
     outputfile.close()
+    
+    # filter out existing entries
+    for step in records ['step']:
+      if step in self.meta ['step']:
+        position = numpy.where (self.meta['step'] == step)
+        for key in records.keys():
+          records [key]  = numpy.delete ( records [key], position )
     
     # split metadata from actual data
     
@@ -362,7 +376,7 @@ class CubismMPCF (Solver):
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
     # sort results by time
-    results.sort ('t')
+    results.sort ('step')
     
     # for non-deterministic simulations
     if not self.deterministic:
