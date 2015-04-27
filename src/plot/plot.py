@@ -434,7 +434,7 @@ def plot_helper_lines (qoi):
     sys.exit()
   
   if '_pos_d' in qoi:
-    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=0.6, label='surface')
+    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=0.6, label='cloud surface')
     ylim = list (pylab.ylim())
     ylim [1] = max (1.05 * surface, ylim [1])
     pylab.ylim ( ylim )
@@ -599,6 +599,27 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
+  
+  # vorticity
+  if base (qoi) == 'W':
+    '''
+    if '_pos_d_x' in qoi:
+      max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
+      positions = numpy.argwhere ((vs < max_d_x) + (vs == numpy.NaN))
+    elif '_pos_d_y' in qoi:
+      max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
+      positions = numpy.argwhere ((vs < max_d_y) + (vs == numpy.NaN))
+    elif '_pos_d_z' in qoi:
+      max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
+      positions = numpy.argwhere ((vs < max_d_z) + (vs == numpy.NaN))
+    '''
+    if '_pos_d' in qoi:
+      max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
+      positions = numpy.argwhere (vs > 0.9 * max_d)
+    else:
+      positions = numpy.argwhere (vs == 0)
+    ts = numpy.delete (ts, positions)
+    vs = numpy.delete (vs, positions)
   
   # exclude first data point, if we are dealing with positions
   if '_pos' in qoi:
