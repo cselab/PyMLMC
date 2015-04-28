@@ -94,7 +94,7 @@ colors = {}
 
 colors ['default'] = 'custom_blue'
 colors ['pos'] = 'mediumturquoise'
-colors ['trendline'] = 'orangered'
+colors ['trendline'] = 'darkorange'
 
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
@@ -106,7 +106,7 @@ colors ['ke']  = 'custom_green'
 colors ['e']   = 'cyan'
 colors ['W']   = 'coral'
 colors ['p']   = 'custom_orange'
-colors ['pw']  = 'darkorange'
+colors ['pw']  = 'orangered'
 colors ['c']   = 'darkorchid'
 colors ['M']   = 'darkturquoise'
 colors ['V2']  = 'custom_blue'
