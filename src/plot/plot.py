@@ -93,7 +93,8 @@ def color_params (name):
 colors = {}
 
 colors ['default'] = 'custom_blue'
-colors ['pos'] = 'olive'
+colors ['pos'] = 'mediumturquoise'
+colors ['trendline'] = 'orangered'
 
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
@@ -105,7 +106,7 @@ colors ['ke']  = 'custom_green'
 colors ['e']   = 'cyan'
 colors ['W']   = 'coral'
 colors ['p']   = 'custom_orange'
-colors ['pw']   = 'orangered'
+colors ['pw']  = 'darkorange'
 colors ['c']   = 'darkorchid'
 colors ['M']   = 'darkturquoise'
 colors ['V2']  = 'custom_blue'
@@ -423,6 +424,16 @@ def set_surface (s):
 
 # === plotting routines
 
+# filter
+def filter (vs, width):
+  if width % 2 != 0:
+    width += 1
+  vs_ext = numpy.r_ [ vs [width-1:0:-1], vs, vs [-1:-width:-1] ]
+  window = numpy.hanning (width)
+  window /= window.sum()
+  vs_cnv = numpy.convolve (window, vs_ext, mode='valid')
+  return vs_cnv [width / 2 - 1 : len (vs_cnv) - width / 2]
+
 # plot a line indicating position
 def plot_helper_lines (qoi):
   
@@ -587,7 +598,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1
   print ' done.'
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, yorigin=True, run=1, label=None, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.config.L
@@ -600,7 +611,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
   
-  # vorticity
+  # vorticity filter
   if base (qoi) == 'W':
     '''
     if '_pos_d_x' in qoi:
@@ -620,6 +631,25 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
       positions = numpy.argwhere (vs == 0)
     ts = numpy.delete (ts, positions)
     vs = numpy.delete (vs, positions)
+
+    # energy filter
+    if base (qoi) == 'e':
+      '''
+        if '_pos_d_x' in qoi:
+        max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
+        positions = numpy.argwhere ((vs < max_d_x) + (vs == numpy.NaN))
+        elif '_pos_d_y' in qoi:
+        max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
+        positions = numpy.argwhere ((vs < max_d_y) + (vs == numpy.NaN))
+        elif '_pos_d_z' in qoi:
+        max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
+        positions = numpy.argwhere ((vs < max_d_z) + (vs == numpy.NaN))
+        '''
+      if '_pos_d' in qoi:
+        max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
+        positions = numpy.argwhere (vs > 0.9 * max_d)
+        ts = numpy.delete (ts, positions)
+        vs = numpy.delete (vs, positions)
   
   # exclude first data point, if we are dealing with positions
   if '_pos' in qoi:
@@ -629,13 +659,18 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if not frame:
     figure (infolines, subplots=1)
   
-  if frame:
+  if not frame:
     label = None
   elif not label:
     label = name (qoi)
   
   pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
-  
+
+  # add trendline (if specified or if dealing with positions)
+  if trendline or '_pos' in qoi:
+    ls = filter (vs, width=smoothen)
+    pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label='trendline')
+
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
 
@@ -664,15 +699,16 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, label=None, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
   
-  print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
+  #print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
+  print ' :: INFO: Plotting %s...' % qoi,
   
   level  = 'finest'
   type   = 0
   sample = 0
   
-  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, yorigin, run, label, frame, save)
+  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, yorigin, run, trendline, smoothen, label, frame, save)
   
   print ' done.'
 
