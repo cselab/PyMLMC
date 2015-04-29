@@ -35,7 +35,8 @@ peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
 # scratch path ($WORK and $SCRATCH quotas are now 50 TB)
-scratch = '/gpfs/scratch/userexternal/jsukys00/pymlmc'
+scratch = None
+#scratch = '/gpfs/scratch/userexternal/jsukys00/pymlmc'
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \

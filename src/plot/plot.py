@@ -413,10 +413,8 @@ def set_extent (e_x, e_y=None, e_z=None):
   global extent_y
   global extent_z
   extent_x = e_x
-  if e_y == None:
-    extent_y = extent_x
-  if e_z == None:
-    extent_z = extent_x
+  extent_y = e_y if e_y != None else extent_x
+  extent_z = e_z if e_z != None else extent_x
 
 def set_surface (s):
   global surface
@@ -611,45 +609,26 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
   
-  # vorticity filter
-  if base (qoi) == 'W':
-    '''
+  # vorticity and energy filters
+  base_qoi = base (qoi)
+  if base_qoi == 'W' or base_qoi == 'e':
+    positions = []
     if '_pos_d_x' in qoi:
       max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
-      positions = numpy.argwhere ((vs < max_d_x) + (vs == numpy.NaN))
+      positions = numpy.argwhere (vs > 0.9 * max_d_x)
     elif '_pos_d_y' in qoi:
       max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
-      positions = numpy.argwhere ((vs < max_d_y) + (vs == numpy.NaN))
+      positions = numpy.argwhere (vs > 0.9 * max_d_y)
     elif '_pos_d_z' in qoi:
       max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
-      positions = numpy.argwhere ((vs < max_d_z) + (vs == numpy.NaN))
-    '''
-    if '_pos_d' in qoi:
+      positions = numpy.argwhere (vs > 0.9 * max_d_z)
+    elif '_pos_d' in qoi:
       max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
       positions = numpy.argwhere (vs > 0.9 * max_d)
-    else:
-      positions = numpy.argwhere (vs == 0)
+    elif base_qoi == 'W':
+      positions = numpy.argwhere (vs < 0.1)
     ts = numpy.delete (ts, positions)
     vs = numpy.delete (vs, positions)
-
-    # energy filter
-    if base (qoi) == 'e':
-      '''
-        if '_pos_d_x' in qoi:
-        max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
-        positions = numpy.argwhere ((vs < max_d_x) + (vs == numpy.NaN))
-        elif '_pos_d_y' in qoi:
-        max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
-        positions = numpy.argwhere ((vs < max_d_y) + (vs == numpy.NaN))
-        elif '_pos_d_z' in qoi:
-        max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
-        positions = numpy.argwhere ((vs < max_d_z) + (vs == numpy.NaN))
-        '''
-      if '_pos_d' in qoi:
-        max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
-        positions = numpy.argwhere (vs > 0.9 * max_d)
-        ts = numpy.delete (ts, positions)
-        vs = numpy.delete (vs, positions)
   
   # exclude first data point, if we are dealing with positions
   if '_pos' in qoi:
@@ -659,7 +638,9 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if not frame:
     figure (infolines, subplots=1)
   
-  if not frame:
+  if '_pos' in qoi:
+    label = 'distance'
+  elif not frame:
     label = None
   elif not label:
     label = name (qoi)
