@@ -37,6 +37,9 @@ bandwidth = 28.0 # GB/s
 # scratch path (not required - we use $WORK)
 scratch = None
 
+# archive space is not subjec to quota (>100TB should be notified)
+archive = '/arch/pra091/pra0913/pymlmc'
+
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
   --envs BG_MEMSIZE=16384 \
