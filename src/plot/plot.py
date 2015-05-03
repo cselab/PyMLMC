@@ -456,7 +456,7 @@ def plot_helper_lines (qoi):
     pylab.ylim ( [0, extent_z] )
 
 # plot each stat
-def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
+def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
   
   percentiles = []
   import re
@@ -509,13 +509,22 @@ def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
   if extent:
     pylab.ylim (*extent)
   
-  elif yorigin:
+  else:
+
+    xlim = list (pylab.xlim())
+    if xorigin:
+      xlim [0] = 0
+    pylab.xlim (xlim)
+
     ylim = list (pylab.ylim())
-    ylim [0] = 0
+    if yorigin:
+      ylim = list (pylab.ylim())
+      ylim [0] = 0
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
       ylim [1] = extent
     pylab.ylim (ylim)
-  
+
+
   pylab.xlabel (xlabel)
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
@@ -525,7 +534,7 @@ def plot_stats (qoi, stats, extent, yorigin, xlabel, run=1, legend=True):
     pylab.legend (loc='best')
 
 # plot computed MC statistics
-def plot_mc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, frame=False, save=None):
+def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MC estimates...',
   
@@ -546,7 +555,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, 
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent, yorigin, xlabel, run, legend=False )
+    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -572,7 +581,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, 
   print ' done.'
 
 # plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, frame=False, save=None):
+def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MLMC estimates...',
   
@@ -583,7 +592,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1
   
   xlabel = '%s [%s]' % (name('t'), unit('t'))
   #pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats, extent, yorigin, xlabel, run)
+  plot_stats (qoi, mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
   if infolines:
     plot_infolines (self)
@@ -596,7 +605,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1
   print ' done.'
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.config.L
@@ -661,13 +670,20 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if extent:
     pylab.ylim(*extent)
 
-  elif yorigin:
+  else:
+    
+    xlim = list (pylab.xlim())
+    if xorigin:
+      xlim [0] = 0
+    pylab.xlim (xlim)
+
     ylim = list (pylab.ylim())
-    ylim [0] = 0
+    if yorigin:
+      ylim [0] = 0
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
       ylim [1] = extent
     pylab.ylim (ylim)
-
+  
   plot_helper_lines (qoi)
 
   if infolines:
@@ -680,7 +696,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
   
   #print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
   print ' :: INFO: Plotting %s...' % qoi,
@@ -689,12 +705,12 @@ def plot (mlmc, qoi=None, infolines=False, extent=None, yorigin=True, run=1, tre
   type   = 0
   sample = 0
   
-  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, yorigin, run, trendline, smoothen, label, frame, save)
+  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, xorigin, yorigin, run, trendline, smoothen, label, frame, save)
   
   print ' done.'
 
 # plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, yorigin=True, legend=4, save=None):
+def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, save=None):
   
   print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
   
@@ -726,9 +742,15 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   if extent:
     pylab.ylim(*extent)
   
-  elif yorigin:
+  else:
+    xlim = list (pylab.xlim())
+    if xorigin:
+      xlim [0] = 0
+    pylab.xlim (xlim)
+
     ylim = list (pylab.ylim())
-    ylim [0] = 0
+    if yorigin:
+      ylim [0] = 0
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
       ylim [1] = extent
     pylab.ylim (ylim)

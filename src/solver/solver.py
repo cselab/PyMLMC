@@ -407,4 +407,7 @@ class Solver (object):
     else:
       time = 0
     
-    return float (time)
+    try:
+      return float (time)
+    except:
+      return float (0)
