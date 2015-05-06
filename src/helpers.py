@@ -94,8 +94,9 @@ def load (dir):
   print
   print ' :: LOADING simulation from'
   print '  : %s' % dir
-  sys.path.insert ( 0, os.path.join (os.getcwd(), dir ) )
-  import script
-  script.mlmc.chroot (dir)
-  script.mlmc.load ()
-  return script
+  list = {}
+  path = os.path.join (os.getcwd(), dir )
+  execfile ( os.path.join (path, 'script.py'), globals(), list )
+  list ['mlmc'] .chroot (dir)
+  list ['mlmc'] .load ()
+  return list
