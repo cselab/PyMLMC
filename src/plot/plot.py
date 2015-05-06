@@ -300,6 +300,10 @@ def getTexTableConfig (mlmc):
 # generate TeX code with the table including information about the simulation
 def generateTexTable (mlmc, base):
   
+  # check for valid mlmc simulation
+  if mlmc == None:
+    return
+  
   # get the config
   
   [keys, captions, opts] = getTexTableConfig (mlmc)
@@ -618,9 +622,8 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
   
-  # vorticity and energy filters
-  base_qoi = base (qoi)
-  if base_qoi == 'W' or base_qoi == 'e':
+  # energy filter
+  if base (qoi) == 'e':
     positions = []
     if '_pos_d_x' in qoi:
       max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
@@ -634,13 +637,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     elif '_pos_d' in qoi:
       max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
       positions = numpy.argwhere (vs > 0.9 * max_d)
-    elif base_qoi == 'W':
-      positions = numpy.argwhere (vs < 0.1)
     ts = numpy.delete (ts, positions)
     vs = numpy.delete (vs, positions)
   
-  # exclude first data point, if we are dealing with positions
-  if '_pos' in qoi:
+  # exclude first data point, if we are dealing with positions or vorticities
+  if '_pos' in qoi or base (qoi) == 'W':
     ts = ts [1:]
     vs = vs [1:]
   
@@ -659,7 +660,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   # add trendline (if specified or if dealing with positions)
   if trendline or '_pos' in qoi:
     ls = filter (vs, width=smoothen)
-    pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label='trendline')
+    if len (ls) == len (ts):
+      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label='trendline')
+    else:
+      print
+      print ' :: WARNING: computing trendline failed (NaN\' present?)'
 
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
