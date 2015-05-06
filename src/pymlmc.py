@@ -134,17 +134,7 @@ class MLMC (object):
     
     while True:
       
-      # load status of MLMC simulation
-      self.status.load (self.config)
-      
-      # recreate MC simulations
-      self.create_MCs (self.config.samples.indices.computed)
-      
-      # if non-interactive session -> wait for jobs to finish
-      if not self.params.interactive:
-        self.join ()
-      
-      # load results
+      # load MLMC simulation
       self.load ()
       
       # deterministic simulations are not suppossed to be updated
@@ -205,8 +195,8 @@ class MLMC (object):
       # update the computed number of samples
       self.config.samples.append ()
       
-      # save status of MLMC simulation
-      self.status.save (self.config)
+      # save MLMC simulation
+      self.save ()
       
       # for clusters: if non-interactive session -> exit
       if local.cluster and not self.params.interactive:
@@ -304,9 +294,27 @@ class MLMC (object):
         sys.exit()
       else:
         print '  : CONTINUE'
+
+  # save MLMC simulation
+  def save (self):
+    
+    # save status of MLMC simulation
+    self.status.save (self.config)
   
-  # load the results from MC simulations
+  # load MLMC simulation
   def load (self):
+    
+    # load status of MLMC simulation
+    self.status.load (self.config)
+    
+    # recreate MC simulations
+    self.create_MCs (self.config.samples.indices.computed)
+    
+    # if non-interactive session -> wait for jobs to finish
+    if not self.params.interactive:
+      self.join ()
+    
+    # load the results from MC simulations
     for mc in self.mcs:
       mc.load ()
   

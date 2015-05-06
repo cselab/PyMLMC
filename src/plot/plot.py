@@ -395,6 +395,7 @@ def saveall (mlmc, save, qoi=None):
   generateTexTable (mlmc, base_name)
 
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
+  plot_helper_lines (qoi)
   if legend or (qoi != None and '_pos' in qoi):
     pylab.legend (loc = loc)
   if save:
@@ -438,6 +439,9 @@ def filter (vs, width):
 
 # plot a line indicating position
 def plot_helper_lines (qoi):
+  
+  if qoi == None:
+    return
   
   if surface == None:
     print
@@ -609,7 +613,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorig
   print ' done.'
 
 # plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
+def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
   
   # some dynamic values
   if level  == 'finest':   level = mlmc.config.L
@@ -617,6 +621,12 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
+  if trendline == None:
+    if '_pos' in qoi:
+      trendline = 1
+    else:
+      trendline = 0
+
   results = mlmc.config.solver.load ( level, type, sample )
   
   ts = numpy.array ( results.meta ['t'] )
@@ -647,21 +657,25 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   if not frame:
     figure (infolines, subplots=1)
-  
-  if '_pos' in qoi:
-    label = 'distance'
-  elif not frame:
-    label = None
-  elif not label:
-    label = name (qoi)
-  
-  pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
+
+  if label == None:
+    if '_pos' in qoi:
+      label = 'distance'
+    if not frame:
+      label = None
+    elif not label:
+      label = name (qoi)
+
+  if not (trendline and frame):
+    pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
 
   # add trendline (if specified or if dealing with positions)
-  if trendline or '_pos' in qoi:
+  if trendline:
     ls = filter (vs, width=smoothen)
+    if not frame:
+      label = 'trendline'
     if len (ls) == len (ts):
-      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label='trendline')
+      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label=label)
     else:
       print
       print ' :: WARNING: computing trendline failed (NaN\' present?)'
@@ -689,8 +703,6 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
       ylim [1] = extent
     pylab.ylim (ylim)
   
-  plot_helper_lines (qoi)
-
   if infolines:
     plot_infolines (self)
   
@@ -701,7 +713,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=0, smoothen=41, label=None, frame=False, save=None):
+def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
   
   #print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
   print ' :: INFO: Plotting %s...' % qoi,
