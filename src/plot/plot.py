@@ -524,13 +524,10 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       xlim [0] = 0
     pylab.xlim (xlim)
 
-    ylim = list (pylab.ylim())
     if yorigin:
-      ylim = list (pylab.ylim())
-      ylim [0] = 0
+      pylab.gca().set_ylim (bottom=0)
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      ylim [1] = extent
-    pylab.ylim (ylim)
+      pylab.gca().set_ylim (top=extent)
 
 
   pylab.xlabel (xlabel)
@@ -696,13 +693,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
       xlim [0] = 0
     pylab.xlim (xlim)
 
-    ylim = list (pylab.ylim())
     if yorigin:
-      ylim [0] = 0
+      pylab.gca().set_ylim (bottom=0)
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      ylim [1] = extent
-    pylab.ylim (ylim)
-  
+      pylab.gca().set_ylim (top=extent)
+    
   if infolines:
     plot_infolines (self)
   
@@ -765,12 +760,10 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
       xlim [0] = 0
     pylab.xlim (xlim)
 
-    ylim = list (pylab.ylim())
     if yorigin:
-      ylim [0] = 0
+      pylab.gca().set_ylim (bottom=0)
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      ylim [1] = extent
-    pylab.ylim (ylim)
+      pylab.gca().set_ylim (top=extent)
   
   pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
