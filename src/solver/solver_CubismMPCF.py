@@ -79,6 +79,13 @@ class Interpolated_Time_Series (object):
     for key in records.keys():
       records [key] = numpy.delete ( records [key], positions )
     
+    # kinetic energy fix
+    #extent = 20
+    extent = 40
+    records ['ke_avg'] /= float (extent) ** 3
+    #records ['ke_avg'] *= 61
+    records ['ke_avg'] *= 344
+    
     # array of NaN's for filling the gaps
     
     count = len (records.values() [0])
@@ -96,15 +103,15 @@ class Interpolated_Time_Series (object):
     for key in data_keys:
       if key in self.data.keys():
         self.data [key] = numpy.append ( self.data [key], records [key] )
-
+  
     # fill in remaining metadata
     
     for key in self.meta.keys():
       if key not in meta_keys:
         self.meta [key] = numpy.append ( self.meta [key], nan_array )
-
+    
     # fill in remaining data
-
+    
     for key in self.data.keys():
       if key not in data_keys:
         self.data [key] = numpy.append ( self.data [key], nan_array )
@@ -163,7 +170,27 @@ class Interpolated_Time_Series (object):
     for key in self.data.keys():
       if key not in records.keys():
         self.data [key] = numpy.append ( self.data [key], nan_array )
-
+  
+  # filter out duplicate entries (keep the first occurrence only)
+  def unique (self, key):
+    
+    # obtain positions of duplicate entries
+    positions = []
+    values    = []
+    for position, value in enumerate (self.meta ['step']):
+      if value in values:
+        positions .append (position)
+      else:
+        values .append (value)
+    
+    # remove duplicate entries from metadata
+    for key in self.meta.keys():
+      self.meta [key] = numpy.delete ( self.meta [key], positions )
+    
+    # remove duplicate entries from data
+    for key in self.data.keys():
+      self.data [key] = numpy.delete ( self.data [key], positions )
+  
   def sort (self, key):
     
     # obtain sorting order
@@ -176,7 +203,7 @@ class Interpolated_Time_Series (object):
     # sort data
     for key in self.data.keys():
       self.data [key] = self.data [key] [order]
-  
+
   def interpolate (self, points):
     
     from numpy import linspace, interp
@@ -368,6 +395,8 @@ class CubismMPCF (Solver):
     # version 2.0 or 3.0 (self.outputfile or self.outputfile_v2 exist)
     else:
       results .load ( outputfile, meta_keys )
+      # fix for run from MIRA - why this is needed?
+      results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
       
       # append version 2.0 to version 3.0 (self.outputfile_v2 also exists)
       # LEGACY, to be removed
@@ -377,6 +406,9 @@ class CubismMPCF (Solver):
       # append version 1.0 to version 3.0 (self.outputfile_v1 also exists)
       if os.path.exists (outputfile_v1):
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+    
+    # filter out duplicate entries
+    results.unique ('step')
     
     # sort results by time
     results.sort ('step')
