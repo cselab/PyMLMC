@@ -719,7 +719,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   adjust (infolines)
   
   if not frame:
-    draw (mlmc, save, qoi, legend=False, loc='best')
+    draw (mlmc, save, qoi)
 
 # plot the first sample of the finest level and type 0
 # used mainly for deterministic runs
@@ -1006,3 +1006,80 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
   if not frame:
     pylab.label (loc='best')
     draw (mlmc, save, legend=True, loc='best')
+
+# plot hinton diagram
+# source: http://matplotlib.org/examples/specialty_plots/hinton_demo.html
+def plot_hinton (matrix, scale=0.95):
+  
+  ax = pylab.gca ()
+
+  ax.patch.set_facecolor ('gray')
+  ax.set_aspect ('equal', 'box')
+  ax.xaxis.set_major_locator (pylab.NullLocator())
+  ax.yaxis.set_major_locator (pylab.NullLocator())
+  
+  for (x, y), w in numpy.ndenumerate (matrix):
+    color = 'white' if w > 0 else 'black'
+    if x == y:
+      color = 'gray'
+    size = scale * numpy.sqrt (numpy.abs(w))
+    #size = scale * numpy.abs(w)
+    rect = pylab.Rectangle ([x - size / 2, y - size / 2], size, size, facecolor=color, edgecolor=color)
+    ax.add_patch (rect)
+  
+  ax.autoscale_view ()
+  ax.invert_yaxis ()
+
+# plot correlations between different qois
+def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None):
+  
+  if qois == None: qois = [ mlmc.config.solver.qoi ]
+  
+  level  = 'finest'
+  type   = 0
+  sample = 0
+  
+  results = mlmc.config.solver.load ( level, type, sample )
+  
+  data = numpy.zeros ( (len (qois), len (results.meta ['t']) - 1) )
+  for i, qoi in enumerate (qois):
+    # exclude first data point, because some channels needs to
+    data [i, :] = numpy.array ( results.data [qoi] ) [1:]
+  
+  # mask unavailable data
+  data = numpy.ma.masked_array ( data, numpy.isnan (data) )
+  
+  # compute correlation matrix
+  R = numpy.ma.corrcoef (data)
+  
+  pylab.figure ( figsize = (8, 8) )
+  
+  # plot Hinton diagram
+  if hinton:
+    plot_hinton (R)
+    pylab.minorticks_off()
+    pylab.gca().tick_params ( labelleft='on', labelright='off', labelbottom='off',labeltop='on' )
+    pylab.gca().set_xticks ( numpy.arange ( len (qois) ) )
+    pylab.gca().set_yticks ( numpy.arange ( len (qois) ) )
+    pylab.gca().set_xticklabels ( [' ' + qoi for qoi in qois], rotation='vertical')
+    pylab.gca().set_yticklabels ( [qoi + ' ' for qoi in qois] )
+
+  # plot conventional correlation matrix
+  else:
+    pylab.pcolor (R)
+    pylab.axis ('equal')
+    pylab.xlim ( [0, len (qois)] )
+    pylab.ylim ( [0, len (qois)] )
+    pylab.xticks ( 0.5 + numpy.arange ( len (qois) ), qois )
+    pylab.yticks ( 0.5 + numpy.arange ( len (qois) ), qois )
+    pylab.colorbar ()
+  
+  if infolines:
+    plot_infolines (self)
+
+  pylab.subplots_adjust (bottom=0.05)
+  pylab.subplots_adjust (right=0.95)
+  pylab.subplots_adjust (left=0.25)
+  pylab.subplots_adjust (top=0.75)
+
+  draw (mlmc, save)
