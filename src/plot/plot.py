@@ -457,27 +457,14 @@ def plot_helper_lines (qoi, run):
   if qoi == None:
     return
   
-  if surface == None:
-    print
-    print
-    print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
-    print
-    sys.exit()
-  
   if '_pos_d' in qoi:
+    if surface == None:
+      print
+      print
+      print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
+      print
+      sys.exit()
     pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
-  '''
-    ylim = list (pylab.ylim())
-    ylim [1] = max (1.05 * surface, ylim [1])
-    pylab.ylim ( ylim )
-  
-  if '_pos_x' in qoi and extent_x != None:
-    pylab.ylim ( [0, extent_x] )
-  if '_pos_y' in qoi and extent_y != None:
-    pylab.ylim ( [0, extent_y] )
-  if '_pos_z' in qoi and extent_z != None:
-    pylab.ylim ( [0, extent_z] )
-  '''
 
 # adjust axes
 def adjust_axes (qoi, extent, xorigin, yorigin):
@@ -778,22 +765,6 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     pylab.plot  (ts, vs, label=str(sample), linewidth=1)
   
   pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
-
-  '''
-  if extent:
-    pylab.ylim(*extent)
-  
-  else:
-    xlim = list (pylab.xlim())
-    if xorigin:
-      xlim [0] = 0
-    pylab.xlim (xlim)
-
-    if yorigin:
-      pylab.gca().set_ylim (bottom=0)
-    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      pylab.gca().set_ylim (top=extent)
-  '''
   
   pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
