@@ -278,7 +278,7 @@ class MLMC (object):
           else:
             print format % ( args + ( 'completed in ' + runtimestr, ) )
         else:
-          print format % ( args + ( 'runtimes not available', ) )
+          print format % ( args + ( 'runtime not available', ) )
       else:
         self.finished = 0
         if self.config.deterministic:
