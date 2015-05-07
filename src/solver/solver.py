@@ -407,11 +407,11 @@ class Solver (object):
           line = lines [-3]
           time = line.strip().split(' ') [-1]
         else:
-          time = 0
+          time = None
     else:
-      time = 0
+      time = None
     
     try:
       return float (time)
     except:
-      return float (0)
+      return None

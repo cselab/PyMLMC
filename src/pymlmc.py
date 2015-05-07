@@ -269,13 +269,16 @@ class MLMC (object):
       pending = mc.pending()
       if pending == 0:
         runtime    = mc.timer (self.config.scheduler.batch)
-        runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
-        walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
-        if walltime != 'unknown':
-          percent = round ( 100 * (runtime / 3600) / walltime )
-          print format % ( args + ( 'completed in ' + runtimestr + (' [%2d%%]' % percent), ) )
+        if runtime != None:
+          runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+          walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+          if walltime != 'unknown':
+            percent = round ( 100 * (runtime / 3600) / walltime )
+            print format % ( args + ( 'completed in ' + runtimestr + (' [%2d%%]' % percent), ) )
+          else:
+            print format % ( args + ( 'completed in ' + runtimestr, ) )
         else:
-          print format % ( args + ( 'completed in ' + runtimestr, ) )
+          print format % ( args + ( 'runtimes not available', ) )
       else:
         self.finished = 0
         if self.config.deterministic:
