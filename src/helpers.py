@@ -99,4 +99,5 @@ def load (dir):
   execfile ( os.path.join (path, 'script.py'), globals(), list )
   list ['mlmc'] .chroot (dir)
   list ['mlmc'] .load ()
+  print
   return list

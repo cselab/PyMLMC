@@ -80,11 +80,11 @@ class Interpolated_Time_Series (object):
       records [key] = numpy.delete ( records [key], positions )
     
     # kinetic energy fix
-    #extent = 20
-    extent = 40
+    extent = 20
+    #extent = 40
     records ['ke_avg'] /= float (extent) ** 3
-    #records ['ke_avg'] *= 61
-    records ['ke_avg'] *= 344
+    records ['ke_avg'] *= 61
+    #records ['ke_avg'] *= 344
     
     # array of NaN's for filling the gaps
     

@@ -140,7 +140,7 @@ def style (run):
 
 # === alphas (specified by the run)
 
-alphas = [1.0, 0.7, 0.5, 0.3]
+alphas = [1.0, 0.6, 0.3, 0.1]
 
 def alpha (run):
   if (run - 1) < len (alphas):
@@ -405,8 +405,11 @@ def saveall (mlmc, save, qoi=None):
   pylab.savefig    (base_name + '.' + 'pdf')
   generateTexTable (mlmc, base_name)
 
+#def draw (mlmc, save, qoi=None, legend=False, loc='best', extent=None, xorigin=True, yorigin=True):
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
-  plot_helper_lines (qoi)
+  
+  #adjust_axes (qoi, extent, xorigin, yorigin)
+  
   if legend or (qoi != None and '_pos' in qoi):
     pylab.legend (loc = loc)
   if save:
@@ -449,7 +452,7 @@ def filter (vs, width):
   return vs_cnv [width / 2 - 1 : len (vs_cnv) - width / 2]
 
 # plot a line indicating position
-def plot_helper_lines (qoi):
+def plot_helper_lines (qoi, run):
   
   if qoi == None:
     return
@@ -462,7 +465,8 @@ def plot_helper_lines (qoi):
     sys.exit()
   
   if '_pos_d' in qoi:
-    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=0.6, label='cloud surface')
+    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+  '''
     ylim = list (pylab.ylim())
     ylim [1] = max (1.05 * surface, ylim [1])
     pylab.ylim ( ylim )
@@ -473,6 +477,44 @@ def plot_helper_lines (qoi):
     pylab.ylim ( [0, extent_y] )
   if '_pos_z' in qoi and extent_z != None:
     pylab.ylim ( [0, extent_z] )
+  '''
+
+# adjust axes
+def adjust_axes (qoi, extent, xorigin, yorigin):
+  
+  # fit all existing data first
+  pylab.gca().axis ('auto')
+  
+  # if extent is specified, use that
+  if extent:
+    pylab.ylim (*extent)
+  
+  # otherwise perform some automatic axes modifications based on parameters
+  else:
+    
+    if xorigin:
+      pylab.gca().set_xlim (left = 0)
+    
+    if yorigin:
+      pylab.gca().set_ylim (bottom = 0)
+
+    if qoi == None:
+      return
+  
+    # this should be perfomed _only_ if data is too close
+    #pylab.gca().set_ylim (top = 1.05 * pylab.ylim() [1])
+    
+    ylim = pylab.ylim() [1]
+
+    if '_pos_d' in qoi and extent_x != None:
+      pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
+
+    if '_pos_x' in qoi and extent_x != None:
+      pylab.gca().set_ylim (top = max (extent_x, ylim))
+    if '_pos_y' in qoi and extent_y != None:
+      pylab.gca().set_ylim (top = max (extent_y, ylim))
+    if '_pos_z' in qoi and extent_z != None:
+      pylab.gca().set_ylim (top = max (extent_z, ylim))
 
 # plot each stat
 def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
@@ -525,26 +567,12 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2, label=label)
   
-  if extent:
-    pylab.ylim (*extent)
+  adjust_axes (qoi, extent, xorigin, yorigin)
   
-  else:
-
-    xlim = list (pylab.xlim())
-    if xorigin:
-      xlim [0] = 0
-    pylab.xlim (xlim)
-
-    if yorigin:
-      pylab.gca().set_ylim (bottom=0)
-    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      pylab.gca().set_ylim (top=extent)
-
-
   pylab.xlabel (xlabel)
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
-  plot_helper_lines (qoi)
+  plot_helper_lines (qoi, run)
   
   if legend:
     pylab.legend (loc='best')
@@ -694,26 +722,15 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
-  if extent:
-    pylab.ylim(*extent)
-
-  else:
-    
-    xlim = list (pylab.xlim())
-    if xorigin:
-      xlim [0] = 0
-    pylab.xlim (xlim)
-
-    if yorigin:
-      pylab.gca().set_ylim (bottom=0)
-    if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
-      pylab.gca().set_ylim (top=extent)
-    
+  plot_helper_lines (qoi, run)
+  
+  adjust_axes (qoi, extent, xorigin, yorigin)
+  
   if infolines:
     plot_infolines (self)
   
   adjust (infolines)
-
+  
   if not frame:
     draw (mlmc, save, qoi, legend=False, loc='best')
 
@@ -761,7 +778,8 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     pylab.plot  (ts, vs, label=str(sample), linewidth=1)
   
   pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
-  
+
+  '''
   if extent:
     pylab.ylim(*extent)
   
@@ -775,11 +793,14 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
       pylab.gca().set_ylim (bottom=0)
     if '_pos' in qoi and not '_pos_d' in qoi and extent != None:
       pylab.gca().set_ylim (top=extent)
+  '''
   
   pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
   plot_helper_lines (qoi)
+  
+  adjust_axes (qoi, extent, xorigin, yorigin)
   
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
