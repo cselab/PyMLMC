@@ -129,11 +129,22 @@ def color (qoi):
 
 # === styles (specified by the run)
 
-styles = ['-', '--', ':', '-.']
+#styles = ['-', '--', ':', '-.']
+styles = ['-', '-', '-', '-']
 
 def style (run):
   if (run - 1) < len (styles):
     return styles [run-1]
+  else:
+    return '-'
+
+# === alphas (specified by the run)
+
+alphas = [1.0, 0.7, 0.5, 0.3]
+
+def alpha (run):
+  if (run - 1) < len (alphas):
+    return alphas [run-1]
   else:
     return '-'
 
@@ -664,7 +675,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
       label = name (qoi)
 
   if not (trendline and frame):
-    pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), label=label)
+    pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=label)
 
   # add trendline (if specified or if dealing with positions)
   if trendline:
@@ -672,7 +683,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     if not frame:
       label = 'trendline'
     if len (ls) == len (ts):
-      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), label=label)
+      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), alpha=alpha(run), label=label)
     else:
       print
       print ' :: WARNING: computing trendline failed (NaN\' present?)'
