@@ -506,7 +506,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     # general plotting
     else:
-      pylab.plot (ts, vs, color=color, linestyle=style(run), label=name)
+      pylab.plot (ts, vs, color=color, linestyle=style(run), alpha=alpha(run), label=name)
   
   # plot percentiles
   if percentiles != []:
@@ -822,10 +822,11 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   # plot EPSILON
   
   pylab.subplot(121)
-  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyles=style(run), marker='x', label='relative level means')
-  if exact:
-    pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-  pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyles=style(run), alpha=alpha(run), marker='x', label='relative level means')
+  if run == 1:
+    if exact:
+      pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+    pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -835,8 +836,9 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   # plot SIGMA
   
   pylab.subplot(122)
-  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, color=color_params('sigma'), linestyle=style(run), marker='x', label='rel. level standard deviations')
-  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
+  if run == 1:
+    pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -877,7 +879,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   #if warmup:
   #  pylab.semilogy (levels, warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
-  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
+  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   #if optimal:
   #  pylab.semilogy (levels, optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
   pylab.title  ('Estimated number of samples')
@@ -921,8 +923,9 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   # plot relative sampling error
   
-  pylab.semilogy (levels, relative_error, color=color_params('errors'), linestyle=style(run), marker='x', label='relative sampling errors')
-  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
+  pylab.semilogy (levels, relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative sampling errors')
+  if run == 1:
+    pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
@@ -1003,7 +1006,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     label += ' (%d)' % count
     rs *= count ** (1.0 / 3.0)
 
-  pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=0.5, label=label)
+  pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=alpha(run), label=label)
   
   pylab.xlabel ('%s [%s]' % (name('t'),   unit('t')))
   pylab.ylabel ('%s [%s]' % (name('Req'), unit('Req')))
