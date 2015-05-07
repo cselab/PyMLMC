@@ -402,8 +402,12 @@ class Solver (object):
     timerfilepath = os.path.join (directory, self.timerfile % label)
     if os.path.exists (timerfilepath):
       with open ( timerfilepath, 'r' ) as f:
-        line = f.readlines() [-3]
-        time = line.strip().split(' ') [-1]
+        lines = f.readlines()
+        if len (lines) >= 3:
+          line = lines [-3]
+          time = line.strip().split(' ') [-1]
+        else:
+          time = 0
     else:
       time = 0
     
