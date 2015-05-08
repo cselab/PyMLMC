@@ -203,11 +203,11 @@ names ['V2']  = 'gas volume'
 names ['Req'] = 'equivalent radius'
 names ['Vc']  = 'cloud volume'
 
-def name (qoi):
+def name (qoi, short=False):
   
   base_qoi = base (qoi)
   
-  if base_qoi in names.keys():
+  if not short and base_qoi in names.keys():
     name_ = names [base_qoi]
   else:
     name_ = base_qoi
@@ -218,21 +218,24 @@ def name (qoi):
     name_ = 'min ' + name_
   if '_max' in qoi:
     name_ = 'max ' + name_
-  if '_pos_x' in qoi:
-    name_ = 'x-pos. of ' + name_
-  if '_pos_y' in qoi:
-    name_ = 'y-pos. of ' + name_
-  if '_pos_z' in qoi:
-    name_ = 'z-pos. of ' + name_
-  if '_pos_d' in qoi:
-    if not '_pos_d_x' in qoi and not '_pos_d_y' in qoi and not '_pos_d_z' in qoi:
-      name_ = 'dist. of ' + name_
-  if '_pos_d_x' in qoi:
-    name_ = 'x-dist. of ' + name_
-  if '_pos_d_y' in qoi:
-    name_ = 'y-dist. of ' + name_
-  if '_pos_d_z' in qoi:
-    name_ = 'z-dist. of ' + name_
+  if short and '_pos' in qoi:
+    name_ = name_ + ' pos'
+  else:
+    if '_pos_x' in qoi:
+      name_ = 'x-pos. of ' + name_
+    if '_pos_y' in qoi:
+      name_ = 'y-pos. of ' + name_
+    if '_pos_z' in qoi:
+      name_ = 'z-pos. of ' + name_
+    if '_pos_d' in qoi:
+      if not '_pos_d_x' in qoi and not '_pos_d_y' in qoi and not '_pos_d_z' in qoi:
+        name_ = 'dist. of ' + name_
+    if '_pos_d_x' in qoi:
+      name_ = 'x-dist. of ' + name_
+    if '_pos_d_y' in qoi:
+      name_ = 'y-dist. of ' + name_
+    if '_pos_d_z' in qoi:
+      name_ = 'z-dist. of ' + name_
 
   return name_
 
@@ -1061,8 +1064,8 @@ def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None)
     pylab.gca().tick_params ( labelleft='on', labelright='off', labelbottom='off',labeltop='on' )
     pylab.gca().set_xticks ( numpy.arange ( len (qois) ) )
     pylab.gca().set_yticks ( numpy.arange ( len (qois) ) )
-    pylab.gca().set_xticklabels ( [' ' + qoi for qoi in qois], rotation='vertical')
-    pylab.gca().set_yticklabels ( [qoi + ' ' for qoi in qois] )
+    pylab.gca().set_xticklabels ( [' ' + name (qoi, short=True) for qoi in qois], rotation='vertical')
+    pylab.gca().set_yticklabels ( [name (qoi, short=True) + ' ' for qoi in qois] )
 
   # plot conventional correlation matrix
   else:
@@ -1079,7 +1082,7 @@ def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None)
 
   pylab.subplots_adjust (bottom=0.05)
   pylab.subplots_adjust (right=0.95)
-  pylab.subplots_adjust (left=0.25)
-  pylab.subplots_adjust (top=0.75)
-
+  pylab.subplots_adjust (left=0.20)
+  pylab.subplots_adjust (top=0.80)
+  
   draw (mlmc, save)
