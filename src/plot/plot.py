@@ -425,10 +425,10 @@ def show ():
 
 # === domain related constants
 
-extent_x = None
-extent_y = None
-extent_z = None
-surface  = None
+extent_x = 'N/A'
+extent_y = 'N/A'
+extent_z = 'N/A'
+surface  = 'N/A'
 
 def set_extent (e_x, e_y=None, e_z=None):
   global extent_x
@@ -461,13 +461,14 @@ def plot_helper_lines (qoi, run):
     return
   
   if '_pos_d' in qoi:
-    if surface == None:
+    if surface == 'N/A':
       print
       print
       print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
       print
       sys.exit()
-    pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+    if surface != None:
+      pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
 
 # adjust axes
 def adjust_axes (qoi, extent, xorigin, yorigin):
@@ -496,7 +497,7 @@ def adjust_axes (qoi, extent, xorigin, yorigin):
     
     ylim = pylab.ylim() [1]
 
-    if '_pos_d' in qoi and extent_x != None:
+    if '_pos_d' in qoi and surface != None:
       pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
 
     if '_pos_x' in qoi and extent_x != None:

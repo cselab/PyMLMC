@@ -44,6 +44,62 @@ class Interpolated_Time_Series (object):
       del records [key]
     self.data = records
   
+  def append (self, filename, meta_keys):
+    
+    outputfile = open ( filename, 'r' )
+    
+    from numpy import genfromtxt
+    data = genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
+    records = dict ( (key, data [key]) for key in data.dtype.names )
+    
+    outputfile.close()
+    
+    # filter out existing entries
+    
+    positions = []
+    for position, step in enumerate (records ['step']):
+      if step in self.meta ['step']:
+        positions .append (position)
+    for key in records.keys():
+      records [key] = numpy.delete ( records [key], positions )
+    
+    # split metadata from actual data
+    
+    meta = {}
+    for key in meta_keys:
+      meta [key] = records [key]
+      del records [key]
+    
+    # array of NaN's for filling the gaps
+    
+    count = len (records.values()[0])
+    nan_array = numpy.empty ( (count, 1) )
+    nan_array [:] = numpy.NAN
+    
+    # append metadata
+    
+    for key in meta.keys():
+      if key in self.meta.keys():
+        self.meta [key] = numpy.append ( self.meta [key], meta [key] )
+    
+    # append data
+    
+    for key in records.keys():
+      if key in self.data.keys():
+        self.data [key] = numpy.append ( self.data [key], records [key] )
+  
+    # fill in remaining metadata
+    
+    for key in self.meta.keys():
+      if key not in meta.keys():
+        self.meta [key] = numpy.append ( self.meta [key], nan_array )
+
+    # fill in remaining data
+
+    for key in self.data.keys():
+      if key not in records.keys():
+        self.data [key] = numpy.append ( self.data [key], nan_array )
+  
   def load_v1 (self, filename, meta_keys, data_keys, meta_formats, data_formats):
     
     outputfile = open ( filename, 'r' )
@@ -72,6 +128,7 @@ class Interpolated_Time_Series (object):
     outputfile.close()
     
     # filter out existing entries
+    
     positions = []
     for position, step in enumerate (records ['step']):
       if step in self.meta ['step']:
@@ -80,6 +137,7 @@ class Interpolated_Time_Series (object):
       records [key] = numpy.delete ( records [key], positions )
     
     # kinetic energy fix
+    
     extent = 20
     #extent = 40
     records ['ke_avg'] /= float (extent) ** 3
@@ -127,6 +185,7 @@ class Interpolated_Time_Series (object):
     outputfile.close()
     
     # filter out existing entries
+    
     positions = []
     for position, step in enumerate (records ['step']):
       if step in self.meta ['step']:
@@ -279,9 +338,10 @@ class CubismMPCF (Solver):
     self.sharedmem = 1
     
     # set files, default quantity of interest, and indicator
-    self.outputfile    = 'statistics.dat'
-    self.outputfile_v2 = 'statistics_legacy.dat'
-    self.outputfile_v1 = 'integrals.dat'
+    self.outputfile       = 'statistics.dat'
+    self.outputfileformat = 'statistics*.dat'
+    #self.outputfile_v2    = 'statistics_legacy.dat'
+    self.outputfile_v1    = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
   
@@ -311,7 +371,7 @@ class CubismMPCF (Solver):
     if discretization ['NZ'] < self.bs * zpesize:
       print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d < %d.' % ( discretization ['NZ'] / zpesize, self.bs )
       sys.exit()
-  
+    
     # check if number of blocks is not smaller than available threads
     blocks_x = discretization ['NX'] / self.bs
     blocks_y = discretization ['NY'] / self.bs
@@ -362,21 +422,21 @@ class CubismMPCF (Solver):
   
   def load (self, level, type, sample):
     
-    # open self.outputfile and read results
+    # get all available output files for version 2.0
+    from glob import glob
+    outputfileformat = os.path.join ( self.directory (level, type, sample), self.outputfileformat )
+    outputfiles = glob (outputfileformat)
+    v2 = len (outputfiles) != 0
     
-    outputfile    = os.path.join ( self.directory (level, type, sample), self.outputfile    )
+    # check for output file for version 1.0
     outputfile_v1 = os.path.join ( self.directory (level, type, sample), self.outputfile_v1 )
-    outputfile_v2 = os.path.join ( self.directory (level, type, sample), self.outputfile_v2 )
-    if os.path.exists (outputfile):
-      version = 3
-    elif os.path.exists (outputfile_v2):
-      version = 2
-    elif os.path.exists (outputfile_v1):
-      version = 1
-    else:
+    v1 = os.path.exists (outputfile_v1)
+    
+    # check if any output files found
+    if not v2 and not v1:
       print
-      print ' :: ERROR: Output file does not exist (versions 1.0 and 2.0 also absent):'
-      print '  : %s' % outputfile
+      print ' :: ERROR: Output file does not exist (version 1.0 is also absent)'
+      print '  : %s' % outputfileformat
       print
       sys.exit()
     
@@ -388,24 +448,26 @@ class CubismMPCF (Solver):
     data_keys    = ( 'r_avg', 'u_avg', 'v_avg', 'w_avg', 'p_avg', 'V2', 'ke_avg', 'r2_avg', 'M_max', 'p_max', 'Req', 'pw_max', 'kin_ke', 'r_min', 'p_min' )
     data_formats = ( 'f', ) * len (data_keys)
     
-    # version 1.0 (only iself.outputfile_v1 exists)
-    if version == 1:
+    # only version 1.0 available
+    if v1 and not v2:
       results .load_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
-    # version 2.0 or 3.0 (self.outputfile or self.outputfile_v2 exist)
+    # version 2.0
     else:
-      results .load ( outputfile, meta_keys )
-      # fix for run from MIRA - why this is needed?
-      results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
       
-      # append version 2.0 to version 3.0 (self.outputfile_v2 also exists)
-      # LEGACY, to be removed
-      if os.path.exists (outputfile_v2):
-        results .append_v2 ( outputfile_v2, meta_keys )
+      # load first output file
+      results .load ( outputfiles [0], meta_keys )
       
-      # append version 1.0 to version 3.0 (self.outputfile_v1 also exists)
-      if os.path.exists (outputfile_v1):
+      # append remaining output files
+      for outputfile in outputfiles [1:]:
+        results .append ( outputfile, meta_keys )
+      
+      # append version 1.0
+      if v1:
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
+    
+    # fix for run from MIRA - why this is needed?
+    results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
     
     # filter out duplicate entries
     results.unique ('step')
@@ -422,6 +484,6 @@ class CubismMPCF (Solver):
       results .interpolate ( self.points + 1 )
       
       # compute meta parameters for interpolation
-      results.meta ['dt'] = numpy.diff (results.meta['t'])
+      results.meta ['dt'] = numpy.diff (results.meta ['t'])
     
     return results

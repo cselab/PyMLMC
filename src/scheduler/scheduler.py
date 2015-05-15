@@ -96,7 +96,7 @@ class Parallelization (object):
     counts = [1 for dim in range(ndims)]
     dim = 0
     from operator import mul
-    while reduce(mul, counts, 1) != self.ranks:
+    while reduce (mul, counts, 1) != self.ranks:
       counts [ dim % ndims ] *= 2
       dim += 1
     return counts
