@@ -152,25 +152,25 @@ def alpha (run):
 
 units = {}
 
-units ['t']   = r'$ms$'
-units ['pos'] = r'$\mu m$'
+units ['t']   = r'$\mu s$'
+units ['pos'] = r'$mm$'
 
-units ['r']   = r'$kg/m^3$' # check
-units ['r2']  = r'$kg/m^3$' # check
-units ['u']   = r'$\mu m/ms$'
-units ['v']   = r'$\mu m/ms$'
-units ['w']   = r'$\mu m/ms$'
-units ['m']   = r'$\mu m/ms$'
+units ['r']   = r'$kg/m^3$'
+units ['r2']  = r'$kg/m^3$'
+units ['u']   = r'$mm/\mu s$'
+units ['v']   = r'$mm/\mu s$'
+units ['w']   = r'$mm/\mu s$'
+units ['m']   = r'$mm/\mu s$'
 units ['ke']  = r'$J$' # check
-units ['W']   = r'$ms^{-1}$'
+units ['W']   = r'$\mu s^{-1}$'
 units ['e']   = r'$J$' # check
 units ['p']   = r'$bar$'
 units ['pw']  = r'$bar$'
-units ['c']   = r'$\mu m/ms$'
+units ['c']   = r'$mm/\mu s$'
 units ['M']   = r'$-$'
-units ['V2']  = r'$\mu m^3$'
-units ['Req'] = r'$\mu m$'
-units ['Vc']  = r'$\mu m^3$'
+units ['V2']  = r'$mm^3$'
+units ['Req'] = r'$mm$'
+units ['Vc']  = r'$mm^3$'
 
 def unit (qoi):
   if 'pos' in qoi:

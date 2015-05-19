@@ -469,6 +469,15 @@ class CubismMPCF (Solver):
     # fix for run from MIRA - why this is needed?
     results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
     
+    # correct time dimension
+    results .meta ['t'] *= numpy.sqrt(10)
+    base_qois = ['c', 'm', 'u', 'v', 'w', 'W']
+    types = ['_avg', '_min', '_max']
+    for base_qoi in base_qois:
+      for type in types:
+        qoi = base_qoi + type
+        if qoi in results.data: results.data [qoi] /= numpy.sqrt(10)
+    
     # filter out duplicate entries
     results.unique ('step')
     

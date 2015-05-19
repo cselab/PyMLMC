@@ -24,6 +24,7 @@ sys.path.append ( os.path.join (os.path.dirname(__file__), 'solver' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'samples' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'scheduler' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'stats' ) )
+sys.path.append ( os.path.join (os.path.dirname(__file__), 'lib' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'plot' ) )
 
 # === default MLMC configuration
