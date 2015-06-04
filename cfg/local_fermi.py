@@ -58,8 +58,8 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs OMP_PROC_BIND=FALSE \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
+  --envs BGLOCKLESSMPIO_F_TYPE=0x47504653 \
 '''
-
 
 #  --envs PAMID_ASYNC_PROGRESS=1 \
 #  --mapping TABCDE \

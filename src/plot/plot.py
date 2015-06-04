@@ -95,6 +95,7 @@ colors = {}
 colors ['default'] = 'custom_blue'
 colors ['pos'] = 'lightgrey'
 colors ['trendline'] = 'darkorange'
+colors ['t'] = 'grey'
 
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
@@ -121,6 +122,8 @@ colors ['rp_approximated']  = 'black'
 def color (qoi):
   if '_pos' in qoi:
     return colors ['pos']
+  if '_time' in qoi:
+    return colors ['t']
   base_qoi = base (qoi)
   if base_qoi in colors.keys():
     return colors [base_qoi]
@@ -173,8 +176,10 @@ units ['Req'] = r'$mm$'
 units ['Vc']  = r'$mm^3$'
 
 def unit (qoi):
-  if 'pos' in qoi:
+  if '_pos' in qoi:
     return units ['pos']
+  if '_time' in qoi:
+    return units ['t']
   base_qoi = base (qoi)
   if base_qoi in units.keys():
     return units [base_qoi]
@@ -218,6 +223,8 @@ def name (qoi, short=False):
     name_ = 'min ' + name_
   if '_max' in qoi:
     name_ = 'max ' + name_
+  if '_time' in qoi:
+    name_ = 'time of ' + name_
   if short and '_pos' in qoi:
     name_ = name_ + ' pos'
   else:
@@ -413,6 +420,10 @@ def draw (mlmc, save, qoi=None, legend=False, loc='best'):
   
   #adjust_axes (qoi, extent, xorigin, yorigin)
   
+  # reset xend_max
+  global xend_max
+  xend_max = None
+  
   if legend or (qoi != None and '_pos' in qoi):
     pylab.legend (loc = loc)
   if save:
@@ -429,6 +440,7 @@ extent_x = 'N/A'
 extent_y = 'N/A'
 extent_z = 'N/A'
 surface  = 'N/A'
+xend_max = None
 
 def set_extent (e_x, e_y=None, e_z=None):
   global extent_x
@@ -471,24 +483,35 @@ def plot_helper_lines (qoi, run):
       pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
 
 # adjust axes
-def adjust_axes (qoi, extent, xorigin, yorigin):
+def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
   
   # fit all existing data first
   pylab.gca().axis ('auto')
   
+  # adjust x-axis
+  if xorigin:
+    pylab.gca().set_xlim (left = 0)
+  if xend != None:
+    global xend_max
+    if xend_max == None:
+      xend_max = xend
+    else:
+      xend_max = max (xend, xend_max)
+    pylab.gca().set_xlim (right = xend_max)
+
   # if extent is specified, use that
   if extent:
     pylab.ylim (*extent)
-  
+
   # otherwise perform some automatic axes modifications based on parameters
   else:
     
-    if xorigin:
-      pylab.gca().set_xlim (left = 0)
-    
     if yorigin:
       pylab.gca().set_ylim (bottom = 0)
-
+    
+    if yend:
+      pylab.gca().set_ylim (top = yend)
+    
     if qoi == None:
       return
   
@@ -681,6 +704,11 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if '_pos' in qoi or base (qoi) == 'W':
     ts = ts [1:]
     vs = vs [1:]
+
+  # exclude more first data points for positions of densities
+  if '_pos' in qoi and base (qoi) == 'r':
+    ts = ts [3:]
+    vs = vs [3:]
   
   if not frame:
     figure (infolines, subplots=1)
@@ -688,7 +716,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if label == None:
     if '_pos' in qoi:
       label = 'distance'
-    if not frame:
+    elif not frame:
       label = None
     elif not label:
       label = name (qoi)
@@ -715,7 +743,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   plot_helper_lines (qoi, run)
   
-  adjust_axes (qoi, extent, xorigin, yorigin)
+  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
   if infolines:
     plot_infolines (self)
@@ -788,6 +816,53 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   draw (mlmc, save, qoi)
   
   print ' done.'
+
+def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
+  
+  if not qoi: qoi = solver.qoi
+  
+  vs = []
+  for outputfilename in outputfilenames:
+    results = solver.load (file=outputfilename)
+    if '_time' in qoi:
+      vs.append ( results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ] )
+    else:
+      vs.append ( numpy.max ( results.data [qoi] ) )
+
+  if not frame:
+    figure (infolines, subplots=1)
+  
+  if label == None:
+    label = name (qoi)
+  
+  if logx:
+    pylab.semilogx (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
+  else:
+    pylab.plot (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
+  
+  if ref_file:
+    results = solver.load (file=ref_file)
+    if '_time' in qoi:
+      v_ref = results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ]
+    else:
+      v_ref = numpy.max ( results.data [qoi] )
+    pylab.axhline (y=v_ref, xmin=params[0], xmax=params[-1], color=color(qoi), linestyle=style(run), alpha=0.5, label=ref_label)
+  
+  pylab.xlabel ('%s [%s]' % (param_name, param_unit))
+  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+  
+  plot_helper_lines (qoi, run)
+
+  yend = 1.05 * numpy.max (vs)
+  adjust_axes (qoi, extent, xorigin, yorigin, yend=yend)
+  
+  if infolines:
+    plot_infolines (self)
+  
+  adjust (infolines)
+  
+  if not frame:
+    draw (None, save, qoi, legend=True)
 
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save=None):
@@ -943,10 +1018,8 @@ import rp
 
 def rp_approximated (r, p0_l=100, p0_g=0.0234, rho_l=1000):
   tc = 0.914681 * r * numpy.sqrt ( rho_l / (p0_l - p0_g) )
-  rp = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
-  ts = numpy.linspace (0, tc, 10000)
-  rs = rp(ts)
-  return ts, rs
+  rh = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
+  return tc, rh
 
 def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=rp.OptPL2()):
   dr0 = 0
@@ -965,14 +1038,15 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     figure (infolines=False, subplots=1)
   
   if approximation:
-    ts, rs = rp_approximated (r, p0_l, p0_g, rho_l)
+    tc, rh = rp_approximated (r, p0_l, p0_g, rho_l)
+    ts = numpy.linspace (0, tc, 10000)
+    rs = rp(ts)
     label = 'Rayleigh-Plesset (approx.)'
     if color == None:
       color = color_params('rp_approximated')
   else:
     results = mlmc.config.solver.load ( mlmc.config.L, 0, 0 )
-    ts = numpy.array ( results.meta ['t'] )
-    tend = ts [-1]
+    tend = numpy.array ( results.meta ['t'] ) [-1]
     model_class = getattr (rp, model)
     ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
     label = name
@@ -1016,7 +1090,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
 def plot_hinton (matrix, scale=0.95):
   
   ax = pylab.gca ()
-
+  
   ax.patch.set_facecolor ('gray')
   ax.set_aspect ('equal', 'box')
   ax.xaxis.set_major_locator (pylab.NullLocator())

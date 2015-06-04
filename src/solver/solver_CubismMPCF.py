@@ -420,12 +420,15 @@ class CubismMPCF (Solver):
     # execute/submit job
     self.launch (args, parallelization, level, type, sample)
   
-  def load (self, level, type, sample):
+  def load (self, level=0, type=0, sample=0, file=None):
     
     # get all available output files for version 2.0
     from glob import glob
-    outputfileformat = os.path.join ( self.directory (level, type, sample), self.outputfileformat )
-    outputfiles = glob (outputfileformat)
+    if file:
+      outputfiles = [self.root + file]
+    else:
+      outputfileformat = os.path.join ( self.directory (level, type, sample), self.outputfileformat )
+      outputfiles = glob (outputfileformat)
     v2 = len (outputfiles) != 0
     
     # check for output file for version 1.0
