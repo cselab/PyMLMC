@@ -61,7 +61,6 @@ class Estimated (Samples):
     
     for level in self.levels:
      if self.counts_updated [level] > self.counts.computed [level]:
-       #self.counts.additional [level] = numpy.max ( 1, numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.computed [level] ) ) )
        self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.computed [level] ) )
        if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
          self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
