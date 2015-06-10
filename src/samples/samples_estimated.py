@@ -17,7 +17,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
   
-  def __init__ (self, tol=1e-1, warmup=None, warmup_finest_level='last', warmup_factor=1, evaluation_fraction=0.9, min_evaluation_fraction=0.1):
+  def __init__ (self, tol=1e-1, warmup=1, aggresive=0, warmup_finest_level='last', evaluation_fraction=0.9, min_evaluation_fraction=0.1, aggression=0.1):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -28,16 +28,15 @@ class Estimated (Samples):
     print ' :: SAMPLES: estimated'
     
     # default warmup samples
-    if not self.warmup:
-      if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
-      elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
-      self.warmup = numpy.array ( [ self.warmup_factor * ( 2 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
-    
+    if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
+    elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
+    counts = numpy.array ( [ self.startat * ( 2 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
-    self.counts.additional = numpy.array (self.warmup, copy=True)
+    self.counts.additional = numpy.array ( counts, copy=True )
     
     # set simulation type (deterministic or stochastic)
-    self.deterministic = ( self.warmup_factor == 1 and self.L == 0 )
+    self.deterministic = ( self.startat == 1 and self.L == 0 )
   
   def finished (self, errors):
     
@@ -46,7 +45,10 @@ class Estimated (Samples):
   def update (self, errors, indicators):
     
     # compute the required cumulative sampling error
-    self.required_error = self.tol * errors.normalization
+    if self.aggressive:
+      self.required_error = self.tol * errors.normalization * max (0.5, 1.0 - self.aggression)
+    else:
+      self.required_error = self.tol * errors.normalization
     
     # compute optimal number of samples
     # assuming that no samples were computed so far
@@ -56,14 +58,20 @@ class Estimated (Samples):
     # assuming that self.counts.computed samples are already computed on each level
     self.counts_updated = self.optimal ( self.counts.computed, self.required_error, indicators)
     
-    # compute counts_additional from counts_updated, according to (min_)evaluation_fraction
+    # compute additional number of samples from counts_updated
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
-    
     for level in self.levels:
      if self.counts_updated [level] > self.counts.computed [level]:
-       self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.computed [level] ) )
-       if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
+       
+       # assign all required additional number of samples
+       if self.aggresive:
          self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
+       
+       # compute required additional number of samples according to (min_)evaluation_fraction
+       else:
+         self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.computed [level] ) )
+         if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
+           self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
     
     # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
     # this prevents assigning wrong number of samples based on _extrapolated_ indicators

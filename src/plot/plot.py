@@ -733,7 +733,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
       pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), alpha=alpha(run), label=label)
     else:
       print
-      print ' :: WARNING: computing trendline failed (NaN\' present?)'
+      print ' :: WARNING: computing trendline failed (NaN\'s present? Too short?)'
 
   if not mlmc.config.deterministic:
     pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
