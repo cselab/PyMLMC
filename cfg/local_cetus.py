@@ -28,7 +28,7 @@ rack      = 1024 # nodes
 bootup       = 5   # minutes
 min_walltime = 0   # hours
 max_walltime = 1   # hours
-min_cores    = 1 * cores
+min_cores    = 128 * cores
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
