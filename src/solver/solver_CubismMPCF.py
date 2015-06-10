@@ -340,7 +340,6 @@ class CubismMPCF (Solver):
     # set files, default quantity of interest, and indicator
     self.outputfile       = 'statistics.dat'
     self.outputfileformat = 'statistics*.dat'
-    #self.outputfile_v2    = 'statistics_legacy.dat'
     self.outputfile_v1    = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
@@ -363,13 +362,13 @@ class CubismMPCF (Solver):
     
     # check if number of cells in not smaller than block size
     if discretization ['NX'] < self.bs * xpesize:
-      print ' :: ERROR: mesh resolution NX / xpesize is smaller than block size: %d < %d.' % ( discretization ['NX'] / xpesize, self.bs )
+      print ' :: ERROR: mesh resolution NX / xpesize is smaller than block size: %d / %d < %d.' % ( discretization ['NX'], xpesize, self.bs )
       sys.exit()
     if discretization ['NY'] < self.bs * ypesize:
-      print ' :: ERROR: mesh resolution NY / ypesize is smaller than block size: %d < %d.' % ( discretization ['NY'] / ypesize, self.bs )
+      print ' :: ERROR: mesh resolution NY / ypesize is smaller than block size: %d / %d < %d.' % ( discretization ['NY'], ypesize, self.bs )
       sys.exit()
     if discretization ['NZ'] < self.bs * zpesize:
-      print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d < %d.' % ( discretization ['NZ'] / zpesize, self.bs )
+      print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d / %d < %d.' % ( discretization ['NZ'], zpesize, self.bs )
       sys.exit()
     
     # check if number of blocks is not smaller than available threads
