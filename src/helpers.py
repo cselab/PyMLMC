@@ -35,9 +35,13 @@ def parse ():
 def level_type_list (levels):
   return [ [None, None] for level in levels ]
 
-# generates hierarchical grids specifying the coarsest grid and the additional number of levels L
+# generates hierarchical grids by specifying the coarsest grid and the additional number of levels L
 def grids (N0, L=0):
   return [ N0 * (2 ** level) for level in range (L+1) ]
+
+# generates hierarchical sponge widths by specifying the coarsest sponge width, the additional number of levels L and the block size
+def spongewidths (S0, L=0, bs=32):
+  return [ min ( bs, S0 * (2 ** level) ) for level in range (L+1) ]
 
 # generates 1D grids with specified numbers of cells N
 def grids_1d (N):
@@ -58,6 +62,12 @@ def grids_2d_t (N, NS):
 # generates 3D grids with specified numbers of cells N
 def grids_3d (N):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n } for n in N ]
+
+# generates 3D grids with specified numbers of cells N and sponge widths SW
+def grids_3d (N, S):
+  if S = none:
+    S = spongewidths (32, L=len(N)-1)
+  return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'spongewidth' : sw } for n, sw in zip (N, SW) ]
 
 # generates 3D grids with specified numbers of cells N and time steps NS
 def grids_3d_t (N, NS):
