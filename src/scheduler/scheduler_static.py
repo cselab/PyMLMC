@@ -15,7 +15,7 @@ from numpy import round, floor, ceil
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=2 ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=1 ):
     
     self.walltime = walltime
     self.nodes    = nodes
