@@ -67,7 +67,7 @@ def grids_3d (N):
 def grids_3d (N, S = None):
   if S == None:
     S = spongewidths (32, L=len(N)-1)
-  return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'spongewidth' : sw } for n, sw in zip (N, SW) ]
+  return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'spongewidth' : s } for n, s in zip (N, S) ]
 
 # generates 3D grids with specified numbers of cells N and time steps NS
 def grids_3d_t (N, NS):
