@@ -576,7 +576,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
     color  = color_stats ('percentile')
     
-    pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.2, label=label)
+    pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.5, label=label)
   
   adjust_axes (qoi, extent, xorigin, yorigin)
   
