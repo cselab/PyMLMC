@@ -38,7 +38,7 @@ class Errors (object):
     self.indicators.extrapolate ()
     
     # set the normalization
-    self.normalization = self.indicators.mean[0][0]
+    self.normalization = self.indicators.mean [self.L] [0]
     
     # compute relative sampling errors
     self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.computed ) / self.normalization

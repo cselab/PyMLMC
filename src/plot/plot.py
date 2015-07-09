@@ -721,7 +721,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
     pylab.subplot ( 2, levels, level + 1 + levels )
     pylab.title ( 'difference of levels %d and %d' % (level, level - 1) )
-    xorigin = False
+    yorigin = False
     plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
 
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
