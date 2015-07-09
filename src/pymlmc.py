@@ -321,27 +321,23 @@ class MLMC (object):
   # assemble MC and MLMC estimates
   def assemble (self, stats):
     
-    # assemble MC estimates on all levels and types
+    # assemble MC estimates on all levels and types for each statistic
     for mc in self.mcs:
       mc.assemble (stats)
 
-    # assemble MC estimates of differences between type = 0 and type = 1 on all levels
-    self.diffs = [ {} ] * (self.config.L + 1)
+    # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
+    self.diffs = [ { stat.name : self.config.solver.DataClass () for stat in stats } for level in self.config.levels ]
     for name in [stat.name for stat in stats]:
-      self.diffs [ name ] = self.config.solver.DataClass ()
       for mc in self.mcs:
-        if mc.config.type == self.config.FINE:   self.stats [ name ] += mc.stats [ name ]
-        if mc.config.type == self.config.COARSE: self.stats [ name ] -= mc.stats [ name ]
+        if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [ name ]
+        if mc.config.type == self.config.COARSE: self.diffs [mc.config.level] [name] -= mc.stats [ name ]
 
-    # assemble MLMC estimates (sum of differences)
+    # assemble MLMC estimates (sum of differences for each statistic)
     self.stats = {}
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = self.config.solver.DataClass ()
-      for mc in self.mcs:
-        if mc.config.type == self.config.FINE:   self.stats [ name ] += mc.stats [ name ]
-        if mc.config.type == self.config.COARSE: self.stats [ name ] -= mc.stats [ name ]
-    
-    return self.stats
+      for diff in self.diffs:
+        self.stats [ name ] += diff [name]
   
   # report computed statistics (mostly used only for debugging)
   def report (self):
