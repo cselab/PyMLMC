@@ -535,7 +535,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
   
   percentiles = []
 
-  for name, stat in stats.iteritems():
+  for stat_name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta ['t'] )
     vs = numpy.array ( stat.data [qoi] )
@@ -545,21 +545,21 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       ts = ts [1:]
       vs = vs [1:]
     
-    color = color_stats (name)
+    color = color_stats (stat_name)
     
     # stat-specific plotting: std. deviation
-    if name == 'std. deviation' and 'mean' in stats:
+    if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
       color = color_stats ('std. deviation')
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
-    elif 'percentile' in name:
+    elif 'percentile' in stat_name:
       percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : float ( name.split(' ') [0] ) } )
     
     # general plotting
     else:
-      pylab.plot (ts, vs, color=color, linestyle=style(run), alpha=alpha(run), label=name)
+      pylab.plot (ts, vs, color=color, linestyle=style(run), alpha=alpha(run), label=stat_name)
   
   # plot percentiles
   if percentiles != []:
