@@ -80,7 +80,7 @@ colors_params ['sigma']   = 'custom_orange'
 colors_params ['samples'] = 'custom_green'
 colors_params ['warmup']  = 'saddlebrown'
 colors_params ['optimal'] = 'yellowgreen'
-colors_params ['errors']  = 'coral'
+colors_params ['errors']  = 'orangered'
 colors_params ['error']   = 'lightskyblue'
 colors_params ['tol']     = 'darkorchid'
 
@@ -974,7 +974,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
     draw (None, save, qoi, legend=True)
 
 # plot indicators
-def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save=None):
+def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
   
   print ' :: INFO: Plotting indicators...',
   
