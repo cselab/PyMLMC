@@ -1093,8 +1093,8 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     results = mlmc.config.solver.load ( mlmc.config.L, 0, 0 )
     tend = numpy.array ( results.meta ['t'] ) [-1]
     model_class = getattr (rp, model)
-    ts, rs, ps, drs, name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
-    label = name
+    ts, rs, ps, drs, model_name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
+    label = model_name
     if mu:
       label += ' + dissipation'
     if color == None:
