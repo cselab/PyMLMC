@@ -655,7 +655,10 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   for level, diff in enumerate (mlmc.diffs):
 
     pylab.subplot ( 1, levels, level + 1 )
-    pylab.title ( 'level %d' % level )
+    if level == 0:
+      pylab.title ( 'level %d' % level )
+    else:
+      pylab.title ( 'difference of levels %d and %d' % (level, level - 1) )
     plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
 
   '''
@@ -668,7 +671,68 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   pylab.subplots_adjust (top=0.95)
   pylab.subplots_adjust (right=0.97)
   pylab.subplots_adjust (left=0.05)
-  
+
+  if infolines:
+    plot_infolines (self)
+    pylab.subplots_adjust (bottom=0.10)
+  else:
+    pylab.subplots_adjust (bottom=0.05)
+
+  if infolines:
+    plot_infolines (self)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+  print ' done.'
+
+# plot computed MC statistics
+def plot_mc_and_diff (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+  print ' :: INFO: Plotting MC estimates AND differences...',
+
+  if not qoi: qoi = mlmc.config.solver.qoi
+
+  levels = len (mlmc.config.levels)
+
+  if not frame:
+    if infolines:
+      pylab.figure (figsize=(levels*6, 4+5))
+    else:
+      pylab.figure (figsize=(levels*6, 2*4))
+
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+  # MC estimates for each level (only type = 0)
+  for mc in mlmc.mcs:
+
+    if mc.config.type != 0:
+      continue
+
+    pylab.subplot ( 2, levels, mc.config.level + 1 )
+    pylab.title ( 'level %d' % mc.config.level )
+    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+
+  # differences of MC estimates
+  for level, diff in enumerate (mlmc.diffs):
+
+    if level == 0:
+      continue
+
+    pylab.subplot ( 2, levels, level + 1 + levels )
+    pylab.title ( 'difference of levels %d and %d' % (level, level - 1) )
+    xorigin = False
+    plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
+
+  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+  pylab.subplot (2, levels, 1 + levels)
+  pylab.legend (handles, labels, loc='center')
+  pylab.axis('off')
+
+  pylab.subplots_adjust (top=0.95)
+  pylab.subplots_adjust (right=0.97)
+  pylab.subplots_adjust (left=0.05)
+
   if infolines:
     plot_infolines (self)
     pylab.subplots_adjust (bottom=0.10)
