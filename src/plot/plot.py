@@ -939,8 +939,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
   for level in mlmc.config.levels:
 
-    pylab.subplot ( 1, levels, mc.config.level + 1 )
-    pylab.title ( 'samples of level %d' % mc.config.level )
+    pylab.subplot ( 1, levels, level + 1 )
+    pylab.title ( 'samples of level %d' % level )
 
     for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
