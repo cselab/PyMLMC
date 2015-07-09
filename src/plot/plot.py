@@ -80,7 +80,7 @@ colors_params ['sigma']   = 'custom_orange'
 colors_params ['samples'] = 'custom_green'
 colors_params ['warmup']  = 'saddlebrown'
 colors_params ['optimal'] = 'yellowgreen'
-colors_params ['errors']  = 'orangered'
+colors_params ['errors']  = 'coral'
 colors_params ['error']   = 'lightskyblue'
 colors_params ['tol']     = 'darkorchid'
 
@@ -1093,8 +1093,6 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
   qoi              = mlmc.config.solver.qoi
-  
-  run = (run-1) % len (styles)
   
   # === plot
   
