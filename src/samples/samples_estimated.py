@@ -64,7 +64,7 @@ class Estimated (Samples):
      if self.counts_updated [level] > self.counts.computed [level]:
        
        # assign all required additional number of samples
-       if self.aggresive:
+       if self.aggressive:
          self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
        
        # compute required additional number of samples according to (min_)evaluation_fraction
