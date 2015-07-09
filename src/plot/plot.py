@@ -878,7 +878,7 @@ def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=Tr
   print ' done.'
 
 # plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, save=None):
+def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=128, save=None):
   
   print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
   
@@ -891,7 +891,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   if not frame:
     figure (infolines, subplots=1)
   
-  for sample in range(mlmc.config.samples.counts.computed[level]):
+  for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
     
     results = mlmc.config.solver.load ( level, type, sample )
     
@@ -927,7 +927,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   print ' done.'
 
 # plot results of all samples (ensemble) of all levels
-def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, save=None):
+def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=128, save=None):
 
   print ' :: INFO: Plotting ensembles for all levels...'
 
@@ -944,7 +944,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     pylab.subplot ( 1, levels, mc.config.level + 1 )
     pylab.title ( 'samples of level %d' % mc.config.level )
 
-    for sample in range (mlmc.config.samples.counts.computed[level]):
+    for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
       results = mlmc.config.solver.load ( level, type, sample )
 
