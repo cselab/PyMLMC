@@ -658,7 +658,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
     if level == 0:
       pylab.title ( 'level %d' % level )
     else:
-      pylab.title ( 'difference of levels %d and %d' % (level, level - 1) )
+      pylab.title ( 'level %d - level %d' % (level, level - 1) )
     plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
 
   '''
@@ -720,7 +720,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
       continue
 
     pylab.subplot ( 2, levels, level + 1 + levels )
-    pylab.title ( 'difference of levels %d and %d' % (level, level - 1) )
+    pylab.title ( 'level %d - level %d' % (level, level - 1) )
     yorigin = False
     plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
 
@@ -924,6 +924,57 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   draw (mlmc, save, qoi)
   
+  print ' done.'
+
+# plot results of all samples (ensemble) of all levels
+def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, save=None):
+
+  print ' :: INFO: Plotting ensembles for all levels...'
+
+  if not qoi: qoi = mlmc.config.solver.qoi
+
+  levels = len (mlmc.config.levels)
+  type   = 0
+
+  if not frame:
+    figure (infolines, subplots=levels)
+
+  for level in mlmc.config.levels:
+
+    pylab.subplot ( 1, levels, mc.config.level + 1 )
+    pylab.title ( 'samples of level %d' % mc.config.level )
+
+    for sample in range (mlmc.config.samples.counts.computed[level]):
+
+      results = mlmc.config.solver.load ( level, type, sample )
+
+      ts = numpy.array ( results.meta ['t'] )
+      vs = numpy.array ( results.data [qoi]  )
+
+      # exclude first data point, if we are dealing with positions
+      if '_pos' in qoi:
+        ts = ts [1:]
+        vs = vs [1:]
+
+      pylab.plot  (ts, vs, label=str(sample), linewidth=1)
+
+    pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
+    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+
+    plot_helper_lines (qoi)
+
+    adjust_axes (qoi, extent, xorigin, yorigin)
+
+    if mlmc.config.samples.counts.computed[level] <= legend:
+      pylab.legend (loc='best')
+
+  if infolines:
+    plot_infolines (self)
+
+  adjust (infolines)
+
+  draw (mlmc, save, qoi)
+
   print ' done.'
 
 def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
