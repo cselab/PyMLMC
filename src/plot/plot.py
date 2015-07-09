@@ -595,7 +595,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  levels = (len(mlmc.mcs) + 1) / 2
+  levels = len (mlmc.config.levels)
   
   if not frame:
     if infolines:
@@ -630,6 +630,54 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   if infolines:
     plot_infolines (self)
   
+  if not frame:
+    draw (mlmc, save, qoi)
+
+  print ' done.'
+
+# plot computed differences of MC statistics
+def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+  print ' :: INFO: Plotting differences of MC estimates...',
+
+  if not qoi: qoi = mlmc.config.solver.qoi
+
+  levels = len (mlmc.config.levels)
+
+  if not frame:
+    if infolines:
+      pylab.figure (figsize=(levels*6, 5))
+    else:
+      pylab.figure (figsize=(levels*6, 4))
+
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+  for level, diff in enumerate (mlmc.diffs):
+
+    pylab.subplot ( 1, levels, level + 1 )
+    pylab.title ( 'level %d' % level )
+    plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
+
+  '''
+  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+  pylab.subplot (2, levels, 1 + levels)
+  pylab.legend (handles, labels, loc='center')
+  pylab.axis('off')
+  '''
+
+  pylab.subplots_adjust (top=0.95)
+  pylab.subplots_adjust (right=0.97)
+  pylab.subplots_adjust (left=0.05)
+
+  if infolines:
+    plot_infolines (self)
+    pylab.subplots_adjust (bottom=0.10)
+  else:
+    pylab.subplots_adjust (bottom=0.05)
+
+  if infolines:
+    plot_infolines (self)
+
   if not frame:
     draw (mlmc, save, qoi)
 
