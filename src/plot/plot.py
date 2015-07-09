@@ -588,7 +588,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
   if legend:
     pylab.legend (loc='best')
 
-# plot computed MC statistics
+# plot computed MC estimators of statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MC estimates...',
@@ -635,7 +635,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 
   print ' done.'
 
-# plot computed differences of MC statistics
+# plot computed differences of MC estimators
 def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
 
   print ' :: INFO: Plotting differences of MC estimates...',
@@ -686,8 +686,8 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   print ' done.'
 
-# plot computed MC statistics
-def plot_mc_and_diff (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+# plot computed MC estimators and their differences
+def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
   print ' :: INFO: Plotting MC estimates AND differences...',
 
