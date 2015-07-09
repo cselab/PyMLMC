@@ -30,7 +30,7 @@ class Estimated (Samples):
     # default warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
-    counts = numpy.array ( [ self.warmup * ( 2 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+    counts = numpy.array ( [ self.warmup * ( 4 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
 
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
