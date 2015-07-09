@@ -938,7 +938,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, save
   # plot EPSILON
   
   pylab.subplot(121)
-  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyles=style(run), alpha=alpha(run), marker='x', label='relative level means')
+  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
   if run == 1:
     if exact:
       pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
