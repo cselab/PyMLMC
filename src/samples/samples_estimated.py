@@ -17,7 +17,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated (Samples):
   
-  def __init__ (self, tol=1e-1, warmup=1, aggresive=0, warmup_finest_level='last', evaluation_fraction=0.9, min_evaluation_fraction=0.1, aggression=0.1):
+  def __init__ (self, tol=1e-1, warmup=1, aggressive=0, warmup_finest_level='last', evaluation_fraction=0.9, min_evaluation_fraction=0.1, aggression=0.1):
     
     # save configuration
     vars (self) .update ( locals() )
