@@ -555,7 +555,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     # collect percentiles for later fill
     elif 'percentile' in stat_name:
-      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : float ( name.split(' ') [0] ) } )
+      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : float ( stat_name.split(' ') [0] ) } )
     
     # general plotting
     else:
