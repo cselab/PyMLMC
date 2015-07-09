@@ -467,7 +467,7 @@ def filter (vs, width):
   return vs_cnv [width / 2 - 1 : len (vs_cnv) - width / 2]
 
 # plot a line indicating position
-def plot_helper_lines (qoi, run):
+def plot_helper_lines (qoi, run=1):
   
   if qoi == None:
     return
