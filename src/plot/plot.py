@@ -636,7 +636,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   print ' done.'
 
 # plot computed differences of MC statistics
-def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
 
   print ' :: INFO: Plotting differences of MC estimates...',
 
@@ -668,7 +668,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   pylab.subplots_adjust (top=0.95)
   pylab.subplots_adjust (right=0.97)
   pylab.subplots_adjust (left=0.05)
-
+  
   if infolines:
     plot_infolines (self)
     pylab.subplots_adjust (bottom=0.10)
