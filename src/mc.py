@@ -115,7 +115,7 @@ class MC (object):
     
     config = self.config
     runtimes = [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ]
-    return min ( runtimes ), max ( runtimes )
+    return max ( runtimes )
   
   # load the results
   def load (self):

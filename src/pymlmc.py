@@ -267,7 +267,7 @@ class MLMC (object):
         args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
       pending = mc.pending()
       if pending == 0:
-        min_runtime, runtime = mc.timer (self.config.scheduler.batch)
+        runtime = mc.timer (self.config.scheduler.batch)
         if runtime != None:
           runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
           walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
