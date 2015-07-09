@@ -59,9 +59,6 @@ class MLMC (object):
     # errors
     self.errors = Errors (self.config.levels)
     
-    # MLMC results
-    self.stats = {}
-    
     # submission file name
     self.submission_file = 'queue.dat'
   
@@ -324,11 +321,20 @@ class MLMC (object):
   # assemble MC and MLMC estimates
   def assemble (self, stats):
     
-    # assemble MC estimates
+    # assemble MC estimates on all levels and types
     for mc in self.mcs:
       mc.assemble (stats)
-    
-    # assemble MLMC estimates
+
+    # assemble MC estimates of differences between type = 0 and type = 1 on all levels
+    self.diffs = [ {} ] * (self.config.L + 1)
+    for name in [stat.name for stat in stats]:
+      self.diffs [ name ] = self.config.solver.DataClass ()
+      for mc in self.mcs:
+        if mc.config.type == self.config.FINE:   self.stats [ name ] += mc.stats [ name ]
+        if mc.config.type == self.config.COARSE: self.stats [ name ] -= mc.stats [ name ]
+
+    # assemble MLMC estimates (sum of differences)
+    self.stats = {}
     for name in [stat.name for stat in stats]:
       self.stats [ name ] = self.config.solver.DataClass ()
       for mc in self.mcs:

@@ -534,8 +534,7 @@ def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
 def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
   
   percentiles = []
-  import re
-  
+
   for name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta ['t'] )
@@ -551,14 +550,12 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # stat-specific plotting: std. deviation
     if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      #pylab.plot (ts, ms + vs, color=color, linestyle=style(run), label='mean +/- std. dev.')
-      #pylab.plot (ts, ms - vs, color=color, linestyle=style(run))
       color = color_stats ('std. deviation')
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.2, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
     elif 'percentile' in name:
-      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : re.findall (name) [0] } )
+      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : stat.params } )
     
     # general plotting
     else:
