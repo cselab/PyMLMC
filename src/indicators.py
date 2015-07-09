@@ -87,7 +87,7 @@ class Indicators (object):
     print
     
     # report mean_diff
-    print '    -> EPSILON_DIFF:',
+    print '    -> EPSILON DIFF:',
     for level in self.levels:
       print '%.1e' % self.mean_diff [level],
     print
@@ -106,7 +106,7 @@ class Indicators (object):
     print
 
     # report variance_diff
-    print '    -> SIGMA_DIFF:  ',
+    print '    -> SIGMA   DIFF:',
     for level in self.levels:
       print '%.1e' % self.variance_diff [level] if not isnan ( self.variance_diff [level] ) else '    N/A',
     print
