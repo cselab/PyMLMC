@@ -888,8 +888,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
-  if not frame:
-    figure (infolines, subplots=1)
+  figure (infolines, subplots=1)
   
   for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
     
@@ -936,8 +935,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
   levels = len (mlmc.config.levels)
   type   = 0
 
-  if not frame:
-    figure (infolines, subplots=levels)
+  figure (infolines, subplots=levels)
 
   for level in mlmc.config.levels:
 
