@@ -687,8 +687,9 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   extent_range = extent [1] - extent [0]
   extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
 
-  for level, diff in enumerate (mlmc.diffs [1:]):
+  for level, diff in enumerate (mlmc.diffs):
 
+    if level == 0: continue
     pylab.subplot ( 1, mlmc.config.L, level)
     pylab.title ( 'level %d - level %d' % (level, level - 1) )
     plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
