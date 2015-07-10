@@ -970,7 +970,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
 # plot results of all samples (ensemble) of all levels
 def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, save=None):
 
-  print ' :: INFO: Plotting ensembles for all levels...'
+  print ' :: INFO: Plotting ensembles for all levels...',
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
