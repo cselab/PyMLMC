@@ -555,6 +555,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     # collect percentiles for later fill
     elif 'percentile' in stat_name:
+      print stat_name.split(' '), stat_name.split(' ') [0], float ( stat_name.split(' ') [0] )
       percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : float ( stat_name.split(' ') [0] ) } )
     
     # general plotting
@@ -574,6 +575,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     upper  = percentiles [1] ['vs']
     ts     = percentiles [0] ['ts']
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
+    label  = 'confidence interval'
     color  = color_stats ('percentile')
     
     pylab.fill_between (ts, lower, upper, facecolor=color, edgecolor=color, alpha=0.5, label=label)
