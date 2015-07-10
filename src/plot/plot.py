@@ -273,7 +273,8 @@ def figure (infolines=False, subplots=1):
 
 # adjust subplot margins
 def adjust (infolines, subplots=1):
-  
+
+  '''
   pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
   
@@ -286,6 +287,8 @@ def adjust (infolines, subplots=1):
     pylab.subplots_adjust(bottom=0.28)
   else:
     pylab.subplots_adjust(bottom=0.15)
+  '''
+  return 0
 
 # compute parameters needed for the generation of the TexTable
 def getTexTableConfig (mlmc):
