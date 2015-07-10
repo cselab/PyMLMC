@@ -614,7 +614,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines, subplots='table')
+  adjust (infolines, subplots=levels)
 
   if not frame:
     draw (mlmc, save, qoi)
@@ -665,7 +665,7 @@ def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yo
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines, subplots='table')
+  adjust (infolines)
 
   if not frame:
     draw (mlmc, save, qoi)
@@ -782,7 +782,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines, subplots='table')
+  adjust (infolines)
 
   if not frame:
     draw (mlmc, save, qoi)
