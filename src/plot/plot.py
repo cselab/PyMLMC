@@ -578,7 +578,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     pylab.fill_between (ts, lower, upper, facecolor=color, alpha=0.5, label=label)
   
-  adjust_axes (qoi, extent, xorigin, yorigin)
+  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
   pylab.xlabel (xlabel)
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
@@ -616,20 +616,24 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   pylab.subplot (2, levels, 1 + levels)
   pylab.legend (handles, labels, loc='center')
   pylab.axis('off')
-  
+
+  '''
   pylab.subplots_adjust (top=0.95)
   pylab.subplots_adjust (right=0.97)
   pylab.subplots_adjust (left=0.05)
-  
+
   if infolines:
-    plot_infolines (self)
-    pylab.subplots_adjust (bottom=0.10)
+  plot_infolines (self)
+  pylab.subplots_adjust (bottom=0.10)
   else:
-    pylab.subplots_adjust (bottom=0.05)
-  
+  pylab.subplots_adjust (bottom=0.05)
+  '''
+
   if infolines:
     plot_infolines (self)
-  
+
+  adjust (infolines, subplots='table')
+
   if not frame:
     draw (mlmc, save, qoi)
 
@@ -668,6 +672,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   pylab.axis('off')
   '''
 
+  '''
   pylab.subplots_adjust (top=0.95)
   pylab.subplots_adjust (right=0.97)
   pylab.subplots_adjust (left=0.05)
@@ -677,9 +682,12 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
     pylab.subplots_adjust (bottom=0.10)
   else:
     pylab.subplots_adjust (bottom=0.05)
+  '''
 
   if infolines:
     plot_infolines (self)
+
+  adjust (infolines, subplots='table')
 
   if not frame:
     draw (mlmc, save, qoi)
@@ -729,6 +737,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
   pylab.legend (handles, labels, loc='center')
   pylab.axis('off')
 
+  '''
   pylab.subplots_adjust (top=0.95)
   pylab.subplots_adjust (right=0.97)
   pylab.subplots_adjust (left=0.05)
@@ -738,9 +747,12 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
     pylab.subplots_adjust (bottom=0.10)
   else:
     pylab.subplots_adjust (bottom=0.05)
+  '''
 
   if infolines:
     plot_infolines (self)
+
+  adjust (infolines, subplots='table')
 
   if not frame:
     draw (mlmc, save, qoi)
@@ -866,7 +878,6 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 # used mainly for deterministic runs
 def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
   
-  #print ' :: INFO: Plotting the first sample of the finest level of %s...' % qoi,
   print ' :: INFO: Plotting %s...' % qoi,
   
   level  = 'finest'
@@ -969,7 +980,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines)
+  adjust (infolines, subplots='table')
 
   draw (mlmc, save, qoi)
 
