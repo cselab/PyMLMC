@@ -231,7 +231,7 @@ class MLMC (object):
 
     header = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE '
     if local.cluster:
-      header += '  |  WALLTIME  | COMMENTS'
+      header += '  |  WALLTIME  |  COMMENTS'
     print header
 
     # run MC simulations
