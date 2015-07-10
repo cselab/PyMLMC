@@ -656,14 +656,18 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   xlabel = '%s [%s]' % (name('t'), unit('t'))
 
+  extent_range = extent [1] - extent [0]
+  extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+
   for level, diff in enumerate (mlmc.diffs):
 
     pylab.subplot ( 1, levels, level + 1 )
     if level == 0:
       pylab.title ( 'level %d' % level )
+      plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
     else:
       pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
+      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
 
   '''
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
@@ -721,6 +725,9 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
     pylab.title ( 'level %d' % mc.config.level )
     plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
 
+  extent_range = extent [1] - extent [0]
+  extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+
   # differences of MC estimates
   for level, diff in enumerate (mlmc.diffs):
 
@@ -729,8 +736,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
     pylab.subplot ( 2, levels, level + 1 + levels )
     pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    yorigin = False
-    plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
+    plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
 
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -937,7 +943,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   print ' done.'
 
 # plot results of all samples (ensemble) of all levels
-def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=128, save=None):
+def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=0, limit=1024, save=None):
 
   print ' :: INFO: Plotting ensembles for all levels...'
 
