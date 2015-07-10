@@ -229,10 +229,13 @@ class MLMC (object):
     for mc in self.mcs:
       mc.validate ()
 
-    header = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE '
+    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE   '
+    separator = '  :---------|----------|--------------|-----------|--------------'
     if local.cluster:
-      header += '  |  WALLTIME  |  COMMENTS'
+      header    += '|  WALLTIME  |  COMMENTS  '
+      separator += '|------------|------------'
     print header
+    print separator
 
     # run MC simulations
     for mc in self.mcs:
@@ -242,6 +245,7 @@ class MLMC (object):
     if not self.config.deterministic:
       f = open (self.submission_file, 'wa')
       f.write (header + '\n')
+      f.write (separator + '\n')
       for mc in self.mcs:
         f.write (mc.info() + '\n')
       f.write ('\n')
