@@ -946,14 +946,13 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   print ' done.'
 
 # plot results of all samples (ensemble) of all levels
-def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=0, limit=1024, save=None):
+def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, save=None):
 
   print ' :: INFO: Plotting ensembles for all levels...'
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
   levels = len (mlmc.config.levels)
-  type   = 0
 
   figure (infolines, subplots=levels)
 
@@ -962,19 +961,26 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     pylab.subplot ( 1, levels, level + 1 )
     pylab.title ( 'samples of level %d' % level )
 
+    types = [mlmc.config.FINE, mlmc.config.COARSE] if level > 0 else [mlmc.config.FINE]
+
     for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
-      results = mlmc.config.solver.load ( level, type, sample )
+      for type in types:
 
-      ts = numpy.array ( results.meta ['t'] )
-      vs = numpy.array ( results.data [qoi]  )
+        results = mlmc.config.solver.load ( level, type, sample )
 
-      # exclude first data point, if we are dealing with positions
-      if '_pos' in qoi:
-        ts = ts [1:]
-        vs = vs [1:]
+        ts = numpy.array ( results.meta ['t'] )
+        vs = numpy.array ( results.data [qoi]  )
 
-      pylab.plot  (ts, vs, label=str(sample), linewidth=1)
+        # exclude first data point, if we are dealing with positions
+        if '_pos' in qoi:
+          ts = ts [1:]
+          vs = vs [1:]
+
+        if type == mlmc.config.FINE:
+          line = pylab.plot  (ts, vs, linewidth=1 )
+        else:
+          pylab.plot  (ts, vs, linewidth=1, alpha=0.6, color=line.get_color() )
 
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
@@ -983,13 +989,12 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     adjust_axes (qoi, extent, xorigin, yorigin)
 
-    if mlmc.config.samples.counts.computed[level] <= legend:
-      pylab.legend (loc='best')
+    pylab.legend (loc='best')
 
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines, subplots='table')
+  adjust (infolines, subplots=levels)
 
   draw (mlmc, save, qoi)
 
