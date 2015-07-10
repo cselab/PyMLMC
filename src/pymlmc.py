@@ -315,8 +315,11 @@ class MLMC (object):
       self.join ()
     
     # load the results from MC simulations
+    print
+    print ' :: LOADING RESULTS...'
     for mc in self.mcs:
       mc.load ()
+    print '  : DONE'
   
   # assemble MC and MLMC estimates
   def assemble (self, stats):

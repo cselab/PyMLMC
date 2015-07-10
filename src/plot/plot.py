@@ -919,7 +919,7 @@ def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=Tr
   print ' done.'
 
 # plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=128, save=None):
+def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=1024, save=None):
   
   print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
   
