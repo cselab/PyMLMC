@@ -230,7 +230,7 @@ class MLMC (object):
       mc.validate ()
 
     header = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE '
-    if self.parallelization.walltime and local.cluster:
+    if local.cluster:
       header += '  |  WALLTIME  | COMMENTS'
     print header
 
