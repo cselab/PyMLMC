@@ -66,9 +66,9 @@ class MC (object):
     resolution = resolution.rjust ( len ('RESOLUTION') )
 
     if self.parallelization.cores % local.cores == 0:
-      args = ( config.level, typestr, intf(len(config.samples)), resolution, intf(self.parallelization.cores/local.cores), 'nodes' )
+      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
     else:
-      args = ( config.level, typestr, intf(len(config.samples)), resolution, intf(self.parallelization.cores), 'cores' )
+      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
     
     if self.parallelization.walltime and local.cluster:
       scope = self.parallelization.scope
