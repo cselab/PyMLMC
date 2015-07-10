@@ -59,7 +59,7 @@ class Example_Solver (Solver):
     # self.sharedmem = 1
 
   # return string representing the resolution of a give discretization 'd'
-  def resolution_string (d):
+  def resolution_string (self, d):
     from helpers import intf
     if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:
       return inft (d['NX']) + '^3'
