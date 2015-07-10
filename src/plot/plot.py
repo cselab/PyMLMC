@@ -611,19 +611,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
     pylab.title ( 'level %d' % mc.config.level )
     plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
-  '''
-  pylab.subplots_adjust (top=0.95)
-  pylab.subplots_adjust (right=0.97)
-  pylab.subplots_adjust (left=0.05)
-
   if infolines:
-  plot_infolines (self)
-  pylab.subplots_adjust (bottom=0.10)
-  else:
-  pylab.subplots_adjust (bottom=0.05)
-  '''
-
-    if infolines:
     plot_infolines (self)
 
   adjust (infolines, subplots='table')
@@ -631,7 +619,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
   if not frame:
     draw (mlmc, save, qoi)
 
-print ' done.'
+  print ' done.'
 
 # plot computed MC estimators of statistics for both types
 def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
