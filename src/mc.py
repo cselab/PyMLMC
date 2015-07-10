@@ -64,7 +64,7 @@ class MC (object):
 
     resolution = config.solver.resolution_string (config.discretization)
     resolution += ' ' * max ( 0, len ('RESOLUTION') - len (resolution) )
-    resolution = resolution.justr()
+    resolution = resolution.rjust()
 
     if self.parallelization.cores % local.cores == 0:
       args = ( config.level, typestr, intf(len(config.samples)), resolution, intf(self.parallelization.cores/local.cores), 'nodes' )
