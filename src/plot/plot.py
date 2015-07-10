@@ -281,10 +281,10 @@ def adjust (infolines, subplots=1):
   else:
     pylab.subplots_adjust (bottom=0.15)
 
-  left = max (0.05, 0.16/subplots)
+  left = max (0.03, 0.16/subplots)
   pylab.subplots_adjust (left=left)
 
-  right = 0.95
+  right = min ( 0.98, 0.94 + 0.01 * subplots)
   pylab.subplots_adjust (right=right)
 
 # compute parameters needed for the generation of the TexTable
