@@ -22,12 +22,6 @@ class Parallelization (object):
     vars (self) .update ( locals() )
     self.batchsize = None
     
-    # set scope (for batch)
-    if batch:
-      self.scope = 'batch'
-    else:
-      self.scope = 'single'
-    
     # convert walltime to hours and minutes
     self.set_walltime (walltime)
     
