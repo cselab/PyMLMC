@@ -77,11 +77,6 @@ class MC (object):
           if len(config.samples) > self.parallelization.batchmax:
             scope += ' of %d' % self.parallelization.batchmax
       args += ( self.parallelization.hours, self.parallelization.minutes, scope )
-    '''
-      return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
-    else:
-      return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s' % args
-    '''
       return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s  |   %2dh %2dm  |  %s' % args
     else:
       return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s' % args
