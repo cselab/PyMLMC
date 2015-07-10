@@ -60,12 +60,16 @@ class MC (object):
     
     config = self.config
     
-    typestr = ['  FINE', 'COARSE'] [config.type]
-    
+    typestr = [' FINE ', 'COARSE'] [config.type]
+
+    resolution = config.solver.resolution_string (config.discretization)
+    resolution += ' ' * max ( 0, len ('RESOLUTION') - len (resolution) )
+    resolution = resolution.justr()
+
     if self.parallelization.cores % local.cores == 0:
-      args = ( config.level, typestr, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
+      args = ( config.level, typestr, intf(len(config.samples)), resolution, intf(self.parallelization.cores/local.cores), 'nodes' )
     else:
-      args = ( config.level, typestr, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
+      args = ( config.level, typestr, intf(len(config.samples)), resolution, intf(self.parallelization.cores), 'cores' )
     
     if self.parallelization.walltime and local.cluster:
       scope = self.parallelization.scope
@@ -73,10 +77,16 @@ class MC (object):
           if len(config.samples) > self.parallelization.batchmax:
             scope += ' of %d' % self.parallelization.batchmax
       args += ( self.parallelization.hours, self.parallelization.minutes, scope )
+    '''
       return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s  |  %2dh %2dm  |  %s' % args
     else:
       return '  :  level %2d  |  %s  |  %s sample(s)  |  %s %s' % args
-  
+    '''
+      return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s  |   %2dh %2dm  |  %s' % args
+    else:
+      return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s' % args
+
+
   # launch all samples
   def run (self):
     

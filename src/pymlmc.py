@@ -228,7 +228,14 @@ class MLMC (object):
     # validate MC simulations
     for mc in self.mcs:
       mc.validate ()
-    
+
+      level  0  |    FINE  |  256  sample(s)  |    2  nodes  |   8h  0m  |  per batch of 8
+    header = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE '
+
+    if self.parallelization.walltime and local.cluster:
+      header += '  |  WALLTIME  | COMMENTS'
+    print header
+
     # run MC simulations
     for mc in self.mcs:
       mc.run ()
@@ -236,8 +243,9 @@ class MLMC (object):
     # generate submission file
     if not self.config.deterministic:
       f = open (self.submission_file, 'wa')
+      f.write (header + '\n')
       for mc in self.mcs:
-        f.write (mc.info()+'\n')
+        f.write (mc.info() + '\n')
       f.write ('\n')
       f.close()
   

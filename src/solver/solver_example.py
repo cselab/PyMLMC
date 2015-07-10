@@ -57,7 +57,15 @@ class Example_Solver (Solver):
     
     # enable shared memory (i.e. 1 MPI-rank per node)
     # self.sharedmem = 1
-  
+
+  # return string representing the resolution of a give discretization 'd'
+  def resolution_string (d):
+    from helpers import intf
+    if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:
+      return inft (d['NX']) + '^3'
+    else:
+      return inft (d['NX']) + 'x' + inft (d['NY']) + 'x' + inft (d['NZ'])
+
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     

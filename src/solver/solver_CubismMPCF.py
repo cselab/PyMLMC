@@ -343,7 +343,15 @@ class CubismMPCF (Solver):
     self.outputfile_v1    = 'integrals.dat'
     self.qoi = 'p_max'
     self.indicator = lambda x : numpy.max ( x [ 'p_max' ] )
-  
+
+  # return string representing the resolution of a give discretization 'd'
+  def resolution_string (d):
+    from helpers import intf
+    if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:
+      return inft (d['NX']) + '^3'
+    else:
+      return inft (d['NX']) + 'x' + inft (d['NY']) + 'x' + inft (d['NZ'])
+
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
