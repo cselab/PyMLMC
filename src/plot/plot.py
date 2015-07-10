@@ -999,7 +999,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
           vs = vs [1:]
 
         if type == mlmc.config.FINE:
-          line = pylab.plot  (ts, vs, linewidth=1 )
+          line, = pylab.plot  (ts, vs, linewidth=1 )
         else:
           pylab.plot  (ts, vs, linewidth=1, alpha=0.6, color=line.get_color() )
 
