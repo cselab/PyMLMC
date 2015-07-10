@@ -229,8 +229,8 @@ class MLMC (object):
     for mc in self.mcs:
       mc.validate ()
 
-    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE   '
-    separator = '  :---------|----------|--------------|-----------|--------------'
+    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  '
+    separator = '  :---------|----------|--------------|-----------|------------'
     if local.cluster:
       header    += '|  WALLTIME  |  COMMENTS  '
       separator += '|------------|------------'

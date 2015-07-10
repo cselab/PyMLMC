@@ -76,16 +76,16 @@ def grids_3d_t (N, NS):
 # integer format with multipliers K, M, etc.
 def intf (number, table=1):
   if table:
-    template = '%3d%s'
+    template = '%3d%1s'
   else:
     template = '%d%s'
   if number == 0:
-    return template % ( 0, ' ' )
+    return template % ( 0, '' )
   from math import log, floor
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
-  return template % ( number, [' ' if table else '', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  return template % ( number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
 
 # pair two seeds into one
 def pair (a, b):

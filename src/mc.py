@@ -66,9 +66,9 @@ class MC (object):
     resolution = resolution.rjust ( len ('RESOLUTION') )
 
     if self.parallelization.cores % local.cores == 0:
-      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'nodes' )
+      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores/local.cores), 'N' )
     else:
-      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores), 'cores' )
+      args = ( config.level, typestr, resolution, intf(len(config.samples)), intf(self.parallelization.cores), 'C' )
     
     if self.parallelization.walltime and local.cluster:
       scope = self.parallelization.scope
@@ -76,9 +76,9 @@ class MC (object):
           if len(config.samples) > self.parallelization.batchmax:
             scope += ' of %d' % self.parallelization.batchmax
       args += ( self.parallelization.hours, self.parallelization.minutes, scope )
-      return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s  |   %2dh %2dm  |  %s' % args
+      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |  %s' % args
     else:
-      return '  :  %5d  |  %s  |  %s  |     %s  |  %s %s' % args
+      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s' % args
 
 
   # launch all samples
