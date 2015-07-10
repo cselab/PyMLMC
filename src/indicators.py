@@ -67,6 +67,9 @@ class Indicators (object):
     for level in self.levels [1:] :
       self.covariance  [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
       self.correlation [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
+
+    # set the normalization
+    self.normalization = self.mean [self.L] [0]
   
   def report (self):
     
@@ -76,46 +79,46 @@ class Indicators (object):
     # report mean (fine)
     print '    -> EPSILON [FI]:',
     for level in self.levels:
-      print '%.1e' % self.mean [level] [0],
+      print '%.1e' % self.mean [level] [0] / self.normalization,
     print
     
     # report mean (coarse)
     print '    -> EPSILON [CO]:',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % self.mean [level] [1],
+      print '%.1e' % self.mean [level] [1] / self.normalization,
     print
     
     # report mean_diff
     print '    -> EPSILON DIFF:',
     for level in self.levels:
-      print '%.1e' % self.mean_diff [level],
+      print '%.1e' % self.mean_diff [level] / self.normalization,
     print
     
     # report variance (fine)
     print '    -> SIGMA   [FI]:',
     for level in self.levels:
-      print '%.1e' % self.variance [level] [0] if not isnan ( self.variance [level] [0] ) else '    N/A',
+      print '%.1e' % self.variance [level] [0] / (self.normalization) ** 2 if not isnan ( self.variance [level] [0] ) else '    N/A',
     print
     
     # report variance (coarse)
     print '    -> SIGMA   [CO]:',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % self.variance [level] [1] if not isnan ( self.variance [level] [1] ) else '    N/A',
+      print '%.1e' % self.variance [level] [1] / (self.normalization) ** 2 if not isnan ( self.variance [level] [1] ) else '    N/A',
     print
 
     # report variance_diff
     print '    -> SIGMA   DIFF:',
     for level in self.levels:
-      print '%.1e' % self.variance_diff [level] if not isnan ( self.variance_diff [level] ) else '    N/A',
+      print '%.1e' % self.variance_diff [level] / (self.normalization) ** 2 if not isnan ( self.variance_diff [level] ) else '    N/A',
     print
     
     # report covariance
     print '    -> COVARIANCE:  ',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % self.covariance [level] if not isnan ( self.covariance [level] ) else '    N/A',
+      print '%.1e' % self.covariance [level] / (self.normalization) ** 2 if not isnan ( self.covariance [level] ) else '    N/A',
     print
     
     # report correlation
