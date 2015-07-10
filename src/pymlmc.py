@@ -229,9 +229,7 @@ class MLMC (object):
     for mc in self.mcs:
       mc.validate ()
 
-      level  0  |    FINE  |  256  sample(s)  |    2  nodes  |   8h  0m  |  per batch of 8
     header = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |   HARDWARE '
-
     if self.parallelization.walltime and local.cluster:
       header += '  |  WALLTIME  | COMMENTS'
     print header
