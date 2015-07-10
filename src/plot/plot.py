@@ -952,7 +952,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   plot_helper_lines (qoi)
   
-  adjust_axes (qoi, extent, xorigin, yorigin)
+  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
@@ -1009,7 +1009,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     plot_helper_lines (qoi)
 
-    adjust_axes (qoi, extent, xorigin, yorigin)
+    adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
 
   if infolines:
     plot_infolines (self)
