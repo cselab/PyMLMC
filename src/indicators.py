@@ -42,19 +42,18 @@ class Indicators (object):
     self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
     
     # compute indicators form MC results
-    values = helpers.level_type_list(self.levels)
-    for i, (level, type) in enumerate(self.levels_types):
-      #TODO: need to this AFTER interpolation of results
+    values = helpers.level_type_list (self.levels)
+    for i, (level, type) in enumerate (self.levels_types):
       values [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results ] )
     
-    # compute plain error indicators
+    # compute plain indicators
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
       self.variance [level] [type] = numpy.cov  (values [level] [type])
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
     
-    # compute error indicators for differences
+    # compute indicators for differences
     self.mean_diff     [0] = numpy.abs ( numpy.mean (values [0] [0]) )
     self.variance_diff [0] = numpy.cov  (values [0] [0])
     for level in self.levels [1:] :
