@@ -553,7 +553,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       color = color_stats ('std. deviation')
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.5)
       # hack to show the legend entry
-      pypab.plot([], [], color=color, alpha=0.5, linewidth=10, label='mean +/- std. dev.')
+      pylab.plot([], [], color=color, alpha=0.5, linewidth=10, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
     elif 'percentile' in stat_name:
@@ -580,7 +580,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     pylab.fill_between (ts, lower, upper, facecolor=color, edgecolor=color, alpha=0.5)
     # hack to show the legend entry
-    pypab.plot([], [], color=color, alpha=0.5, linewidth=10, label=label)
+    pylab.plot([], [], color=color, alpha=0.5, linewidth=10, label=label)
   
   adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
