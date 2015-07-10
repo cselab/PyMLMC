@@ -74,7 +74,7 @@ def grids_3d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
 # integer format with multipliers K, M, etc.
-def intf (number, table=1):
+def intf (number, table=0):
   if table:
     template = '%3d%1s'
   else:
