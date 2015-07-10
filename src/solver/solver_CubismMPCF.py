@@ -348,9 +348,9 @@ class CubismMPCF (Solver):
   def resolution_string (self, d):
     from helpers import intf
     if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:
-      return inft (d['NX']) + '^3'
+      return intf (d['NX']) + '^3'
     else:
-      return inft (d['NX']) + 'x' + inft (d['NY']) + 'x' + inft (d['NZ'])
+      return intf (d['NX']) + 'x' + intf (d['NY']) + 'x' + intf (d['NZ'])
 
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
