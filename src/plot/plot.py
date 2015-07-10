@@ -274,7 +274,6 @@ def figure (infolines=False, subplots=1):
 # adjust subplot margins
 def adjust (infolines, subplots=1):
 
-  '''
   pylab.subplots_adjust(top=0.92)
   pylab.subplots_adjust(right=0.95)
   
@@ -282,12 +281,12 @@ def adjust (infolines, subplots=1):
     pylab.subplots_adjust(left=0.14)
   else:
     pylab.subplots_adjust(left=0.08)
-
+  
   if infolines:
     pylab.subplots_adjust(bottom=0.28)
   else:
     pylab.subplots_adjust(bottom=0.15)
-  '''
+
   return 0
 
 # compute parameters needed for the generation of the TexTable
@@ -593,6 +592,51 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
 
 # plot computed MC estimators of statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+  print ' :: INFO: Plotting MC estimates...',
+
+  if not qoi: qoi = mlmc.config.solver.qoi
+
+  levels = len (mlmc.config.levels)
+
+  if not frame:
+    figure (infolines, subplots=levels)
+
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+  for mc in mlmc.mcs:
+
+    if mc.config.type != mlmc.config.FINE:
+      continue
+
+    pylab.subplot ( 1, levels, mc.config.level + 1 )
+    pylab.title ( 'level %d' % mc.config.level )
+    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
+
+  '''
+  pylab.subplots_adjust (top=0.95)
+  pylab.subplots_adjust (right=0.97)
+  pylab.subplots_adjust (left=0.05)
+
+  if infolines:
+  plot_infolines (self)
+  pylab.subplots_adjust (bottom=0.10)
+  else:
+  pylab.subplots_adjust (bottom=0.05)
+  '''
+
+    if infolines:
+    plot_infolines (self)
+
+  adjust (infolines, subplots='table')
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+print ' done.'
+
+# plot computed MC estimators of statistics for both types
+def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting MC estimates...',
   
@@ -649,28 +693,19 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  levels = len (mlmc.config.levels)
-
   if not frame:
-    if infolines:
-      pylab.figure (figsize=(levels*6, 5))
-    else:
-      pylab.figure (figsize=(levels*6, 4))
+    figure (infolines, subplots=mlmc.config.L)
 
   xlabel = '%s [%s]' % (name('t'), unit('t'))
 
   extent_range = extent [1] - extent [0]
   extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
 
-  for level, diff in enumerate (mlmc.diffs):
+  for level, diff in enumerate (mlmc.diffs [1:]):
 
-    pylab.subplot ( 1, levels, level + 1 )
-    if level == 0:
-      pylab.title ( 'level %d' % level )
-      plot_stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run )
-    else:
-      pylab.title ( 'level %d - level %d' % (level, level - 1) )
-      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+    pylab.subplot ( 1, mlmc.config.L, level)
+    pylab.title ( 'level %d - level %d' % (level, level - 1) )
+    plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
 
   '''
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
@@ -694,7 +729,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   if infolines:
     plot_infolines (self)
 
-  adjust (infolines, subplots='table')
+  adjust (infolines, subplots=mlmc.config.L)
 
   if not frame:
     draw (mlmc, save, qoi)
