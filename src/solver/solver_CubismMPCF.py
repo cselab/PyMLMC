@@ -380,9 +380,9 @@ class CubismMPCF (Solver):
       sys.exit()
     
     # check if number of blocks is not smaller than available threads
-    blocks_x = discretization ['NX'] / self.bs
-    blocks_y = discretization ['NY'] / self.bs
-    blocks_z = discretization ['NZ'] / self.bs
+    blocks_x = discretization ['NX'] / (self.bs * xpesize)
+    blocks_y = discretization ['NY'] / (self.bs * ypesize)
+    blocks_z = discretization ['NZ'] / (self.bs * zpesize)
     blocks   = blocks_x * blocks_y * blocks_z
     if blocks < parallelization.threads:
       print ' :: ERROR: number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
