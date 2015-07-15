@@ -447,10 +447,9 @@ class CubismMPCF (Solver):
     # check if any output files found
     if not v2 and not v1:
       print
-      print ' :: ERROR: Output file does not exist (version 1.0 is also absent)'
+      print ' :: WARNING: Output file does not exist (version 1.0 is also absent)'
       print '  : %s' % outputfileformat
-      print
-      sys.exit()
+      return None
     
     results = Interpolated_Time_Series ()
     

@@ -15,13 +15,14 @@ from numpy import round, floor, ceil
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=1 ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=1, ratios=None ):
     
     self.walltime = walltime
     self.nodes    = nodes
     self.cores    = cores
     self.email    = email
     self.separate = separate
+    self.ratios   = ratios
   
   def distribute (self):
     
@@ -29,8 +30,15 @@ class Static (Scheduler):
     print ' :: SCHEDULER: static'
     
     for level, type in self.levels_types:
-      
+
+      '''
+      if self.ratios:
+        required = self.cores / float (self.ratios [level - type])
+      else:
+      '''
       required = self.cores / float (self.ratios [level - type])
+
+      # respect the minimal amount of cores on the machine
       cores = max ( min ( local.min_cores, self.cores ), int ( round ( required ) ) )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
