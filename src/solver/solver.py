@@ -203,7 +203,7 @@ class Solver (object):
     
     # add timer
     if local.timer:
-      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label }
+      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label, 'statusfile' : self.statusfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
