@@ -22,8 +22,7 @@ class Solver (object):
   scriptfile = 'script_%s.sh'
   submitfile = 'submit_%s.sh'
   statusfile = 'status_%s.dat'
-  #timerfile  = 'timerfile_%s.dat'
-  timerfile  = 'report.%s'
+  timerfile  = 'timerfile_%s.dat'
   inputdir   = 'input'
   outputdir  = 'output'
   
