@@ -46,6 +46,7 @@ class MLMC_Config (object):
   scheduler       = Static ()
   root            = '.'
   deterministic   = 0
+  ratios          = None
   
   def __init__ (self, id=0):
     
@@ -74,4 +75,5 @@ class MLMC_Config (object):
     self.works = [ self.solver.work (discretization) for discretization in self.discretizations ]
     
     # core ratios
-    self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
+    if self.ratios == None:
+      self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]

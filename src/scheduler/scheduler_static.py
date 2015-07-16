@@ -31,11 +31,6 @@ class Static (Scheduler):
     
     for level, type in self.levels_types:
 
-      '''
-      if self.ratios:
-        required = self.cores / float (self.ratios [level - type])
-      else:
-      '''
       required = self.cores / float (self.ratios [level - type])
 
       # respect the minimal amount of cores on the machine
