@@ -28,7 +28,7 @@ rack      = 1024 # nodes
 bootup       = 5   # minutes
 min_walltime = 0.5 # hours
 max_walltime = 24  # hours
-min_cores    = 512 * cores
+min_cores    = 128 * cores # 512 * cores (modified to be consistent with Cetus)
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
