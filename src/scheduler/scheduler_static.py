@@ -48,6 +48,8 @@ class Static (Scheduler):
       
       # set maximal batch size such that the required walltime does not exceed specified walltime
       batchmax = int ( floor ( self.walltime / float(walltime) ) )
-      
+
       # construct parallelization according to all computed parameters
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, self.email )
+
+      print '  : Level %d, type %d: %d ranks' % ( level, type, self.parallelizations [level] [type] .ranks )
