@@ -111,3 +111,14 @@ def load (dir):
   list ['mlmc'] .load ()
   print
   return list
+
+# query for user decision
+def query (question):
+  print ' :: QUERY: %s [enter \'y\' or press ENTER]' % question
+  input = raw_input ( '  : ' ) or 'y'
+  if input != 'y':
+    print '  : EXIT'
+    print
+    sys.exit()
+  else:
+    print '  : CONTINUE'

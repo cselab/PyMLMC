@@ -13,6 +13,7 @@
 
 from solver import Solver
 import local
+import helpers
 
 import numpy
 import sys
@@ -389,6 +390,7 @@ class CubismMPCF (Solver):
       print '  : Discretization: %s' % str(discretization)
       print '  : Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
       print
+      helpers.query ('Continue with sub-optimal parallelization?')
       sys.exit()
   
   # run the specified deterministic simulation (level, type, sample)
