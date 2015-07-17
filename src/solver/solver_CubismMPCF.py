@@ -391,7 +391,6 @@ class CubismMPCF (Solver):
       print '  : Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
       print
       helpers.query ('Continue with sub-optimal parallelization?')
-      sys.exit()
   
   # run the specified deterministic simulation (level, type, sample)
   # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
