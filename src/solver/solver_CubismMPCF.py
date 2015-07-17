@@ -386,6 +386,7 @@ class CubismMPCF (Solver):
     blocks_z = discretization ['NZ'] / (self.bs * zpesize)
     blocks   = blocks_x * blocks_y * blocks_z
     if blocks < parallelization.threads:
+      print
       print ' :: ERROR: number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
       print '  : Discretization: %s' % str(discretization)
       print '  : Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
