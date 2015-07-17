@@ -343,7 +343,12 @@ class MLMC (object):
 
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
-    self.diffs = [ { stat.name : self.config.solver.DataClass () for stat in stats } for level in self.config.levels ]
+    #self.diffs = [ { stat.name : self.config.solver.DataClass () for stat in stats } for level in self.config.levels ]
+    self.diffs = []
+    for level in self.config.levels:
+      self.diffs .append ( {} )
+      for stat in stats:
+        self.diffs [-1] [stat.name] = self.config.solver.DataClass ()
     for name in [stat.name for stat in stats]:
       for mc in self.mcs:
         if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [ name ]
