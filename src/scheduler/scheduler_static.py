@@ -53,4 +53,4 @@ class Static (Scheduler):
       # construct parallelization according to all computed parameters
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, self.email )
 
-      print '  : Level %d, type %d: %d ranks' % ( level, type, self.parallelizations [level] [type] .ranks )
+      #print '  : Level %d, type %d: %d ranks' % ( level, type, self.parallelizations [level] [type] .ranks )
