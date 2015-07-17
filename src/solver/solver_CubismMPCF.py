@@ -386,7 +386,8 @@ class CubismMPCF (Solver):
     blocks   = blocks_x * blocks_y * blocks_z
     if blocks < parallelization.threads:
       print ' :: ERROR: number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
-      print '  : Discretization is %s | Parallelization (ranks) is %s, each with %d threads' % ( str(discretization), str(parallelization.reshape(3)), parallelization.threads )
+      print '  : Discretization: %s' % str(discretization)
+      print '  : Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
       sys.exit()
   
   # run the specified deterministic simulation (level, type, sample)
