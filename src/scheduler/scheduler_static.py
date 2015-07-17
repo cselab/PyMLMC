@@ -28,7 +28,8 @@ class Static (Scheduler):
     
     print
     print ' :: SCHEDULER: static'
-    
+    print '  : Ratios: %s' % str(self.ratios)
+
     for level, type in self.levels_types:
 
       required = self.cores / float (self.ratios [level - type])
