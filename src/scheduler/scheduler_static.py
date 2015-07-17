@@ -29,6 +29,7 @@ class Static (Scheduler):
     print
     print ' :: SCHEDULER: static'
     print '  : Ratios: %s' % str(self.ratios)
+    print '  : Min cores: %d' % local.min_cores
 
     for level, type in self.levels_types:
 
