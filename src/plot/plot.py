@@ -931,6 +931,8 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   # some dynamic values
   if level  == 'finest':   level  = mlmc.config.L
   if level  == 'coarsest': level  = 0
+
+  xend = float('nan')
   
   if not qoi: qoi = mlmc.config.solver.qoi
   
@@ -941,7 +943,9 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
     results = mlmc.config.solver.load ( level, type, sample )
     
     ts = numpy.array ( results.meta ['t'] )
-    vs = numpy.array ( results.data [qoi]  )
+    vs = numpy.array ( results.data [qoi] )
+
+    xend = max (xend, numpy.max(ts))
     
     # exclude first data point, if we are dealing with positions
     if '_pos' in qoi:
@@ -957,7 +961,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   plot_helper_lines (qoi)
   
-  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
+  adjust_axes (qoi, extent, xorigin, yorigin, xend=xend)
   
   if mlmc.config.samples.counts.computed[level] <= legend:
     pylab.legend (loc='best')
@@ -989,6 +993,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     types = [mlmc.config.FINE, mlmc.config.COARSE] if level > 0 else [mlmc.config.FINE]
 
+    xend = float('nan')
+
     for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
       for type in types:
@@ -997,6 +1003,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
         ts = numpy.array ( results.meta ['t'] )
         vs = numpy.array ( results.data [qoi]  )
+
+        xend = max (xend, numpy.max(ts))
 
         # exclude first data point, if we are dealing with positions
         if '_pos' in qoi:
@@ -1014,7 +1022,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     plot_helper_lines (qoi)
 
-    adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
+    adjust_axes (qoi, extent, xorigin, yorigin, xend=xend)
 
   if infolines:
     plot_infolines (self)
