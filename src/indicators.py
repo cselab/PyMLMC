@@ -44,7 +44,7 @@ class Indicators (object):
     # compute indicators form MC results
     values = helpers.level_type_list (self.levels)
     for i, (level, type) in enumerate (self.levels_types):
-      values [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results ] )
+      values [level] [type] = numpy.array ( [ self.indicator ( result.data ) if result else float('NaN') for result in mcs [i] .results ] )
     
     # compute plain indicators
     for level, type in self.levels_types:

@@ -58,9 +58,9 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
   --envs DARSHAN_DISABLE=1 \
-  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
   '''
 
+#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 #  --envs PAMID_ASYNC_PROGRESS=1 \
 #  --mapping TABCDE \
 
