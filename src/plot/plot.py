@@ -941,7 +941,10 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
     
     results = mlmc.config.solver.load ( level, type, sample )
-    
+
+    if results == None:
+      continue
+
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi] )
 
@@ -1000,6 +1003,9 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
       for type in types:
 
         results = mlmc.config.solver.load ( level, type, sample )
+
+        if results == None:
+          continue
 
         ts = numpy.array ( results.meta ['t'] )
         vs = numpy.array ( results.data [qoi]  )
