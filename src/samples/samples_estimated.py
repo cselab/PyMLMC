@@ -39,11 +39,18 @@ class Estimated (Samples):
     self.deterministic = ( self.warmup == 1 and self.L == 0 )
   
   def finished (self, errors):
-    
-    return errors.total_relative_error <= self.tol
+
+    if numpy.isnan (errors.total_relative_error):
+      return True
+    else:
+      return errors.total_relative_error <= self.tol
   
   def update (self, errors, indicators):
-    
+
+    # check if errors or indicators contain NaN's
+    if not numpy.isnan (errors)     .any() : return
+    if not numpy.isnan (indicators) .any() : return
+
     # compute the required cumulative sampling error
     if self.aggressive:
       self.required_error = self.tol * errors.normalization * max (0.5, 1.0 - self.aggression)
