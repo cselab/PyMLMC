@@ -66,9 +66,10 @@ class Errors (object):
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):
     
-    work_mlmc = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )
-    variance = numpy.mean ( [ self.indicators.variance [level] [0] for level in self.levels ] )
-    work_mc   = works [self.L] * variance / (self.total_error ** 2)
+    work_mlmc    = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )
+    variance_mc  = numpy.max ( [ self.indicators.variance [level] [0] for level in self.levels ] )
+    samples_mc   = ceil ( variance / (self.total_error ** 2) )
+    work_mc      = works [self.L] samples_mc
     self.speedup = work_mc / work_mlmc
     
     print

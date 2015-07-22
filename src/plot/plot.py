@@ -21,7 +21,7 @@ import numpy
 import sys
 
 # figure configuration
-matplotlib.rcParams ['figure.max_open_warning'] = 100
+#matplotlib.rcParams ['figure.max_open_warning'] = 100 # not working on mira
 matplotlib.rcParams ['savefig.dpi']             = 300
 
 # font configuration
