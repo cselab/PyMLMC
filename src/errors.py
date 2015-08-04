@@ -74,8 +74,8 @@ class Errors (object):
     
     print
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup
-    print '  : -> MLMC budget: %s' % helpers.intf ( numpy.ceil(work_mlmc) )
-    print '  : ->   MC budget: %s' % helpers.intf ( numpy.ceil(work_mc) )
+    print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
+    print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
   
   def save (self):
     
