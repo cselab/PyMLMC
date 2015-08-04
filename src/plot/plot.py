@@ -1028,7 +1028,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     plot_helper_lines (qoi)
 
-    adjust_axes (qoi, extent, xorigin, yorigin)#, xend=xend)
+    adjust_axes (qoi, extent, xorigin, yorigin)#, xend=xend) # xend does not work when failed jobs are present
 
   if infolines:
     plot_infolines (self)
