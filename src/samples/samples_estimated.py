@@ -27,7 +27,7 @@ class Estimated (Samples):
   def init (self):
     
     print
-    print ' :: SAMPLES: estimated'
+    print ' :: SAMPLES: estimated for the specified tolerance'
     
     # default warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
@@ -38,21 +38,14 @@ class Estimated (Samples):
     self.counts.additional = numpy.array ( counts, copy=True )
     
     # set simulation type (deterministic or stochastic)
-    self.deterministic = ( self.warmup == 1 and self.L == 0 )
+    #self.deterministic = ( self.warmup == 1 and self.L == 0 )
   
   def finished (self, errors):
 
-    # if budget is unlimited, check the error
-    if self.budget == None:
-      if numpy.isnan (errors.total_relative_error):
-        return True
-      else:
-        return errors.total_relative_error <= self.tol
-
-    # if budget is limited, check the amount of work already done
+    if numpy.isnan (errors.total_relative_error):
+      return True
     else:
-      work = numpy.sum ( numpy.array(self.works) * numpy.array(self.counts.computed) )
-      return work >= self.budget
+      return errors.total_relative_error <= self.tol
 
   def update (self, errors, indicators):
 

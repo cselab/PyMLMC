@@ -125,3 +125,6 @@ class Scheduler (object):
     if self.walltime == None:
       self.walltime = local.walltime
 
+    # dimensionalize work to CPU hours
+    self.works = [ work * self.walltime * self.cores for work in works ]
+
