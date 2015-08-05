@@ -82,52 +82,52 @@ class Indicators (object):
     print ' :: INDICATORS: (normalized to %.1e)' % self.normalization
     
     # report mean (fine)
-    print '    -> EPSILON [FI]:',
+    print '  : EPSILON [FI]:',
     for level in self.levels:
       print '%.1e' % (self.mean [level] [0] / self.normalization),
     print
     
     # report mean (coarse)
-    print '    -> EPSILON [CO]:',
+    print '  : EPSILON [CO]:',
     print '    ---',
     for level in self.levels [1:]:
       print '%.1e' % (self.mean [level] [1] / self.normalization),
     print
     
     # report mean_diff
-    print '    -> EPSILON DIFF:',
+    print '  : EPSILON DIFF:',
     for level in self.levels:
       print '%.1e' % (self.mean_diff [level] / self.normalization),
     print
     
     # report variance (fine)
-    print '    -> SIGMA   [FI]:',
+    print '  : SIGMA   [FI]:',
     for level in self.levels:
       print '%.1e' % (self.variance [level] [0] / (self.normalization) ** 2) if not isnan ( self.variance [level] [0] ) else '    N/A',
     print
     
     # report variance (coarse)
-    print '    -> SIGMA   [CO]:',
+    print '  : SIGMA   [CO]:',
     print '    ---',
     for level in self.levels [1:]:
       print '%.1e' % (self.variance [level] [1] / (self.normalization) ** 2) if not isnan ( self.variance [level] [1] ) else '    N/A',
     print
 
     # report variance_diff
-    print '    -> SIGMA   DIFF:',
+    print '  : SIGMA   DIFF:',
     for level in self.levels:
       print '%.1e' % (self.variance_diff [level] / (self.normalization) ** 2) if not isnan ( self.variance_diff [level] ) else '    N/A',
     print
     
     # report covariance
-    print '    -> COVARIANCE:  ',
+    print '  : COVARIANCE:  ',
     print '    ---',
     for level in self.levels [1:]:
       print '%.1e' % (self.covariance [level] / (self.normalization) ** 2) if not isnan ( self.covariance [level] ) else '    N/A',
     print
     
     # report correlation
-    print '    -> CORRELATION: ',
+    print '  : CORRELATION: ',
     print '    ---',
     for level in self.levels [1:]:
       print '   %.2f' % self.correlation [level] if not isnan ( self.correlation [level] ) else '    N/A',
