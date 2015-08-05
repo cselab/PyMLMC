@@ -45,9 +45,6 @@ class Estimated_Budget (Samples):
 
   def update (self, errors, indicators):
 
-    # check if indicators contain NaN's
-    if indicators.nans: return
-    
     # compute optimal number of samples
     # assuming that no samples were computed so far
     self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.budget, indicators )

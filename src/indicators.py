@@ -164,15 +164,36 @@ class Indicators (object):
   
   # extrapolate missing variance estimates using available estimates
   def extrapolate (self):
-    
+
     for level in self.levels:
       if numpy.isnan ( self.variance_diff [level] ):
-        self.variance_diff [level] = self.variance_diff [level-1] / 2
+        if level != 0:
+          self.variance_diff [level] = self.variance_diff [level-1] / 2
+        else:
+          print
+          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print
+          import sys
+          sys.exit()
     
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
-        self.variance [level] [0] = self.variance [level-1] [0]
+        if level != 0:
+          self.variance [level] [0] = self.variance [level-1] [0]
+        else:
+          print
+          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print
+          import sys
+            sys.exit()
     
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [1] ):
-        self.variance [level] [1] = self.variance [level-1] [1]
+        if level != 0:
+          self.variance [level] [1] = self.variance [level-1] [1]
+        else:
+          print
+          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print
+          import sys
+          sys.exit()
