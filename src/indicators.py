@@ -185,7 +185,7 @@ class Indicators (object):
           print ' :: ERROR: Extrapolation of indicators not possible!'
           print
           import sys
-            sys.exit()
+          sys.exit()
     
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [1] ):
