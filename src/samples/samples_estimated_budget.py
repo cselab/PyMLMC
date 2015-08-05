@@ -59,11 +59,13 @@ class Estimated_Budget (Samples):
      if self.counts_updated [level] > self.counts.computed [level]:
         self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
 
+    '''
     # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
     # this prevents assigning wrong number of samples based on _extrapolated_ indicators
     for level in self.levels:
       if self.counts.computed [level] == 1 and self.counts.additional [level] > 1:
         self.counts.additional [level] = 1;
+    '''
     
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.computed + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
