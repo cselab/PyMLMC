@@ -15,11 +15,7 @@ import numpy
 # surpresses invalid division errors and simply returns 'nan' in such cases
 numpy.seterr ( divide='ignore', invalid='ignore' )
 
-# this Samples class updates the required number of samples based on the prescribed computational budget (in CPU hours)
-
-from samples_estimated import Estimated
-
-class Estimated_Budget (Estimated):
+class Estimated_Budget (Samples):
   
   def __init__ (self, budget=8, warmup=1, warmup_finest_level='last'):
     
