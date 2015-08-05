@@ -49,7 +49,7 @@ class Indicators (object):
     # flag for existing NaN's
     self.nans = 0
     for level, type in self.levels_types:
-      if numpy.isnan ( values [level] [type] ):
+      if numpy.isnan ( values [level] [type] ) .any() :
         self.nans = 1
     
     # compute plain indicators
