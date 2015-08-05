@@ -58,15 +58,15 @@ class Errors (object):
     print
     print ' :: ERRORS: (normalized to %.1e)' % self.normalization
     
-    print '  : Level sampling errors:'
-    print '    ',
+    print '  : Level sampling errors:',
+    #print '    ',
     for level in self.levels:
       print '%.1e' % self.relative_error [level],
     print
 
-    print '  : Total sampling error: %f ~ %.1e' % (self.total_relative_error, self.total_relative_error),
+    print '  : Total sampling error : %f ~ %.1e' % (self.total_relative_error, self.total_relative_error),
     if tol:
-      print '(= %.1f%% of rel_tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
+      print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
     else:
       print
   

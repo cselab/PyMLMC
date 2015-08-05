@@ -33,8 +33,8 @@ class Status (object):
     with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
       
       f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed [level]) + ', ' for level in config.levels ] ) + ']\n' )
-      if not config.deterministic:
-        f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
+      #if not config.deterministic:
+      #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
       if 'cluster' in self.list:
         f.write ( 'cluster = \'%s\'' % self.list ['cluster']  + '\n' )
@@ -65,14 +65,14 @@ class Status (object):
       
       config.samples.counts.computed = self.list ['samples']
       config.samples.make ()
-      
+      '''
       if not config.deterministic:
         if config.samples.tol != self.list ['tol']:
           print
           print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
           print ('  : -> Tolerance from the status file will be used.')
         config.samples.tol = self.list ['tol']
-      
+      '''
       config.scheduler.batch = self.list ['batch']
       
       if 'cluster' not in self.list:
