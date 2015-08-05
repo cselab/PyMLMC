@@ -35,8 +35,11 @@ class Errors (object):
     self.counts     = counts
     
     # extrapolate missing indicators
-    self.indicators.extrapolate ()
-    
+    if indicators.nans:
+      self.indicators.extrapolate ()
+      print
+      print ' :: WARNING: Missing indicator values are extrapolated!'
+
     # set the normalization
     self.normalization = self.indicators.normalization
     
