@@ -187,9 +187,9 @@ class Indicators (object):
           import sys
           sys.exit()
     
-    for level in self.levels:
+    for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
-        if level != 0:
+        if level != 1:
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
           print
