@@ -12,7 +12,7 @@
 # === global imports
 
 import numpy
-from math import isnan
+#from math import isnan
 
 # === local imports
 
@@ -103,34 +103,34 @@ class Indicators (object):
     # report variance (fine)
     print '  : SIGMA   [FI]:',
     for level in self.levels:
-      print '%.1e' % (self.variance [level] [0] / (self.normalization) ** 2) if not isnan ( self.variance [level] [0] ) else '    N/A',
+      print '%.1e' % (self.variance [level] [0] / (self.normalization) ** 2) if not numpy.isnan ( self.variance [level] [0] ) else '    N/A',
     print
     
     # report variance (coarse)
     print '  : SIGMA   [CO]:',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % (self.variance [level] [1] / (self.normalization) ** 2) if not isnan ( self.variance [level] [1] ) else '    N/A',
+      print '%.1e' % (self.variance [level] [1] / (self.normalization) ** 2) if not numpy.isnan ( self.variance [level] [1] ) else '    N/A',
     print
 
     # report variance_diff
     print '  : SIGMA   DIFF:',
     for level in self.levels:
-      print '%.1e' % (self.variance_diff [level] / (self.normalization) ** 2) if not isnan ( self.variance_diff [level] ) else '    N/A',
+      print '%.1e' % (self.variance_diff [level] / (self.normalization) ** 2) if not numpy.isnan ( self.variance_diff [level] ) else '    N/A',
     print
     
     # report covariance
     print '  : COVARIANCE:  ',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % (self.covariance [level] / (self.normalization) ** 2) if not isnan ( self.covariance [level] ) else '    N/A',
+      print '%.1e' % (self.covariance [level] / (self.normalization) ** 2) if not numpy.isnan ( self.covariance [level] ) else '    N/A',
     print
     
     # report correlation
     print '  : CORRELATION: ',
     print '    ---',
     for level in self.levels [1:]:
-      print '   %.2f' % self.correlation [level] if not isnan ( self.correlation [level] ) else '    N/A',
+      print '   %.2f' % self.correlation [level] if not numpy.isnan ( self.correlation [level] ) else '    N/A',
     print
   
   def save (self):
