@@ -32,7 +32,7 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
   
   def compute (self, mcs):
-    
+
     # list of results
     self.mean           = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
     self.variance       = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
@@ -40,11 +40,16 @@ class Indicators (object):
     self.variance_diff  = numpy.zeros ( self.L + 1, dtype=float)
     self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
     self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
-    
-    # compute indicators form MC results
+
+    # evaluate indicators for all samples on all levels and types
     values = helpers.level_type_list (self.levels)
     for i, (level, type) in enumerate (self.levels_types):
       values [level] [type] = numpy.array ( [ self.indicator ( result.data ) if result else float('NaN') for result in mcs [i] .results ] )
+
+    # flag for existing NaN's
+    self.nans = 0
+    for level, type in self.levels_types:
+      if numpy.isnan ( values [level] [type] ) self.nans = 1
     
     # compute plain indicators
     for level, type in self.levels_types:
@@ -69,7 +74,7 @@ class Indicators (object):
 
     # set the normalization
     self.normalization = self.mean [self.L] [0]
-  
+
   def report (self):
     
     print
