@@ -119,14 +119,14 @@ class Indicators (object):
     print
     
     # report covariance
-    print '  : COVARIANCE:  ',
+    print '  : COVARIANCE  :',
     print '    ---',
     for level in self.levels [1:]:
       print '%.1e' % (self.covariance [level] / (self.normalization) ** 2) if not numpy.isnan ( self.covariance [level] ) else '    N/A',
     print
     
     # report correlation
-    print '  : CORRELATION: ',
+    print '  : CORRELATION :',
     print '    ---',
     for level in self.levels [1:]:
       print '   %.2f' % self.correlation [level] if not numpy.isnan ( self.correlation [level] ) else '    N/A',
