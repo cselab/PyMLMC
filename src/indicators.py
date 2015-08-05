@@ -12,7 +12,6 @@
 # === global imports
 
 import numpy
-#from math import isnan
 
 # === local imports
 
@@ -167,13 +166,13 @@ class Indicators (object):
   def extrapolate (self):
     
     for level in self.levels:
-      if isnan ( self.variance_diff [level] ):
+      if numpy.isnan ( self.variance_diff [level] ):
         self.variance_diff [level] = self.variance_diff [level-1] / 2
     
     for level in self.levels:
-      if isnan ( self.variance [level] [0] ):
+      if numpy.isnan ( self.variance [level] [0] ):
         self.variance [level] [0] = self.variance [level-1] [0]
     
     for level in self.levels:
-      if isnan ( self.variance [level] [1] ):
+      if numpy.isnan ( self.variance [level] [1] ):
         self.variance [level] [1] = self.variance [level-1] [1]
