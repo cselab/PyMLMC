@@ -78,7 +78,16 @@ class Estimated_Budget (Samples):
     
     print
     print ' :: SAMPLES:'
-    
+
+    budget_used = sum ( [ self.works [level] * self.counts.computed [level] for level in self.levels ] )
+    budget_left = self.budget - budget_used
+    budget_reqd = sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] )
+
+    print '  : -> Specified budget: %s CPU hours' % helpers.intf (numpy.ceil(self.budget), table=1)
+    print '  : -> Consumed  budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_used), table=1)
+    print '  : -> Remaining budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_left), table=1)
+    print '  : -> Requested budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_reqd), table=1)
+
     print '    -> Updated number of samples for each level:'
     print '      ',
     for level in self.levels:
