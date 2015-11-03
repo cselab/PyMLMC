@@ -45,9 +45,6 @@ class Static (Scheduler):
       # respect the minimal walltime of the machine
       walltime = max ( local.min_walltime (cores), walltime )
 
-      ## respect the maximal walltime of the machine
-      #walltime = min ( local.max_walltime (cores), walltime )
-
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
       
