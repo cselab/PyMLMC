@@ -1,7 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Static scheduler class
-# Load balancing is offloaded to the underlying job scheduling sub-system (LSF, SLURM, etc.)
+# Load balancing is offloaded to the underlying job scheduling sub-system (LSF, SLURM, Cobalt, LoadLeveller, etc.)
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
