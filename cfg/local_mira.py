@@ -33,7 +33,7 @@ def min_walltime (cores): # hours
   return 0.5
 
 def max_walltime (cores): # hours
-  if cores < 16 * 4096:
+  if cores <= 16 * 4096:
     return 12
   else:
     return 24
