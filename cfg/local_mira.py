@@ -97,4 +97,5 @@ submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%
 
 # timer
 #timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
-timer = None
+timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s; touch %(statusfile)s'
+#timer = None
