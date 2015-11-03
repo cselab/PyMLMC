@@ -26,7 +26,8 @@ rack      = 1024 # nodes
 
 # constraints
 bootup       = 5   # minutes
-min_walltime = 0.5 # hours
+#min_walltime = 0.5 # hours
+min_walltime = 12 # hours
 max_walltime = 24  # hours
 min_cores    = 512 * cores
 
