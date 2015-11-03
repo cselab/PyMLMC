@@ -26,7 +26,7 @@ class Estimated_Budget (Samples):
     
     print
     print ' :: SAMPLES: estimated for the specified budget'
-    
+
     # default warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
@@ -37,7 +37,7 @@ class Estimated_Budget (Samples):
     
     # set simulation type (deterministic or stochastic)
     #self.deterministic = ( self.warmup == 1 and self.L == 0 )
-  
+
   def finished (self, errors):
 
     work = numpy.sum ( numpy.array(self.works) * numpy.array(self.counts.computed) )
@@ -66,7 +66,7 @@ class Estimated_Budget (Samples):
       if self.counts.computed [level] == 1 and self.counts.additional [level] > 1:
         self.counts.additional [level] = 1;
     '''
-    
+
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.computed + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
@@ -162,4 +162,3 @@ class Estimated_Budget (Samples):
           budget -= self.works [level] * updated [level]
     
     return updated
- 

@@ -34,6 +34,9 @@ min_cores    = 512 * cores
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
+
 # scratch path
 scratch = '/projects/CloudPredict/sukysj/pymlmc'
 

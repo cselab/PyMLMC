@@ -308,7 +308,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', path=None, points=1000, bs=32, init=None):
+  def __init__ (self, options='', path=None, points=1000, bs=32, workunit=1, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -356,7 +356,7 @@ class CubismMPCF (Solver):
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return d ['NX'] * d ['NY'] * d ['NZ'] * ( d['NX'] + d['NY'] + d['NZ'] )
+    return self.workunit * d ['NX'] * d ['NY'] * d ['NZ'] * numpy.max ( [ d['NX'], d['NY'], d['NZ'] ] )
   
   # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):

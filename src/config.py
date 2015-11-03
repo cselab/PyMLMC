@@ -17,6 +17,7 @@ import sys
 # === local imports
 
 import helpers
+import local
 
 # === additional Python paths
 
@@ -71,8 +72,9 @@ class MLMC_Config (object):
     self.levels_types   = [ [0, self.FINE] ]  + [ level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types ]
     
     # works
-    # TODO: take into account _differences_ on all levels except the coarsest
-    self.works = [ self.solver.work (discretization) for discretization in self.discretizations ]
+    self.works = [ self.solver.work (self.discretizations[0]) / float (local.performance) ]
+    for level in self.levels [1:]:
+      self.works += [ ( self.solver.work (self.discretizations [level]) + self.solver.work (self.discretizations [level-1]) ) / float (local.performance) ]
     
     # core ratios
     if self.ratios == None:
