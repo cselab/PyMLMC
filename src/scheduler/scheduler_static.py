@@ -45,14 +45,14 @@ class Static (Scheduler):
       # respect the minimal walltime of the machine
       walltime = max ( local.min_walltime (cores), walltime )
 
-      # respect the maximal walltime of the machine
-      walltime = min ( local.max_walltime (cores), walltime )
+      ## respect the maximal walltime of the machine
+      #walltime = min ( local.max_walltime (cores), walltime )
 
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
       
       # set maximal batch size such that the required walltime does not exceed specified walltime
-      batchmax = int ( floor ( self.walltime / float(walltime) ) )
+      batchmax = int ( floor ( min ( local.max_walltime (cores), self.walltime ) / float(walltime) ) )
 
       # construct parallelization according to all computed parameters
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, self.email )
