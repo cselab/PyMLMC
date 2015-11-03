@@ -1,7 +1,9 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for Brutus cluster
+# Intel Xeon cluster @ ETH Zurich, Switzerland
 # More information: http://www.clusterwiki.ethz.ch/brutus/Brutus_wiki
+# LSF job scheduling system
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys

@@ -1,8 +1,9 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for Cetus cluster
-# BlueGene/Q @ Argonne National Laboratory
+# IBM BlueGene/Q @ Argonne National Laboratory, United States
 # More information: http://www.alcf.anl.gov/user-guides/blue-geneq-versus-blue-genep
+# Cobalt job scheduling system
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys

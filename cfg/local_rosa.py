@@ -1,9 +1,10 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for Monte Rosa cluster
-# Cray XE6 @ Swiss Supercomputing Center (CSCS)
+# Cray XE6 @ Swiss Supercomputing Center (CSCS), Switzerland
 # More information: http://www.cscs.ch/computers/monte_rosa/index.html
 #                   http://user.cscs.ch/computing_resources/monte_rosa/index.html
+# SLURM job scheduling system
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys

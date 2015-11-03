@@ -1,8 +1,9 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for JUQUEEN cluster
-# Julich Supercomputing Centre (JSC)
+# IBM BlueGene/Q @ Julich Supercomputing Centre (JSC), Germany
 # More information: http://www.fz-juelich.de/ias/jsc/EN/Expertise/Supercomputers/JUQUEEN
+# LoadLeveller job scheduling system
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys

@@ -1,9 +1,10 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Local configuration for Piz Daint cluster
-# Cray XC30 @ Swiss Supercomputing Center (CSCS)
+# Cray XC30 @ Swiss Supercomputing Center (CSCS), Switzerland
 # More information: http://www.cscs.ch/computers/piz_daint/index.html
 #                   http://user.cscs.ch/computing_resources/piz_daint/index.html
+# SLURM job scheduling system
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
