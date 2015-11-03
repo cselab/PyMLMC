@@ -12,7 +12,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Argonne Mira (BlueGene/Q)'
+name = 'Argonne Mira (IBM BlueGene/Q)'
 
 # Mira is a cluster
 cluster = 1

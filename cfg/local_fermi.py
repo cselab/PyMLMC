@@ -13,7 +13,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Cineca FERMI (BlueGene/Q)'
+name = 'Cineca FERMI (IBM BlueGene/Q)'
 
 # FERMI is a cluster
 cluster = 1

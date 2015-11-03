@@ -13,7 +13,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Julich JUQUEEN (BlueGene/Q)'
+name = 'Julich JUQUEEN (IBM BlueGene/Q)'
 
 # JUQUEEN is a cluster
 cluster = 1

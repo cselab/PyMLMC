@@ -13,7 +13,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Argonne Cetus (BlueGene/Q)'
+name = 'Argonne Cetus (IBM BlueGene/Q)'
 
 # Cetus is a cluster
 cluster = 1
@@ -36,7 +36,8 @@ peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
 # scratch path
-scratch = '/projects/CloudPredict/sukysj/pymlmc'
+#scratch = '/projects/CloudPredict/sukysj/pymlmc'
+scratch = None
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
