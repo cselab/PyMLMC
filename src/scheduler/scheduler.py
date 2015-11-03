@@ -100,6 +100,8 @@ class Scheduler (object):
   def setup (self, levels, levels_types, works, ratios, sharedmem):
     
     vars (self) .update ( locals() )
+
+    print works
     
     self.L = len(levels) - 1
     self.parallelizations = helpers.level_type_list (levels)
