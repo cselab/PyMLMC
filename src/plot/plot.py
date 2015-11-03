@@ -223,6 +223,8 @@ def name (qoi, short=False):
     name_ = 'min ' + name_
   if '_max' in qoi:
     name_ = 'max ' + name_
+  if '_sen' in qoi:
+    name_ = name_ + ' sensor'
   if '_time' in qoi:
     name_ = 'time of ' + name_
   if short and '_pos' in qoi:
