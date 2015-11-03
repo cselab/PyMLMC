@@ -25,11 +25,18 @@ memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
+
 bootup       = 5   # minutes
-#min_walltime = 0.5 # hours
-min_walltime = 12 # hours
-max_walltime = 24  # hours
 min_cores    = 512 * cores
+
+def min_walltime (cores): # hours
+  return 0.5
+
+def max_walltime (cores): # hours
+  if cores < 16 * 4096:
+    return 12
+  else:
+    return 24
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
