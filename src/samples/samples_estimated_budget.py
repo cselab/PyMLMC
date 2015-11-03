@@ -82,7 +82,7 @@ class Estimated_Budget (Samples):
   def report_budget (self):
 
     print
-    print ' :: SAMPLES BUDGET:'
+    print ' :: BUDGET:'
 
     budget_used = sum ( [ self.works [level] * self.counts.computed [level] for level in self.levels ] )
     budget_left = self.budget - budget_used
