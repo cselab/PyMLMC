@@ -34,6 +34,9 @@ class Samples (object):
     # store configuration
     vars (self) .update ( locals() )
     
+    # 'sample' is treated as a _pair_ of fine and coarse samples
+    self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
+    
     self.counts  = Counts ()
     self.indices = Indices ()
     
