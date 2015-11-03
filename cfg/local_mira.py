@@ -38,7 +38,8 @@ bandwidth = 0.0 # GB/s
 performance = 1
 
 # scratch path
-scratch = '/projects/CloudPredict/sukysj/pymlmc'
+#scratch = '/projects/CloudPredict/sukysj/pymlmc'
+scratch = None
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
