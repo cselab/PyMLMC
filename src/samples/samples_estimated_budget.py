@@ -38,6 +38,9 @@ class Estimated_Budget (Samples):
     # set simulation type (deterministic or stochastic)
     #self.deterministic = ( self.warmup == 1 and self.L == 0 )
 
+    # report budget status
+    self.report_budget()
+
   def finished (self, errors):
 
     work = numpy.sum ( numpy.array(self.works) * numpy.array(self.counts.computed) )
@@ -75,11 +78,11 @@ class Estimated_Budget (Samples):
     
     # check if the current finest level is optimal
     #self.check_optimal_finest_level ()
-  
-  def report (self):
-    
-    print
-    print ' :: SAMPLES:'
+
+  def report_budget (self):
+
+  print
+  print ' :: SAMPLES BUDGET:'
 
     budget_used = sum ( [ self.works [level] * self.counts.computed [level] for level in self.levels ] )
     budget_left = self.budget - budget_used
@@ -89,6 +92,11 @@ class Estimated_Budget (Samples):
     print '  : -> Consumed  budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_used), table=1)
     print '  : -> Remaining budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_left), table=1)
     print '  : -> Requested budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_reqd), table=1)
+
+  def report (self):
+
+    print
+    print ' :: SAMPLES:'
 
     print '    -> Updated number of samples for each level:'
     print '      ',
@@ -101,7 +109,10 @@ class Estimated_Budget (Samples):
     for level in self.levels:
       print '%d' % self.counts.additional [level],
     print
-  
+
+    # report budget status
+    self.report_budget()
+
   # query for budget
   def query (self):
     

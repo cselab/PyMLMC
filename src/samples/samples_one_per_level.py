@@ -25,3 +25,14 @@ class One_Per_Level (Samples):
   
   def finished (self, errors):
     return 1
+
+  def report (self):
+
+    print
+    print ' :: SAMPLES:'
+
+    print '    -> Number of samples for each level:'
+    print '      ',
+    for level in self.levels:
+      print '%d' % self.counts.additional [level],
+    print
