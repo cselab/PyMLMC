@@ -293,6 +293,10 @@ class Solver (object):
 
     # append command to create status file
     job += '\n' + 'touch %s' % ( self.statusfile % label )
+
+    # fork to background for ensemble jobs
+    if parallelization.batch and local.ensembles:
+      job = '(%s) &' % job
     
     # prepare solver
     self.prepare (directory)
