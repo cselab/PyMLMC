@@ -134,7 +134,7 @@ class Scheduler (object):
 
   def report (self):
     
-    print '  : Requested level allocation ratios:' % str(self.ratios)
+    print '  : Requested level allocation ratios:'
     print '    %s' % str(self.ratios)
     print '  : SPECIFICATIONS:'
     print '    Cores per node: %d' % local.cores
