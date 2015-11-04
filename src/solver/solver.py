@@ -408,17 +408,20 @@ class Solver (object):
           # set label
           label = self.label (level, type) + 'e%d' % (i+1)
 
-          # header for the ensemble job
-          ensemble = '\n# === BATCH JOB id %d' % i
+          # initialize ensemble job
+          ensemble = ''
 
           # prepare each part of the batch job
           for j, part in enumerate (parts [submitted : submitted + count]):
 
             # prepare job to be part of an ensemble with batch job id = i
-            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : i} for job in part ]
+            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : j} for job in part ]
 
             # construct batch job
             batch = ''.join (part)
+
+            # header for the ensemble job
+            ensemble += '\n# === BATCH JOB id %d' % j
 
             # add batch job to the ensemble
             ensemble += batch
