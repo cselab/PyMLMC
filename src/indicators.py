@@ -77,7 +77,7 @@ class Indicators (object):
 
   def report (self):
 
-    if numpy.isnan (self.normalizations):
+    if numpy.isnan (self.normalization):
       print
       print ' :: INDICATORS: N/A since \'normalization\' is N/A'
       return
