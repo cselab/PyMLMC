@@ -170,22 +170,20 @@ class Indicators (object):
         if level != 0:
           self.variance_diff [level] = self.variance_diff [level-1] / 2
         else:
+          self.variance_diff [level] = numpy.nan
           print
-          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print ' :: WARNING: Extrapolation of indicators not possible!'
           print
-          import sys
-          sys.exit()
     
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
         if level != 0:
           self.variance [level] [0] = self.variance [level-1] [0]
         else:
+          self.variance [level] [0] = numpy.nan
           print
-          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print ' :: WARNING: Extrapolation of indicators not possible!'
           print
-          import sys
-          sys.exit()
     
     for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
