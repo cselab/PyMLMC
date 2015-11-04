@@ -167,7 +167,7 @@ class MLMC (object):
 
       # report number of samples used so far (avoid updating as this might not be possible)
       self.config.samples.report   ()
-
+      
       # for interactive sessions, query user for additional input
       if self.params.query:
         while self.query():
