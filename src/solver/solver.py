@@ -422,7 +422,7 @@ class Solver (object):
           ensemble = local.ensemble % args
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, count), directory )
 
           # update 'submitted' counter
           submitted += count
