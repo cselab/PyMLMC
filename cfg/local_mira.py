@@ -114,7 +114,7 @@ ensemble_job = '''ulimit -c 0; runjob \
   --envs XLSMPOPTS=parthds=%(threads)d \
   --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
-  : %(cmd)s %(options)s &
+  : %(cmd)s %(options)s
   '''
 
 # batch job block hook
