@@ -418,7 +418,7 @@ class Solver (object):
             ensemble += batch
 
           # construct an ensemble
-          args = {'nodes' : parallelization.nodes, 'emsemble' : ensemble}
+          args = {'nodes' : parallelization.nodes, 'ensemble' : ensemble}
           ensemble = local.ensemble % args
 
           # submit
