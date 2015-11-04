@@ -157,12 +157,17 @@ class MLMC (object):
         print ' :: Simulation finished.'
         self.status.save (self.config)
         return
-      
+
+      '''
       # update, report, and validate the required number of samples
       self.config.samples.update   (self.errors, self.indicators)
       self.config.samples.report   ()
       self.config.samples.validate ()
-      
+      '''
+
+      # report number of samples used so far (avoid updating as this might not be possible)
+      self.config.samples.report   ()
+
       # for interactive sessions, query user for additional input
       if self.params.query:
         while self.query():
@@ -176,6 +181,12 @@ class MLMC (object):
           self.config.samples.update   (self.errors, self.indicators)
           self.config.samples.report   ()
           self.config.samples.validate ()
+
+      # for non-interactive sessions, proceed immediately
+      else:
+        self.config.samples.update   (self.errors, self.indicators)
+        self.config.samples.report   ()
+        self.config.samples.validate ()
       
       # save the required number of samples
       self.config.samples.save ()
