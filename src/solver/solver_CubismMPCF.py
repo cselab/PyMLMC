@@ -264,11 +264,13 @@ class Interpolated_Time_Series (object):
     for key in self.data.keys():
       self.data [key] = self.data [key] [order]
 
-  def interpolate (self, points):
+  def interpolate (self, points, begin=None, end=None):
     
     from numpy import linspace, interp
+    if begin == None: begin = self.meta ['t'] [0]
+    if end   == None: end   = self.meta ['t'] [-1]
     
-    times = linspace ( self.meta ['t'] [0], self.meta ['t'] [-1], points )
+    times = linspace ( begin, end, points )
     for key in self.data.keys():
       self.data [key] = interp ( times, self.meta ['t'], self.data [key], left=None, right=None )
     

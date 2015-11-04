@@ -54,7 +54,7 @@ class Errors (object):
   
   # report relative sampling errors
   def report (self):
-
+    
     print
     print ' :: ERRORS: (normalized to %.1e)' % self.normalization
     
