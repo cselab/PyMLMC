@@ -190,8 +190,7 @@ class Indicators (object):
         if level != 1:
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
+          self.variance [level] [1] = numpy.nan
           print
-          print ' :: ERROR: Extrapolation of indicators not possible!'
+          print ' :: WARNING: Extrapolation of indicators not possible!'
           print
-          import sys
-          sys.exit()
