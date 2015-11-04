@@ -21,18 +21,21 @@ cluster = 1
 cores     = 16   # per node
 threads   = 4    # per core
 walltime  = 1    # h
-memory    = 1024 # GB per core
+memory    = 1024 # MB per core
 rack      = 1024 # nodes
 
 # constraints
 
 bootup       = 5   # minutes
 min_cores    = 512 * cores
+max_cores    = 49152 * cores
 
 def min_walltime (cores): # hours
   return 0.5
 
 def max_walltime (cores): # hours
+  if cores == 'default':
+    return '12/24'
   if cores <= 16 * 4096:
     return 12
   else:

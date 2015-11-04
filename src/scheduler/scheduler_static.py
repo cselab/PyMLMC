@@ -28,10 +28,8 @@ class Static (Scheduler):
     
     print
     print ' :: SCHEDULER: static'
-    print '  : Ratios: %s' % str(self.ratios)
-    print '  : Min cores: %d' % local.min_cores
-    print '  : Min nodes: %d' % (local.min_cores / local.cores)
-    
+    self.report ()
+
     for level, type in self.levels_types:
 
       required = self.cores / float (self.ratios [level - type])
