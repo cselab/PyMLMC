@@ -109,13 +109,14 @@ class Estimated (Samples):
       for level in self.levels:
         print '%d' % self.counts_updated [level],
       print
-    
-    fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-    print '    -> Pending number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts.additional [level],
-    print
+
+    if self.counts.additional != []:
+      fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
+      print '    -> Pending number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
+      print '      ',
+      for level in self.levels:
+        print '%d' % self.counts.additional [level],
+      print
   
   # query for tolerance
   def query (self):

@@ -94,12 +94,13 @@ class Estimated_Budget (Samples):
       for level in self.levels:
         print '%d' % self.counts_updated [level],
       print
-    
-    print '    -> Pending number of samples for each level'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts.additional [level],
-    print
+
+    if self.counts.additional != []:
+      print '    -> Pending number of samples for each level'
+      print '      ',
+      for level in self.levels:
+        print '%d' % self.counts.additional [level],
+      print
 
     # report budget status
     self.report_budget()
