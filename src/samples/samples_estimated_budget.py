@@ -27,16 +27,20 @@ class Estimated_Budget (Samples):
     print
     print ' :: SAMPLES: estimated for the specified budget'
 
-    # default warmup samples
+    # set range for multiple warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
-    counts = numpy.array ( [ self.warmup * ( 4 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+    
+    # compute warmup samples based on works
+    #counts = numpy.array ( [ self.warmup * ( 4 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+    counts = numpy.array ( [ self.warmup * round ( float (self.works [self.L] / self.works [level-1]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
+
+    # adjust warmup samples w.r.t. set range for multiple warmup samples
+    counts [0 : self.warmup_finest_level+1] = counts [self.L - self.warmup_finest_level : self.L+1]
+    counts [self.warmup_finest_level : ]    = counts [self.L]
 
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
-    
-    # set simulation type (deterministic or stochastic)
-    #self.deterministic = ( self.warmup == 1 and self.L == 0 )
 
     # report budget status
     self.report_budget()
@@ -61,15 +65,7 @@ class Estimated_Budget (Samples):
     for level in self.levels:
      if self.counts_updated [level] > self.counts.computed [level]:
         self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
-
-    '''
-    # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
-    # this prevents assigning wrong number of samples based on _extrapolated_ indicators
-    for level in self.levels:
-      if self.counts.computed [level] == 1 and self.counts.additional [level] > 1:
-        self.counts.additional [level] = 1;
-    '''
-
+    
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.computed + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     

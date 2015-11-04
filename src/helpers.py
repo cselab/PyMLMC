@@ -94,10 +94,10 @@ def pair (a, b):
 # dump list to file
 def dump (listvar, listformat, listname, filename):
   with open ( filename, 'a') as f:
-    line = listname + ' .append ( [ '
+    line = listname + ' = [ '
     for var in listvar:
       line += listformat % var + ', '
-    f.write ( line + '] )\n' )
+    f.write ( line + ']\n' )
 
 # load MLMC simulation from a different directory
 def load (dir):

@@ -29,16 +29,20 @@ class Estimated (Samples):
     print
     print ' :: SAMPLES: estimated for the specified tolerance'
     
-    # default warmup samples
+    # set range for multiple warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
-    counts = numpy.array ( [ self.warmup * ( 4 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+
+    # compute warmup samples based on works
+    #counts = numpy.array ( [ self.warmup * ( 4 ** max ( 0, self.warmup_finest_level - level) ) for level in self.levels ] )
+    counts = numpy.array ( [ self.warmup * round ( float (self.works [self.L] / self.works [level-1]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
+
+    # adjust warmup samples w.r.t. set range for multiple warmup samples
+    counts [0 : self.warmup_finest_level+1] = counts [self.L - self.warmup_finest_level : self.L+1]
+    counts [self.warmup_finest_level : ]    = counts [self.L]
 
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
-    
-    # set simulation type (deterministic or stochastic)
-    #self.deterministic = ( self.warmup == 1 and self.L == 0 )
   
   def finished (self, errors):
 
@@ -109,13 +113,6 @@ class Estimated (Samples):
     print
     
     fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-    '''
-    print '    -> Updated number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
-    print '      ',
-    for level in self.levels:
-      print '%d' % ( self.counts.computed [level] + self.counts.additional [level] ),
-    print
-    '''
     print '    -> Additional number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
     print '      ',
     for level in self.levels:

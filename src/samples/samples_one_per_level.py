@@ -19,9 +19,6 @@ class One_Per_Level (Samples):
     
     self.counts.computed   = [ 0 for level in self.levels ]
     self.counts.additional = [ 1 for level in self.levels ]
-    
-    # set simulation type (deterministic or stochastic)
-    #self.deterministic = ( self.L == 0 )
   
   def finished (self, errors):
     return 1
