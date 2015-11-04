@@ -13,6 +13,7 @@
 
 import os
 import sys
+import math
 
 # === local imports
 
@@ -75,7 +76,7 @@ class MC (object):
       count = intf (1, table=1)
       if self.parallelization.batch and self.parallelization.batchmax != None:
         scope = intf (self.parallelization.batchmax, table=1)
-        count = intf (ceil (float (len(config.samples)) / self.parallelization.batchmax), table=1)
+        count = intf (math.ceil (float (len(config.samples)) / self.parallelization.batchmax), table=1)
       args += ( self.parallelization.hours, self.parallelization.minutes, batch, count )
       return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s  |  %s' % args
     else:
