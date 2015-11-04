@@ -71,11 +71,13 @@ class MC (object):
       args = ( config.level, typestr, resolution, intf(len(config.samples), table=1), intf(self.parallelization.cores, table=1), 'C' )
     
     if self.parallelization.walltime and local.cluster:
-      scope = ''
+      batch = ''
+      count = intf (1, table=1)
       if self.parallelization.batch and self.parallelization.batchmax != None:
-        scope = intf(self.parallelization.batchmax, table=1)
-      args += ( self.parallelization.hours, self.parallelization.minutes, scope )
-      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s' % args
+        scope = intf (self.parallelization.batchmax, table=1)
+        count = intf (ceil (float (len(config.samples)) / self.parallelization.batchmax), table=1)
+      args += ( self.parallelization.hours, self.parallelization.minutes, batch, count )
+      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s  |  %s' % args
     else:
       return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s' % args
 
