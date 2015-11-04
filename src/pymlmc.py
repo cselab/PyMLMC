@@ -258,7 +258,9 @@ class MLMC (object):
   
   # check if MC estimates are already available
   def join (self):
-    
+
+    from helpers import intf
+
     print
     if self.config.deterministic:
       print ' :: STATUS of simulation:'
@@ -272,7 +274,7 @@ class MLMC (object):
       if self.config.deterministic:
         args = tuple()
       else:
-        args = ( mc.config.level, ['  FINE', 'COARSE'] [mc.config.type], intf(len(mc.config.samples)) )
+        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1) )
       pending = mc.pending()
       if pending == 0:
         runtime = mc.timer (self.config.scheduler.batch)
@@ -291,7 +293,7 @@ class MLMC (object):
         if self.config.deterministic:
           print format % ( args + ( 'pending', ) )
         else:
-          print format % ( args + ( 'pending: %d' % pending, ) )
+          print format % ( args + ( 'pending: %s' % intf (pending, table=1), ) )
     
     if not self.finished:
       print

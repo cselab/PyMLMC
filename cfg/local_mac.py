@@ -10,7 +10,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'MacBook Pro (2014)'
+name = 'Apple MacBook Pro (2014)'
 
 # Mac is not a cluster
 cluster = 0
@@ -30,6 +30,9 @@ min_cores    = 1
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
+
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
 
 # scratch path
 scratch = None
