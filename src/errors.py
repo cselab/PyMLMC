@@ -75,7 +75,7 @@ class Errors (object):
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):
 
-    if not self.total_error:
+    if numpy.isnan(self.total_error) or self.total_error == 0:
       print
       print ' :: WARNING: Speedup can not be estimated since total sampling error is not available.'
       print
