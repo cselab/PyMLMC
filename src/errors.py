@@ -53,7 +53,7 @@ class Errors (object):
     self.total_error = self.total_relative_error * self.normalization
   
   # report relative sampling errors
-  def report (self, tol):
+  def report (self):
 
     print
     print ' :: ERRORS: (normalized to %.1e)' % self.normalization
@@ -64,11 +64,13 @@ class Errors (object):
       print '%.1e' % self.relative_error [level],
     print
 
-    print '  : Total sampling error : %f [%.1e]' % (self.total_relative_error, self.total_relative_error),
+    print '  : Total sampling error : %f [%.1e]' % (self.total_relative_error, self.total_relative_error)
+    '''
     if tol:
       print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
     else:
       print
+    '''
   
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):

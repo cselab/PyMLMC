@@ -145,7 +145,7 @@ class MLMC (object):
       
       # compute, report, and save errors
       self.errors.compute (self.indicators, self.config.samples.counts)
-      self.errors.report  (self.config.samples.tol)
+      self.errors.report  ()
       self.errors.save    ()
       
       # report speedup (MLMC vs MC)
