@@ -421,7 +421,7 @@ class Solver (object):
             batch = ''.join (part)
 
             # header for the ensemble job
-            ensemble += '\n# === BATCH JOB id %d' % j
+            ensemble += '\n# === BATCH JOB id %d\n' % j
 
             # add batch job to the ensemble
             ensemble += batch
