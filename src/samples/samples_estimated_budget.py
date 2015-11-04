@@ -23,9 +23,6 @@ class Estimated_Budget (Samples):
     vars (self) .update ( locals() )
   
   def init (self):
-    
-    print
-    print ' :: SAMPLES: estimated for the specified budget'
 
     # set range for multiple warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
@@ -41,8 +38,7 @@ class Estimated_Budget (Samples):
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
 
-    # report budget status
-    self.report_budget()
+    self.counts_updated = None
 
   def finished (self, errors):
 
@@ -91,15 +87,16 @@ class Estimated_Budget (Samples):
   def report (self):
 
     print
-    print ' :: SAMPLES:'
+    print ' :: SAMPLES: (estimated for the specified budget)'
 
-    print '    -> Updated number of samples for each level:'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts_updated [level],
-    print
+    if self.counts_updated:
+      print '    -> Updated number of samples for each level:'
+      print '      ',
+      for level in self.levels:
+        print '%d' % self.counts_updated [level],
+      print
     
-    print '    -> Additional number of samples for each level'
+    print '    -> Pending number of samples for each level'
     print '      ',
     for level in self.levels:
       print '%d' % self.counts.additional [level],

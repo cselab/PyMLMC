@@ -26,9 +26,6 @@ class Estimated (Samples):
   
   def init (self):
     
-    print
-    print ' :: SAMPLES: estimated for the specified tolerance'
-    
     # set range for multiple warmup samples
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
@@ -42,6 +39,8 @@ class Estimated (Samples):
 
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
+
+    self.counts_updated = None
   
   def finished (self, errors):
 
@@ -103,16 +102,17 @@ class Estimated (Samples):
   def report (self):
     
     print
-    print ' :: SAMPLES:'
-    
-    print '    -> Updated number of samples for each level:'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts_updated [level],
-    print
+    print ' :: SAMPLES: (estimated for the specified tolerance)'
+
+    if self.counts_updated:
+      print '    -> Updated number of samples for each level:'
+      print '      ',
+      for level in self.levels:
+        print '%d' % self.counts_updated [level],
+      print
     
     fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-    print '    -> Additional number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
+    print '    -> Pending number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
     print '      ',
     for level in self.levels:
       print '%d' % self.counts.additional [level],

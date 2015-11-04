@@ -13,10 +13,7 @@ from samples import *
 class One_Per_Level (Samples):
   
   def init (self):
-    
-    print
-    print ' :: SAMPLES: one sample per each level'
-    
+
     self.counts.computed   = [ 0 for level in self.levels ]
     self.counts.additional = [ 1 for level in self.levels ]
   
@@ -26,7 +23,7 @@ class One_Per_Level (Samples):
   def report (self):
 
     print
-    print ' :: SAMPLES:'
+    print ' :: SAMPLES: (one sample per each level)'
 
     print '    -> Number of samples for each level:'
     print '      ',

@@ -92,8 +92,9 @@ class MLMC (object):
   # initial phase
   def init (self):
     
-    # initialize, validate, and save the required number of samples
+    # initialize, report, validate, and save the required number of samples
     self.config.samples.init     ()
+    self.config.samples.report   ()
     self.config.samples.validate ()
     if not self.config.deterministic:
       self.config.samples.save     ()
