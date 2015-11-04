@@ -84,7 +84,7 @@ class Parallelization (object):
     # adjust 'walltime' according to 'batchsize'
     if self.walltime != None:
       self.set_walltime ( self.walltime * self.batchsize )
-  
+
   # distribute ranks for ndims dimensions
   def reshape (self, ndims):
     counts = [1 for dim in range(ndims)]

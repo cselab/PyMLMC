@@ -197,7 +197,7 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.'):
+  def submit (self, job, parallelization, label, directory='.', ensemble=None):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
@@ -235,6 +235,11 @@ class Solver (object):
     # take bootup time into account
     if args ['hours'] == 0 and args ['minutes'] < 2 * local.bootup:
       args ['minutes'] += local.bootup
+
+    # take ensemble size into account, if specified
+    if ensemble:
+      args ['cores'] *= ensemble
+      args ['nodes'] *= ensemble
 
     # assemble submission script (if enabled)
     if local.script:
@@ -406,13 +411,13 @@ class Solver (object):
 
             # add batch job to the ensemble
             ensemble += batch
-          
+
           # construct an ensemble
           args = {'nodes' : parallelization.nodes, 'emsemble' : ensemble}
           ensemble = local.ensemble % args
 
           # submit
-          self.execute ( self.submit_ensemble (ensemble, parallelization, label, directory), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory), directory )
 
           # update 'submitted' counter
           submitted += count
