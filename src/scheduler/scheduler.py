@@ -146,5 +146,5 @@ class Scheduler (object):
     print '    Min nodes: %d' % (local.min_cores / local.cores)
     print '    Max nodes: %d' % (local.max_cores / local.cores)
     print '    Min walltime (h): %s' % str(local.min_walltime ('default'))
-    print '    Max walltime (h): %d' % str(local.max_walltime ('default'))
+    print '    Max walltime (h): %s' % str(local.max_walltime ('default'))
 
