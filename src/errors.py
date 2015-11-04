@@ -74,7 +74,13 @@ class Errors (object):
   
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):
-    
+
+    if not self.total_error:
+      print
+      print ' :: WARNING: Speedup can not be estimated since total sampling error is not available.'
+      print
+      return
+
     work_mlmc    = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )
     variance_mc  = numpy.max ( [ self.indicators.variance [level] [0] for level in self.levels ] )
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
