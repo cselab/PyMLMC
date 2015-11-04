@@ -90,6 +90,12 @@ class Estimated_Budget (Samples):
     print
     print ' :: SAMPLES: (estimated for the specified budget)'
 
+    print '    -> Computed number of samples for each level:'
+    print '      ',
+    for level in self.levels:
+      print '%d' % self.counts.computed [level],
+    print
+    
     if self.counts_updated:
       print '    -> Updated number of samples for each level:'
       print '      ',
