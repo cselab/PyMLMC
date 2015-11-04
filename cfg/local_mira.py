@@ -53,7 +53,7 @@ performance = 1
 scratch = None
 
 # ensemble support
-ensembles = 0
+ensembles = 1
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
