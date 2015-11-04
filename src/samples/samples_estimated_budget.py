@@ -78,6 +78,8 @@ class Estimated_Budget (Samples):
     budget_used = sum ( [ self.works [level] * self.counts.computed [level] for level in self.levels ] )
     budget_left = self.budget - budget_used
     budget_reqd = sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] )
+    print self.counts.additional
+    print self.works
 
     print '  : -> Specified budget: %s CPU hours' % helpers.intf (numpy.ceil(self.budget), table=1)
     print '  : -> Consumed  budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_used), table=1)
