@@ -397,7 +397,7 @@ class Solver (object):
 
         # submit each ensemble
         submitted = 0
-        for i, count in enumerate (decompsition):
+        for i, count in enumerate (decomposition):
 
           # set label
           label = self.label (level, type) + 'e%d' % (i+1)
