@@ -76,27 +76,32 @@ class Indicators (object):
     self.normalization = self.mean [self.L] [0]
 
   def report (self):
-    
+
+    if numpy.isnan (self.normalizations):
+      print
+      print ' :: INDICATORS: N/A since \'normalization\' is N/A'
+      return
+
     print
     print ' :: INDICATORS: (normalized to %.1e)' % self.normalization
     
     # report mean (fine)
     print '  : EPSILON [FI]:',
     for level in self.levels:
-      print '%.1e' % (self.mean [level] [0] / self.normalization),
+      print '%.1e' % (self.mean [level] [0] / self.normalization) if not numpy.isnan ( self.mean [level] [0] ) else '    N/A',
     print
     
     # report mean (coarse)
     print '  : EPSILON [CO]:',
     print '    ---',
     for level in self.levels [1:]:
-      print '%.1e' % (self.mean [level] [1] / self.normalization),
+      print '%.1e' % (self.mean [level] [1] / self.normalization) if not numpy.isnan ( self.mean [level] [1] ) else '    N/A',
     print
     
     # report mean_diff
     print '  : EPSILON DIFF:',
     for level in self.levels:
-      print '%.1e' % (self.mean_diff [level] / self.normalization),
+      print '%.1e' % (self.mean_diff [level] / self.normalization) if not numpy.isnan ( self.mean_diff [level] ) else '    N/A',
     print
     
     # report variance (fine)
