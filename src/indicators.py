@@ -79,7 +79,7 @@ class Indicators (object):
 
     if numpy.isnan (self.normalization):
       print
-      print ' :: INDICATORS: N/A since \'normalization\' is N/A'
+      print ' :: INDICATORS: not available since \'normalization\' is N/A'
       return
 
     print
