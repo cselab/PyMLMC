@@ -258,15 +258,21 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
-  
+
+    # assemble submission command
+    if ensemble:
+      submit = local.submit_ensemble % args
+    else:
+      submit = local.submit % args
+
     # create submit script
     submitfile = os.path.join (directory, self.submitfile % label)
     with open (submitfile, 'w') as f:
-      f.write ( local.submit % args )
+      f.write (submit)
       self.chmodx (submitfile)
-    
-    # assemble submission command
-    return local.submit % args
+
+    # return submission command
+    return submit
   
   # launch a job from the specified 'args' and 'parallelization'
   # depending on parameters, job will be run immediately or will be submitted to a queueing system
