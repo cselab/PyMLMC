@@ -72,7 +72,7 @@ class MC (object):
       args = ( config.level, typestr, resolution, intf(len(config.samples), table=1), intf(self.parallelization.cores, table=1), 'C' )
     
     if self.parallelization.walltime and local.cluster:
-      batch = ''
+      batch = '    '
       count = intf (1, table=1)
       if self.parallelization.batch and self.parallelization.batchmax != None:
         scope = intf (self.parallelization.batchmax, table=1)
