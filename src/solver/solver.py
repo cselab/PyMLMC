@@ -238,8 +238,12 @@ class Solver (object):
 
     # take ensemble size into account, if specified
     if ensemble:
-      args ['cores'] *= ensemble
-      args ['nodes'] *= ensemble
+      if ensemble <= parallelization.mergemax:
+        args ['cores'] *= ensemble
+        args ['nodes'] *= ensemble
+      else:
+        print ' :: ERROR: \'ensemble\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (ensemble, parallelization.mergemax)
+        sys.exit()
 
     # assemble submission script (if enabled)
     if local.script:
@@ -389,6 +393,7 @@ class Solver (object):
         binary = bin ( len(parts) )
         decomposition = [ 2**(len(binary) - 1 - power) if flag == '1' else 0 for power, flag in enumerate(binary) ]
         decomposition = [ ensemble for ensemble in decomposition if ensemble != 0 ]
+        # TODO: enforce: ensemble <= parallelization.mergemax
 
         # submit each ensemble
         submitted = 0
