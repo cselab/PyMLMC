@@ -21,6 +21,7 @@ class Estimated_Budget (Samples):
     
     # save configuration
     vars (self) .update ( locals() )
+    self.counts_updated = None
   
   def init (self):
 
@@ -37,8 +38,6 @@ class Estimated_Budget (Samples):
 
     self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
-
-    self.counts_updated = None
 
   def finished (self, errors):
 
