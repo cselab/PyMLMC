@@ -16,7 +16,7 @@ import sys
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None, email=''):
+  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None, mergemax=None, email=''):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -104,6 +104,7 @@ class Scheduler (object):
     self.L = len(levels) - 1
     self.parallelizations = helpers.level_type_list (levels)
     self.batch = helpers.level_type_list (levels)
+    #self.merge = helpers.level_type_list (levels)
 
     print
     print ' :: MACHINE:'

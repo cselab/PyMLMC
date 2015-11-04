@@ -52,6 +52,9 @@ performance = 1
 #scratch = '/projects/CloudPredict/sukysj/pymlmc'
 scratch = None
 
+# ensemble support
+ensembles = 0
+
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
   --envs BG_MEMSIZE=16384 \
@@ -71,7 +74,6 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs OMP_WAIT_POLICY=PASSIVE \
   --envs OMP_PROC_BIND=FALSE \
   --envs USEMAXTHREADS=0 \
-  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
   --envs MYROUNDS=1 \
   --envs DARSHAN_DISABLE=1 \
   '''
@@ -86,6 +88,7 @@ simple_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
+  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
@@ -97,9 +100,47 @@ mpi_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
+  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
+
+# MPI run command for a specific batch job id
+ensemble_job = '''ulimit -c 0; runjob \
+  --np %(ranks)d \
+  --ranks-per-node %(tasks)d \
+  --cwd $PWD \
+  --envs OMP_NUM_THREADS=%(threads)d \
+  --envs XLSMPOPTS=parthds=%(threads)d \
+  --block BATCH_JOB_BLOCK_HOOK \
+  %(envs)s \
+  : %(cmd)s %(options)s &
+  '''
+
+# batch job block hook
+BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
+
+# ensembles of jobs
+ensemble = '''#!/bin/bash
+
+BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
+
+for BLOCK in $BLOCKS
+do
+  boot-block --block $BLOCK &
+done
+wait
+
+%(ensemble)s
+
+wait
+
+for BLOCK in $BLOCKS
+do
+  boot-block --block $BLOCK --free &
+done
+wait
+'''
 
 # submission script template
 script = None
@@ -107,7 +148,10 @@ script = None
 # submit command
 submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
 
+# submit command for ensemble jobs
+submit_ensemble = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(jobfile)s'
+
 # timer
-#timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
-timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s; touch %(statusfile)s'
+#timer = 'time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
 #timer = None

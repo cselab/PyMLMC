@@ -13,6 +13,7 @@ import sys
 import subprocess
 import shutil
 import stat
+import math
 
 import local
 
@@ -162,7 +163,7 @@ class Solver (object):
     return args
   
   # assemble job command
-  def job (self, args):
+  def job (self, args, merge):
     
     # if input directory does not exist, create it
     if not os.path.exists (self.inputdir):
@@ -190,6 +191,8 @@ class Solver (object):
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
       return local.simple_job % args
+    elif merge:
+      return local.ensemble_job % args
     else:
       return local.mpi_job % args
   
@@ -197,7 +200,7 @@ class Solver (object):
   def submit (self, job, parallelization, label, directory='.'):
     
     # check if walltime does not exceed 'local.max_walltime'
-    if parallelization.walltime > local.max_walltime:
+    if parallelization.walltime > local.max_walltime (parallelization.cores):
       print ' :: ERROR: \'walltime\' exceeds \'max_walltime\' in \'local.py\': %.2f > %.2f' % (parallelization.walltime, local.max_walltime)
       sys.exit()
     
@@ -262,14 +265,17 @@ class Solver (object):
   def launch (self, args, parallelization, level, type, sample):
     
     # assemble job
-    job = self.job (args)
+    job = self.job (args, parallelization.batch and local.ensembles)
     
     # get directory
     directory = self.directory (level, type, sample)
     
     # get label
     label = self.label (level, type, sample)
-    
+
+    # prepend command to print date
+    job = 'date\n' + job
+
     # append command to create status file
     job += '\n' + 'touch %s' % ( self.statusfile % label )
     
@@ -353,19 +359,64 @@ class Solver (object):
       # get directory
       directory = self.directory (level, type)
       
-      # split batch job into parts
+      # split batch jobs into parts
       parts = [ self.batch [i:i+parallelization.batchsize] for i in range (0, len(self.batch), parallelization.batchsize) ]
-      
-      # submit each part of the batch job
-      for i, part in enumerate(parts):
+
+      # if merging into ensembles is disabled
+      if not local.ensembles:
+
+        # submit each part of the batch job
+        for i, part in enumerate (parts):
+
+          # construct batch job
+          batch = ''.join (part)
         
-        # extract required part of the batch job
-        batch = ''.join (part)
-        
-        # submit
-        label = self.label (level, type) + '_b%d' % (i+1)
-        self.execute ( self.submit (batch, parallelization, label, directory), directory )
-  
+          # set label
+          label = self.label (level, type) + '_b%d' % (i+1)
+
+          # submit
+          self.execute ( self.submit (batch, parallelization, label, directory), directory )
+
+      # else if merging into ensembles is enabled
+      else:
+
+        # split parts into ensembles (with size being powers of 2)
+        binary = bin ( len(parts) )
+        decomposition = [ 2**(len(binary) - 1 - power) if flag == '1' else 0 for power, flag in enumerate(binary) ]
+        decomposition = [ ensemble for ensemble in decomposition if ensemble != 0 ]
+
+        # submit each ensemble
+        submitted = 0
+        for i, count in enumerate (decompsition):
+
+          # set label
+          label = self.label (level, type) + 'e%d' % (i+1)
+
+          # header for the ensemble job
+          ensemble = '\n# === BATCH JOB id %d' % i
+
+          # prepare each part of the batch job
+          for j, part in enumerate (parts [submitted : submitted + count]):
+
+            # prepare job to be part of an ensemble with batch job id = i
+            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : i} for job in part ]
+
+            # construct batch job
+            batch = ''.join (part)
+
+            # add batch job to the ensemble
+            ensemble += batch
+          
+          # construct an ensemble
+          args = {'nodes' : parallelization.nodes, 'emsemble' : ensemble}
+          ensemble = local.ensemble % args
+
+          # submit
+          self.execute ( self.submit_ensemble (ensemble, parallelization, label, directory), directory )
+
+          # update 'submitted' counter
+          submitted += count
+
   # check if the job is finished
   # (required only for non-interactive sessions)
   def finished (self, level, type, sample):
