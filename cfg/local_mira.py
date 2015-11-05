@@ -116,7 +116,7 @@ script = '''#!/bin/bash
 # get blocks for each batch job in the ensemble
 BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
 
-# split string of blocks into array elements                                                                                                                                       │-bash: a: command not found
+# split string of blocks into array elements
 read -r -a BLOCKS <<< $BLOCKS
 
 for BLOCK in $BLOCKS
