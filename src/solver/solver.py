@@ -256,7 +256,7 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
-    
+
     submit = local.submit % args
 
     # create submit script
@@ -421,7 +421,7 @@ class Solver (object):
             batch = ''.join (part)
 
             # fork to background (such that other batch jobs in ensemble could proceed)
-            batch = '(%s) &' % batch
+            batch = '(%s) &\n' % batch
 
             # header for the ensemble job
             ensemble += '\n# === BATCH JOB id %d\n' % j
