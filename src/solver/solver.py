@@ -191,10 +191,6 @@ class Solver (object):
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
       return local.simple_job % args
-    '''
-    elif merge:
-      return local.ensemble_job % args
-    '''
     else:
       return local.mpi_job % args
   
