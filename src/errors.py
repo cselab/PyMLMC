@@ -36,9 +36,9 @@ class Errors (object):
     
     # extrapolate missing indicators
     if indicators.nans:
-      self.indicators.extrapolate ()
       print
       print ' :: WARNING: Missing indicator values are extrapolated!'
+      self.indicators.extrapolate ()
 
     # set the normalization
     self.normalization = self.indicators.normalization
@@ -54,7 +54,12 @@ class Errors (object):
   
   # report relative sampling errors
   def report (self):
-    
+
+    if numpy.isnan (self.normalization):
+      print
+      print ' :: ERRORS: not available since \'normalization\' is N/A'
+      return
+
     print
     print ' :: ERRORS: (normalized to %.1e)' % self.normalization
     
@@ -78,7 +83,6 @@ class Errors (object):
     if numpy.isnan(self.total_error) or self.total_error == 0:
       print
       print ' :: WARNING: Speedup can not be estimated since total sampling error is not available.'
-      print
       return
 
     work_mlmc    = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )

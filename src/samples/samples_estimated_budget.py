@@ -95,7 +95,7 @@ class Estimated_Budget (Samples):
     for level in self.levels:
       print '%d' % self.counts.computed [level],
     print
-    
+
     if self.counts_updated:
       print '    -> Updated number of samples for each level:'
       print '      ',
@@ -118,7 +118,11 @@ class Estimated_Budget (Samples):
     
     print
     print ' :: QUERY: specify the required computational budget [press ENTER to leave %s CPU hours]: ' % helpers.intf (self.budget)
-    budget = float ( raw_input ( '  : ' ) or str(self.budget) )
+    input = raw_input ( '  : ' ) or str(self.budget)
+    input = input.replace ('K', '000')
+    input = input.replace ('M', '000000')
+    input = input.replace ('G', '000000000')
+    budget = float ( input )
     modified = budget != self.budget
     self.budget = budget
     return modified

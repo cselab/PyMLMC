@@ -140,12 +140,12 @@ class Scheduler (object):
     print '  : SPECIFICATIONS:'
     print '    Cores per node: %d' % local.cores
     print '    Threads per core: %d' % local.threads
-    print '    Memory (MB) per core: %d' % local.memory
+    if local.memory:    print '    Memory (MB) per core: %d' % local.memory
     print '  : CONSTRAINTS:'
-    print '    Min cores: %d' % local.min_cores
-    print '    Max cores: %d' % local.max_cores
-    print '    Min nodes: %d' % (local.min_cores / local.cores)
-    print '    Max nodes: %d' % (local.max_cores / local.cores)
-    print '    Min walltime (h): %s' % str(local.min_walltime ('default'))
-    print '    Max walltime (h): %s' % str(local.max_walltime ('default'))
+    if local.min_cores:    print '    Min cores: %d' % local.min_cores
+    if local.max_cores:    print '    Max cores: %d' % local.max_cores
+    if local.min_cores:    print '    Min nodes: %d' % (local.min_cores / local.cores)
+    if local.max_cores:    print '    Max nodes: %d' % (local.max_cores / local.cores)
+    if local.min_walltime: print '    Min walltime (h): %s' % str(local.min_walltime ('default'))
+    if local.max_walltime: print '    Max walltime (h): %s' % str(local.max_walltime ('default'))
 

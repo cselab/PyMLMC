@@ -26,6 +26,7 @@ bootup       = None
 min_walltime = None
 max_walltime = None
 min_cores    = 1
+max_cores    = None
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s

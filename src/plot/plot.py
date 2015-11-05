@@ -835,7 +835,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
     else:
       trendline = 0
 
-  results = mlmc.config.solver.load ( level, type, sample )
+  results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
   
   ts = numpy.array ( results.meta ['t'] )
   vs = numpy.array ( results.data [qoi] )
@@ -942,7 +942,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
     
-    results = mlmc.config.solver.load ( level, type, sample )
+    results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
 
     if results == None:
       continue
@@ -1004,7 +1004,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
       for type in types:
 
-        results = mlmc.config.solver.load ( level, type, sample )
+        results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
 
         if results == None:
           continue
@@ -1076,7 +1076,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
   
   plot_helper_lines (qoi, run)
-
+  
   yend = 1.05 * numpy.max (vs)
   adjust_axes (qoi, extent, xorigin, yorigin, yend=yend)
   
@@ -1252,7 +1252,7 @@ def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, te
 def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, color=None, approximation=False, model='OptPL2', run=1, frame=False, save=None):
   
   if r == None:
-    r = numpy.array ( mlmc.config.solver.load ( mlmc.config.L, 0, 0 ) .data ['Req'] ) [0]
+    r = numpy.array ( mlmc.mcs [ mlmc.config.pick [mlmc.config.L] [0] ] .results [0] .data ['Req'] ) [0]
     if count != 1:
       r /= count ** (1.0/3.0)
   
@@ -1267,7 +1267,7 @@ def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu
     if color == None:
       color = color_params('rp_approximated')
   else:
-    results = mlmc.config.solver.load ( mlmc.config.L, 0, 0 )
+    results = mlmc.mcs [ mlmc.config.pick [mlmc.config.L] [0] ] .results [0]
     tend = numpy.array ( results.meta ['t'] ) [-1]
     model_class = getattr (rp, model)
     ts, rs, ps, drs, model_name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
@@ -1339,7 +1339,7 @@ def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None)
   type   = 0
   sample = 0
   
-  results = mlmc.config.solver.load ( level, type, sample )
+  results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
   
   data = numpy.zeros ( (len (qois), len (results.meta ['t']) - 1) )
   for i, qoi in enumerate (qois):

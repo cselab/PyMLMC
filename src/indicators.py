@@ -17,6 +17,11 @@ import numpy
 
 import helpers
 
+# === warnings suppression
+
+import warnings
+warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
+
 # === classes
 
 class Indicators (object):
@@ -177,8 +182,7 @@ class Indicators (object):
         else:
           self.variance_diff [level] = numpy.nan
           print
-          print ' :: WARNING: Extrapolation of indicators not possible!'
-          print
+          print ' :: WARNING: Extrapolation of indicators \'SIGMA DIFF\' not possible!'
     
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
@@ -187,8 +191,7 @@ class Indicators (object):
         else:
           self.variance [level] [0] = numpy.nan
           print
-          print ' :: WARNING: Extrapolation of indicators not possible!'
-          print
+          print ' :: WARNING: Extrapolation of indicators \'SIGMA [FINE]\' not possible!'
     
     for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
@@ -197,5 +200,4 @@ class Indicators (object):
         else:
           self.variance [level] [1] = numpy.nan
           print
-          print ' :: WARNING: Extrapolation of indicators not possible!'
-          print
+          print ' :: WARNING: Extrapolation of indicators \'SIGMA [COARSE]\' not possible!'

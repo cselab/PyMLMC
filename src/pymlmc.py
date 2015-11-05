@@ -340,8 +340,13 @@ class MLMC (object):
     # load the results from MC simulations
     print
     print ' :: LOADING RESULTS...'
+    print '  :  LEVEL  |   TYPE   |  LOADED  |  FAILED  |'
+    print '  :------------------------------------------|'
+    format = '  :      %d  |  %s  |   %s   |   %s   |'
     for mc in self.mcs:
-      mc.load ()
+      loaded, failed = mc.load ()
+      typestr = [' FINE ', 'COARSE'] [mc.config.type]
+      print format % (mc.config.level, typestr, helpers.intf (loaded, table=1), helpers.intf (failed, table=1) if failed != 0 else '    ')
     print '  : DONE'
   
   # assemble MC and MLMC estimates

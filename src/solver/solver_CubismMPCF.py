@@ -453,10 +453,11 @@ class CubismMPCF (Solver):
     
     # check if any output files found
     if not v2 and not v1:
-      print
-      print ' :: WARNING: Output file does not exist (version 1.0 is also absent)'
-      print '  : %s' % outputfileformat
-      return None
+      if self.params.verbose >= 1:
+        print
+        print ' :: WARNING: Output file does not exist (version 1.0 is also absent)'
+        print '  : %s' % outputfileformat
+      raise Exception ('Output file does not exist')
     
     results = Interpolated_Time_Series ()
     
