@@ -143,6 +143,8 @@ class MC (object):
         except:
           self.results [i] = None
           failed += 1
+
+    return loaded, failed
   
   # assmble MC estimates
   def assemble (self, stats):
