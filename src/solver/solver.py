@@ -256,14 +256,7 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
-
-    '''
-    # assemble submission command
-    if merge:
-      submit = local.submit_ensemble % args
-    else:
-    '''
-
+    
     submit = local.submit % args
 
     # create submit script
@@ -295,14 +288,6 @@ class Solver (object):
     # append command to create status file
     job += '\n' + 'touch %s' % ( self.statusfile % label )
 
-    # fork to background for ensemble jobs
-    if parallelization.batch and local.ensembles:
-      job = '(%s) &' % job
-
-    # else set block hook
-    else:
-      job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
-    
     # prepare solver
     self.prepare (directory)
     
@@ -316,6 +301,11 @@ class Solver (object):
       
       # else submit job to job management system
       else:
+
+        # else set block hook
+        job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
+
+        # submit
         self.execute ( self.submit (job, parallelization, label, directory), directory )
     
     # node run -> execute job directly
@@ -430,17 +420,14 @@ class Solver (object):
             # construct batch job
             batch = ''.join (part)
 
+            # fork to background (such that other batch jobs in ensemble could proceed)
+            batch = '(%s) &' % batch
+
             # header for the ensemble job
             ensemble += '\n# === BATCH JOB id %d\n' % j
 
             # add batch job to the ensemble
             ensemble += batch
-
-          '''
-          # construct an ensemble
-          args = {'nodes' : parallelization.nodes, 'job' : ensemble}
-          ensemble = local.ensemble % args
-          '''
 
           # submit
           self.execute ( self.submit (ensemble, parallelization, label, directory, size), directory )
