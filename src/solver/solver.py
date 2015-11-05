@@ -421,7 +421,7 @@ class Solver (object):
           ensemble = ''
 
           # prepare each part of the batch job
-          for j, part in enumerate (parts [submitted : submitted + count]):
+          for j, part in enumerate (parts [submitted : submitted + size]):
 
             # prepare job to be part of an ensemble with batch job id = i
             # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
@@ -446,7 +446,7 @@ class Solver (object):
           self.execute ( self.submit (ensemble, parallelization, label, directory, size), directory )
 
           # update 'submitted' counter
-          submitted += count
+          submitted += size
 
   # check if the job is finished
   # (required only for non-interactive sessions)
