@@ -131,15 +131,18 @@ class MC (object):
     config = self.config
     loaded = 0
     failed = 0
+
     for i, sample in enumerate (config.samples):
-      try:
+      if self.params.verbose >= 1:
         self.results [i] = config.solver.load ( config.level, config.type, sample )
         loaded += 1
-      except:
-        self.results [i] = None
-        failed += 1
-
-    return loaded, failed
+      else:
+        try:
+          self.results [i] = config.solver.load ( config.level, config.type, sample )
+          loaded += 1
+        except:
+          self.results [i] = None
+          failed += 1
   
   # assmble MC estimates
   def assemble (self, stats):
