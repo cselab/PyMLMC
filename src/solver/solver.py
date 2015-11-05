@@ -303,7 +303,7 @@ class Solver (object):
       else:
 
         # else set block hook
-        job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
+        job = job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
 
         # submit
         self.execute ( self.submit (job, parallelization, label, directory), directory )
