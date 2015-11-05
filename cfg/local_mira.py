@@ -116,6 +116,15 @@ script = '''#!/bin/bash
 # get blocks for each batch job in the ensemble
 BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
 
+# print info about blocks
+echo
+echo 'Obtained blocks:'
+for BLOCK in $BLOCKS
+do
+  echo $BLOCK
+done
+echo
+
 # split string of blocks into array elements
 read -r -a BLOCKS <<< $BLOCKS
 
