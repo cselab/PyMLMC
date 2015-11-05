@@ -123,7 +123,11 @@ BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 # ensembles of jobs
 ensemble = '''#!/bin/bash
 
+# get blocks for each batch job in the ensemble
 BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
+
+# split string of blocks into array elements                                                                                                                                       │-bash: a: command not found
+read -r -a BLOCKS <<< $BLOCKS
 
 for BLOCK in $BLOCKS
 do
