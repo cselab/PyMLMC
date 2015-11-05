@@ -110,7 +110,7 @@ mpi_job = '''ulimit -c 0; runjob \
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 
-# script (required for support of batch job ensembles)
+# submission script template (required for support of batch job ensembles)
 script = '''#!/bin/bash
 
 # get blocks for each batch job in the ensemble
@@ -136,11 +136,8 @@ done
 wait
 '''
 
-# submission script template
-script = None
-
 # submit command
-submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(jobfile)s'
+submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(scriptfile)s'
 #submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
 
 '''
