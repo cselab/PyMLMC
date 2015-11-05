@@ -107,20 +107,6 @@ mpi_job = '''ulimit -c 0; runjob \
   '''
 #  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 
-"""
-# MPI run command for a specific batch job id
-ensemble_job = '''ulimit -c 0; runjob \
-  --np %(ranks)d \
-  --ranks-per-node %(tasks)d \
-  --cwd $PWD \
-  --envs OMP_NUM_THREADS=%(threads)d \
-  --envs XLSMPOPTS=parthds=%(threads)d \
-  --block BATCH_JOB_BLOCK_HOOK \
-  %(envs)s \
-  : %(cmd)s %(options)s
-  '''
-"""
-
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 
