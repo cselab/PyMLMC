@@ -49,8 +49,7 @@ bandwidth = 0.0 # GB/s
 performance = 1
 
 # scratch path
-#scratch = '/projects/CloudPredict/sukysj/pymlmc'
-scratch = None
+scratch = '/projects/CloudPredict/sukysj/pymlmc'
 
 # ensemble support
 ensembles = 1
