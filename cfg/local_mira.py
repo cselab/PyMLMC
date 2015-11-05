@@ -88,10 +88,11 @@ simple_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
-  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
+  --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
+#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 
 # MPI run command
 mpi_job = '''ulimit -c 0; runjob \
@@ -100,11 +101,13 @@ mpi_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
-  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
+  --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
+#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 
+"""
 # MPI run command for a specific batch job id
 ensemble_job = '''ulimit -c 0; runjob \
   --np %(ranks)d \
@@ -116,12 +119,13 @@ ensemble_job = '''ulimit -c 0; runjob \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
+"""
 
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 
-# ensembles of jobs
-ensemble = '''#!/bin/bash
+# script (required for support of batch job ensembles)
+script = '''#!/bin/bash
 
 # get blocks for each batch job in the ensemble
 BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
@@ -135,7 +139,7 @@ do
 done
 wait
 
-%(ensemble)s
+%(job)s
 
 wait
 
@@ -150,10 +154,13 @@ wait
 script = None
 
 # submit command
-submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
+submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(jobfile)s'
+#submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
 
+'''
 # submit command for ensemble jobs
 submit_ensemble = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(jobfile)s'
+'''
 
 # timer
 #timer = 'time --portability --output=%(timerfile)s --append (%(job)s)'

@@ -163,7 +163,7 @@ class Solver (object):
     return args
   
   # assemble job command
-  def job (self, args, merge):
+  def job (self, args):
     
     # if input directory does not exist, create it
     if not os.path.exists (self.inputdir):
@@ -191,13 +191,15 @@ class Solver (object):
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
       return local.simple_job % args
+    '''
     elif merge:
       return local.ensemble_job % args
+    '''
     else:
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', ensemble=None):
+  def submit (self, job, parallelization, label, directory='.', merge=None):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
@@ -237,12 +239,12 @@ class Solver (object):
       args ['minutes'] += local.bootup
 
     # take ensemble size into account, if specified
-    if ensemble:
-      if ensemble <= parallelization.mergemax:
-        args ['cores'] *= ensemble
-        args ['nodes'] *= ensemble
+    if merge:
+      if merge <= parallelization.mergemax:
+        args ['cores'] *= merge
+        args ['nodes'] *= merge
       else:
-        print ' :: ERROR: \'ensemble\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (ensemble, parallelization.mergemax)
+        print ' :: ERROR: \'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (merge, parallelization.mergemax)
         sys.exit()
 
     # assemble submission script (if enabled)
@@ -259,11 +261,14 @@ class Solver (object):
         print args ['script']
         print '==='
 
+    '''
     # assemble submission command
-    if ensemble:
+    if merge:
       submit = local.submit_ensemble % args
     else:
-      submit = local.submit % args
+    '''
+
+    submit = local.submit % args
 
     # create submit script
     submitfile = os.path.join (directory, self.submitfile % label)
@@ -280,7 +285,7 @@ class Solver (object):
   def launch (self, args, parallelization, level, type, sample):
     
     # assemble job
-    job = self.job (args, parallelization.batch and local.ensembles)
+    job = self.job (args)
     
     # get directory
     directory = self.directory (level, type, sample)
@@ -297,6 +302,10 @@ class Solver (object):
     # fork to background for ensemble jobs
     if parallelization.batch and local.ensembles:
       job = '(%s) &' % job
+
+    # else set block hook
+    else:
+      job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
     
     # prepare solver
     self.prepare (directory)
@@ -407,7 +416,7 @@ class Solver (object):
 
         # submit each ensemble
         submitted = 0
-        for i, count in enumerate (decomposition):
+        for i, size in enumerate (decomposition):
 
           # set label
           label = self.label (level, type) + 'e%d' % (i+1)
@@ -419,6 +428,7 @@ class Solver (object):
           for j, part in enumerate (parts [submitted : submitted + count]):
 
             # prepare job to be part of an ensemble with batch job id = i
+            # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
             part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : j} for job in part ]
 
             # construct batch job
@@ -430,12 +440,14 @@ class Solver (object):
             # add batch job to the ensemble
             ensemble += batch
 
+          '''
           # construct an ensemble
-          args = {'nodes' : parallelization.nodes, 'ensemble' : ensemble}
+          args = {'nodes' : parallelization.nodes, 'job' : ensemble}
           ensemble = local.ensemble % args
+          '''
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, count), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, size), directory )
 
           # update 'submitted' counter
           submitted += count
