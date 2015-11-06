@@ -85,7 +85,7 @@ class MC (object):
       else:
         return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s  |  %s  |' % args
     else:
-      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s' % args
+      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |' % args
 
   # launch all samples
   def run (self):
@@ -101,34 +101,35 @@ class MC (object):
     # adjust parallelization according to the number of samples
     self.parallelization.adjust ( len (config.samples) )
     
-    # report information of the MC run and the prescribed parallelization
+    # get information of the MC run and the prescribed parallelization
     info_mc = self.info()
-    print info_mc,
-    sys.stdout.flush()
     
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)
 
-    # use progress indicator
-    progress = Progress (prefix='', steps=len(config.samples), length=10)
+    # use progress indicator, report MC info each time
+    progress = Progress (prefix=info_mc, steps=len(config.samples), length=20)
 
+    import time
     # run all samples
     for step, sample in enumerate (config.samples):
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
       progress.update (step)
+      time.sleep(1)
 
     # reset progress indicator
     progress.reset()
-    
+
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
 
-    # print additional (scheduler-related) information from the solver
+    # print combined info: MC info and additional (scheduler-related) information from the solver
     info_solver = info_solver if info_solver != None else ''
-    print ' ' + info_solver
+    info = info_mc + '  ' + info_solver
+    print info
 
     # return combined info
-    return info_mc + '  ' + info_solver
+    return info
   
   # check how many runs are still pending
   def pending (self):

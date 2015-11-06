@@ -131,6 +131,7 @@ def query (question):
 class Progress (object):
 
   def __init__ (self, prefix, steps, length=20):
+
     self.prefix = prefix
     self.length = length
     self.steps  = steps
