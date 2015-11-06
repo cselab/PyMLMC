@@ -100,7 +100,7 @@ class MC (object):
     self.parallelization.adjust ( len (config.samples) )
     
     # report information of the MC run and the prescribed parallelization
-    print self.info()
+    print self.info(),
     
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)
@@ -110,7 +110,10 @@ class MC (object):
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
     
     # finalize solver
-    config.solver.finalize (config.level, config.type, self.parallelization)
+    info = config.solver.finalize (config.level, config.type, self.parallelization)
+
+    # print additional (scheduler-related) information from the solver
+    print '  ' + info if info != None else ''
   
   # check how many runs are still pending
   def pending (self):
