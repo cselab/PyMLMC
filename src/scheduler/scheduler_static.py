@@ -58,7 +58,7 @@ class Static (Scheduler):
       # set maximal batch size such that the required walltime does not exceed specified walltime
       if local.max_walltime (cores) != None:
         batchmax = int ( floor ( min ( local.max_walltime (cores), self.walltime ) / float(walltime) ) )
-      else
+      else:
         batchmax = None
 
       # set maximal merge size such that the maximum number of cores is not exceeded
