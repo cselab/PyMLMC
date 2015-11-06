@@ -126,3 +126,26 @@ def query (question):
     sys.exit()
   else:
     print '  : CONTINUE'
+
+# provides an update'able progress bar for the command line
+class Progress (object):
+
+  def __init__ (self, prefix, steps, length=20):
+    self.prefix = prefix
+    self.length = length
+    self.steps  = steps
+
+    from sys import stdout
+    self.stdout = stdout
+
+  def update (self, step):
+    text  = '\r' + self.prefix
+    fraction = float(step) / self.steps
+    text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
+    text += ' ' + str(int(round(100*fraction))) + '%'
+    self.stdout.write(text)
+    self.stdout.flush()
+
+  def reset (self):
+    self.stdout.write('\r')
+    self.stdout.flush()

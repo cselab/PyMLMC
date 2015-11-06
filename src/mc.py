@@ -17,7 +17,7 @@ import math
 
 # === local imports
 
-from helpers import intf, pair
+from helpers import intf, pair, Progress
 import local
 
 # === classes
@@ -104,13 +104,21 @@ class MC (object):
     # report information of the MC run and the prescribed parallelization
     info_mc = self.info()
     print info_mc,
+    sys.stdout.flush()
     
     # initialize solver
     config.solver.initialize (config.level, config.type, self.parallelization)
-    
+
+    # use progress indicator
+    progress = Progress (prefix='', steps=len(config.samples), length=10)
+
     # run all samples
-    for sample in config.samples:
+    for step, sample in enumerate (config.samples):
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
+      progress.update (step)
+
+    # reset progress indicator
+    progress.reset()
     
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)

@@ -41,7 +41,8 @@ class Static (Scheduler):
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
       
       # respect the minimal walltime of the machine
-      walltime = max ( local.min_walltime (cores), walltime )
+      if local.min_walltime (cores) != None:
+        walltime = max ( local.min_walltime (cores), walltime )
 
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
@@ -55,7 +56,10 @@ class Static (Scheduler):
       '''
       
       # set maximal batch size such that the required walltime does not exceed specified walltime
-      batchmax = int ( floor ( min ( local.max_walltime (cores), self.walltime ) / float(walltime) ) )
+      if local.max_walltime (cores) != None:
+        batchmax = int ( floor ( min ( local.max_walltime (cores), self.walltime ) / float(walltime) ) )
+      else
+        batchmax = None
 
       # set maximal merge size such that the maximum number of cores is not exceeded
       mergemax = int ( floor ( local.max_cores / float(cores) ) )

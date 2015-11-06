@@ -23,10 +23,14 @@ memory    = None # GB per core
 
 # constraints
 bootup       = None
-min_walltime = None
-max_walltime = None
 min_cores    = 1
 max_cores    = None
+
+def min_walltime (cores): # hours
+  return None
+
+def max_walltime (cores): # hours
+  return None
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
@@ -37,6 +41,9 @@ performance = 1
 
 # scratch path
 scratch = None
+
+# ensemble support
+ensembles = 0
 
 # default environment variables
 envs = ''
@@ -54,4 +61,4 @@ script = None
 submit = '%(job)s'
 
 # timer
-timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
