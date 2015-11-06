@@ -150,8 +150,11 @@ class MLMC (object):
       
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.config.works)
-      
-      # check if the simulation is already finished 
+
+      # report number of samples used so far (avoid updating as this might not be possible)
+      self.config.samples.report   ()
+
+      # check if the simulation is already finished
       if self.config.samples.finished (self.errors):
         print
         print ' :: Simulation finished.'
@@ -164,30 +167,40 @@ class MLMC (object):
       self.config.samples.report   ()
       self.config.samples.validate ()
       '''
-
-      # report number of samples used so far (avoid updating as this might not be possible)
-      self.config.samples.report   ()
       
       # for interactive sessions, query user for additional input
       if self.params.query:
         while self.query():
-          # check if the simulation is already finished 
+
+          # otherwise update, report, and validate the number of samples
+          if self.indicators.available:
+            self.config.samples.update (self.errors, self.indicators)
+            self.config.samples.report   ()
+            self.config.samples.validate ()
+          else:
+            print ' :: WARNING: indicators not available - samples can not be updated'
+
+          # check if the simulation is already finished
           if self.config.samples.finished (self.errors):
             print
             print ' :: Simulation finished.'
             self.status.save (self.config)
             return
-          # otherwise update, report, and validate the number of samples
-          self.config.samples.update   (self.errors, self.indicators)
-          self.config.samples.report   ()
-          self.config.samples.validate ()
 
       # for non-interactive sessions, proceed immediately
       else:
-        self.config.samples.update   (self.errors, self.indicators)
-        self.config.samples.report   ()
-        self.config.samples.validate ()
-      
+        if self.indicators.available:
+          self.config.samples.update   (self.errors, self.indicators)
+          self.config.samples.report   ()
+          self.config.samples.validate ()
+        else:
+          print ' :: WARNING: indicators not available - samples can not be updated'
+
+      # check if samples are available
+      if not self.config.samples.available:
+        print ' :: WARNING: samples not available -> exiting'
+        return
+
       # save the required number of samples
       self.config.samples.save ()
       

@@ -97,7 +97,10 @@ class Estimated (Samples):
     
     # check if the current finest level is optimal
     #self.check_optimal_finest_level ()
-  
+
+    # samples are now available
+    self.available = 1
+
   def report (self):
     
     print

@@ -34,6 +34,8 @@ class Indicators (object):
     self.L = len (self.levels) - 1
     
     self.indicators_file = 'indicators.dat'
+
+    self.available = 0
   
   def compute (self, mcs):
 
@@ -82,7 +84,10 @@ class Indicators (object):
 
   def report (self):
 
+    self.available = 1
+
     if numpy.isnan (self.normalization):
+      self.available = 0
       print
       print ' :: INDICATORS: not available since \'normalization\' is N/A'
       return

@@ -18,6 +18,7 @@ class Errors (object):
     self.levels      = levels
     self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
+    self.available   = 0
   
   def init (self):
     
@@ -33,6 +34,13 @@ class Errors (object):
     # save configuration
     self.indicators = indicators
     self.counts     = counts
+
+    # check if indicators are available
+    if not self.indicators.available:
+      self.available = 0
+      return
+    else:
+      self.available = 1
     
     # extrapolate missing indicators
     if indicators.nans:
@@ -55,9 +63,9 @@ class Errors (object):
   # report relative sampling errors
   def report (self):
 
-    if numpy.isnan (self.normalization):
+    if not self.indicators.available:
       print
-      print ' :: ERRORS: not available since \'normalization\' is N/A'
+      print ' :: ERRORS: not available since \'indicators\' are not available'
       return
 
     print
@@ -80,7 +88,7 @@ class Errors (object):
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):
 
-    if numpy.isnan(self.total_error) or self.total_error == 0:
+    if not self.available or self.total_error == 0:
       print
       print ' :: WARNING: Speedup can not be estimated since total sampling error is not available.'
       return
@@ -97,8 +105,12 @@ class Errors (object):
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
   
   def save (self):
-    
-    helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file)
-    with open ( self.errors_file, 'a' ) as f:
-      f.write ( 'total_relative_error .append ( %f )\n' % self.total_relative_error )
-      f.write ( 'total_error .append ( %f )\n' % self.total_error )
+
+    if self.available:
+      helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file)
+      with open ( self.errors_file, 'a' ) as f:
+        f.write ( 'total_relative_error .append ( %f )\n' % self.total_relative_error )
+        f.write ( 'total_error .append ( %f )\n' % self.total_error )
+    else:
+      with open ( self.errors_file, 'a' ) as f:
+        f.write ( 'total_relative_error .append ( %f )\n' % float ('NaN') )

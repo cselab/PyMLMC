@@ -26,6 +26,7 @@ class Indices (object):
 class Samples (object):
   
   samples_file = 'samples.dat'
+  available    = 0
   
   def setup (self, levels, works):
     
