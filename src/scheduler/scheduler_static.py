@@ -62,7 +62,10 @@ class Static (Scheduler):
         batchmax = None
 
       # set maximal merge size such that the maximum number of cores is not exceeded
-      mergemax = int ( floor ( local.max_cores / float(cores) ) )
+      if local.max_cores != None:
+        mergemax = int ( floor ( local.max_cores / float(cores) ) )
+      else:
+        mergemax = None
 
       # construct parallelization according to all computed parameters
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, mergemax, self.email )
