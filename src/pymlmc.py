@@ -265,17 +265,19 @@ class MLMC (object):
     print header
     print separator
 
-    # run MC simulations
-    for mc in self.mcs:
-      mc.run ()
-    
-    # generate submission file
+    # initialize submission file
     if not self.config.deterministic:
       f = open (self.submission_file, 'wa')
       f.write (header + '\n')
       f.write (separator + '\n')
-      for mc in self.mcs:
-        f.write (mc.info() + '\n')
+
+    # run MC simulations and update submission file
+    for mc in self.mcs:
+      info = mc.run ()
+      f.write (info + '\n')
+
+    # finalize submission file
+    if not self.config.deterministic:
       f.write ('\n')
       f.close()
   
