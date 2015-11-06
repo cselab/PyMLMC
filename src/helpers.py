@@ -149,4 +149,8 @@ class Progress (object):
 
   def reset (self):
     self.stdout.write('\r')
+    length = len (self.prefix) + 8 + self.length
+    self.stdout.write(' ' * length)
+    self.stdout.flush()
+    self.stdout.write('\r')
     self.stdout.flush()

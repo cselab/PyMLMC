@@ -115,8 +115,7 @@ class MC (object):
     # run all samples
     for step, sample in enumerate (config.samples):
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
-      progress.update (step)
-      time.sleep(1)
+      progress.update (step + 1)
 
     # reset progress indicator
     progress.reset()
