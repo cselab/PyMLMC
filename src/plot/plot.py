@@ -597,9 +597,9 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
 # plot computed MC estimators of statistics
 def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
-  print ' :: INFO: Plotting MC estimates...',
-
   if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting MC estimates of \'%s\'...' % qoi,
 
   levels = len (mlmc.config.levels)
 
@@ -630,9 +630,9 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 # plot computed MC estimators of statistics for both types
 def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
-  print ' :: INFO: Plotting MC estimates...',
-  
   if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting MC estimates (both types) of \'%s\'...' % qoi,
   
   levels = len (mlmc.config.levels)
   
@@ -681,9 +681,9 @@ def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yo
 # plot computed differences of MC estimators
 def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
 
-  print ' :: INFO: Plotting differences of MC estimates...',
-
   if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
 
   if not frame:
     figure (infolines, subplots=mlmc.config.L)
@@ -732,9 +732,9 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 # plot computed MC estimators and their differences
 def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
-  print ' :: INFO: Plotting MC estimates AND differences...',
-
   if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting MC estimates AND differences of \'%s\'...' % qoi,
 
   levels = len (mlmc.config.levels)
 
@@ -799,10 +799,10 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 # plot computed MLMC statistics
 def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
-  print ' :: INFO: Plotting MLMC estimates...',
-  
   if not qoi: qoi = mlmc.config.solver.qoi
-  
+
+  print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
+
   if not frame:
     figure (infolines, subplots=1)
   
@@ -828,7 +828,9 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   if level  == 'coarsest': level = 0
   
   if not qoi: qoi = mlmc.config.solver.qoi
-  
+
+  print ' :: INFO: Plotting sample of \'%s\' for level %d and type %d...' % (qoi, level, type),
+
   if trendline == None:
     if '_pos' in qoi:
       trendline = 1
@@ -915,8 +917,6 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
 # used mainly for deterministic runs
 def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
   
-  print ' :: INFO: Plotting %s...' % qoi,
-  
   level  = 'finest'
   type   = 0
   sample = 0
@@ -928,16 +928,16 @@ def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=Tr
 # plot results of all samples (ensemble) of the specified level and type 
 def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=1024, save=None):
   
-  print ' :: INFO: Plotting ensemble for level %d (type %d)...' % (level, type),
-  
   # some dynamic values
   if level  == 'finest':   level  = mlmc.config.L
   if level  == 'coarsest': level  = 0
-
-  xend = float('nan')
   
   if not qoi: qoi = mlmc.config.solver.qoi
-  
+
+  print ' :: INFO: Plotting ensemble of \'%s\' for level %d (type %d)...' % (qoi, level, type),
+
+  xend = float('nan')
+
   figure (infolines, subplots=1)
   
   for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
@@ -983,9 +983,9 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
 # plot results of all samples (ensemble) of all levels
 def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, save=None):
 
-  print ' :: INFO: Plotting ensembles for all levels...',
-
   if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting ensembles of \'%s\' for all levels...' % qoi,
 
   levels = len (mlmc.config.levels)
 
@@ -1044,6 +1044,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
   
   if not qoi: qoi = solver.qoi
+
+  print ' :: INFO: Plotting diagram of \'%s\'...' % qoi,
   
   vs = []
   for outputfilename in outputfilenames:
