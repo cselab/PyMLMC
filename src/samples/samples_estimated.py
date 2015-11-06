@@ -43,8 +43,11 @@ class Estimated (Samples):
   
   def finished (self, errors):
 
+    if not erros.available:
+      return 0
+    
     if numpy.isnan (errors.total_relative_error):
-      return True
+      return 1
     else:
       return errors.total_relative_error <= self.tol
 
