@@ -438,7 +438,7 @@ class Solver (object):
         # return information about ensembles
         from helpers import intf
         info = [ '%s (%s N)' % ( intf (size), intf (parallelization.nodes * size) ) for size in decomposition ]
-        return ' | '.join(info)
+        return ' - '.join(info)
 
   # check if the job is finished
   # (required only for non-interactive sessions)
