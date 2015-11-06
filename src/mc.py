@@ -81,7 +81,7 @@ class MC (object):
         if local.ensembles:
           merge = intf (self.parallelization.mergemax, table=1)
       args += ( self.parallelization.hours, self.parallelization.minutes, batch, count, merge )
-      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s  |  %s  |   %s' % args
+      return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s   |   %2dh %2dm  |   %s  |  %s  |   %s  |' % args
     else:
       return '  :  %5d  |  %s  |  %s  |     %s  |   %s %s' % args
 
