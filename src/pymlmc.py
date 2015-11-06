@@ -280,44 +280,84 @@ class MLMC (object):
   def query (self):
     return self.config.samples.query ()
   
-  # check if MC estimates are already available
+  # check if MC estimates are already available and report
   def join (self):
 
     from helpers import intf
 
     print
+    self.finished = 1
+
+    # deterministic reporting
     if self.config.deterministic:
+
       print ' :: STATUS of simulation:'
       format = '  : %s'
-    else:
-      print ' :: STATUS of MC simulations:'
-      format = '  :  level %2d  |  %s  |  %s sample(s)  |  %s'
-    
-    self.finished = 1
-    for mc in self.mcs:
-      if self.config.deterministic:
-        args = tuple()
-      else:
-        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1) )
-      pending = mc.pending()
-      if pending == 0:
-        runtime = mc.timer (self.config.scheduler.batch)
-        if runtime != None:
-          runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
-          walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
-          if walltime != 'unknown':
-            percent = round ( 100 * (runtime / 3600) / walltime )
-            print format % ( args + ( 'completed in ' + runtimestr + (' [%2d%%]' % percent), ) )
+
+      # for all MC simulations
+      for mc in self.mcs:
+
+        # check how many samples are still pending
+        pending = mc.pending()
+
+        # if simulation is finished, report runtime
+        if pending == 0:
+
+          runtime = mc.timer (self.config.scheduler.batch)
+          if runtime != None:
+            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+            walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+            if walltime != 'unknown':
+              percent = round ( 100 * (runtime / 3600) / walltime )
+              print format % ('Completed in ' + runtimestr + (' [%2d%%]' % percent) )
+            else:
+              print format % ('Completed in ' + runtimestr)
           else:
-            print format % ( args + ( 'completed in ' + runtimestr, ) )
+            print format % 'Completed in N/A'
+
+        # report if some simulations are pending
         else:
-          print format % ( args + ( 'completed in N/A', ) )
-      else:
-        self.finished = 0
-        if self.config.deterministic:
-          print format % ( args + ( 'pending', ) )
+
+          self.finished = 0
+          print format % 'Pending'
+
+
+    # stochastic reporting
+    else:
+
+      print ' :: STATUS of MC simulations:'
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  RUNTIME  |  USAGE  |  PENDING  |'
+      print '  :------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |     %s  |  %s  |   %s   |    %s   |'
+
+      # for all MC simulations
+      for mc in self.mcs:
+
+        # check how many samples are still pending
+        pending = mc.pending()
+
+        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1) )
+
+        # if all samples are finished, report runtime
+        if pending == 0:
+
+          runtime = mc.timer (self.config.scheduler.batch)
+          if runtime != None:
+            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+            walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+            if walltime != 'unknown':
+              percent = round ( 100 * (runtime / 3600) / walltime )
+              print format % ( args + ( runtimestr, '[%2d%%]' % percent, '    ') )
+            else:
+              print format % ( args + ( runtimestr, '     ', '    ') )
+          else:
+            print format % ( args + ( '   N/A  ', '     ', '    ') )
+
+        # report if some simulations are pending
         else:
-          print format % ( args + ( 'pending: %s' % intf (pending, table=1), ) )
+          
+          self.finished = 0
+          print format % ( args + ( '        ', '     ', intf (pending, table=1), ) )
     
     if not self.finished:
       print
@@ -349,17 +389,18 @@ class MLMC (object):
     # if non-interactive session -> wait for jobs to finish
     if not self.params.interactive:
       self.join ()
-    
+
+    from helpers import intf
     # load the results from MC simulations
     print
     print ' :: LOADING RESULTS...'
-    print '  :  LEVEL  |   TYPE   |  LOADED  |  FAILED  |'
-    print '  :------------------------------------------|'
-    format = '  :      %d  |  %s  |   %s   |   %s   |'
+    print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |'
+    print '  :------------------------------------------------------|'
+    format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |'
     for mc in self.mcs:
       loaded, failed = mc.load ()
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, helpers.intf (loaded, table=1), helpers.intf (failed, table=1) if failed != 0 else '    ')
+      print format % (mc.config.level, typestr, intf(len(config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
     print '  : DONE'
   
   # assemble MC and MLMC estimates
