@@ -113,7 +113,7 @@ class MC (object):
     info = config.solver.finalize (config.level, config.type, self.parallelization)
 
     # print additional (scheduler-related) information from the solver
-    print '  ' + info if info != None else ''
+    print ' ' + info if info != None else ''
   
   # check how many runs are still pending
   def pending (self):
