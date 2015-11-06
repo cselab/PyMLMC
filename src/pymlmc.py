@@ -254,11 +254,14 @@ class MLMC (object):
     for mc in self.mcs:
       mc.validate ()
 
-    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  '
-    separator = '  :---------|----------|--------------|-----------|------------'
+    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
+    separator = '  :---------|----------|--------------|-----------|------------|'
     if local.cluster:
-      header    += '|  WALLTIME  |  BATCH  |  JOBS  |  MERGE  |  INFO  '
-      separator += '|------------|---------|--------|---------|--------'
+      header    += '  WALLTIME  |  BATCH  |  JOBS  |'
+      separator += '------------|---------|--------|'
+      if local.ensembles:
+        header    += '  MERGE  |  ENSEMBLES  '
+        separator += '---------|-------------'
     print header
     print separator
 
