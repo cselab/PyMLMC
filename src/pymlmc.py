@@ -400,7 +400,7 @@ class MLMC (object):
     for mc in self.mcs:
       loaded, failed = mc.load ()
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, intf(len(config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
+      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
     print '  : DONE'
   
   # assemble MC and MLMC estimates
