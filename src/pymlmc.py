@@ -351,13 +351,13 @@ class MLMC (object):
             else:
               print format % ( args + ( runtimestr, '     ', '    ') )
           else:
-            print format % ( args + ( '   N/A  ', '     ', '    ') )
+            print format % ( args + ( '  N/A  ', '     ', '    ') )
 
         # report if some simulations are pending
         else:
-          
+
           self.finished = 0
-          print format % ( args + ( '        ', '     ', intf (pending, table=1), ) )
+          print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
     
     if not self.finished:
       print
