@@ -224,7 +224,8 @@ def name (qoi, short=False):
   if '_max' in qoi:
     name_ = 'max ' + name_
   if '_sen' in qoi:
-    name_ = name_ + ' sensor'
+    id = qoi.split ('_sen', 1) [1]
+    name_ = name_ + ' sensor ' + id
   if '_time' in qoi:
     name_ = 'time of ' + name_
   if short and '_pos' in qoi:

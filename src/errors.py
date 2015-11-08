@@ -34,19 +34,19 @@ class Errors (object):
     # save configuration
     self.indicators = indicators
     self.counts     = counts
-
-    # check if indicators are available
-    if not self.indicators.available:
-      self.available = 0
-      return
-    else:
-      self.available = 1
     
     # extrapolate missing indicators
     if indicators.nans:
       print
       print ' :: WARNING: Missing indicator values are extrapolated!'
       self.indicators.extrapolate ()
+    
+    # check if indicators are available
+    if not self.indicators.available:
+      self.available = 0
+      return
+    else:
+      self.available = 1
 
     # set the normalization
     self.normalization = self.indicators.normalization
@@ -63,7 +63,7 @@ class Errors (object):
   # report relative sampling errors
   def report (self):
 
-    if not self.indicators.available:
+    if not self.available:
       print
       print ' :: ERRORS: not available since \'indicators\' are not available'
       return

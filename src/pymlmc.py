@@ -180,7 +180,7 @@ class MLMC (object):
             return
 
           # otherwise update, report, and validate the number of samples
-          if self.indicators.available:
+          if self.errors.available and self.indicators.available:
             self.config.samples.update   (self.errors, self.indicators)
             self.config.samples.report   ()
             self.config.samples.validate ()
@@ -189,7 +189,7 @@ class MLMC (object):
 
       # for non-interactive sessions, proceed immediately
       else:
-        if self.indicators.available:
+        if self.errors.available and self.indicators.available:
           self.config.samples.update   (self.errors, self.indicators)
           self.config.samples.report   ()
           self.config.samples.validate ()

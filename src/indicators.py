@@ -36,6 +36,8 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
 
     self.available = 0
+
+    self.nans      = 0
   
   def compute (self, mcs):
 
@@ -51,17 +53,15 @@ class Indicators (object):
     values = helpers.level_type_list (self.levels)
     for i, (level, type) in enumerate (self.levels_types):
       values [level] [type] = numpy.array ( [ self.indicator ( result.data ) if result else float('NaN') for result in mcs [i] .results ] )
-
-    # flag for existing NaN's
-    self.nans = 0
-    for level, type in self.levels_types:
-      if numpy.isnan ( values [level] [type] ) .any() :
-        self.nans = 1
     
     # compute plain indicators
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
       self.variance [level] [type] = numpy.cov  (values [level] [type])
+      if numpy.isnan ( self.mean     [level] [type] ) .any() :
+        self.nans = 1
+      if numpy.isnan ( self.variance [level] [type] ) .any() :
+        self.nans = 1
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
     
@@ -71,23 +71,34 @@ class Indicators (object):
     for level in self.levels [1:] :
       self.mean_diff     [level] = numpy.abs ( numpy.mean (values [level] [0] - values [level] [1]) )
       self.variance_diff [level] = numpy.cov  (values [level] [0] - values [level] [1])
-    
+      if numpy.isnan ( self.mean_diff     [level] ) .any() :
+        self.nans = 1
+      if numpy.isnan ( self.variance_diff [level] ) .any() :
+        self.nans = 1
+
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
       self.covariance  [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
       self.correlation [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
+      if numpy.isnan ( self.covariance  [level] ) .any() :
+        self.nans = 1
+      if numpy.isnan ( self.correlation [level] ) .any() :
+        self.nans = 1
 
     # set the normalization
     self.normalization = self.mean [self.L] [0]
 
-  def report (self):
-
-    self.available = 1
-
+    # set availability
     if numpy.isnan (self.normalization):
       self.available = 0
+    else:
+      self.available = 1
+
+  def report (self):
+
+    if not self.available:
       print
       print ' :: INDICATORS: not available since \'normalization\' is N/A'
       return
@@ -186,6 +197,7 @@ class Indicators (object):
           self.variance_diff [level] = self.variance_diff [level-1] / 2
         else:
           self.variance_diff [level] = numpy.nan
+          self.available = 0
           print
           print ' :: WARNING: Extrapolation of indicators \'SIGMA DIFF\' not possible!'
     
@@ -195,6 +207,7 @@ class Indicators (object):
           self.variance [level] [0] = self.variance [level-1] [0]
         else:
           self.variance [level] [0] = numpy.nan
+          self.available = 0
           print
           print ' :: WARNING: Extrapolation of indicators \'SIGMA [FINE]\' not possible!'
     
@@ -204,5 +217,6 @@ class Indicators (object):
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
           self.variance [level] [1] = numpy.nan
+          self.available = 0
           print
           print ' :: WARNING: Extrapolation of indicators \'SIGMA [COARSE]\' not possible!'
