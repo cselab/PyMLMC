@@ -26,17 +26,29 @@ walltime  = 1    # hours
 memory    = 4096 # GB per core
 
 # constraints
+
 bootup       = 5  # minutes
-min_walltime = 0  # hours
-max_walltime = 24 # hours
 min_cores    = cores
+max_cores    = 5272 * cores
+
+def min_walltime (cores): # hours
+  return 0
+
+def max_walltime (cores): # hours
+  return 24
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
+
 # scratch path
 scratch = '/scratch/daint/sukysj/pymlmc'
+
+# ensemble support
+ensembles = 1
 
 # default environment variables
 envs = ''
@@ -67,5 +79,4 @@ ulimit -c 0
 submit = 'sbatch %(scriptfile)s'
 
 # timer
-#timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
-timer = 'date; (time -p (%(job)s)) 2>&1 | tee %(timerfile)s; touch %(statusfile)s'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

@@ -26,17 +26,29 @@ memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
+
 bootup       = 5   # minutes
-min_walltime = 0.5 # hours
-max_walltime = 24  # hours
 min_cores    = 512 * cores
+max_cores    = 28 * rack * cores
+
+def min_walltime (cores): # hours
+  return 0.5
+
+def max_walltime (cores): # hours
+  return 24
 
 # theoretical performance figures per node
 peakflops = 12.8 # TFLOP/s
 bandwidth = 28.0 # GB/s
 
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
+
 # scratch path (not required - we use $WORK)
 scratch = None
+
+# ensemble support
+ensembles = 0
 
 # archive space is not subjec to quota (>100TB should be notified)
 archive = '/arch/pra091/pra0913/pymlmc'
@@ -111,4 +123,4 @@ script = '''
 submit = 'llsubmit %(scriptfile)s'
 
 # timer
-timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

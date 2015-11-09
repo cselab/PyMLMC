@@ -27,9 +27,14 @@ rack      = 1024 # nodes
 
 # constraints
 bootup       = 5  # minutes
-min_walltime = 0  # hours
-max_walltime = 24 # hours
 min_cores    = 64 * cores
+max_cores    = 2 * rack * cores
+
+def min_walltime (cores): # hours
+  return 0
+
+def max_walltime (cores): # hours
+  return 24
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
@@ -38,6 +43,9 @@ bandwidth = 0.0 # GB/s
 # scratch path ($WORK and $SCRATCH quotas are now 50 TB)
 #scratch = None
 scratch = '/gpfs/scratch/userexternal/jsukys00/pymlmc'
+
+# ensemble support
+ensembles = 0
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
@@ -111,4 +119,4 @@ script = '''
 submit = 'llsubmit %(scriptfile)s'
 
 # timer
-timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

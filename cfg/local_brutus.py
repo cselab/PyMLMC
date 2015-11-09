@@ -26,17 +26,30 @@ memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
+
 bootup       = 5  # minutes
-min_walltime = 0  # hours
-max_walltime = 36 # hours (could be more (7d), but then there is a limit on cores)
 min_cores    = 1
+max_cores    = 2048
+
+def min_walltime (cores):
+  return 0 # hours
+
+# could be more (7d) but then there is a limit on cores
+def max_walltime (cores): # hours
+  return 36
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
+
 # scratch path
 scratch = '/cluster/scratch_xp/public/sukysj/pymlmc'
+
+# ensemble support
+ensembles = 0
 
 # default environment variables
 envs = ''
@@ -54,4 +67,4 @@ script = None
 submit = 'ulimit -c 0; export OMP_NUM_THREADS=%(threads)d; bsub -n %(cores)d -R "span[ptile=%(threads)d]" -W %(hours).2d:%(minutes).2d -R "rusage[mem=%(memory)d]" -J %(label)s -oo report.%(label)s %(xopts)s < %(jobfile)s'
 
 # timer
-timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'

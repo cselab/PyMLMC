@@ -77,6 +77,7 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs DARSHAN_DISABLE=1 \
   '''
 
+#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 #  --envs PAMID_ASYNC_PROGRESS=1 \
 #  --mapping TABCDE \
 
@@ -91,7 +92,6 @@ simple_job = '''ulimit -c 0; runjob \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
-#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 
 # MPI run command
 mpi_job = '''ulimit -c 0; runjob \
@@ -104,7 +104,6 @@ mpi_job = '''ulimit -c 0; runjob \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
-#  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
 
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
@@ -146,14 +145,7 @@ wait
 
 # submit command
 submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(scriptfile)s'
-#submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
-
-'''
-# submit command for ensemble jobs
-submit_ensemble = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(jobfile)s'
-'''
 
 # timer
 #timer = 'time --portability --output=%(timerfile)s --append (%(job)s)'
 timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
-#timer = None

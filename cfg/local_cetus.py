@@ -26,18 +26,34 @@ memory    = 1024 # GB per core
 rack      = 1024 # nodes
 
 # constraints
+
 bootup       = 5   # minutes
-min_walltime = 0   # hours
-max_walltime = 1   # hours
-min_cores    = 128 * cores
+min_cores    = 512 * cores
+max_cores    = 49152 * cores
+
+def min_walltime (cores): # hours
+  return 0.5
+
+def max_walltime (cores): # hours
+  if cores == 'default':
+    return '12/24'
+  if cores <= 16 * 4096:
+    return 12
+  else:
+    return 24
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
 bandwidth = 0.0 # GB/s
 
+# core performance metric (normalized w.r.t. IBM BG/Q)
+performance = 1
+
 # scratch path
-#scratch = '/projects/CloudPredict/sukysj/pymlmc'
-scratch = None
+scratch = '/projects/CloudPredict/sukysj/pymlmc'
+
+# ensemble support
+ensembles = 1
 
 # default environment variables
 envs = '''  --envs PAMI_DEVICE=B \
@@ -60,7 +76,6 @@ envs = '''  --envs PAMI_DEVICE=B \
   --envs USEMAXTHREADS=0 \
   --envs MYROUNDS=1 \
   --envs DARSHAN_DISABLE=1 \
-  --block $COBALT_PARTNAME ${COBALT_CORNER:+--corner} $COBALT_CORNER ${COBALT_SHAPE:+--shape} $COBALT_SHAPE \
   '''
 
 #  --envs PAMID_ASYNC_PROGRESS=1 \
@@ -73,6 +88,7 @@ simple_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
+  --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
@@ -84,15 +100,51 @@ mpi_job = '''ulimit -c 0; runjob \
   --cwd $PWD \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
+  --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
   : %(cmd)s %(options)s
   '''
 
-# submission script template
-script = None
+# batch job block hook
+BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
+
+# submission script template (required for support of batch job ensembles)
+script = '''#!/bin/bash
+
+  # get blocks for each batch job in the ensemble
+  BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
+
+  # split string of blocks into array elements
+  read -r -a BLOCKS <<< $BLOCKS
+
+  # print info about blocks
+  echo
+  echo 'Obtained blocks:'
+  for BLOCK in ${BLOCKS[@]}
+  do
+  echo $BLOCK
+  done
+  echo
+
+  for BLOCK in ${BLOCKS[@]}
+  do
+  boot-block --block $BLOCK &
+  done
+  wait
+
+  %(job)s
+
+  wait
+
+  for BLOCK in ${BLOCKS[@]}
+  do
+  boot-block --block $BLOCK --free &
+  done
+  wait
+  '''
 
 # submit command
-submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s %(xopts)s --mode script %(jobfile)s'
+submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(scriptfile)s'
 
 # timer
-timer = 'date; time --portability --output=%(timerfile)s --append (%(job)s)'
+timer = '(time -p (%(job)s)) 2>&1 | tee %(timerfile)s'
