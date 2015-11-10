@@ -110,8 +110,8 @@ class Solver (object):
       return os.path.join (self.root, self.outputdir)
     
     else:
-      #dir = '%d_%d' % (level, type)
-      dir = '%d%s' % (level, ['f', 'c'] [type])
+      dir = '%d_%d' % (level, type)
+      #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '/%d' % sample
       return os.path.join (os.path.join (self.root, self.outputdir), dir)
@@ -123,8 +123,8 @@ class Solver (object):
       return self.name
     
     else:
-      #dir = '%d_%d' % (level, type)
-      dir = '%d%s' % (level, ['f', 'c'] [type])
+      dir = '%d_%d' % (level, type)
+      #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
       return '%s_%s' % (self.name, dir)

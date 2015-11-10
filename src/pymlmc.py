@@ -402,11 +402,15 @@ class MLMC (object):
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |'
     print '  :------------------------------------------------------|'
     format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |'
+    self.available = 1
     for mc in self.mcs:
       loaded, failed = mc.load ()
+      if loaded == 0:
+        self.available = 0
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
       print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
     print '  : DONE'
+
   
   # assemble MC and MLMC estimates
   def assemble (self, stats):
@@ -414,6 +418,13 @@ class MLMC (object):
     print
     print ' :: ASSEMBLING:'
 
+    # check if statistics can be assembled
+    if not self.available:
+      print
+      print ' :: ERROR: statistics can not be assembled -> exiting...'
+      print
+      sys.exit()
+    
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
     for mc in self.mcs:

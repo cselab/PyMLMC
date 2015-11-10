@@ -344,8 +344,8 @@ class CubismMPCF (Solver):
     self.outputfile       = 'statistics.dat'
     self.outputfileformat = 'statistics*.dat'
     self.outputfile_v1    = 'integrals.dat'
-    self.qoi = 'p_sen'
-    self.indicator = lambda x : numpy.max ( x [ 'p_sen' ] )
+    self.qoi = 'p_sen1'
+    self.indicator = lambda x : numpy.max ( x [ 'p_sen1' ] )
   
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
