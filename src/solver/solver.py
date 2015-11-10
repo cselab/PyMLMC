@@ -110,7 +110,8 @@ class Solver (object):
       return os.path.join (self.root, self.outputdir)
     
     else:
-      dir = '%d_%d' % (level, type)
+      #dir = '%d_%d' % (level, type)
+      dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '/%d' % sample
       return os.path.join (os.path.join (self.root, self.outputdir), dir)
@@ -122,7 +123,8 @@ class Solver (object):
       return self.name
     
     else:
-      dir = '%d_%d' % (level, type)
+      #dir = '%d_%d' % (level, type)
+      dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
       return '%s_%s' % (self.name, dir)
@@ -234,15 +236,6 @@ class Solver (object):
     if args ['hours'] == 0 and args ['minutes'] < 2 * local.bootup:
       args ['minutes'] += local.bootup
 
-    # take ensemble size into account, if specified
-    if merge:
-      if merge <= parallelization.mergemax:
-        args ['cores'] *= merge
-        args ['nodes'] *= merge
-      else:
-        print ' :: ERROR: \'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (merge, parallelization.mergemax)
-        sys.exit()
-
     # assemble submission script (if enabled)
     if local.script:
       args ['script']     = local.script % args
@@ -257,6 +250,18 @@ class Solver (object):
         print args ['script']
         print '==='
 
+    # take ensemble size into account, if specified
+    if merge:
+      if merge <= parallelization.mergemax:
+        args ['cores'] *= merge
+        args ['nodes'] *= merge
+      else:
+        print
+        print ' :: ERROR: \'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (merge, parallelization.mergemax)
+        print
+        sys.exit()
+
+    # assemble submission command
     submit = local.submit % args
 
     # create submit script
@@ -397,8 +402,8 @@ class Solver (object):
         # split parts into ensembles (with size being powers of 2)
         binary = bin ( len(parts) )
         decomposition = [ 2**(len(binary) - 1 - power) if flag == '1' else 0 for power, flag in enumerate(binary) ]
-        decomposition = [ ensemble for ensemble in decomposition if ensemble != 0 ]
         # TODO: enforce: ensemble <= parallelization.mergemax
+        decomposition = [ ensemble for ensemble in decomposition if ensemble != 0 ]
 
         # submit each ensemble
         submitted = 0

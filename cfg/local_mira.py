@@ -108,7 +108,7 @@ mpi_job = '''ulimit -c 0; runjob \
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 
-# submission script template (required for support of batch job ensembles)
+# submission script template (required for support of batch jobs ensembles)
 script = '''#!/bin/bash
 
 # get blocks for each batch job in the ensemble
