@@ -1024,7 +1024,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
           line, = pylab.plot  (ts, vs, linewidth=1 )
         else:
           pylab.plot  (ts, vs, linewidth=1, alpha=0.6, color=line.get_color() )
-
+    
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
     pylab.title ( '%s at level %d' % (name(qoi), level) )
