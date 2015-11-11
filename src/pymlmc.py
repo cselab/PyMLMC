@@ -365,17 +365,9 @@ class MLMC (object):
           print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
     
     if not self.finished:
-      print
-      print ' :: WARNING: Some simulations are still pending'
-      print ' :: QUERY: Ignore and continue nevertheless? [enter \'y\' or press ENTER]'
-      input = raw_input ( '  : ' ) or 'y'
-      if input != 'y':
-        print '  : EXIT'
-        print
-        sys.exit()
-      else:
-        print '  : CONTINUE'
-
+      # issue a warning and query for progress
+      helpers.query ('Ignore and continue nevertheless?', warning='Some simulations are still pending')
+  
   # save MLMC simulation
   def save (self):
     
@@ -410,15 +402,8 @@ class MLMC (object):
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
       print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
 
-    print
-    print ' :: QUERY: Continue? [enter \'y\' or press ENTER]'
-    input = raw_input ( '  : ' ) or 'y'
-    if input != 'y':
-      print '  : EXIT'
-      print
-      sys.exit()
-    else:
-      print '  : CONTINUE'
+    # query for progress
+    helpers.query ('Continue?')
 
   # assemble MC and MLMC estimates
   def assemble (self, stats):
