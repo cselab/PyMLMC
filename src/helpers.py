@@ -116,17 +116,6 @@ def load (dir):
   print
   return list
 
-# query for user decision
-def query (question):
-  print ' :: QUERY: %s [enter \'y\' or press ENTER]' % question
-  input = raw_input ( '  : ' ) or 'y'
-  if input != 'y':
-    print '  : EXIT'
-    print
-    sys.exit()
-  else:
-    print '  : CONTINUE'
-
 # provides an update'able progress bar for the command line
 class Progress (object):
 

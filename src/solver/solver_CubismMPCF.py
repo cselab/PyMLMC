@@ -373,14 +373,17 @@ class CubismMPCF (Solver):
     
     # check if number of cells in not smaller than block size
     if discretization ['NX'] < self.bs * xpesize:
-      print ' :: ERROR: mesh resolution NX / xpesize is smaller than block size: %d / %d < %d.' % ( discretization ['NX'], xpesize, self.bs )
-      sys.exit()
+      message = 'mesh resolution NX / xpesize is smaller than block size'
+      details = '%d / %d < %d.' % ( discretization ['NX'], xpesize, self.bs )
+      helpers.error (message, details)
     if discretization ['NY'] < self.bs * ypesize:
-      print ' :: ERROR: mesh resolution NY / ypesize is smaller than block size: %d / %d < %d.' % ( discretization ['NY'], ypesize, self.bs )
-      sys.exit()
+      message = 'mesh resolution NY / ypesize is smaller than block size'
+      details = '%d / %d < %d.' % ( discretization ['NY'], ypesize, self.bs )
+      helpers.error (message, details)
     if discretization ['NZ'] < self.bs * zpesize:
-      print ' :: ERROR: mesh resolution NZ / zpesize is smaller than block size: %d / %d < %d.' % ( discretization ['NZ'], zpesize, self.bs )
-      sys.exit()
+      message = 'mesh resolution NZ / zpesize is smaller than block size'
+      details = '%d / %d < %d.' % ( discretization ['NZ'], zpesize, self.bs )
+      helpers.error (message, details)
     
     # check if number of blocks is not smaller than available threads
     blocks_x = discretization ['NX'] / (self.bs * xpesize)
@@ -388,12 +391,11 @@ class CubismMPCF (Solver):
     blocks_z = discretization ['NZ'] / (self.bs * zpesize)
     blocks   = blocks_x * blocks_y * blocks_z
     if blocks < parallelization.threads:
-      print
-      print ' :: ERROR: number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
-      print '  : Discretization: %s' % str(discretization)
-      print '  : Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
-      print
-      helpers.query ('Continue with sub-optimal parallelization?')
+      message = 'number of blocks is smaller than available threads: %d < %d.' % ( blocks, parallelization.threads )
+      details = 'Discretization: %s' % str(discretization)
+      advice  = 'Parallelization: %s ranks, %d threads' % ( str(parallelization.reshape(3)), parallelization.threads )
+      helpers.warning (message, details, advice)
+      helpers.query   ('Continue with sub-optimal parallelization?')
   
   # run the specified deterministic simulation (level, type, sample)
   # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
@@ -454,9 +456,7 @@ class CubismMPCF (Solver):
     # check if any output files found
     if not v2 and not v1:
       if self.params.verbose >= 1:
-        print
-        print ' :: WARNING: Output file does not exist (version 1.0 is also absent)'
-        print '  : %s' % outputfileformat
+        helpers.warning ('Output file does not exist (version 1.0 is also absent)', details = outputfileformat)
       raise Exception ('Output file does not exist')
     
     results = Interpolated_Time_Series ()

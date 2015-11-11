@@ -193,8 +193,7 @@ class Solver (object):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
-      print ' :: ERROR: \'walltime\' exceeds \'max_walltime\' in \'local.py\': %.2f > %.2f' % (parallelization.walltime, local.max_walltime)
-      sys.exit()
+      helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
     
     # add timer
     if local.timer:
@@ -248,10 +247,7 @@ class Solver (object):
         args ['cores'] *= merge
         args ['nodes'] *= merge
       else:
-        print
-        print ' :: ERROR: \'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\': %d > %d' % (merge, parallelization.mergemax)
-        print
-        sys.exit()
+        helpers.error ('\'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\'', details = '%d > %d' % (merge, parallelization.mergemax))
 
     # assemble submission command
     submit = local.submit % args
