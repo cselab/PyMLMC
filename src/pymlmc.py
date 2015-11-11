@@ -409,7 +409,6 @@ class MLMC (object):
         self.available = 0
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
       print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
-    print '  : DONE'
 
     print
     print ' :: QUERY: Continue? [enter \'y\' or press ENTER]'
