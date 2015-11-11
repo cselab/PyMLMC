@@ -144,6 +144,15 @@ class Progress (object):
     self.stdout.write('\r')
     self.stdout.flush()
 
+# info
+def info (message, details=None, advice=None):
+  print
+  print ' :: INFO: %s' % message
+  if details != None:
+    print '  : %s' % details
+  if advice != None:
+    print '  : -> %s' % advice
+
 # query
 def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None):
 
