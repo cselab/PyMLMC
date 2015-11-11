@@ -72,8 +72,7 @@ class Parallelization (object):
     
     # check if we are not adjusting twice
     if self.batchsize != None:
-      print ' :: ERROR: Parallelization.adjust() can be called only once!'
-      sys.exit()
+      helpers.error ('Parallelization.adjust() can be called only once!')
     
     # determine 'batchsize': required size of one part of the batch job
     if self.batchmax != None:

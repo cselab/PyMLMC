@@ -77,17 +77,9 @@ class MLMC (object):
     
     # recursive updating phase
     self.update()
-    
-    # query user for further action
-    print
-    print ' :: QUERY: Continue with data analysis? [enter \'y\' or press ENTER]'
-    input = raw_input ( '  : ' ) or 'y'
-    if input != 'y':
-      print '  : EXIT'
-      print
-      sys.exit()
-    else:
-      print '  : CONTINUE'
+
+    # query for progress
+    helpers.query ('Continue with data analysis?')
   
   # initial phase
   def init (self):
@@ -142,7 +134,10 @@ class MLMC (object):
       self.indicators.compute (self.mcs)
       self.indicators.report  ()
       self.indicators.save    ()
-      
+
+      # query for progress
+      helpers.query ('Continue?')
+
       # compute, report, and save errors
       self.errors.compute (self.indicators, self.config.samples.counts)
       self.errors.report  ()
@@ -150,6 +145,9 @@ class MLMC (object):
       
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.config.works)
+
+      # query for progress
+      helpers.query ('Continue?')
 
       # report number of samples used so far (avoid updating as this might not be possible)
       self.config.samples.report   ()
@@ -185,7 +183,7 @@ class MLMC (object):
             self.config.samples.report   ()
             self.config.samples.validate ()
           else:
-            print ' :: WARNING: indicators not available - samples can not be updated'
+            helpers.warning ('indicators not available - samples can not be updated')
 
       # for non-interactive sessions, proceed immediately
       else:
@@ -194,11 +192,11 @@ class MLMC (object):
           self.config.samples.report   ()
           self.config.samples.validate ()
         else:
-          print ' :: WARNING: indicators not available - samples can not be updated'
+          helpers.warning ('indicators or errors not available - samples can not be updated')
 
       # check if samples are available
       if not self.config.samples.available:
-        print ' :: WARNING: samples not available -> exiting'
+        helpers.warning ('samples not available -> exiting')
         return
 
       # save the required number of samples
@@ -367,7 +365,7 @@ class MLMC (object):
     if not self.finished:
       # issue a warning and query for progress
       helpers.query ('Ignore and continue nevertheless?', warning='Some simulations are still pending')
-  
+
   # save MLMC simulation
   def save (self):
     
@@ -413,10 +411,7 @@ class MLMC (object):
 
     # check if statistics can be assembled
     if not self.available:
-      print
-      print ' :: ERROR: statistics can not be assembled -> exiting...'
-      print
-      sys.exit()
+      helpers.error ('Statistics can not be assembled')
     
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'

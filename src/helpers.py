@@ -156,13 +156,13 @@ class Progress (object):
     self.stdout.flush()
 
 # query
-def query (message, default='y', warning=None):
+def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None):
 
   print
   if warning != None:
     print ' :: WARNING: %s' % warning
-  print ' :: QUERY: %s [enter \'y\' or press ENTER]' % message
-  input = raw_input ( '  : ' ) or default
+  print ' :: QUERY: %s [%s]' % (message, hint)
+  input = type ( raw_input ( '  : ' ) ) or default
   if input != 'y':
     print '  : EXIT'
     print
@@ -171,3 +171,19 @@ def query (message, default='y', warning=None):
     print '  : CONTINUE'
   
   return input
+
+# error
+def error (message, details=None, advice=None):
+  print
+  print ' :: ERROR: %s -> exiting...' % message
+  if details != None:
+    print '  : %s' % details
+  if advice != None:
+    print '  : -> %s' % advice
+  print
+  sys.exit()
+
+# warning
+def warning (message):
+  print
+  print ' :: WARNING: %s' % message

@@ -37,8 +37,7 @@ class Errors (object):
     
     # extrapolate missing indicators
     if indicators.nans:
-      print
-      print ' :: WARNING: Missing indicator values are extrapolated!'
+      helpers.warning ('Missing indicator values are extrapolated!')
       self.indicators.extrapolate ()
     
     # check if indicators are available
@@ -89,8 +88,7 @@ class Errors (object):
   def speedup (self, works):
 
     if not self.available or self.total_error == 0:
-      print
-      print ' :: WARNING: Speedup can not be estimated since total sampling error is not available.'
+      helpers.warning ('Speedup can not be estimated since total sampling error is not available')
       return
 
     work_mlmc    = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )

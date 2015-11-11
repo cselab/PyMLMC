@@ -101,11 +101,8 @@ class Status (object):
       print ('  : Simulation was executed on \'%s\'' % self.list ['cluster'] )
     
     except:
-      
-      print
-      print (' :: ERROR: MLMC status could not be loaded from')
-      print ('  : %s' % os.path.join (config.root, self.status_file))
-      print ('  : -> Run PyMLMC with \'-r\' option to restart the simulation')
-      print
-      
-      sys.exit()
+
+      message = 'MLMC status could not be loaded from'
+      details = os.path.join (config.root, self.status_file))
+      advice  = 'Run PyMLMC with \'-r\' option to restart the simulation'
+      helpers.error (message, details, advice)

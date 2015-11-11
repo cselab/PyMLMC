@@ -128,6 +128,7 @@ class Estimated_Budget (Samples):
     budget = float ( input )
     modified = budget != self.budget
     self.budget = budget
+    print '  : %s' % helpers.intf (self.budget)
     return modified
   
   # computes the optimal number of samples if some samples are already computed

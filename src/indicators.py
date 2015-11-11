@@ -198,9 +198,8 @@ class Indicators (object):
         else:
           self.variance_diff [level] = numpy.nan
           self.available = 0
-          print
-          print ' :: WARNING: Extrapolation of indicators \'SIGMA DIFF\' not possible!'
-    
+          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
+
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
         if level != 0:
@@ -208,8 +207,7 @@ class Indicators (object):
         else:
           self.variance [level] [0] = numpy.nan
           self.available = 0
-          print
-          print ' :: WARNING: Extrapolation of indicators \'SIGMA [FINE]\' not possible!'
+          helpers.warning ('Extrapolation of indicators \'SIGMA [FINE]\' not possible!')
     
     for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
@@ -218,5 +216,4 @@ class Indicators (object):
         else:
           self.variance [level] [1] = numpy.nan
           self.available = 0
-          print
-          print ' :: WARNING: Extrapolation of indicators \'SIGMA [COARSE]\' not possible!'
+          helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
