@@ -411,6 +411,7 @@ class MLMC (object):
       print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
     print '  : DONE'
 
+    print
     print ' :: QUERY: Continue? [enter \'y\' or press ENTER]'
     input = raw_input ( '  : ' ) or 'y'
     if input != 'y':
@@ -419,7 +420,7 @@ class MLMC (object):
       sys.exit()
     else:
       print '  : CONTINUE'
-  
+
   # assemble MC and MLMC estimates
   def assemble (self, stats):
 
