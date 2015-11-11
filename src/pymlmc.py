@@ -196,7 +196,7 @@ class MLMC (object):
 
       # check if samples are available
       if not self.config.samples.available:
-        helpers.warning ('samples not available -> exiting')
+        helpers.warning ('samples not available -> exiting simulation...')
         return
 
       # save the required number of samples

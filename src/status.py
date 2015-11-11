@@ -103,6 +103,6 @@ class Status (object):
     except:
 
       message = 'MLMC status could not be loaded from'
-      details = os.path.join (config.root, self.status_file))
+      details = os.path.join (config.root, self.status_file)
       advice  = 'Run PyMLMC with \'-r\' option to restart the simulation'
       helpers.error (message, details, advice)
