@@ -184,6 +184,10 @@ def error (message, details=None, advice=None):
   sys.exit()
 
 # warning
-def warning (message):
+def warning (message, details=None, advice=None):
   print
   print ' :: WARNING: %s' % message
+  if details != None:
+    print '  : %s' % details
+  if advice != None:
+    print '  : -> %s' % advice

@@ -62,10 +62,7 @@ class Solver (object):
         if os.path.exists ( executablepath ):
           shutil.copy ( executablepath, self.outputdir)
         else:
-          print
-          print ' :: ERROR: executable not found at ' + executablepath
-          print
-          sys.exit()
+          helpers.error ('executable not found at ' + executablepath)
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):
@@ -76,13 +73,11 @@ class Solver (object):
       label = self.label (level, type, sample)
       present = os.path.exists ( os.path.join (directory, self.jobfile % label) )
     if present:
-      print
-      print ' :: ERROR: working directory is NOT clean!'
-      print '  : -> Remove all directories like "%s".' % directory
-      print '  : -> Alternatively, run PyMLMC with \'-p\' option to proceed with simulations.'
-      print
-      sys.exit()
-  
+      message = 'working directory is NOT clean!'
+      details = 'Remove all directories like "%s"' % directory
+      advice  = 'Alternatively, run PyMLMC with \'-p\' option to proceed with simulations'
+      helpers.error (message, details, advice)
+
   # initialize solver
   def initialize (self, level, type, parallelization):
     if parallelization.batch:
@@ -93,10 +88,7 @@ class Solver (object):
     try:
       return os.environ [var]
     except:
-      print
-      print ' :: WARNING: environment variable %s not set.' % var
-      print '  : -> Using path = None'
-      print
+      helpers.warning ('environment variable %s not set' % var, details = 'Using path = None')
       return None
 
   # make file executable
