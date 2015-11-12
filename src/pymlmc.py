@@ -256,13 +256,13 @@ class MLMC (object):
       mc.validate ()
 
     header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
-    separator = '  :---------|----------|--------------|-----------|------------|'
+    separator = '  :------------------------------------------------------------|'
     if local.cluster:
       header    += '  WALLTIME  |  BATCH  |  JOBS  |'
-      separator += '------------|---------|--------|'
+      separator += '-------------------------------|'
       if local.ensembles:
         header    += '  MERGE  |  ENSEMBLES  '
-        separator += '---------|-------------'
+        separator += '-----------------------'
     print header
     print separator
 
@@ -393,7 +393,7 @@ class MLMC (object):
     print
     print ' :: LOADING RESULTS...'
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
-    print '  :------------------------------------------------------|-----------|'
+    print '  :------------------------------------------------------------------|'
     format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |    %s   |'
     for mc in self.mcs:
       pending = mc.pending()
@@ -407,7 +407,7 @@ class MLMC (object):
         self.available = 1
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
       print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ', intf (pending, table=1) if pending else '    ')
-      
+
     # query for progress
     helpers.query ('Continue?')
 
