@@ -75,20 +75,21 @@ class Errors (object):
     print '  :----------' + (len (self.levels) * '--------')
     print '  :  ERROR  :',
     for level in self.levels:
-      print '%.1e' % self.relative_error [level] if not numpy.isnan (self.relative_error [level]) else '    N/A',
+      print '%.1e' % self.relative_error [level] if not numpy.isnan (self.relative_error [level]) and not numpy.isinf (self.relative_error [level]) else '    N/A',
     print
 
     print '  :'
-    print '  : Total sampling error : ' + ('%f [%.1e]' % (self.total_relative_error, self.total_relative_error) if not numpy.isnan (self.total_relative_error) else 'N/A')
-    if numpy.isnan (self.total_relative_error):
-      self.available = 0
+    print '  : Total sampling error : ' + ('%f [%.1e]' % (self.total_relative_error, self.total_relative_error) if not numpy.isnan (self.total_relative_error) and not numpy.isinf (self.total_relative_error) else 'N/A')
     '''
     if tol:
       print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
     else:
       print
     '''
-  
+
+    if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
+      self.available = 0
+
   # compute and report speedup (MLMC vs MC)
   def speedup (self, works):
 

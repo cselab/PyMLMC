@@ -87,11 +87,11 @@ class Indicators (object):
       self.correlation [level] = numpy.corrcoef (values_diff [level] [0], values_diff [level] [1]) [0][1]
 
     # set the normalization
-    if numpy.isnan (self.mean [self.L] [0]):
+    if numpy.isnan (self.mean [0] [0]):
       self.normalization = 1
       helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
-      self.normalization = self.mean [self.L] [0]
+      self.normalization = self.mean [0] [0]
 
   def report (self):
 
