@@ -704,7 +704,8 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
     if level == 0: continue
     pylab.subplot ( 1, mlmc.config.L, level)
     pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+    if mlmc.config.samples.counts.loaded [level]:
+      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
 
   '''
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
@@ -760,10 +761,14 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
     pylab.subplot ( 2, levels, mc.config.level + 1 )
     pylab.title ( 'level %d' % mc.config.level )
-    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+    if mc.available:
+      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
 
-  extent_range = extent [1] - extent [0]
-  extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+  if extent:
+    extent_range = extent [1] - extent [0]
+    extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+  else:
+    extent_diff = None
 
   # differences of MC estimates
   for level, diff in enumerate (mlmc.diffs):
@@ -773,7 +778,8 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
     pylab.subplot ( 2, levels, level + 1 + levels )
     pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+    if mlmc.config.samples.loaded:
+      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
 
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -808,6 +814,10 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorig
   if not qoi: qoi = mlmc.config.solver.qoi
 
   print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
+  
+  if not mlmc.available:
+    print ' NOT available.'
+    return
 
   if not frame:
     figure (infolines, subplots=1)
