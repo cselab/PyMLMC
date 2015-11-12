@@ -189,15 +189,15 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', merge=None):
+  def submit (self, job, parallelization, label, directory='.', merge=None, timer=1):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
     
     # add timer
-    if local.timer:
-      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label, 'statusfile' : self.statusfile % label }
+    if timer and local.timer:
+      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -413,6 +413,10 @@ class Solver (object):
             # construct batch job
             batch = ''.join (part)
 
+            # add timer
+            if local.timer:
+              batch = local.timer % { 'job' : batch, 'timerfile' : self.timerfile % label }
+
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(%s) &\n' % batch
 
@@ -423,7 +427,7 @@ class Solver (object):
             ensemble += batch
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, size), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, size, timer=0), directory )
 
           # update 'submitted' counter
           submitted += size
