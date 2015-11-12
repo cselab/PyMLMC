@@ -59,7 +59,10 @@ class MLMC_Config (object):
     # enumeration of fine and coarse mesh levels in one level difference
     self.FINE   = 0
     self.COARSE = 1
-    
+
+    # determine types
+    self.types  = lambda level : [self.FINE, self.COARSE] if level > 0 else [self.FINE]
+
     # determine levels
     self.levels = range ( len ( self.discretizations ) )
     

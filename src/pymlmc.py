@@ -388,25 +388,57 @@ class MLMC (object):
     if not self.params.interactive:
       self.join ()
 
+    # load the results from MC simulations and report
+
     from helpers import intf
-    # load the results from MC simulations
     print
     print ' :: LOADING RESULTS...'
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
     print '  :------------------------------------------------------------------|'
     format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |    %s   |'
-    for mc in self.mcs:
-      pending = mc.pending()
-      loaded, failed = mc.load ()
-      # loading is level-dependent (i.e. both samples should be loaded)
-      # TODO: this min/max is not robust - should really compare sample-by-sample
-      self.config.samples.counts.loaded [mc.config.level] = min (loaded, self.config.samples.counts.loaded [mc.config.level])
-      self.config.samples.counts.failed [mc.config.level] = max (failed, self.config.samples.counts.failed [mc.config.level])
-      # check if at least one sample at some level with type 0
-      if mc.available and mc.config.type == self.config.FINE:
-        self.available = 1
-      typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ', intf (pending, table=1) if pending else '    ')
+
+    for level in self.config.levels:
+
+      loaded = [None, None]
+
+      for type in reversed (self.config.types (level)):
+
+        mc = self.mcs [ self.config.pick [level] [type] ]
+        pending = mc.pending()
+        loaded [type] = mc.load ()
+
+        # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
+        # TODO: coarsest level might be not level 0!
+        if level == 0:
+          self.config.samples.counts.loaded [mc.config.level] = sum (loaded [self.config.FINE])
+          self.config.samples.counts.failed [mc.config.level] = len(mc.config.samples) - self.config.samples.counts.loaded [level]
+        elif loaded [self.config.FINE] != None and loaded [self.config.COARSE] != None:
+          both = [ loaded [self.config.FINE] [sample] * loaded [self.config.COARSE] [sample] for sample in range(len(mc.config.samples))]
+          self.config.samples.counts.loaded [level] = sum (both)
+          self.config.samples.counts.failed [level] = len(mc.config.samples) - self.config.samples.counts.loaded [level]
+
+        # check if at least one sample at some level with type FINE
+        if mc.available and mc.config.type == self.config.FINE:
+          self.available = 1
+
+        # report
+        typestr    = [' FINE ', 'COARSE'] [mc.config.type]
+        samplesstr = intf(len(mc.config.samples), table=1)
+        loadedstr  = intf (sum (loaded [type]), table=1, empty=1)
+        failedstr  = intf (len(mc.config.samples) - sum (loaded [type]), table=1, empty=1)
+        pendingstr = intf (pending, table=1, empty=1)
+        print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
+
+    # report how many pairs of fine and course samples were loaded
+    print
+    print ' :: LOADED PAIRS (FINE & COARSE)...'
+    print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |'
+    print '  :-------------------------------------------|'
+    format = '  :      %d  |     %s  |   %s   |   %s   |'
+    for level in self.config.levels:
+      loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
+      failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
+      print format % (mc.config.level, intf (self.config.samples.counts.computed [level], table=1), loadedstr, failedstr)
 
     # query for progress
     helpers.query ('Continue?')
@@ -439,12 +471,14 @@ class MLMC (object):
     '''
     for name in [stat.name for stat in stats]:
       #for mc in self.mcs:
+      coarsest_level_found = 0
       for level in self.config.levels:
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
-          self.diffs [level] [name] = self.mcs [ self.config.pick [level] [0] ] .stats [name]
-          if level != 0:
-            self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [0] ] .stats [name]
+          self.diffs [level] [name] = self.mcs [ self.config.pick [level] [self.config.FINE] ] .stats [name]
+          if coarsest_level_found:
+            self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
+          coarsest_level_found = 1
         else:
           self.diffs [level] [name] = None
         #if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [name]

@@ -1012,13 +1012,11 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     pylab.subplot ( 1, levels, level + 1 )
     pylab.title ( 'samples of level %d' % level )
 
-    types = [mlmc.config.FINE, mlmc.config.COARSE] if level > 0 else [mlmc.config.FINE]
-
     xend = float('nan')
     
     for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
-      for type in types:
+      for type in mlmc.config.types (level):
 
         results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
 
@@ -1193,7 +1191,8 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   #if warmup:
   #  pylab.semilogy (levels, warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
-  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
+  #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
+  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
   #if optimal:
   #  pylab.semilogy (levels, optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
   pylab.title  ('Estimated number of samples')

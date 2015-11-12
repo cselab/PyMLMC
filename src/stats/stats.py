@@ -25,6 +25,7 @@ class Stat (object):
     for key in keys:
       stats.data [key] = []
       for step in xrange ( len ( samples [0] .data [key] ) ):
-        stats.data [key] .append ( self.compute ( [ sample.data [key] [step] if sample != None else float('NaN') for sample in samples ] ) )
+        series = [ sample.data [key] [step] for sample in samples if sample != None ]
+        stats.data [key] .append ( self.compute ( series ) )
     
     return stats

@@ -509,6 +509,7 @@ class CubismMPCF (Solver):
       # interpolate time dependent results using linear interpolation
       # this is needed since number of time steps and time step sizes
       # are usually different for every simulation
+      # TODO: if simulation is not yet finished, interpolation interval must be adapted!
       results .interpolate ( self.points + 1 )
       
       # compute meta parameters for interpolation

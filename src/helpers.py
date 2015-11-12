@@ -80,13 +80,19 @@ def grids_3d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
 # integer format with multipliers K, M, etc.
-def intf (number, table=0):
+def intf (number, table=0, empty=0):
   if table:
     template = '%3d%1s'
   else:
     template = '%d%s'
   if number == 0:
-    return template % ( 0, '' )
+    if empty:
+      if table:
+        return '    '
+      else:
+        return ''
+    else:
+      return template % ( 0, '' )
   from math import log, floor
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
