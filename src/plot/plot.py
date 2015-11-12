@@ -1100,7 +1100,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   
   EPSILON       = mlmc.indicators.mean_diff
   SIGMA         = mlmc.indicators.variance_diff
-  TOL           = mlmc.config.samples.tol
+  #TOL           = mlmc.config.samples.tol
   NORMALIZATION = mlmc.errors.normalization
   levels        = mlmc.config.levels
   qoi           = mlmc.config.solver.qoi
@@ -1124,7 +1124,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   if run == 1:
     if exact:
       pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-    pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+    #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -1135,8 +1135,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   
   pylab.subplot(122)
   pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
-  if run == 1:
-    pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+  #if run == 1:
+  #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
@@ -1162,9 +1162,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   warmup           = mlmc.config.samples.warmup
   samples          = mlmc.config.samples.counts.computed
+  loaded           = mlmc.config.samples.counts.loaded
   #optimal          = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction
-  TOL              = mlmc.config.samples.tol
+  #TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
   qoi              = mlmc.config.solver.qoi
   
@@ -1208,7 +1209,7 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   # === load all required data
   
   relative_error   = mlmc.errors.relative_error
-  TOL              = mlmc.config.samples.tol
+  #TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
   qoi              = mlmc.config.solver.qoi
   
@@ -1220,8 +1221,8 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   # plot relative sampling error
   
   pylab.semilogy (levels, relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative sampling errors')
-  if run == 1:
-    pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
+  #if run == 1:
+  #  pylab.axhline  (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')

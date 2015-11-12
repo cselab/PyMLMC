@@ -40,15 +40,15 @@ class Errors (object):
       helpers.warning ('Missing indicator values are extrapolated!')
       self.indicators.extrapolate ()
     
+    # set the normalization
+    self.normalization = self.indicators.normalization
+
     # check if indicators are available
     if not self.indicators.available:
       self.available = 0
       return
     else:
       self.available = 1
-
-    # set the normalization
-    self.normalization = self.indicators.normalization
     
     # compute relative sampling errors
     self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.computed ) / self.normalization

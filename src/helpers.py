@@ -35,9 +35,11 @@ def parse ():
 def level_type_list (levels):
   return [ [None, None] for level in levels ]
 
+'''
 # picks entry for corresponding level and type from the 'level_type_list'
 def pick (list, level, type):
   return list [ level + type * len(list)/2 ]
+'''
 
 # generates hierarchical grids by specifying the coarsest grid and the additional number of levels L
 def grids (N0, L=0):

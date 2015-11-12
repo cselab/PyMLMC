@@ -58,6 +58,9 @@ class MLMC (object):
     
     # errors
     self.errors = Errors (self.config.levels)
+
+    # availability
+    self.available = 0
     
     # submission file name
     self.submission_file = 'queue.dat'
@@ -392,13 +395,14 @@ class MLMC (object):
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |'
     print '  :------------------------------------------------------|'
     format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |'
-    self.available = 1
     for mc in self.mcs:
       loaded, failed = mc.load ()
-      if loaded == 0:
-        self.available = 0
+      # TODO: this should be only level-dependent (i.e. both samples should be loaded)
+      self.config.samples.counts.loaded .append (loaded)
+      self.config.samples.counts.failed .append (failed)
+      if mc.available: self.available = 1
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1), intf (failed, table=1) if failed != 0 else '    ')
+      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ')
 
     # query for progress
     helpers.query ('Continue?')
@@ -409,7 +413,7 @@ class MLMC (object):
     print
     print ' :: ASSEMBLING:'
 
-    # check if statistics can be assembled
+    # check if statistics can be assembled (at least at some level and of some type)
     if not self.available:
       helpers.error ('Statistics can not be assembled')
     
@@ -420,26 +424,37 @@ class MLMC (object):
 
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
+    self.diffs = [ {} for level in self.config.levels ]
     #self.diffs = [ { stat.name : self.config.solver.DataClass () for stat in stats } for level in self.config.levels ]
+    '''
     self.diffs = []
     for level in self.config.levels:
       self.diffs .append ( {} )
-      for stat in stats:
-        self.diffs [-1] [stat.name] = self.config.solver.DataClass ()
+      #for stat in stats:
+      #  self.diffs [-1] [stat.name] = self.config.solver.DataClass ()
+    '''
     for name in [stat.name for stat in stats]:
-      for mc in self.mcs:
-        if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [ name ]
-        if mc.config.type == self.config.COARSE: self.diffs [mc.config.level] [name] -= mc.stats [ name ]
+      #for mc in self.mcs:
+      for level in self.config.levels:
+        self.diffs [level] [name] = self.mcs [ self.config.pick [level] [0] ] .stats [name]
+        # TODO: here, if a level fails, we should remove a corresponding level with type = 0 as well
+        if level != 0 and self.diffs [level] [name] != None and self.mcs [ self.config.pick [level] [0] ] .available:
+          self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [0] ] .stats [name]
+        #if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [name]
+        #if mc.config.type == self.config.COARSE: self.diffs [mc.config.level] [name] -= mc.stats [name]
 
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = {}
     for name in [stat.name for stat in stats]:
-      self.stats [ name ] = self.config.solver.DataClass ()
-      for diff in self.diffs:
-        self.stats [ name ] += diff [name]
+      #self.stats [name] = self.config.solver.DataClass ()
+      self.stats [name] = self.diffs [0] [name]
+      for diff in self.diffs [1:]:
+        if diff [name] != None:
+          self.stats [name] += diff [name]
 
     print '  : DONE'
+    print
   
   # report computed statistics (mostly used only for debugging)
   def report (self):

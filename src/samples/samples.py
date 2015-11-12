@@ -12,6 +12,8 @@ class Counts (object):
   
   computed   = []
   additional = []
+  loaded     = []
+  failed     = []
 
 class Indices (object):
   

@@ -31,6 +31,7 @@ class MC_Config (object):
     self.discretization = mlmc_config.discretizations [level - type]
     self.id             = mlmc_config.id
     self.root           = mlmc_config.root
+    self.available      = 0
 
 class MC (object):
   
@@ -163,13 +164,17 @@ class MC (object):
           self.results [i] = None
           failed += 1
 
+    self.available = (loaded != 0)
+
     return loaded, failed
   
   # assmble MC estimates
   def assemble (self, stats):
-    
+
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute_all ( self.results, self.config.solver.DataClass )
+      if self.available:
+        self.stats [ stat.name ] = stat.compute_all ( self.results, self.config.solver.DataClass )
+      else:
+        self.stats [ stat.name ] = None
     return self.stats
-
