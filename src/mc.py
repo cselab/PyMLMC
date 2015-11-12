@@ -159,9 +159,9 @@ class MC (object):
         except:
           self.results [i] = None
             
-    loaded = [ 1 if result != None else 0 for result in self.results ]
+    loaded = [ i for i, result in enumerate (self.results) if result != None ]
 
-    self.available = (sum (loaded) > 0)
+    self.available = (len (loaded) > 0)
 
     return loaded
   

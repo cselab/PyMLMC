@@ -134,7 +134,7 @@ class MLMC (object):
         return
       
       # compute, report, and save error indicators
-      self.indicators.compute (self.mcs)
+      self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
       self.indicators.report  ()
       self.indicators.save    ()
 
@@ -410,12 +410,13 @@ class MLMC (object):
         # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
         # TODO: coarsest level might be not level 0!
         if level == 0:
-          self.config.samples.counts.loaded [mc.config.level] = sum (loaded [self.config.FINE])
-          self.config.samples.counts.failed [mc.config.level] = len(mc.config.samples) - self.config.samples.counts.loaded [level]
+          self.config.samples.indices.loaded [level] = loaded [self.config.FINE]
+          self.config.samples.counts .loaded [level] = len (self.config.samples.indices.loaded [level])
+          self.config.samples.counts .failed [level] = len (mc.config.samples) - self.config.samples.counts.loaded [level]
         elif loaded [self.config.FINE] != None and loaded [self.config.COARSE] != None:
-          both = [ loaded [self.config.FINE] [sample] * loaded [self.config.COARSE] [sample] for sample in range(len(mc.config.samples))]
-          self.config.samples.counts.loaded [level] = sum (both)
-          self.config.samples.counts.failed [level] = len(mc.config.samples) - self.config.samples.counts.loaded [level]
+          self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (loaded [self.config.COARSE]) )
+          self.config.samples.counts .loaded [level] = len (self.config.samples.indices.loaded [level])
+          self.config.samples.counts .failed [level] = len (mc.config.samples) - self.config.samples.counts.loaded [level]
 
         # check if at least one sample at some level with type FINE
         if mc.available and mc.config.type == self.config.FINE:
@@ -424,8 +425,8 @@ class MLMC (object):
         # report
         typestr    = [' FINE ', 'COARSE'] [mc.config.type]
         samplesstr = intf(len(mc.config.samples), table=1)
-        loadedstr  = intf (sum (loaded [type]), table=1, empty=1)
-        failedstr  = intf (len(mc.config.samples) - sum (loaded [type]), table=1, empty=1)
+        loadedstr  = intf (len (loaded [type]), table=1, empty=1)
+        failedstr  = intf (len (mc.config.samples) - len (loaded [type]), table=1, empty=1)
         pendingstr = intf (pending, table=1, empty=1)
         print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
 

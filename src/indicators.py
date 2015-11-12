@@ -39,7 +39,7 @@ class Indicators (object):
 
     self.nans      = 0
   
-  def compute (self, mcs):
+  def compute (self, mcs, loaded):
 
     # list of results
     self.mean           = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
@@ -50,61 +50,56 @@ class Indicators (object):
     self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
 
     # evaluate indicators for all samples on all levels and types
-    values = helpers.level_type_list (self.levels)
+    values      = helpers.level_type_list (self.levels)
+    values_diff = helpers.level_type_list (self.levels)
     for i, (level, type) in enumerate (self.levels_types):
-      values [level] [type] = numpy.array ( [ self.indicator ( result.data ) if result else float('NaN') for result in mcs [i] .results ] )
+      results_diff = [ result for sample, result in enumerate (mcs [i] .results) if sample in loaded [level] ]
+      values      [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results ] )
+      values_diff [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in results_diff ] )
+      if len (values [level] [type]) == 0:
+        values [level] [type] = numpy.array ( [ float('NaN') ] )
+      if len (values_diff [level] [type]) == 0:
+        values_diff [level] [type] = numpy.array ( [ float('NaN') ] )
+      if numpy.isnan ( values [level] [type] ) .any():
+        self.nans = 1
+      if numpy.isnan ( values_diff [level] [type] ) .any():
+        self.nans = 1
     
     # compute plain indicators
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
       self.variance [level] [type] = numpy.cov  (values [level] [type])
-      if numpy.isnan ( self.mean     [level] [type] ) .any() :
-        self.nans = 1
-      if numpy.isnan ( self.variance [level] [type] ) .any() :
-        self.nans = 1
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
     
     # compute indicators for differences
-    self.mean_diff     [0] = numpy.abs ( numpy.mean (values [0] [0]) )
-    self.variance_diff [0] = numpy.cov  (values [0] [0])
+    self.mean_diff     [0] = numpy.abs ( numpy.mean (values_diff [0] [0]) )
+    self.variance_diff [0] = numpy.cov  (values_diff [0] [0])
     for level in self.levels [1:] :
-      self.mean_diff     [level] = numpy.abs ( numpy.mean (values [level] [0] - values [level] [1]) )
-      self.variance_diff [level] = numpy.cov  (values [level] [0] - values [level] [1])
-      if numpy.isnan ( self.mean_diff     [level] ) .any() :
-        self.nans = 1
-      if numpy.isnan ( self.variance_diff [level] ) .any() :
-        self.nans = 1
+      self.mean_diff     [level] = numpy.abs ( numpy.mean (values_diff [level] [0] - values_diff [level] [1]) )
+      self.variance_diff [level] = numpy.cov  (values_diff [level] [0] - values_diff [level] [1])
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
-      self.covariance  [level] = numpy.cov      (values [level] [0], values [level] [1]) [0][1]
-      self.correlation [level] = numpy.corrcoef (values [level] [0], values [level] [1]) [0][1]
-      if numpy.isnan ( self.covariance  [level] ) .any() :
-        self.nans = 1
-      if numpy.isnan ( self.correlation [level] ) .any() :
-        self.nans = 1
+      self.covariance  [level] = numpy.cov      (values_diff [level] [0], values_diff [level] [1]) [0][1]
+      self.correlation [level] = numpy.corrcoef (values_diff [level] [0], values_diff [level] [1]) [0][1]
 
     # set the normalization
-    self.normalization = self.mean [self.L] [0]
-
-    # set availability
-    if numpy.isnan (self.normalization):
-      self.available = 0
+    if numpy.isnan (self.mean [self.L] [0]):
+      self.normalization = 1
+      helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
-      self.available = 1
+      self.normalization = self.mean [self.L] [0]
 
   def report (self):
 
-    if not self.available:
-      print
-      print ' :: INDICATORS: not available since \'normalization\' is N/A'
-      return
-
     print
     print ' :: INDICATORS: (normalized to %.1e)' % self.normalization
+
+    print '  :    LEVEL    :' + ''.join ( ['       %d' % level for level in self.levels ] )
+    print '  :--------------' + (len (self.levels) * '--------')
     
     # report mean (fine)
     print '  : EPSILON [FI]:',
@@ -191,13 +186,15 @@ class Indicators (object):
   # extrapolate missing variance estimates using available estimates
   def extrapolate (self):
 
+    self.available = 1
+
     for level in self.levels:
       if numpy.isnan ( self.variance_diff [level] ):
         if level != 0:
           self.variance_diff [level] = self.variance_diff [level-1] / 2
         else:
           self.variance_diff [level] = numpy.nan
-          self.available = 0
+          #self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
 
     for level in self.levels:
@@ -206,7 +203,7 @@ class Indicators (object):
           self.variance [level] [0] = self.variance [level-1] [0]
         else:
           self.variance [level] [0] = numpy.nan
-          self.available = 0
+          #self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA [FINE]\' not possible!')
     
     for level in self.levels [1:]:
@@ -215,5 +212,5 @@ class Indicators (object):
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
           self.variance [level] [1] = numpy.nan
-          self.available = 0
+          #self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')

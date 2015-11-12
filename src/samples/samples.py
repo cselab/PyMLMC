@@ -19,6 +19,7 @@ class Indices (object):
   
   computed   = []
   additional = []
+  loaded     = []
   
   def make (self, counts):
     
@@ -43,8 +44,10 @@ class Samples (object):
     
     self.L       = len(levels) - 1
 
-    self.counts.loaded = [ float('inf') for level in self.levels ]
-    self.counts.failed = [ float('-inf') for level in self.levels ]
+    self.counts.loaded  = [ None for level in self.levels ]
+    self.counts.failed  = [ None for level in self.levels ]
+
+    self.indices.loaded = [ None for level in self.levels ]
   
   def validate (self):
     

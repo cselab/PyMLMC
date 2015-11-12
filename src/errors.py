@@ -51,7 +51,7 @@ class Errors (object):
       self.available = 1
     
     # compute relative sampling errors
-    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.computed ) / self.normalization
+    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.loaded ) / self.normalization
     
     # compute the cumulative relative sampling error
     self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
@@ -69,14 +69,19 @@ class Errors (object):
 
     print
     print ' :: ERRORS: (normalized to %.1e)' % self.normalization
-    
-    print '  : Level sampling errors:',
-    #print '    ',
+
+    print '  :'
+    print '  :  LEVEL  :' + ''.join ( ['       %d' % level for level in self.levels ] )
+    print '  :----------' + (len (self.levels) * '--------')
+    print '  :  ERROR  :',
     for level in self.levels:
-      print '%.1e' % self.relative_error [level],
+      print '%.1e' % self.relative_error [level] if not numpy.isnan (self.relative_error [level]) else '    N/A',
     print
 
-    print '  : Total sampling error : %f [%.1e]' % (self.total_relative_error, self.total_relative_error)
+    print '  :'
+    print '  : Total sampling error : ' + ('%f [%.1e]' % (self.total_relative_error, self.total_relative_error) if not numpy.isnan (self.total_relative_error) else 'N/A')
+    if numpy.isnan (self.total_relative_error):
+      self.available = 0
     '''
     if tol:
       print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
