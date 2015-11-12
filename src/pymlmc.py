@@ -398,13 +398,16 @@ class MLMC (object):
     for mc in self.mcs:
       pending = mc.pending()
       loaded, failed = mc.load ()
-      # TODO: this should be only level-dependent (i.e. both samples should be loaded)
-      self.config.samples.counts.loaded .append (loaded)
-      self.config.samples.counts.failed .append (failed)
-      if mc.available: self.available = 1
+      # loading is level-dependent (i.e. both samples should be loaded)
+      # TODO: this min/max is not robust - should really compare sample-by-sample
+      self.config.samples.counts.loaded [mc.config.level] = min (loaded, self.config.samples.counts.loaded [mc.config.level])
+      self.config.samples.counts.failed [mc.config.level] = max (failed, self.config.samples.counts.failed [mc.config.level])
+      # check if at least one sample at some level with type 0
+      if mc.available and mc.config.type == self.config.FINE:
+        self.available = 1
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ', inft (pending, table=1))
-
+      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ', intf (pending, table=1) if pending else '    ')
+      
     # query for progress
     helpers.query ('Continue?')
 
@@ -414,7 +417,7 @@ class MLMC (object):
     print
     print ' :: ASSEMBLING:'
 
-    # check if statistics can be assembled (at least at some level and of some type)
+    # check if statistics can be assembled (at least one sample at some level with type 0)
     if not self.available:
       helpers.error ('Statistics can not be assembled')
     
@@ -437,10 +440,13 @@ class MLMC (object):
     for name in [stat.name for stat in stats]:
       #for mc in self.mcs:
       for level in self.config.levels:
-        self.diffs [level] [name] = self.mcs [ self.config.pick [level] [0] ] .stats [name]
-        # TODO: here, if a level fails, we should remove a corresponding level with type = 0 as well
-        if level != 0 and self.diffs [level] [name] != None and self.mcs [ self.config.pick [level] [0] ] .available:
-          self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [0] ] .stats [name]
+        # if at least one sample from that level is available
+        if self.config.samples.counts.loaded [level] != 0:
+          self.diffs [level] [name] = self.mcs [ self.config.pick [level] [0] ] .stats [name]
+          if level != 0:
+            self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [0] ] .stats [name]
+        else:
+          self.diffs [level] [name] = None
         #if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [name]
         #if mc.config.type == self.config.COARSE: self.diffs [mc.config.level] [name] -= mc.stats [name]
 
@@ -449,8 +455,13 @@ class MLMC (object):
     self.stats = {}
     for name in [stat.name for stat in stats]:
       #self.stats [name] = self.config.solver.DataClass ()
-      self.stats [name] = self.diffs [0] [name]
-      for diff in self.diffs [1:]:
+      # find first valid level (will be treated as level 0)
+      for i, diff in enumerate (self.diffs):
+        if diff [name] != None:
+          self.stats [name] = diff [name]
+          break
+      # add remaining differences
+      for diff in self.diffs [i+1:]:
         if diff [name] != None:
           self.stats [name] += diff [name]
 

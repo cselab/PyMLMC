@@ -616,7 +616,8 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 
     pylab.subplot ( 1, levels, mc.config.level + 1 )
     pylab.title ( 'level %d' % mc.config.level )
-    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
+    if mc.available:
+      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
   if infolines:
     plot_infolines (self)
@@ -650,7 +651,8 @@ def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yo
     typestr = ['fine', 'coarse'] [mc.config.type]
     pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
     pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+    if mc.available:
+      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
   
   handles, labels = pylab.gcf().gca().get_legend_handles_labels()
   pylab.subplot (2, levels, 1 + levels)
@@ -691,8 +693,11 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   xlabel = '%s [%s]' % (name('t'), unit('t'))
 
-  extent_range = extent [1] - extent [0]
-  extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+  if extent:
+    extent_range = extent [1] - extent [0]
+    extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+  else:
+    extent_diff = None
 
   for level, diff in enumerate (mlmc.diffs):
 
@@ -1000,7 +1005,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     types = [mlmc.config.FINE, mlmc.config.COARSE] if level > 0 else [mlmc.config.FINE]
 
     xend = float('nan')
-
+    
     for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
 
       for type in types:

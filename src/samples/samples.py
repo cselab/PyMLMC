@@ -42,6 +42,9 @@ class Samples (object):
     self.indices = Indices ()
     
     self.L       = len(levels) - 1
+
+    self.counts.loaded = [ float('inf') for level in self.levels ]
+    self.counts.failed = [ float('-inf') for level in self.levels ]
   
   def validate (self):
     
