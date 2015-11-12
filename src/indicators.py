@@ -54,7 +54,7 @@ class Indicators (object):
     values_diff = helpers.level_type_list (self.levels)
     for i, (level, type) in enumerate (self.levels_types):
       results_diff = [ result for sample, result in enumerate (mcs [i] .results) if sample in loaded [level] ]
-      values      [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results ] )
+      values      [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results if result != None ] )
       values_diff [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in results_diff ] )
       if len (values [level] [type]) == 0:
         values [level] [type] = numpy.array ( [ float('NaN') ] )
