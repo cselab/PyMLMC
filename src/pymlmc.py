@@ -392,17 +392,18 @@ class MLMC (object):
     # load the results from MC simulations
     print
     print ' :: LOADING RESULTS...'
-    print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |'
-    print '  :------------------------------------------------------|'
-    format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |'
+    print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
+    print '  :------------------------------------------------------|-----------|'
+    format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |    %s   |'
     for mc in self.mcs:
+      pending = mc.pending()
       loaded, failed = mc.load ()
       # TODO: this should be only level-dependent (i.e. both samples should be loaded)
       self.config.samples.counts.loaded .append (loaded)
       self.config.samples.counts.failed .append (failed)
       if mc.available: self.available = 1
       typestr = [' FINE ', 'COARSE'] [mc.config.type]
-      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ')
+      print format % (mc.config.level, typestr, intf(len(mc.config.samples), table=1), intf (loaded, table=1) if loaded != 0 else '    ', intf (failed, table=1) if failed != 0 else '    ', inft (pending, table=1))
 
     # query for progress
     helpers.query ('Continue?')
