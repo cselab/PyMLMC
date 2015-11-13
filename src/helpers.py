@@ -129,9 +129,10 @@ class Progress (object):
 
   def __init__ (self, prefix, steps, length=20):
 
-    self.prefix = prefix
-    self.length = length
-    self.steps  = steps
+    self.prefix  = prefix
+    self.length  = length
+    self.steps   = steps
+    selt.percent = None
 
     from sys import stdout
     self.stdout = stdout
@@ -139,10 +140,14 @@ class Progress (object):
   def update (self, step):
     text  = '\r' + self.prefix
     fraction = float(step) / self.steps
+    percent = int(round(100*fraction))
+    if percent = self.percent:
+      return
+    self.percent = percent
     text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
-    text += ' ' + str(int(round(100*fraction))) + '%'
-    self.stdout.write(text)
-    self.stdout.flush()
+    text += ' ' + str (percent) + '%'
+    self.stdout.write (text)
+    self.stdout.flush ()
 
   def reset (self):
     self.stdout.write('\r')
