@@ -109,7 +109,7 @@ class MC (object):
     config.solver.initialize (config.level, config.type, self.parallelization)
 
     # use progress indicator, report MC info each time
-    prefix = info_mc + ' Progress: '
+    prefix = info_mc + '  Progress: '
     progress = Progress (prefix=prefix, steps=len(config.samples), length=20)
 
     import time
