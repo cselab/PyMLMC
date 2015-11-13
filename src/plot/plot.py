@@ -1241,7 +1241,7 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
   levels_extent (levels)
-  pylab.ylim   (ymax=1.5*TOL)
+  #pylab.ylim   (ymax=1.5*TOL)
   pylab.legend (loc='lower left')
   
   adjust (infolines)

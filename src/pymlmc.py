@@ -472,16 +472,7 @@ class MLMC (object):
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
     self.diffs = [ {} for level in self.config.levels ]
-    #self.diffs = [ { stat.name : self.config.solver.DataClass () for stat in stats } for level in self.config.levels ]
-    '''
-    self.diffs = []
-    for level in self.config.levels:
-      self.diffs .append ( {} )
-      #for stat in stats:
-      #  self.diffs [-1] [stat.name] = self.config.solver.DataClass ()
-    '''
     for name in [stat.name for stat in stats]:
-      #for mc in self.mcs:
       coarsest_level_found = 0
       for level in self.config.levels:
         # if at least one sample from that level is available
@@ -492,14 +483,11 @@ class MLMC (object):
           coarsest_level_found = 1
         else:
           self.diffs [level] [name] = None
-        #if mc.config.type == self.config.FINE:   self.diffs [mc.config.level] [name] += mc.stats [name]
-        #if mc.config.type == self.config.COARSE: self.diffs [mc.config.level] [name] -= mc.stats [name]
 
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = {}
     for name in [stat.name for stat in stats]:
-      #self.stats [name] = self.config.solver.DataClass ()
       # find first valid level (will be treated as level 0)
       for i, diff in enumerate (self.diffs):
         if diff [name] != None:
