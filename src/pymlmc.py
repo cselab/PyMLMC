@@ -399,7 +399,6 @@ class MLMC (object):
       self.join ()
 
     # load the results from MC simulations and report
-
     from helpers import intf
     print
     print ' :: LOADING RESULTS...'
@@ -407,26 +406,20 @@ class MLMC (object):
     print '  :------------------------------------------------------------------|'
     format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |    %s   |'
 
+    # candidate for the coarsest level
+    self.L0 = None
+
+    # load all levels
     for level in self.config.levels:
 
       loaded = [None, None]
 
+      # load both types
       for type in reversed (self.config.types (level)):
 
         mc = self.mcs [ self.config.pick [level] [type] ]
         pending = mc.pending()
         loaded [type] = mc.load ()
-
-        # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
-        # TODO: coarsest level might be not level 0!
-        if level == 0:
-          self.config.samples.indices.loaded [level] = loaded [self.config.FINE]
-          self.config.samples.counts .loaded [level] = len (self.config.samples.indices.loaded [level])
-          self.config.samples.counts .failed [level] = len (mc.config.samples) - self.config.samples.counts.loaded [level]
-        elif loaded [self.config.FINE] != None and loaded [self.config.COARSE] != None:
-          self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (loaded [self.config.COARSE]) )
-          self.config.samples.counts .loaded [level] = len (self.config.samples.indices.loaded [level])
-          self.config.samples.counts .failed [level] = len (mc.config.samples) - self.config.samples.counts.loaded [level]
 
         # check if at least one sample at some level with type FINE
         if mc.available and mc.config.type == self.config.FINE:
@@ -439,6 +432,21 @@ class MLMC (object):
         failedstr  = intf (len (mc.config.samples) - len (loaded [type]), table=1, empty=1)
         pendingstr = intf (pending, table=1, empty=1)
         print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
+
+      # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
+      # TODO: what to do if an _entire_ level is missing?
+      if self.L0 == None:
+        if len (loaded [self.config.FINE]) > 0:
+          self.config.samples.indices.loaded [level] = loaded [self.config.FINE]
+          self.L0 = level
+        else:
+          self.config.samples.indices.loaded [level] = []
+      else:
+        self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (loaded [self.config.COARSE]) )
+
+      # compute auxiliary counts
+      self.config.samples.counts.loaded [level] = len (self.config.samples.indices.loaded [level])
+      self.config.samples.counts.failed [level] = self.config.samples.counts.computed [level] - self.config.samples.counts.loaded [level]
 
     # report how many pairs of fine and course samples were loaded
     print
