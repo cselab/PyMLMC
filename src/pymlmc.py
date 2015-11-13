@@ -103,7 +103,13 @@ class MLMC (object):
     
     # distribute initial samples
     self.config.scheduler.distribute ()
-    
+      
+    # report number of samples used so far
+    self.config.samples.report ()
+
+    # query for progress
+    helpers.query ('Submit jobs?')
+
     # compute initial samples
     self.run ()
     
@@ -152,8 +158,8 @@ class MLMC (object):
       # query for progress
       helpers.query ('Continue?')
 
-      # report number of samples used so far (avoid updating as this might not be possible)
-      self.config.samples.report   ()
+      # report number of samples used so far
+      self.config.samples.report ()
 
       # check if the simulation is already finished
       if self.config.samples.finished (self.errors):
@@ -211,7 +217,10 @@ class MLMC (object):
       
       # distribute additional samples
       self.config.scheduler.distribute ()
-      
+
+      # query for progress
+      helpers.query ('Submit jobs?')
+
       # compute additional samples
       self.run ()
       
