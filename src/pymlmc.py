@@ -162,15 +162,16 @@ class MLMC (object):
         self.status.save (self.config)
         return
 
-      '''
       # update, report, and validate the required number of samples
-      self.config.samples.update   (self.errors, self.indicators)
-      self.config.samples.report   ()
-      self.config.samples.validate ()
-      '''
+      if self.errors.available and self.indicators.available:
+        self.config.samples.update   (self.errors, self.indicators)
+        self.config.samples.report   ()
+        self.config.samples.validate ()
       
-      # for interactive sessions, query user for additional input
+      # for interactive sessions
       if self.params.query:
+
+        # query user for additional input
         while self.query():
 
           # check if the simulation is already finished
