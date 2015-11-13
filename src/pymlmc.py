@@ -434,7 +434,6 @@ class MLMC (object):
         print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
 
       # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
-      # TODO: what to do if an _entire_ level is missing?
       if self.L0 == None:
         if len (loaded [self.config.FINE]) > 0:
           self.config.samples.indices.loaded [level] = loaded [self.config.FINE]
