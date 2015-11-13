@@ -50,9 +50,6 @@ class Example_Solver (Solver):
     # picks out (or computes) the required quantity of interest
     self.indicator = lambda x : x
     
-    # set datatype that function self.load(...) returns
-    self.DataClass = Float
-    
     # enable shared memory (i.e. 1 MPI-rank per node)
     # self.sharedmem = 1
 

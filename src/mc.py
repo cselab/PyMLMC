@@ -171,7 +171,7 @@ class MC (object):
     self.stats = {}
     for stat in stats:
       if self.available:
-        self.stats [ stat.name ] = stat.compute_all ( self.results, self.config.solver.DataClass )
+        self.stats [ stat.name ] = stat.compute_all ( self.results )
       else:
         self.stats [ stat.name ] = None
     return self.stats

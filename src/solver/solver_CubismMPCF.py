@@ -331,9 +331,6 @@ class CubismMPCF (Solver):
     else:
       self.cmd = self.executable + ' ' + args
     
-    # set datatype that function self.load(...) returns
-    self.DataClass = Interpolated_Time_Series
-    
     # enable shared memory (i.e. 1 MPI-rank per node)
     self.sharedmem = 1
     

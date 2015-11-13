@@ -11,20 +11,18 @@
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
-  def compute_all (self, samples, DataClass):
+  def compute_all (self, samples):
     
-    stats = DataClass ()
-    
-    # copy metadata from the first sample
-    stats.meta = samples [0] .meta
-    
-    # copy keys from the first sample
-    keys = samples [0] .data.keys()
+    # copy data class from the first sample
+    stats = samples [0]
+
+    # record number of steps from the first sample
+    steps = len ( samples [0] .data [key] )
     
     # compute sample statistics
-    for key in keys:
+    for key in stats.data.keys():
       stats.data [key] = []
-      for step in xrange ( len ( samples [0] .data [key] ) ):
+      for step in xrange (steps):
         series = [ sample.data [key] [step] for sample in samples if sample != None ]
         stats.data [key] .append ( self.compute ( series ) )
     
