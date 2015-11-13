@@ -15,14 +15,11 @@ class Stat (object):
     
     # copy data class from the first sample
     stats = samples [0]
-
-    # record number of steps from the first sample
-    steps = len ( samples [0] .data [key] )
     
     # compute sample statistics
     for key in stats.data.keys():
       stats.data [key] = []
-      for step in xrange (steps):
+      for step in xrange ( len ( samples [0] .data [key] ) ):
         series = [ sample.data [key] [step] for sample in samples if sample != None ]
         stats.data [key] .append ( self.compute ( series ) )
     
