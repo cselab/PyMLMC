@@ -8,13 +8,15 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+import copy
+
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
   def compute_all (self, samples):
     
     # copy data class from the first sample
-    stats = samples [0]
+    stats = copy.deepcopy (samples [0])
     
     # compute sample statistics
     for key in stats.data.keys():
