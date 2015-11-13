@@ -310,7 +310,7 @@ class Interpolated_Time_Series (object):
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', path=None, points=1000, bs=32, workunit=1, init=None):
+  def __init__ (self, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -330,9 +330,6 @@ class CubismMPCF (Solver):
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
       self.cmd = self.executable + ' ' + args
-    
-    # name of this solver (used as prefix for the job names)
-    self.name = 'mpcf'
     
     # set datatype that function self.load(...) returns
     self.DataClass = Interpolated_Time_Series

@@ -30,8 +30,9 @@ class Example_Solver (Solver):
   # constructor for the example solver
   # 'options'       options for the solver
   # 'path'          path to the executable; if local.cluster = 1 and path != None, a local copy of the executable is created
+  # 'name'          name of this solver (used as prefix for the job names)
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', path=None, init=None):
+  def __init__ (self, options='', path=None, name='example', init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -48,9 +49,6 @@ class Example_Solver (Solver):
     # indicator function: given the results of the output file,
     # picks out (or computes) the required quantity of interest
     self.indicator = lambda x : x
-    
-    # name of this solver (used as prefix for the job names)
-    self.name = 'example'
     
     # set datatype that function self.load(...) returns
     self.DataClass = Float
