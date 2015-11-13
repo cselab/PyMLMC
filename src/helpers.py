@@ -141,7 +141,7 @@ class Progress (object):
     text  = '\r' + self.prefix
     fraction = float(step) / self.steps
     percent = int(round(100*fraction))
-    if percent = self.percent:
+    if percent == self.percent:
       return
     self.percent = percent
     text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
