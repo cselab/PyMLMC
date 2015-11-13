@@ -950,7 +950,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensemble of \'%s\' for level %d (type %d)...' % (qoi, level, type),
+  print ' :: INFO: Plotting ensemble of \'%s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
 
   xend = float('nan')
 
@@ -1001,7 +1001,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensembles of \'%s\' for all levels...' % qoi,
+  print ' :: INFO: Plotting ensembles of \'%s\' for all levels (limit set to %d)...' % (qoi, limit)
 
   levels = len (mlmc.config.levels)
 

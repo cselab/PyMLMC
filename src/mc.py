@@ -166,12 +166,21 @@ class MC (object):
     return loaded
   
   # assmble MC estimates
-  def assemble (self, stats):
+  def assemble (self, stats, indices):
 
+    # assemble MC estimates from all available samples
+    self.stats_all = {}
+    for stat in stats:
+      if self.available:
+        self.stats_all [ stat.name ] = stat.compute_all ( self.results )
+      else:
+        self.stats_all [ stat.name ] = None
+
+    # assemble MC estimates using only specified subset of all samples
     self.stats = {}
     for stat in stats:
       if self.available:
+        results = [ result for sample, result in enumerate (self.results) if sample in indices ]
         self.stats [ stat.name ] = stat.compute_all ( self.results )
       else:
         self.stats [ stat.name ] = None
-    return self.stats

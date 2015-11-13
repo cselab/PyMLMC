@@ -467,7 +467,7 @@ class MLMC (object):
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
     for mc in self.mcs:
-      mc.assemble (stats)
+      mc.assemble (stats, self.config.samples.indices.loaded [level])
 
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
