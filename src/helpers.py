@@ -183,6 +183,7 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
     print ' :: WARNING: %s' % warning
   print ' :: QUERY: %s [%s]' % (message, hint)
   if params.yes:
+    print '  : '
     print '  : AUTO CONTINUE'
     return None
   else:
