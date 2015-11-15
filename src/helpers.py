@@ -15,6 +15,8 @@ import sys
 import subprocess
 import argparse
 
+params = None
+
 # === functions
 
 # parse command line arguments
@@ -22,14 +24,19 @@ def parse ():
   parser = argparse.ArgumentParser()
   parser.add_argument ('-r', '--restart',       action = "count", default = 0,  help = 'restart the simulation')
   parser.add_argument ('-i', '--interactive',   action = "count", default = 0,  help = 'after launch of each update, wait for jobs to finish instead of exiting')
-  parser.add_argument ('-q', '--query',         action = "store", default = 1,  help = 'query user for the modification of the tolerance after each update', type=int)
+  parser.add_argument ('-q', '--query',         action = "store", default = 1,  help = 'query user for the modification of the tolerance or budget after each update', type=int)
+  parser.add_argument ('-y', '--yes',           action = "count", default = 0,  help = 'automatically answer '\yes\' to all queries', type=int)
   parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=str)
   parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
   parser.add_argument ('-p', '--proceed',       action = "count", default = 0,  help = 'proceed with simulations (can override existing files)')
   parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
 #  parser.add_argument ('-d', '--deterministic', action = "count", default = deterministic,  help = 'deterministic simulation - no subdirectories are created')
-  return parser.parse_args()
+
+  global params
+  params = parser.parse_args()
+
+  return params
 
 # creates an empty nested list iterating over levels and types
 def level_type_list (levels):
@@ -175,13 +182,16 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
   if warning != None:
     print ' :: WARNING: %s' % warning
   print ' :: QUERY: %s [%s]' % (message, hint)
-  input = type ( raw_input ( '  : ' ) ) or default
-  if input != 'y':
-    print '  : EXIT'
-    print
-    sys.exit()
+  if params.yes:
+    print '  : AUTO CONTINUE'
   else:
-    print '  : CONTINUE'
+    input = type ( raw_input ( '  : ' ) ) or default
+    if input != 'y':
+      print '  : EXIT'
+      print
+      sys.exit()
+    else:
+      print '  : CONTINUE'
   
   return input
 
