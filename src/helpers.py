@@ -184,6 +184,7 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
   print ' :: QUERY: %s [%s]' % (message, hint)
   if params.yes:
     print '  : AUTO CONTINUE'
+    return None
   else:
     input = type ( raw_input ( '  : ' ) ) or default
     if input != 'y':
@@ -192,8 +193,7 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
       sys.exit()
     else:
       print '  : CONTINUE'
-  
-  return input
+    return input
 
 # error
 def error (message, details=None, advice=None):
