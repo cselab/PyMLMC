@@ -121,21 +121,26 @@ class Estimated_Budget (Samples):
     
     print
     print ' :: QUERY: specify the required computational budget [press ENTER to leave %s CPU hours]: ' % helpers.intf (self.budget)
-    input = raw_input ( '  : ' ) or str(self.budget)
-    factor = 1
-    if 'K' in input:
-      factor = 1e3
-      input = input.replace ('K', '')
-    if 'M' in input:
-      factor = 1e6
-      input = input.replace ('M', '')
-    if 'G' in input:
-      factor = 1e9
-      input = input.replace ('G', '')
-    budget = float ( input ) * factor
-    modified = budget != self.budget
-    self.budget = budget
-    print '  : %s' % helpers.intf (self.budget)
+    if helpers.params.auto:
+      print '  :'
+      print '  : AUTO CONTINUE'
+      modified = 0
+    else:
+      input = raw_input ( '  : ' ) or str(self.budget)
+      factor = 1
+      if 'K' in input:
+        factor = 1e3
+        input = input.replace ('K', '')
+      if 'M' in input:
+        factor = 1e6
+        input = input.replace ('M', '')
+      if 'G' in input:
+        factor = 1e9
+        input = input.replace ('G', '')
+      budget = float ( input ) * factor
+      modified = budget != self.budget
+      self.budget = budget
+      print '  : %s' % helpers.intf (self.budget)
     return modified
   
   # computes the optimal number of samples if some samples are already computed
