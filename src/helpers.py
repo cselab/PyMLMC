@@ -132,7 +132,7 @@ class Progress (object):
     self.prefix  = prefix
     self.length  = length
     self.steps   = steps
-    selt.percent = None
+    self.percent = None
 
     from sys import stdout
     self.stdout = stdout
