@@ -1032,7 +1032,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
         if '_pos' in qoi:
           ts = ts [1:]
           vs = vs [1:]
-
+        
         if type == mlmc.config.FINE:
           line, = pylab.plot  (ts, vs, linewidth=1 )
         else:

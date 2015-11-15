@@ -480,14 +480,23 @@ class MLMC (object):
     print '  : Differences of MC estimates...'
     self.diffs = [ {} for level in self.config.levels ]
     for name in [stat.name for stat in stats]:
-      coarsest_level_found = 0
-      for level in self.config.levels:
+
+      # mark all levels as unavailable until the valid coarsest level L0
+      for level in self.config.levels [0 : self.L0]:
+        self.diffs [level] [name] = None
+
+      # coarsest level difference is just a plain MC estimate
+      self.diffs [self.L0] [name] = self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name]
+
+      # assemble differences of the remaining levels
+      for level in self.config.levels [self.L0 + 1 : ]:
+
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
-          self.diffs [level] [name] = self.mcs [ self.config.pick [level] [self.config.FINE] ] .stats [name]
-          if coarsest_level_found:
-            self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
-          coarsest_level_found = 1
+          self.diffs [level] [name]  = self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name]
+          self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
+
+        # else mark level as unavailable
         else:
           self.diffs [level] [name] = None
 
@@ -495,13 +504,12 @@ class MLMC (object):
     print '  : MLMC estimates...'
     self.stats = {}
     for name in [stat.name for stat in stats]:
-      # find first valid level (will be treated as level 0)
-      for i, diff in enumerate (self.diffs):
-        if diff [name] != None:
-          self.stats [name] = diff [name]
-          break
+
+      # copy coarsest difference
+      self.stats [name] = self.diffs [self.L0] [name]
+
       # add remaining differences
-      for diff in self.diffs [i+1:]:
+      for diff in self.diffs [self.L0 + 1 : ]:
         if diff [name] != None:
           self.stats [name] += diff [name]
 
