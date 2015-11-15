@@ -122,10 +122,16 @@ class Estimated_Budget (Samples):
     print
     print ' :: QUERY: specify the required computational budget [press ENTER to leave %s CPU hours]: ' % helpers.intf (self.budget)
     input = raw_input ( '  : ' ) or str(self.budget)
-    input = input.replace ('K', '000')
-    input = input.replace ('M', '000000')
-    input = input.replace ('G', '000000000')
-    budget = float ( input )
+    if 'K' in input:
+      factor = 1e3
+      input.replace ('K', '')
+    if 'M' in input:
+      factor = 1e6
+      input.replace ('M', '')
+    if 'G' in input:
+      factor = 1e9
+      input.replace ('G', '')
+    budget = float ( input ) * factor
     modified = budget != self.budget
     self.budget = budget
     print '  : %s' % helpers.intf (self.budget)
