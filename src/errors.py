@@ -96,7 +96,7 @@ class Errors (object):
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
       return
 
-    work_mlmc    = sum ( [ works [level] * self.counts.computed [level] for level in self.levels ] )
+    work_mlmc    = sum ( [ works [level] * self.counts.loaded [level] for level in self.levels ] )
     variance_mc  = numpy.max ( [ self.indicators.variance [level] [0] for level in self.levels ] )
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
     work_mc      = works [self.L] * samples_mc
