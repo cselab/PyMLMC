@@ -101,10 +101,12 @@ def intf (number, table=0, empty=0):
     else:
       return template % ( 0, '' )
   from math import log, floor
+  sign = -1 if number < 0 else 1
+  number = abs (number)
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
-  return template % ( number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  return template % ( sign * number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
 
 # pair two seeds into one
 def pair (a, b):
