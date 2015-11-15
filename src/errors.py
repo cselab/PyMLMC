@@ -63,8 +63,7 @@ class Errors (object):
   def report (self):
 
     if not self.available:
-      print
-      print ' :: ERRORS: not available since \'indicators\' are not available'
+      helpers.warning ('ERRORS not available')
       return
 
     print
