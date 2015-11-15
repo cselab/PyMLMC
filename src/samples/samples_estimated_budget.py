@@ -99,7 +99,7 @@ class Estimated_Budget (Samples):
       print '%d' % self.counts.computed [level],
     print
 
-    if self.counts_updated:
+    if self.counts_updated != []:
       print '    -> Updated number of samples for each level:'
       print '      ',
       for level in self.levels:
