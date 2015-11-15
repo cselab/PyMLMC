@@ -136,14 +136,16 @@ class Progress (object):
 
     from sys import stdout
     self.stdout = stdout
+    
+    self.update (0)
 
   def update (self, step):
-    text  = '\r' + self.prefix
     fraction = float(step) / self.steps
     percent = int(round(100*fraction))
     if percent == self.percent:
       return
     self.percent = percent
+    text  = '\r' + self.prefix
     text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
     text += ' ' + str (percent) + '%'
     self.stdout.write (text)
