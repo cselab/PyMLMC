@@ -124,13 +124,13 @@ class Estimated_Budget (Samples):
     input = raw_input ( '  : ' ) or str(self.budget)
     if 'K' in input:
       factor = 1e3
-      input.replace ('K', '')
+      input = input.replace ('K', '')
     if 'M' in input:
       factor = 1e6
-      input.replace ('M', '')
+      input = input.replace ('M', '')
     if 'G' in input:
       factor = 1e9
-      input.replace ('G', '')
+      input = input.replace ('G', '')
     budget = float ( input ) * factor
     modified = budget != self.budget
     self.budget = budget
