@@ -57,7 +57,12 @@ class Solver (object):
     
     # copy executable to output directory
     if local.cluster and self.path:
-      if not os.path.exists ( os.path.join (self.outputdir, self.executable) ):
+
+      # for proceeding simulations, reusing of an old executable might be prefered
+      reuse = 0
+      if self.params.proceed and os.path.exists ( os.path.join (self.outputdir, self.executable) ):
+        reuse = helpers.query ('Old executable present. Reuse?', exit=0)
+      if reuse != 'y':
         executablepath = os.path.join (self.path, self.executable)
         if os.path.exists ( executablepath ):
           shutil.copy ( executablepath, self.outputdir)

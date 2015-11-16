@@ -178,7 +178,7 @@ def info (message, details=None, advice=None):
     print '  : -> %s' % advice
 
 # query
-def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None):
+def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1):
 
   print
   if warning != None:
@@ -186,16 +186,17 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
   print ' :: QUERY: %s [%s]' % (message, hint)
   if params.auto:
     print '  : '
-    print '  : AUTO CONTINUE'
-    return None
+    print '  : AUTO CONTINUE [%s]' % str (default)
+    return default
   else:
     input = type ( raw_input ( '  : ' ) ) or default
-    if input != 'y':
+    if input != default:
       print '  : EXIT'
       print
-      sys.exit()
+      if exit:
+        sys.exit()
     else:
-      print '  : CONTINUE'
+      print '  : %s' % str (input)
     return input
 
 # error
