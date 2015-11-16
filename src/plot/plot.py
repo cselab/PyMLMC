@@ -480,7 +480,9 @@ def plot_helper_lines (qoi, run=1):
   
   if qoi == None:
     return
-  
+
+  pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+
   if '_pos_d' in qoi:
     if surface == 'N/A':
       print
@@ -1042,7 +1044,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
         if type == mlmc.config.FINE:
           line, = pylab.plot  (ts, vs, linewidth=1, alpha=1.0 )
         else:
-          pylab.plot  (ts, vs, linewidth=1, alpha=0.6, color=line.get_color() )
+          pylab.plot  (ts, vs, linewidth=1, alpha=0.3, color=line.get_color() )
     
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
@@ -1206,8 +1208,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=0.7)
-  #TODO: add light gray lines at y = 1, 2, 4 (OR: label data points)
-  #OR: change to barplot, labeling data points
+  pylab.axhline (y=1, color='black', linestyle='-', linewidth=2, alpha=0.6)
+  pylab.axhline (y=2, color='black', linestyle='-', linewidth=2, alpha=0.4)
+  pylab.axhline (y=4, color='black', linestyle='-', linewidth=2, alpha=0.2)
+
   if not frame:
     pylab.legend (loc='upper right')
   
