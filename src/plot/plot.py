@@ -703,7 +703,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   if extent:
     extent_range = extent [1] - extent [0]
-    extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+    extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
   else:
     extent_diff = None
 
@@ -774,7 +774,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
   if extent:
     extent_range = extent [1] - extent [0]
-    extent_diff = ( extent [0] - extent_range / 2.0, extent [1] - extent_range / 2.0 )
+    extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
   else:
     extent_diff = None
 
@@ -1208,9 +1208,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=0.7)
-  pylab.axhline (y=1, color='black', linestyle='-', linewidth=2, alpha=0.6)
-  pylab.axhline (y=2, color='black', linestyle='-', linewidth=2, alpha=0.4)
-  pylab.axhline (y=4, color='black', linestyle='-', linewidth=2, alpha=0.2)
+  pylab.axhline (y=1, color='black', linestyle='-', linewidth=2, alpha=0.7)
+  pylab.axhline (y=2, color='black', linestyle='-', linewidth=2, alpha=0.5)
+  pylab.axhline (y=3, color='black', linestyle='-', linewidth=2, alpha=0.3)
+  pylab.axhline (y=4, color='black', linestyle='-', linewidth=2, alpha=0.1)
 
   if not frame:
     pylab.legend (loc='upper right')

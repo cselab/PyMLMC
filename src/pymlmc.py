@@ -468,6 +468,8 @@ class MLMC (object):
     print
     print ' :: ASSEMBLING:'
 
+    import copy
+
     # check if statistics can be assembled (at least one sample at some level with type 0)
     if not self.available:
       helpers.error ('Statistics can not be assembled')
@@ -487,15 +489,15 @@ class MLMC (object):
         self.diffs [level] [name] = None
 
       # coarsest level difference is just a plain MC estimate
-      self.diffs [self.L0] [name] = self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name]
+      self.diffs [self.L0] [name] = copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name])
 
       # assemble differences of the remaining levels
       for level in self.config.levels [self.L0 + 1 : ]:
 
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
-          self.diffs [level] [name]  = self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name]
-          self.diffs [level] [name] -= self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
+          self.diffs [level] [name]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name])
+          self.diffs [level] [name] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
 
         # else mark level as unavailable
         else:
@@ -503,7 +505,6 @@ class MLMC (object):
 
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
-    import copy
     self.stats = {}
     for name in [stat.name for stat in stats]:
 
