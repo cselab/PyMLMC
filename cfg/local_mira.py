@@ -36,10 +36,11 @@ def min_walltime (cores): # hours
 def max_walltime (cores): # hours
   if cores == 'default':
     return '12/24'
+  if cores <= 16 * 1024:
+    return 3
   if cores <= 16 * 4096:
     return 12
-  else:
-    return 24
+  return 24
 
 # theoretical performance figures per node
 peakflops = 0.0 # TFLOP/s
