@@ -42,7 +42,7 @@ class Estimated_Budget (Samples):
   def finished (self, errors):
 
     work = numpy.sum ( numpy.array(self.works) * numpy.array(self.counts.computed) )
-    return work >= self.budget
+    return work >= 0.95 * self.budget
 
   def update (self, errors, indicators):
 
