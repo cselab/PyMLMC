@@ -435,7 +435,13 @@ def draw (mlmc, save, qoi=None, legend=False, loc='best'):
 
 # show plots
 def show ():
-  pylab.show()
+  pylab.show  ()
+  #pylab.show  (block=false)
+
+# query for action
+def query ():
+  raw_input ('Press ENTER to continue... ')
+  pylab.close ('all')
 
 # === domain related constants
 

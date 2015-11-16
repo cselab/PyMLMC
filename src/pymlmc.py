@@ -503,11 +503,12 @@ class MLMC (object):
 
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
+    import copy
     self.stats = {}
     for name in [stat.name for stat in stats]:
 
       # copy coarsest difference
-      self.stats [name] = self.diffs [self.L0] [name]
+      self.stats [name] = copy.deepcopy (self.diffs [self.L0] [name])
 
       # add remaining differences
       for diff in self.diffs [self.L0 + 1 : ]:
