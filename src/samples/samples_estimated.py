@@ -132,10 +132,10 @@ class Estimated (Samples):
   
   # query for tolerance
   def query (self):
-    
-    print
-    print ' :: QUERY: specify the required tolerance [press ENTER to leave tol=%.1e]: ' % self.tol
-    tol = float ( raw_input ( '  : ' ) or str(self.tol) )
+
+    message = 'specify the required tolerance'
+    hint    = 'press ENTER to leave tol=%.1e' % self.tol
+    tol = helpers.query (message, hint=hint, type=float, default=self.tol, format='%.1e', exit=0)
     modified = tol != self.tol
     self.tol = tol
     return modified

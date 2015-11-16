@@ -178,25 +178,53 @@ def info (message, details=None, advice=None):
     print '  : -> %s' % advice
 
 # query
-def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1):
+def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1, format=None):
 
   print
   if warning != None:
     print ' :: WARNING: %s' % warning
   print ' :: QUERY: %s [%s]' % (message, hint)
+
+  # in auto mode, continue with the default value
   if params.auto:
-    print '  : '
     print '  : AUTO CONTINUE [%s]' % str (default)
-    return default
+    input = default
+
+  # otherwise, query for user input
   else:
-    input = type ( raw_input ( '  : ' ) ) or default
-    if input != default:
-      print '  : EXIT'
-      print
-      if exit:
+    input = raw_input ( '  : ' )
+
+    # format accordingly
+    if not format:
+      input = type (input) or default
+    elif format == 'intf':
+      factor = 1
+      if 'K' in input:
+        factor = 1e3
+        input = input.replace ('K', '')
+      if 'M' in input:
+        factor = 1e6
+        input = input.replace ('M', '')
+      if 'G' in input:
+        factor = 1e9
+        input = input.replace ('G', '')
+      input = type (input) * factor
+
+    # handle process flow
+    if exit:
+      if input != default:
+        print '  : EXIT'
+        print
         sys.exit()
+
+    # report the parsed input
+    if format == 'intf':
+      print '  : %s' % intf (input)
+    elif format:
+      print '  : %s' % (format % input)
     else:
-      print '  : %s' % str (input)
+      print '  : %s' % str  (input)
+    
     return input
 
 # error
