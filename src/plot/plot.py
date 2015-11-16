@@ -1034,7 +1034,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
           vs = vs [1:]
         
         if type == mlmc.config.FINE:
-          line, = pylab.plot  (ts, vs, linewidth=1 )
+          line, = pylab.plot  (ts, vs, linewidth=1, alpha=1.0 )
         else:
           pylab.plot  (ts, vs, linewidth=1, alpha=0.6, color=line.get_color() )
     
@@ -1219,9 +1219,13 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
 def plot_errors (mlmc, infolines=False, run=1, frame=False, save=None):
   
   print ' :: INFO: Plotting errors...',
-  
+
+  if not mlmc.errors.available:
+    print ' NOT available.'
+    return
+
   # === load all required data
-  
+
   relative_error   = mlmc.errors.relative_error
   #TOL              = mlmc.config.samples.tol
   levels           = mlmc.config.levels
