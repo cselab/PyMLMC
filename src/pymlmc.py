@@ -170,6 +170,7 @@ class MLMC (object):
       if self.config.samples.finished (self.errors):
         print
         print ' :: Simulation finished.'
+        self.config.samples.save (self.config.iteration)
         self.status.save (self.config)
         return
 
@@ -189,6 +190,7 @@ class MLMC (object):
           if self.config.samples.finished (self.errors):
             print
             print ' :: Simulation finished.'
+            self.config.samples.save (self.config.iteration)
             self.status.save (self.config)
             return
 

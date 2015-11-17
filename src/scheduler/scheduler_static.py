@@ -15,7 +15,7 @@ from numpy import round, floor, ceil
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, ratios=None ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, batchsize=1, ratios=None ):
     
     self.walltime = walltime
     self.nodes    = nodes
@@ -39,7 +39,10 @@ class Static (Scheduler):
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
-      
+
+      # walltime is decreased if batching is enabled also on the finest level
+      walltime /= batchsize
+
       # respect the minimal walltime of the machine
       if local.min_walltime (cores) != None:
         walltime = max ( local.min_walltime (cores), walltime )

@@ -1180,9 +1180,13 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   print ' :: INFO: Plotting samples...',
   
   # === load all required data
-  
-  warmup           = mlmc.config.samples.warmup
-  samples          = mlmc.config.samples.counts.computed
+
+  list = {}
+  execfile ( os.path.join (mlmc.config.root, mlmc.config.samples.samples_file), globals(), list )
+
+  computed = self.list ['computed']
+  pending  = self.list ['pending']
+
   loaded           = mlmc.config.samples.counts.loaded
   #optimal          = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction
@@ -1200,7 +1204,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   #if warmup:
   #  pylab.semilogy (levels, warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
-  pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
+  pylab.semilogy (levels, loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
   #if optimal:
   #  pylab.semilogy (levels, optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/optimal_fraction)))
   pylab.title  ('Estimated number of samples')

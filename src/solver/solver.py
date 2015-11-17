@@ -16,6 +16,7 @@ import stat
 import math
 
 import local
+import helpers
 
 class Solver (object):
   
