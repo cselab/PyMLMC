@@ -17,12 +17,13 @@ class Static (Scheduler):
   
   def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, batchsize=1, ratios=None ):
     
-    self.walltime = walltime
-    self.nodes    = nodes
-    self.cores    = cores
-    self.email    = email
-    self.separate = separate
-    self.ratios   = ratios
+    self.walltime  = walltime
+    self.nodes     = nodes
+    self.cores     = cores
+    self.email     = email
+    self.separate  = separate
+    self.batchsize = batchsize
+    self.ratios    = ratios
   
   def distribute (self):
     
@@ -41,7 +42,7 @@ class Static (Scheduler):
       walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
 
       # walltime is decreased if batching is enabled also on the finest level
-      walltime /= batchsize
+      walltime /= self.batchsize
 
       # respect the minimal walltime of the machine
       if local.min_walltime (cores) != None:
