@@ -108,6 +108,13 @@ def pair (a, b):
 
 # dump list to file
 def dump (listvar, listformat, listname, filename, iteration):
+
+  # write header if new file
+  if not os.path.exists (filename):
+    with open ( filename, 'a') as f:
+      f.write ( '%s = {}\n' % listname )
+  
+  # write data
   with open ( filename, 'a') as f:
     line = listname + ' [%d]' % iteration + ' = [ '
     for var in listvar:
