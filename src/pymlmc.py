@@ -435,7 +435,7 @@ class MLMC (object):
         helpers.error (message, details, advice)
     
     # recreate MC simulations
-    self.create_MCs (self.config.samples.indices.computed)
+    self.create_MCs (self.config.samples.indices.combined)
     
     # if non-interactive session -> wait for jobs to finish
     if not self.params.interactive:
@@ -499,7 +499,7 @@ class MLMC (object):
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
-      print format % (mc.config.level, intf (self.config.samples.counts.computed [level], table=1), loadedstr, failedstr)
+      print format % (mc.config.level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
 
     # query for progress
     helpers.query ('Continue?')

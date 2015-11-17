@@ -56,11 +56,11 @@ class Estimated_Budget (Samples):
     # compute additional number of samples from counts_updated
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
     for level in self.levels:
-     if self.counts_updated [level] > self.counts.computed [level]:
-        self.counts.additional [level] = self.counts_updated [level] - self.counts.computed [level]
+     if self.counts_updated [level] > self.counts.loaded [level]:
+        self.counts.additional [level] = self.counts_updated [level] - self.counts.loaded [level]
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.computed + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.loaded + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
