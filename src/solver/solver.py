@@ -287,7 +287,8 @@ class Solver (object):
     job += '\n' + 'touch %s' % ( self.statusfile % label )
 
     # prepare solver
-    self.prepare (directory)
+    if not self.params.proceed:
+      self.prepare (directory)
     
     # cluster run 
     if local.cluster:

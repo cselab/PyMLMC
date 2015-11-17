@@ -73,11 +73,19 @@ class MLMC (object):
   
   # MLMC simulation
   def simulation (self):
-    
+
+    # check for consistency
+    if self.params.restart and self.params.proceed:
+      helpers.error ('Both \'-r\' (--restart) and \'-p\' (--proceed) were specified.', advice='Use either of the options, not both.')
+
     # initial phase
     if self.params.restart:
       self.init ()
-    
+
+    # proceed with the existing simulation (no modification in setup)
+    if self.params.proceed:
+      self.proceed ()
+
     # recursive updating phase
     self.update()
 
@@ -105,9 +113,6 @@ class MLMC (object):
     # distribute initial samples
     self.config.scheduler.distribute ()
       
-    # report number of samples used so far
-    self.config.samples.report ()
-
     # query for progress
     helpers.query ('Submit jobs?')
 
@@ -216,13 +221,13 @@ class MLMC (object):
       # make indices for the required number of samples
       self.config.samples.make ()
       
-      # distribute additional samples
+      # distribute required samples
       self.config.scheduler.distribute ()
 
       # query for progress
       helpers.query ('Submit jobs?')
 
-      # compute additional samples
+      # compute required samples
       self.run ()
       
       # update the computed number of samples
@@ -242,7 +247,49 @@ class MLMC (object):
       # otherwise, sleep a bit
       else:
         time.sleep(5)
-  
+
+  # proceed with the existing simulation (no modification in setup)
+  def proceed (self):
+
+    # load MLMC simulation
+    self.load ()
+
+    # report number of samples used so far
+    self.config.samples.report ()
+
+    # revert the previous required number of samples
+    # TODO: implement this!
+    self.config.samples.revert ()
+
+    # report the reverted number of samples
+    self.config.samples.report ()
+
+    # make indices for the required number of samples
+    self.config.samples.make ()
+
+    # distribute required samples
+    self.config.scheduler.distribute ()
+
+    # query for progress
+    helpers.query ('Submit jobs?')
+
+    # compute required samples
+    self.run ()
+
+    # update the computed number of samples
+    self.config.samples.append ()
+
+    # save MLMC simulation
+    self.save ()
+
+    # for clusters: if non-interactive session -> exit
+    if local.cluster and not self.params.interactive:
+      print
+      print ' :: INFO: Non-interactive mode specified -> exiting.'
+      print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
+      print
+      sys.exit ()
+
   # create MC objects
   def create_MCs (self, indices):
     self.mcs = []

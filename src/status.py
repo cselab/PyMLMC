@@ -32,7 +32,8 @@ class Status (object):
   
     with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
       
-      f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed [level]) + ', ' for level in config.levels ] ) + ']\n' )
+      f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed   [level]) + ', ' for level in config.levels ] ) + ']\n' )
+      f.write ( 'pending  = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
       #if not config.deterministic:
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
@@ -71,7 +72,8 @@ class Status (object):
       self.list = {}
       execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
       
-      config.samples.counts.computed = self.list ['samples']
+      config.samples.counts.computed   = self.list ['samples']
+      config.samples.counts.additional = self.list ['pending']
       config.samples.make ()
       '''
       if not config.deterministic:
@@ -104,5 +106,5 @@ class Status (object):
 
       message = 'MLMC status could not be loaded from'
       details = os.path.join (config.root, self.status_file)
-      advice  = 'Run PyMLMC with \'-r\' option to restart the simulation'
+      advice  = 'Run PyMLMC with \'-v 2\' option for verbose mode or with \'-r\' option to restart the simulation'
       helpers.error (message, details, advice)
