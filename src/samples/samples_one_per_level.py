@@ -14,7 +14,6 @@ class One_Per_Level (Samples):
   
   def init (self):
 
-    self.counts.computed   = [ 0 for level in self.levels ]
     self.counts.additional = [ 1 for level in self.levels ]
   
   def finished (self, errors):

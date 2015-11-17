@@ -8,10 +8,13 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+import numpy
+
 class Counts (object):
   
   computed   = []
   additional = []
+  combined   = []
   loaded     = []
   failed     = []
 
@@ -19,12 +22,14 @@ class Indices (object):
   
   computed   = []
   additional = []
+  combined   = []
   loaded     = []
   
   def make (self, counts):
     
     self.computed   = [ range ( 0,                       counts.computed [level] ) for level in range(len(counts.computed)) ]
     self.additional = [ range ( counts.computed [level], counts.computed [level] + counts.additional [level] ) for level in range(len(counts.additional)) ]
+    self.combined   = [ range ( 0,                       counts.combined [level] ) for level in range(len(counts.combined)) ]
 
 class Samples (object):
   
@@ -44,6 +49,8 @@ class Samples (object):
     
     self.L       = len(levels) - 1
 
+    self.counts.computed = numpy.zeros ( len(self.levels), dtype=int )
+
     self.counts.loaded  = [ None for level in self.levels ]
     self.counts.failed  = [ None for level in self.levels ]
 
@@ -60,9 +67,11 @@ class Samples (object):
     from helpers import dump
     dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
     dump (self.counts.additional, '%d', 'additional', self.samples_file)
+    dump (self.counts.additional, '%d', 'combined',   self.samples_file)
   
   def make (self):
-    
+
+    self.counts.combined = self.counts.computed + self.counts.additional
     self.indices.make (self.counts)
   
   def append (self):

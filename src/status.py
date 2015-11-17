@@ -34,6 +34,7 @@ class Status (object):
       
       f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed   [level]) + ', ' for level in config.levels ] ) + ']\n' )
       f.write ( 'pending  = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
+      f.write ( 'combined = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
       #if not config.deterministic:
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
@@ -67,44 +68,35 @@ class Status (object):
   # load status
   def load (self, config):
     
-    try:
-    
-      self.list = {}
-      execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
-      
-      config.samples.counts.computed   = self.list ['samples']
-      config.samples.counts.additional = self.list ['pending']
-      config.samples.make ()
-      '''
-      if not config.deterministic:
-        if config.samples.tol != self.list ['tol']:
-          print
-          print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
-          print ('  : -> Tolerance from the status file will be used.')
-        config.samples.tol = self.list ['tol']
-      '''
-      config.scheduler.batch = self.list ['batch']
-      
-      if 'cluster' not in self.list:
-        self.list ['cluster'] = 'unknown'
-      
-      if 'parallelization' not in self.list:
-        self.list ['parallelization'] = 'unknown'
-      
-      if 'walltimes' not in self.list:
-        walltimes = helpers.level_type_list (config.levels)
-        for level, type in config.levels_types:
-          walltimes [level] [type] = 'unknown'
-        self.list ['walltimes'] = walltimes
-      
-      print
-      print (' :: INFO: MLMC status loaded from')
-      print ('  : %s' % os.path.join (config.root, self.status_file))
-      print ('  : Simulation was executed on \'%s\'' % self.list ['cluster'] )
-    
-    except:
+    self.list = {}
+    execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
 
-      message = 'MLMC status could not be loaded from'
-      details = os.path.join (config.root, self.status_file)
-      advice  = 'Run PyMLMC with \'-v 2\' option for verbose mode or with \'-r\' option to restart the simulation'
-      helpers.error (message, details, advice)
+    config.samples.counts.computed   = self.list ['samples']
+    config.samples.counts.additional = self.list ['pending']
+    config.samples.make ()
+    '''
+    if not config.deterministic:
+      if config.samples.tol != self.list ['tol']:
+        print
+        print (' :: WARNING: The requested tolerance is different from the tolerance in the in status file.')
+        print ('  : -> Tolerance from the status file will be used.')
+      config.samples.tol = self.list ['tol']
+    '''
+    config.scheduler.batch = self.list ['batch']
+      
+    if 'cluster' not in self.list:
+      self.list ['cluster'] = 'unknown'
+      
+    if 'parallelization' not in self.list:
+      self.list ['parallelization'] = 'unknown'
+      
+    if 'walltimes' not in self.list:
+      walltimes = helpers.level_type_list (config.levels)
+      for level, type in config.levels_types:
+        walltimes [level] [type] = 'unknown'
+      self.list ['walltimes'] = walltimes
+      
+    print
+    print (' :: INFO: MLMC status loaded from')
+    print ('  : %s' % os.path.join (config.root, self.status_file))
+    print ('  : Simulation was executed on \'%s\'' % self.list ['cluster'] )

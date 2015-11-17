@@ -36,7 +36,6 @@ class Estimated_Budget (Samples):
     counts [0 : self.warmup_finest_level+1] = counts [self.L - self.warmup_finest_level : self.L+1]
     counts [self.warmup_finest_level : ]    = counts [self.L]
 
-    self.counts.computed   = numpy.zeros ( len(self.levels), dtype=int )
     self.counts.additional = numpy.array ( counts, copy=True )
 
   def finished (self, errors):

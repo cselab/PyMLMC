@@ -118,9 +118,6 @@ class MLMC (object):
 
     # compute initial samples
     self.run ()
-    
-    # update the computed number of samples
-    self.config.samples.append ()
 
     # save status of MLMC simulation
     self.status.save (self.config)
@@ -137,10 +134,13 @@ class MLMC (object):
   def update (self):
     
     while True:
-      
+
       # load MLMC simulation
       self.load ()
-      
+
+      # update the computed number of samples
+      self.config.samples.append ()
+
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
@@ -256,17 +256,7 @@ class MLMC (object):
 
     # report number of samples used so far
     self.config.samples.report ()
-
-    # revert the previous required number of samples
-    # TODO: implement this!
-    self.config.samples.revert ()
-
-    # report the reverted number of samples
-    self.config.samples.report ()
-
-    # make indices for the required number of samples
-    self.config.samples.make ()
-
+    
     # distribute required samples
     self.config.scheduler.distribute ()
 
@@ -275,9 +265,6 @@ class MLMC (object):
 
     # compute required samples
     self.run ()
-
-    # update the computed number of samples
-    self.config.samples.append ()
 
     # save MLMC simulation
     self.save ()
@@ -437,7 +424,16 @@ class MLMC (object):
   def load (self):
     
     # load status of MLMC simulation
-    self.status.load (self.config)
+    if self.params.verbose:
+      self.status.load (self.config)
+    else:
+      try:
+        self.status.load (self.config)
+      except:
+        message = 'MLMC status could not be loaded from'
+        details = os.path.join (self.config.root, self.config.status_file)
+        advice  = 'Run PyMLMC with \'-v 1\' option for verbose mode or with \'-r\' option to restart the simulation'
+        helpers.error (message, details, advice)
     
     # recreate MC simulations
     self.create_MCs (self.config.samples.indices.computed)
