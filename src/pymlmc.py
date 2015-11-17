@@ -95,7 +95,10 @@ class MLMC (object):
   
   # initial phase
   def init (self):
-    
+
+    # set iteration to 1 ('initial')
+    self.config.iteration = 1
+
     # initialize, report, validate, and save the required number of samples
     self.config.samples.init     ()
     self.config.samples.report   ()
@@ -179,7 +182,7 @@ class MLMC (object):
         self.config.samples.update   (self.errors, self.indicators)
         self.config.samples.report   ()
         self.config.samples.validate ()
-      
+
       # for interactive sessions
       if self.params.query:
 
@@ -229,7 +232,10 @@ class MLMC (object):
 
       # compute required samples
       self.run ()
-      
+
+      # increment iteration
+      self.config.iteration += 1
+
       # update the computed number of samples
       self.config.samples.append ()
       

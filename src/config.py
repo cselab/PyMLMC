@@ -47,6 +47,7 @@ class MLMC_Config (object):
   scheduler       = Static ()
   root            = '.'
   deterministic   = 0
+  iteration       = None
   ratios          = None
   
   def __init__ (self, id=0):

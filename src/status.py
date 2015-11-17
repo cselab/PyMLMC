@@ -31,12 +31,16 @@ class Status (object):
   def save (self, config):
   
     with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
-      
+
+      f.write ( 'iteration = %d' % config.iteration )
+
       f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed   [level]) + ', ' for level in config.levels ] ) + ']\n' )
       f.write ( 'pending  = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
       f.write ( 'combined = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
+
       #if not config.deterministic:
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
+
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
 
       if 'cluster' in self.list:
@@ -71,6 +75,8 @@ class Status (object):
     self.list = {}
     execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
 
+    config.iteration = self.list ['iteration']
+    
     config.samples.counts.computed   = self.list ['samples']
     config.samples.counts.additional = self.list ['pending']
     config.samples.make ()
