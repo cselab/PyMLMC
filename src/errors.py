@@ -19,14 +19,6 @@ class Errors (object):
     self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
     self.available   = 0
-  
-  def init (self):
-    
-    # initialize errors file
-    with open ( self.errors_file, 'w') as f:
-      f.write ( 'relative_error = []\n' )
-      f.write ( 'total_relative_error = []\n' )
-      f.write ( 'total_error = []\n' )
 
   # compute errors
   def compute (self, indicators, counts):
@@ -107,13 +99,11 @@ class Errors (object):
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
   
-  def save (self):
+  def save (self, iteration):
 
     if self.available:
-      helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file)
-      with open ( self.errors_file, 'a' ) as f:
-        f.write ( 'total_relative_error .append ( %f )\n' % self.total_relative_error )
-        f.write ( 'total_error .append ( %f )\n' % self.total_error )
-    else:
-      with open ( self.errors_file, 'a' ) as f:
-        f.write ( 'total_relative_error .append ( %f )\n' % float ('NaN') )
+      helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file, iteration)
+
+    with open ( self.errors_file, 'a' ) as f:
+      f.write ( 'total_relative_error [%d] = %f\n' % (iteration, self.total_relative_error if self.available else float ('NaN')) )
+      f.write ( 'total_error          [%d] = %f\n' % (iteration, self.total_error          if self.available else float ('NaN')) )

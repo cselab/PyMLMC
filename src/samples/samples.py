@@ -62,12 +62,12 @@ class Samples (object):
       if self.counts.additional [level] == 0:
         Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
   
-  def save (self):
+  def save (self, iteration):
     
     from helpers import dump
-    dump (self.counts.computed,   '%d', 'computed',   self.samples_file)
-    dump (self.counts.additional, '%d', 'additional', self.samples_file)
-    dump (self.counts.additional, '%d', 'combined',   self.samples_file)
+    dump (self.counts.computed,   '%d', 'computed',   self.samples_file, iteration)
+    dump (self.counts.additional, '%d', 'additional', self.samples_file, iteration)
+    dump (self.counts.combined,   '%d', 'combined',   self.samples_file, iteration)
   
   def make (self):
 

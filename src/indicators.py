@@ -164,35 +164,35 @@ class Indicators (object):
       print '   %.2f' % self.correlation [level] if not numpy.isnan ( self.correlation [level] ) else '    N/A',
     print
   
-  def save (self):
+  def save (self, iteration):
     
     # save mean (fine)
     epsilon_fi = [ self.mean [level] [0] for level in self.levels ]
-    helpers.dump (epsilon_fi, '%f', 'epsilon_fi', self.indicators_file)
+    helpers.dump (epsilon_fi, '%f', 'epsilon_fi', self.indicators_file, iteration)
     
     # save mean (coarse)
     epsilon_co = [ self.mean [level] [1] for level in self.levels ]
-    helpers.dump (epsilon_co, '%f', 'epsilon_co', self.indicators_file)
+    helpers.dump (epsilon_co, '%f', 'epsilon_co', self.indicators_file, iteration)
 
     # save variance (fine)
     sigma_fi = [ self.variance [level] [0] for level in self.levels ]
-    helpers.dump (sigma_fi, '%f', 'sigma_fi', self.indicators_file)
+    helpers.dump (sigma_fi, '%f', 'sigma_fi', self.indicators_file, iteration)
 
     # save variance (coarse)
     sigma_co = [ self.variance [level] [1] for level in self.levels ]
-    helpers.dump (sigma_co, '%f', 'sigma_co', self.indicators_file)
+    helpers.dump (sigma_co, '%f', 'sigma_co', self.indicators_file, iteration)
     
     # save mean_diff
-    helpers.dump (self.mean_diff, '%f', 'epsilon_diff', self.indicators_file)
+    helpers.dump (self.mean_diff, '%f', 'epsilon_diff', self.indicators_file, iteration)
 
     # save variance_diff
-    helpers.dump (self.variance_diff, '%f', 'variance_diff', self.indicators_file)
+    helpers.dump (self.variance_diff, '%f', 'variance_diff', self.indicators_file, iteration)
 
     # save covariance
-    helpers.dump (self.covariance, '%f', 'covariance', self.indicators_file)
+    helpers.dump (self.covariance, '%f', 'covariance', self.indicators_file, iteration)
 
     # save correlation
-    helpers.dump (self.correlation, '%f', 'correlation', self.indicators_file)
+    helpers.dump (self.correlation, '%f', 'correlation', self.indicators_file, iteration)
   
   # extrapolate missing variance estimates using available estimates
   def extrapolate (self):

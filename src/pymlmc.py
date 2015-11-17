@@ -104,11 +104,7 @@ class MLMC (object):
     self.config.samples.report   ()
     self.config.samples.validate ()
     if not self.config.deterministic:
-      self.config.samples.save     ()
-    
-    # initialize errors
-    if not self.config.deterministic:
-      self.errors.init ()
+      self.config.samples.save   (self.config.iteration)
     
     # make indices for the required number of samples
     self.config.samples.make ()
@@ -151,7 +147,7 @@ class MLMC (object):
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
       self.indicators.report  ()
-      self.indicators.save    ()
+      self.indicators.save    (self.config.iteration)
 
       # query for progress
       helpers.query ('Continue?')
@@ -159,7 +155,7 @@ class MLMC (object):
       # compute, report, and save errors
       self.errors.compute (self.indicators, self.config.samples.counts)
       self.errors.report  ()
-      self.errors.save    ()
+      self.errors.save    (self.config.iteration)
       
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.config.works)
@@ -218,9 +214,6 @@ class MLMC (object):
         helpers.warning ('samples not available -> exiting simulation...')
         return
 
-      # save the required number of samples
-      self.config.samples.save ()
-      
       # make indices for the required number of samples
       self.config.samples.make ()
       
@@ -236,8 +229,8 @@ class MLMC (object):
       # increment iteration
       self.config.iteration += 1
 
-      # update the computed number of samples
-      self.config.samples.append ()
+      # save the required number of samples
+      self.config.samples.save (self.config.iteration)
       
       # save MLMC simulation
       self.save ()
@@ -253,7 +246,7 @@ class MLMC (object):
       # otherwise, sleep a bit
       else:
         time.sleep(5)
-
+  
   # proceed with the existing simulation (no modification in setup)
   def proceed (self):
 
