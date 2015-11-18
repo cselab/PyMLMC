@@ -32,11 +32,11 @@ class Status (object):
   
     with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
 
-      f.write ( 'iteration = %d' % config.iteration )
+      f.write ( 'iteration = %d\n' % config.iteration )
 
       f.write ( 'samples  = [ ' + ''.join ( [ str (config.samples.counts.computed   [level]) + ', ' for level in config.levels ] ) + ']\n' )
       f.write ( 'pending  = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
-      f.write ( 'combined = [ ' + ''.join ( [ str (config.samples.counts.additional [level]) + ', ' for level in config.levels ] ) + ']\n' )
+      f.write ( 'combined = [ ' + ''.join ( [ str (config.samples.counts.combined   [level]) + ', ' for level in config.levels ] ) + ']\n' )
 
       #if not config.deterministic:
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )

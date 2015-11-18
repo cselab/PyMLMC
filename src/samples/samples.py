@@ -8,6 +8,8 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+import helpers
+
 import numpy
 
 class Counts (object):
@@ -61,7 +63,7 @@ class Samples (object):
     for level in self.levels:
       if self.counts.additional [level] == 0:
         Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
-  
+
   def save (self, iteration):
     
     from helpers import dump
@@ -76,4 +78,34 @@ class Samples (object):
   
   def append (self):
     
-    self.counts.computed += self.counts.additional
+    self.counts.computed = [ self.counts.computed [level] + self.counts.additional [level] for level in self.levels ]
+  
+  def manual (self):
+
+    if helpers.query ('Do you want to manually adjust samples?', exit=0) != 'y':
+      modified = False
+      return modified
+
+    else:
+
+      message = 'specify the required additional number of samples (separated by spaces)'
+      hint    = 'press ENTER to make no changes'
+      default = str (self.counts.additional)
+      parsed = 0
+
+      while not parsed:
+        samples = helpers.query (message, hint=hint, type=str, default=default, exit=0)
+        modified = samples != default
+        if modified:
+          samples = samples.split (' ')
+          if len (samples) != len (self.levels):
+            helpers.warning ('Input not recognized, please try again:')
+            continue
+          else:
+            parsed = 1
+          for level in self.levels:
+            self.counts.additional [level] = int (samples [level])
+        else:
+          parsed = 1
+
+      return modified

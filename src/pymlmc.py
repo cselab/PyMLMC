@@ -166,6 +166,7 @@ class MLMC (object):
       # report number of samples used so far
       self.config.samples.report ()
 
+      '''
       # check if the simulation is already finished
       if self.config.samples.finished (self.errors):
         print
@@ -179,7 +180,44 @@ class MLMC (object):
         self.config.samples.update   (self.errors, self.indicators)
         self.config.samples.report   ()
         self.config.samples.validate ()
+      else:
+        helpers.warning ('indicators or errors not available - samples can not be updated')
+      '''
 
+      # recursively query user for input
+      while True:
+
+        # check if the simulation is already finished
+        if self.config.samples.finished (self.errors):
+          print
+          print ' :: Simulation finished.'
+          self.config.samples.save (self.config.iteration)
+          self.status.save (self.config)
+          return
+
+        # update, report, and validate the required number of samples
+        if self.errors.available and self.indicators.available:
+          self.config.samples.update   (self.errors, self.indicators)
+          self.config.samples.report   ()
+          self.config.samples.validate ()
+        else:
+          helpers.warning ('indicators or errors not available - samples can not be updated')
+
+        # for interactive sessions
+        if self.params.query:
+
+          # query user for input
+          modified = self.query()
+
+          # proceed if no changes were requested
+          if not modified:
+            break
+
+        # for non-interactive sessions, proceed immediately
+        else:
+          break
+
+      '''
       # for interactive sessions
       if self.params.query:
 
@@ -210,6 +248,7 @@ class MLMC (object):
           self.config.samples.validate ()
         else:
           helpers.warning ('indicators or errors not available - samples can not be updated')
+      '''
 
       # check if samples are available
       if not self.config.samples.available:
@@ -330,8 +369,11 @@ class MLMC (object):
   
   # query user for additional information
   def query (self):
-    return self.config.samples.query ()
-  
+
+    modified = self.config.samples.query  ()
+    adjusted = self.config.samples.manual ()
+    return modified
+
   # check if MC estimates are already available and report
   def join (self):
 
@@ -432,7 +474,7 @@ class MLMC (object):
         self.status.load (self.config)
       except:
         message = 'MLMC status could not be loaded from'
-        details = os.path.join (self.config.root, self.config.status_file)
+        details = os.path.join (self.config.root, self.status.status_file)
         advice  = 'Run PyMLMC with \'-v 1\' option for verbose mode or with \'-r\' option to restart the simulation'
         helpers.error (message, details, advice)
     

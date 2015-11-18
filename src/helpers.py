@@ -209,7 +209,10 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
       if 'G' in input:
         factor = 1e9
         input = input.replace ('G', '')
-      input = type (input) * factor
+      try:
+        input = type (input) * factor
+      except:
+        input = default
 
     # handle process flow
     if exit:
