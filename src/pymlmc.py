@@ -184,7 +184,7 @@ class MLMC (object):
         helpers.warning ('indicators or errors not available - samples can not be updated')
       '''
 
-      # recursively query user for input
+      # recursively query user for input for automated optimal sample adjustments
       while True:
 
         # check if the simulation is already finished
@@ -209,8 +209,31 @@ class MLMC (object):
           # query user for input
           modified = self.query()
 
-          # proceed if no changes were requested
+          # if no changes were requested, proceed
           if not modified:
+            break
+
+        # for non-interactive sessions, proceed immediately
+        else:
+          break
+
+      # recursively query user for manual sample adjustments
+      while True:
+
+        # for interactive sessions
+        if self.params.query:
+
+          # query user for input
+          adjusted = self.config.samples.manual()
+
+          # always report manual adjustments
+          if adjusted:
+            self.config.samples.available = 1
+            self.config.samples.report   ()
+            self.config.samples.validate ()
+
+          # proceed if no adjustments were requested
+          if not adjusted:
             break
 
         # for non-interactive sessions, proceed immediately
@@ -370,8 +393,7 @@ class MLMC (object):
   # query user for additional information
   def query (self):
 
-    modified = self.config.samples.query  ()
-    adjusted = self.config.samples.manual ()
+    modified = self.config.samples.query ()
     return modified
 
   # check if MC estimates are already available and report

@@ -78,7 +78,8 @@ class Samples (object):
   
   def append (self):
     
-    self.counts.computed = [ self.counts.computed [level] + self.counts.additional [level] for level in self.levels ]
+    self.counts.computed   = [ self.counts.computed [level] + self.counts.additional [level] for level in self.levels ]
+    self.counts.additional = [ 0 for level in self.levels ]
   
   def manual (self):
 
