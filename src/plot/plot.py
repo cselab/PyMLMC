@@ -1194,11 +1194,11 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   basevalue = 0
   baseline  = [basevalue for level in levels]
   if warmup:
-    pylab.semilogy (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+    pylab.plot (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
     if fill:
       pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5)
   if mlmc.config.iteration > 0:
-    pylab.semilogy (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    pylab.plot (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
       pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5)
   if total:
