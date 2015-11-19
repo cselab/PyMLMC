@@ -27,6 +27,7 @@ class Solver (object):
   timerfile  = 'timerfile_%s.dat'
   inputdir   = 'input'
   outputdir  = 'output'
+  init       = None
   
   # common setup routines
   def setup (self, params, root, deterministic):
@@ -165,14 +166,6 @@ class Solver (object):
   # assemble job command
   def job (self, args):
     
-    # if input directory does not exist, create it
-    if not os.path.exists (self.inputdir):
-      os.mkdir (self.inputdir)
-    
-    # if specified, execute the initialization function
-    if self.init:
-      self.init ( args ['seed'] )
-    
     # cluster run
     if local.cluster:
       
@@ -289,7 +282,7 @@ class Solver (object):
 
     # prepare solver
     if not self.params.proceed:
-      self.prepare (directory)
+      self.prepare (directory, args ['seed'])
     
     # cluster run 
     if local.cluster:
@@ -312,17 +305,21 @@ class Solver (object):
     else:
       self.execute ( job )
   
-  # prepare solver - create directories, copy files
-  def prepare (self, directory):
+  # prepare solver - create directories, copy files, execute init script
+  def prepare (self, directory, seed):
     
     # create directory
     if not self.deterministic and not os.path.exists (directory):
       os.makedirs ( directory )
-    
+
     # copy needed input files
     if os.path.exists (self.inputdir):
       for inputfile in os.listdir (self.inputdir):
         shutil.copy ( os.path.join (self.inputdir, inputfile), directory )
+
+    # if specified, execute solver init script
+    if self.init and not self.params.noinit:
+      self.init ( directory, seed )
   
   # execute the command
   def execute (self, cmd, directory='.'):
