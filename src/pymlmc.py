@@ -167,11 +167,10 @@ class MLMC (object):
       # recursively query user for input for automated optimal sample adjustments
       while True:
 
-        # if the simulation is already finished, save MLMC config and exit
+        # return if the simulation is already finished
         if self.config.samples.finished (self.errors):
           print
           print ' :: Simulation finished.'
-          self.save ()
           return
 
         # update, report, and validate the required number of samples

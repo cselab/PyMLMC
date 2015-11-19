@@ -1182,11 +1182,11 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   # === load all required data
 
   import os
-  list = {}
-  execfile ( os.path.join (mlmc.config.root, mlmc.config.samples.samples_file), globals(), list )
+  history = {}
+  execfile ( os.path.join (mlmc.config.root, mlmc.config.samples.samples_file), globals(), history )
 
-  computed = self.list ['computed']
-  pending  = self.list ['additional']
+  computed = history ['computed']
+  pending  = history ['additional']
   
   loaded           = mlmc.config.samples.counts.loaded
   #optimal          = mlmc.config.samples.counts_optimal
@@ -1202,8 +1202,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # plot number of samples
   
-  #if warmup:
-  #  pylab.semilogy (levels, warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  pylab.semilogy (levels, pending [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   pylab.semilogy (levels, loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
   #if optimal:
@@ -1213,10 +1212,10 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=0.7)
-  pylab.axhline (y=1, color='black', linestyle='-', linewidth=2, alpha=0.7)
-  pylab.axhline (y=2, color='black', linestyle='-', linewidth=2, alpha=0.5)
-  pylab.axhline (y=3, color='black', linestyle='-', linewidth=2, alpha=0.3)
-  pylab.axhline (y=4, color='black', linestyle='-', linewidth=2, alpha=0.1)
+  pylab.axhline (y=1, color='black', linestyle='-', linewidth=1, alpha=0.7)
+  pylab.axhline (y=2, color='black', linestyle='-', linewidth=1, alpha=0.5)
+  pylab.axhline (y=3, color='black', linestyle='-', linewidth=1, alpha=0.3)
+  pylab.axhline (y=4, color='black', linestyle='-', linewidth=1, alpha=0.1)
 
   if not frame:
     pylab.legend (loc='upper right')
