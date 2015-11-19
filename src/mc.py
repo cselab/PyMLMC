@@ -131,13 +131,19 @@ class MC (object):
 
     # return combined info
     return info
-  
+
+  # check how many runs are already finished
+  def finished (self):
+
+    config = self.config
+    return sum ( [ config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
+
   # check how many runs are still pending
   def pending (self):
     
     config = self.config
     return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
-  
+
   # report timer results
   def timer (self, batch):
     

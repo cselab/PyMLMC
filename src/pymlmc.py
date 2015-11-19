@@ -391,11 +391,47 @@ class MLMC (object):
       # for all MC simulations
       for mc in self.mcs:
 
+        # check how many samples are already finished
+        finished = mc.finished()
+
         # check how many samples are still pending
         pending = mc.pending()
 
         args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1) )
 
+        # if some samples are finished, report runtime
+        if finished > 0:
+
+          runtime = mc.timer (self.config.scheduler.batch)
+          if runtime != None:
+            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+            walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+            if walltime != 'unknown':
+              percent = round ( 100 * (runtime / 3600) / walltime )
+              args += ( runtimestr, '[%2d%%]' % percent )
+              #print format % ( args + ( runtimestr, '[%2d%%]' % percent, '    ') )
+            else:
+              args += ( runtimestr, '     ' )
+              #print format % ( args + ( runtimestr, '     ', '    ') )
+          else:
+            args += ( '  N/A  ', '     ' )
+            #print format % ( args + ( '  N/A  ', '     ', '    ') )
+
+          # report if some simulations are pending
+          if pending == 0:
+            args += ( '    ', )
+          else:
+            args += ( intf (pending, table=1), )
+
+          print format % args
+
+        # report that all simulations are pending
+        else:
+
+          self.finished = 0
+          print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
+
+        '''
         # if all samples are finished, report runtime
         if pending == 0:
 
@@ -416,7 +452,8 @@ class MLMC (object):
 
           self.finished = 0
           print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
-    
+        '''
+
     if not self.finished:
       # issue a warning and query for progress
       helpers.query ('Ignore and continue nevertheless?', warning='Some simulations are still pending')
