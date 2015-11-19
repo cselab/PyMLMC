@@ -10,6 +10,7 @@
 
 import helpers
 
+import os
 import numpy
 
 class Counts (object):
@@ -73,7 +74,7 @@ class Samples (object):
   
   def make (self):
 
-    self.counts.combined = self.counts.computed + self.counts.additional
+    self.counts.combined = [ self.counts.computed [level] + self.counts.additional [level] for level in self.levels ]
     self.indices.make (self.counts)
   
   def append (self):
@@ -110,3 +111,13 @@ class Samples (object):
           parsed = 1
 
       return modified
+
+  def load (self):
+    
+    self.samples_file
+    list = {}
+    execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
+
+    config.iteration = self.list ['iteration']
+
+    config.samples.counts.computed   = self.list ['samples']

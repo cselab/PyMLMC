@@ -1181,12 +1181,13 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # === load all required data
 
+  import os
   list = {}
   execfile ( os.path.join (mlmc.config.root, mlmc.config.samples.samples_file), globals(), list )
 
   computed = self.list ['computed']
-  pending  = self.list ['pending']
-
+  pending  = self.list ['additional']
+  
   loaded           = mlmc.config.samples.counts.loaded
   #optimal          = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction

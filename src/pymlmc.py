@@ -103,8 +103,6 @@ class MLMC (object):
     self.config.samples.init     ()
     self.config.samples.report   ()
     self.config.samples.validate ()
-    if not self.config.deterministic:
-      self.config.samples.save   (self.config.iteration)
     
     # make indices for the required number of samples
     self.config.samples.make ()
@@ -119,7 +117,7 @@ class MLMC (object):
     self.run ()
 
     # save status of MLMC simulation
-    self.status.save (self.config)
+    self.save (self.config)
     
     # for clusters: if non-interactive session -> exit
     if local.cluster and not self.params.interactive:
@@ -166,33 +164,14 @@ class MLMC (object):
       # report number of samples used so far
       self.config.samples.report ()
 
-      '''
-      # check if the simulation is already finished
-      if self.config.samples.finished (self.errors):
-        print
-        print ' :: Simulation finished.'
-        self.config.samples.save (self.config.iteration)
-        self.status.save (self.config)
-        return
-
-      # update, report, and validate the required number of samples
-      if self.errors.available and self.indicators.available:
-        self.config.samples.update   (self.errors, self.indicators)
-        self.config.samples.report   ()
-        self.config.samples.validate ()
-      else:
-        helpers.warning ('indicators or errors not available - samples can not be updated')
-      '''
-
       # recursively query user for input for automated optimal sample adjustments
       while True:
 
-        # check if the simulation is already finished
+        # if the simulation is already finished, save MLMC config and exit
         if self.config.samples.finished (self.errors):
           print
           print ' :: Simulation finished.'
-          self.config.samples.save (self.config.iteration)
-          self.status.save (self.config)
+          self.save (self.config)
           return
 
         # update, report, and validate the required number of samples
@@ -240,39 +219,6 @@ class MLMC (object):
         else:
           break
 
-      '''
-      # for interactive sessions
-      if self.params.query:
-
-        # query user for additional input
-        while self.query():
-
-          # check if the simulation is already finished
-          if self.config.samples.finished (self.errors):
-            print
-            print ' :: Simulation finished.'
-            self.config.samples.save (self.config.iteration)
-            self.status.save (self.config)
-            return
-
-          # otherwise update, report, and validate the number of samples
-          if self.errors.available and self.indicators.available:
-            self.config.samples.update   (self.errors, self.indicators)
-            self.config.samples.report   ()
-            self.config.samples.validate ()
-          else:
-            helpers.warning ('indicators not available - samples can not be updated')
-
-      # for non-interactive sessions, proceed immediately
-      else:
-        if self.errors.available and self.indicators.available:
-          self.config.samples.update   (self.errors, self.indicators)
-          self.config.samples.report   ()
-          self.config.samples.validate ()
-        else:
-          helpers.warning ('indicators or errors not available - samples can not be updated')
-      '''
-
       # check if samples are available
       if not self.config.samples.available:
         helpers.warning ('samples not available -> exiting simulation...')
@@ -293,10 +239,7 @@ class MLMC (object):
       # increment iteration
       self.config.iteration += 1
 
-      # save the required number of samples
-      self.config.samples.save (self.config.iteration)
-      
-      # save MLMC simulation
+      # save status of MLMC simulation
       self.save ()
       
       # for clusters: if non-interactive session -> exit
@@ -484,6 +427,10 @@ class MLMC (object):
     
     # save status of MLMC simulation
     self.status.save (self.config)
+
+    # save samples history
+    if not self.config.deterministic:
+      self.config.samples.save (self.config.iteration)
   
   # load MLMC simulation
   def load (self):
