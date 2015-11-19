@@ -1198,11 +1198,11 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
     if fill:
       pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5)
   if total:
-    pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s')
+    pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
   #if optimal:
   #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
   pylab.title  ('Computational budget')
-  pylab.ylabel ('computational budget, %s core hours' % unit)
+  pylab.ylabel ('computational budget [%s core hours]' % unit)
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=basevalue)
