@@ -1179,9 +1179,9 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   levels           = mlmc.config.levels
   qoi              = mlmc.config.solver.qoi
 
-  budget_warmup      = [ mlmc.config.samples.history ['combined'] [0] [level] * mlmc.config.samples.works for level in levels ]
-  budget_final       = [ mlmc.config.samples.counts.loaded            [level] * mlmc.config.samples.works for level in levels ]
-  #budget_optimal     = [ mlmc.config.samples.counts_optimal           [level] * mlmc.config.samples.works for level in levels ]
+  budget_warmup      = [ mlmc.config.samples.history ['combined'] [0] [level] * mlmc.config.samples.works [level] for level in levels ]
+  budget_final       = [ mlmc.config.samples.counts.loaded            [level] * mlmc.config.samples.works [level] for level in levels ]
+  #budget_optimal     = [ mlmc.config.samples.counts_optimal           [level] * mlmc.config.samples.works [level] for level in levels ]
   budget_total       = sum (budget_final)
 
   # === plot
