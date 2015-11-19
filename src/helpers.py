@@ -27,7 +27,7 @@ def parse ():
   parser.add_argument ('-i', '--interactive',   action = "count", default = 0,  help = 'after launch of each update, wait for jobs to finish instead of exiting')
   parser.add_argument ('-q', '--query',         action = "count", default = 1,  help = 'query user for the modification of the tolerance or budget after each update')
   parser.add_argument ('-a', '--auto',          action = "count", default = 0,  help = 'automatically continue in all queries')
-  parser.add_argument ('-o', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=str)
+  parser.add_argument ('-x', '--xopts',         action = "store", default = '', help = 'additional options for the job scheduling system', type=str)
   parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
   parser.add_argument ('-p', '--proceed',       action = "count", default = 0,  help = 'proceed with simulations (might override existing files)')
