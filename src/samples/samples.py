@@ -38,6 +38,7 @@ class Samples (object):
   
   samples_file = 'samples.dat'
   available    = 0
+  history      = None
   
   def setup (self, levels, works):
     

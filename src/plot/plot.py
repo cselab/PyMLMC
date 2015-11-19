@@ -1202,7 +1202,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # plot number of samples
   
-  pylab.semilogy (levels, pending [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  pylab.semilogy (levels, combined [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   pylab.semilogy (levels, loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
   #if optimal:
