@@ -1253,8 +1253,8 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, fill=1, save=None):
     if fill:
       pylab.fill_between (levels, mlmc.errors.history ['relative_error'] [1], mlmc.errors.relative_error, facecolor=color_params('final'), alpha=0.5)
   pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run), label='total %1.1e' % mlmc.errors.total_relative_error)
-  if run == 1:
-    #pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
+  #if run == 1:
+  #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
