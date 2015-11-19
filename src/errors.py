@@ -19,6 +19,7 @@ class Errors (object):
     self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
     self.available   = 0
+    self.history     = None
 
   # compute errors
   def compute (self, indicators, counts):
@@ -107,3 +108,9 @@ class Errors (object):
     with open ( self.errors_file, 'a' ) as f:
       f.write ( 'total_relative_error [%d] = %f\n' % (iteration, self.total_relative_error if self.available else float ('NaN')) )
       f.write ( 'total_error          [%d] = %f\n' % (iteration, self.total_error          if self.available else float ('NaN')) )
+
+  def load (self, config):
+
+    if config.iteration > 1:
+      self.history = {}
+      execfile ( os.path.join (config.root, self.errors_file), globals(), self.history )

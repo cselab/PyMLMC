@@ -446,8 +446,14 @@ class MLMC (object):
         advice  = 'Run PyMLMC with \'-v 1\' option for verbose mode or with \'-r\' option to restart the simulation'
         helpers.error (message, details, advice)
 
+    # load indicators history
+    self.config.indicators.load (self.config)
+
     # load samples history
     self.config.samples.load (self.config)
+
+    # load errors history
+    self.config.errors.load (self.config)
 
     # recreate MC simulations
     self.create_MCs (self.config.samples.indices.combined)

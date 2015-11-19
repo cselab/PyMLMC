@@ -31,13 +31,11 @@ class Indicators (object):
     # store configuration 
     vars (self) .update ( locals() )
     
-    self.L = len (self.levels) - 1
-    
+    self.L               = len (self.levels) - 1
     self.indicators_file = 'indicators.dat'
-
-    self.available = 0
-
-    self.nans      = 0
+    self.available       = 0
+    self.nans            = 0
+    self.history         = None
   
   def compute (self, mcs, loaded):
 
@@ -193,7 +191,13 @@ class Indicators (object):
 
     # save correlation
     helpers.dump (self.correlation, '%f', 'correlation', self.indicators_file, iteration)
-  
+
+  def load (self, config):
+
+    if config.iteration > 1:
+      self.history = {}
+      execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
+
   # extrapolate missing variance estimates using available estimates
   def extrapolate (self):
     
