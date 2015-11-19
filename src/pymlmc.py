@@ -117,7 +117,7 @@ class MLMC (object):
     self.run ()
 
     # save status of MLMC simulation
-    self.save (self.config)
+    self.save ()
     
     # for clusters: if non-interactive session -> exit
     if local.cluster and not self.params.interactive:
@@ -171,7 +171,7 @@ class MLMC (object):
         if self.config.samples.finished (self.errors):
           print
           print ' :: Simulation finished.'
-          self.save (self.config)
+          self.save ()
           return
 
         # update, report, and validate the required number of samples
