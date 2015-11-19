@@ -9,6 +9,8 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import helpers
+
+import os
 import numpy
 
 class Errors (object):
