@@ -113,12 +113,7 @@ class Samples (object):
 
       return modified
 
-  def load (self):
+  def load (self, config):
     
-    self.samples_file
-    list = {}
-    execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
-
-    config.iteration = self.list ['iteration']
-
-    config.samples.counts.computed   = self.list ['samples']
+    self.history = {}
+    execfile ( os.path.join (config.root, self.samples_file), globals(), self.history )

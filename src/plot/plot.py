@@ -1181,13 +1181,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # === load all required data
 
-  import os
-  history = {}
-  execfile ( os.path.join (mlmc.config.root, mlmc.config.samples.samples_file), globals(), history )
-
-  computed = history ['computed']
-  pending  = history ['additional']
-  
+  history          = mlmc.config.samples.history
   loaded           = mlmc.config.samples.counts.loaded
   #optimal          = mlmc.config.samples.counts_optimal
   #optimal_fraction = mlmc.config.samples.optimal_fraction
@@ -1202,7 +1196,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   
   # plot number of samples
   
-  pylab.semilogy (levels, combined [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  pylab.semilogy (levels, history ['combined'] [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   pylab.semilogy (levels, loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated')
   #if optimal:
