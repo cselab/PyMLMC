@@ -39,6 +39,10 @@ matplotlib.colors.ColorConverter.colors['custom_green'] = (182/256.0,212/256.0,4
 # default color cycle (not working on MIRA)
 matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
 
+# === global imports
+
+import helpers
+
 # === parser for base qoi
 
 def base (qoi):
@@ -78,6 +82,7 @@ colors_params ['default'] = 'custom_blue'
 colors_params ['epsilon'] = 'custom_blue'
 colors_params ['sigma']   = 'custom_orange'
 colors_params ['samples'] = 'custom_green'
+colors_params ['budget']  = 'olivedrab'
 colors_params ['warmup']  = 'saddlebrown'
 colors_params ['optimal'] = 'yellowgreen'
 colors_params ['errors']  = 'coral'
@@ -1112,6 +1117,113 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
   if not frame:
     draw (None, save, qoi, legend=True)
 
+# plot samples
+def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, fill=1, save=None):
+
+  print ' :: INFO: Plotting samples...',
+
+  # === load all required data
+
+  levels           = mlmc.config.levels
+  qoi              = mlmc.config.solver.qoi
+
+  # === plot
+
+  if not frame:
+    figure (infolines, subplots=1)
+
+  # plot number of samples
+
+  basevalue = 0.3
+  baseline  = [basevalue for level in levels]
+  pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  if fill:
+    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5)
+  #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
+  if mlmc.config.iteration > 0:
+    pylab.semilogy (levels, mlmc.config.samples.counts.loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    if fill:
+      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
+  #if optimal:
+  #  pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
+  pylab.title  ('Number of samples')
+  pylab.ylabel ('number of samples')
+  pylab.xlabel ('mesh level')
+  levels_extent (levels)
+  pylab.ylim   (ymin=basevalue)
+  pylab.axhline (y=1, color='black', linestyle='-', linewidth=1, alpha=0.7)
+  pylab.axhline (y=2, color='black', linestyle='-', linewidth=1, alpha=0.5)
+  pylab.axhline (y=3, color='black', linestyle='-', linewidth=1, alpha=0.3)
+  pylab.axhline (y=4, color='black', linestyle='-', linewidth=1, alpha=0.1)
+
+  if not frame:
+    pylab.legend (loc='upper right')
+
+  adjust (infolines)
+
+  if infolines:
+    show_info(self)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+  print ' done.'
+
+# plot budget
+def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False, total=1, fill=1, save=None):
+
+  print ' :: INFO: Plotting budget...',
+
+  # === load all required data
+
+  levels           = mlmc.config.levels
+  qoi              = mlmc.config.solver.qoi
+
+  budget_warmup      = [ mlmc.config.samples.history ['combined'] [0] [level] * mlmc.config.samples.works for level in levels ]
+  budget_final       = [ mlmc.config.samples.counts.loaded            [level] * mlmc.config.samples.works for level in levels ]
+  #budget_optimal     = [ mlmc.config.samples.counts_optimal           [level] * mlmc.config.samples.works for level in levels ]
+  budget_total       = sum (budget_final)
+
+  # === plot
+
+  if not frame:
+    figure (infolines, subplots=1)
+
+  # plot budget
+
+  basevalue = 0
+  baseline  = [basevalue for level in levels]
+  if warmup:
+    pylab.semilogy (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+    if fill:
+      pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5)
+  if mlmc.config.iteration > 0:
+    pylab.semilogy (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    if fill:
+      pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5)
+  if total:
+    pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %s core hours' % helpers.intf (budget_total))
+  #if optimal:
+  #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
+  pylab.title  ('Number of samples')
+  pylab.ylabel ('number of samples')
+  pylab.xlabel ('mesh level')
+  levels_extent (levels)
+  pylab.ylim   (ymin=basevalue)
+
+  if not frame:
+    pylab.legend (loc='upper right')
+
+  adjust (infolines)
+
+  if infolines:
+    show_info(self)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+print ' done.'
+
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
   
@@ -1174,59 +1286,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
 
   print ' done.'
 
-# plot samples
-def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, fill=1, save=None):
-  
-  print ' :: INFO: Plotting samples...',
-  
-  # === load all required data
-
-  levels           = mlmc.config.levels
-  qoi              = mlmc.config.solver.qoi
-  
-  # === plot
-  
-  if not frame:
-    figure (infolines, subplots=1)
-  
-  # plot number of samples
-
-  basevalue = 0.3
-  baseline  = [basevalue for level in levels]
-  pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
-  if fill:
-    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5)
-  #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
-  if mlmc.config.iteration > 0:
-    pylab.semilogy (levels, mlmc.config.samples.counts.loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
-    if fill:
-      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
-    #pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
-  pylab.title  ('Number of samples')
-  pylab.ylabel ('number of samples')
-  pylab.xlabel ('mesh level')
-  levels_extent (levels)
-  pylab.ylim   (ymin=basevalue)
-  pylab.axhline (y=1, color='black', linestyle='-', linewidth=1, alpha=0.7)
-  pylab.axhline (y=2, color='black', linestyle='-', linewidth=1, alpha=0.5)
-  pylab.axhline (y=3, color='black', linestyle='-', linewidth=1, alpha=0.3)
-  pylab.axhline (y=4, color='black', linestyle='-', linewidth=1, alpha=0.1)
-
-  if not frame:
-    pylab.legend (loc='upper right')
-  
-  adjust (infolines)
-  
-  if infolines:
-    show_info(self)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
 # plot errors
-def plot_errors (mlmc, infolines=False, run=1, frame=False, fill=1, save=None):
+def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
   
   print ' :: INFO: Plotting errors...',
 
@@ -1246,12 +1307,14 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, fill=1, save=None):
     figure (infolines, subplots=1)
   
   # plot relative sampling error
-  pylab.semilogy (levels, mlmc.errors.history ['relative_error'] [0], color=color_params('warmup'), linestyle=style(run), alpha=alpha(run), marker='+', label='warmup')
+  if warmup:
+    pylab.semilogy (levels, mlmc.errors.history ['relative_error'] [0], color=color_params('warmup'), linestyle=style(run), alpha=alpha(run), marker='+', label='warmup')
   if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
       pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('final'), alpha=0.5)
-  pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total (%1.1e)' % mlmc.errors.total_relative_error)
+  if total:
+    pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %1.1e' % mlmc.errors.total_relative_error)
   #if run == 1:
   #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
