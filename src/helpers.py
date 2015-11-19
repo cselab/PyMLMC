@@ -118,7 +118,10 @@ def dump (listvar, listformat, listname, filename, iteration):
   with open ( filename, 'a') as f:
     line = listname + ' [%d]' % iteration + ' = [ '
     for var in listvar:
-      line += listformat % var + ', '
+      if str(var) == 'nan':
+        line += 'float('nan')' + ', '
+      else:
+        line += listformat % var + ', '
     f.write ( line + ']\n' )
 
 # load MLMC simulation from a different directory
