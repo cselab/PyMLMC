@@ -177,8 +177,8 @@ class Indicators (object):
 
     # dump history
     helpers.delete (self.indicators_file)
-    for i in range (iteration):
-      for variable in self.history:
+    for variable in self.history:
+      for i in range (iteration):
         helpers.dump (self.history [variable] [i], '%f', variable, self.indicators_file, i)
 
   def load (self, config):
