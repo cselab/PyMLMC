@@ -104,12 +104,16 @@ class Errors (object):
   
   def save (self, iteration):
 
-    if self.available:
-      helpers.dump (self.relative_error, '%f', 'relative_error', self.errors_file, iteration)
+    # append history
+    self.history ['relative_error']       [iteration] = self.relative_error
+    self.history ['total_relative_error'] [iteration] = self.total_relative_error if self.available else float ('NaN')
+    self.history ['total_error']          [iteration] = self.total_error          if self.available else float ('NaN')
 
-    with open ( self.errors_file, 'a' ) as f:
-      f.write ( 'total_relative_error [%d] = %f\n' % (iteration, self.total_relative_error if self.available else float ('NaN')) )
-      f.write ( 'total_error          [%d] = %f\n' % (iteration, self.total_error          if self.available else float ('NaN')) )
+    # dump history
+    helpers.delete (self.errors_file)
+    for i in range (iteration):
+      for variable in self.history:
+        helpers.dump (self.history [variable] [i], '%f', variable, self.errors_file, i)
 
   def load (self, config):
 

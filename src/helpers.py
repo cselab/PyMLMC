@@ -14,6 +14,7 @@ import os
 import sys
 import subprocess
 import argparse
+import collections
 
 params = None
 
@@ -110,23 +111,27 @@ def pair (a, b):
 def delete (filename):
   os.remove (filename)
 
-# dump list to file
-def dump (listvar, listformat, listname, filename, iteration):
+# dump variable or list (iterable object) to a file
+def dump (var, format, name, filename, iteration):
 
   # write header for the first iteration
-  if iteration == 1:
+  if iteration == 0:
     with open ( filename, 'a') as f:
-      f.write ( '%s = {}\n' % listname )
+      f.write ( '%s = {}\n' % name )
   
   # write data
   with open ( filename, 'a') as f:
-    line = listname + ' [%d]' % iteration + ' = [ '
-    for var in listvar:
-      if str(var) == 'nan':
-        line += 'float(\'nan\')' + ', '
-      else:
-        line += listformat % var + ', '
-    f.write ( line + ']\n' )
+    if not isinstance (var, collections.Iterable):
+      line = name + ' [%d]' % iteration + ' = ' + format % var
+    else:
+      line = name + ' [%d]' % iteration + ' = [ '
+      for item in var:
+        if str(item) == 'nan':
+          line += 'float(\'nan\')' + ', '
+        else:
+          line += format % item + ', '
+      line += ']'
+    f.write ( line + '\n' )
 
 # load MLMC simulation from a different directory
 def load (dir):
