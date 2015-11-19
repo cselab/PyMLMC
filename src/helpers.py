@@ -31,7 +31,7 @@ def parse ():
   parser.add_argument ('-v', '--verbose',       action = "store", default = 0,  help = 'additional options for the solver', type=int)
   parser.add_argument ('-s', '--simulate',      action = "count", default = 0,  help = 'simulate run only - no actual execution')
   parser.add_argument ('-p', '--proceed',       action = "count", default = 0,  help = 'proceed with simulations (might override existing files)')
-  parser.add_argument ('-o', '--override',      action = "count", default = 0,  help = 'override configurations, but do not submit new jobs')
+  parser.add_argument ('-o', '--override',      action = "count", default = 0,  help = 'override configurations')
   parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
 
   global params

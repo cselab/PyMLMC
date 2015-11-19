@@ -81,7 +81,7 @@ class Solver (object):
     if present:
       message = 'working directory is NOT clean!'
       details = 'Remove all directories like "%s"' % directory
-      advice  = 'Alternatively, run PyMLMC with \'-p\' option to proceed with simulations'
+      advice  = 'Alternatively, run PyMLMC with \'-o\' option to override or with \'-p\' option to proceed with simulations'
       helpers.error (message, details, advice)
 
   # initialize solver
@@ -345,7 +345,7 @@ class Solver (object):
       stderr = subprocess.STDOUT
     
     # execute command
-    if not self.params.simulate and not self.params.override:
+    if not self.params.simulate:
       subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy() )
   
   # add job to batch
