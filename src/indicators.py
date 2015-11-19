@@ -164,7 +164,13 @@ class Indicators (object):
     print
   
   def save (self, iteration):
-    
+
+    # dump history
+    '''
+    for i in range (iteration):
+      for entry in self.history:
+    '''
+
     # save mean (fine)
     epsilon_fi = [ self.mean [level] [0] for level in self.levels ]
     helpers.dump (epsilon_fi, '%f', 'epsilon_fi', self.indicators_file, iteration)

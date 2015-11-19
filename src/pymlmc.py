@@ -96,8 +96,8 @@ class MLMC (object):
   # initial phase
   def init (self):
 
-    # set iteration to 1 ('initial')
-    self.config.iteration = 1
+    # set iteration to 0 ('initial')
+    self.config.iteration = 0
 
     # initialize, report, validate, and save the required number of samples
     self.config.samples.init     ()

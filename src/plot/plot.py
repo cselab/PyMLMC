@@ -1193,14 +1193,14 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
 
   basevalue = 0.3
   baseline  = [basevalue for level in levels]
-  pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [1], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+  pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   if fill:
-    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [1], facecolor=color_params('warmup'), alpha=0.5)
+    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5)
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
-  if mlmc.config.iteration > 1:
+  if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.config.samples.counts.loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [1], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
     pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
   pylab.title  ('Number of samples')
   pylab.ylabel ('number of samples')
@@ -1247,11 +1247,11 @@ def plot_errors (mlmc, infolines=False, run=1, frame=False, fill=1, save=None):
   
   # plot relative sampling error
   
-  pylab.semilogy (levels, mlmc.errors.history ['relative_error'] [1], color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='warmup')
-  if mlmc.config.iteration > 1:
+  pylab.semilogy (levels, mlmc.errors.history ['relative_error'] [0], color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='warmup')
+  if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.errors.history ['relative_error'] [1], mlmc.errors.relative_error, facecolor=color_params('final'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.errors.history ['relative_error'] [0], mlmc.errors.relative_error, facecolor=color_params('final'), alpha=0.5)
   pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run), label='total %1.1e' % mlmc.errors.total_relative_error)
   #if run == 1:
   #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
