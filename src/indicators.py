@@ -36,7 +36,7 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
     self.available       = 0
     self.nans            = 0
-    self.history         = None
+    self.history         = {}
   
   def compute (self, mcs, loaded):
 
@@ -165,12 +165,23 @@ class Indicators (object):
   
   def save (self, iteration):
 
-    # dump history
-    '''
-    for i in range (iteration):
-      for entry in self.history:
-    '''
+    # append history
+    self.history ['epsilon_fi']    [iteration] = [ self.mean [level] [0] for level in self.levels ]
+    self.history ['epsilon_co']    [iteration] = [ self.mean [level] [1] for level in self.levels ]
+    self.history ['sigma_fi']      [iteration] = [ self.variance [level] [0] for level in self.levels ]
+    self.history ['sigma_co']      [iteration] = [ self.variance [level] [1] for level in self.levels ]
+    self.history ['epsilon_diff']  [iteration] = self.mean_diff
+    self.history ['variance_diff'] [iteration] = self.variance_diff
+    self.history ['covariance']    [iteration] = self.covariance
+    self.history ['correlation']   [iteration] = self.correlation
 
+    # dump history
+    helpers.delete (self.indicators_file)
+    for i in range (iteration):
+      for variable in self.history:
+        helpers.dump (self.history [variable] [i], '%f', variable, self.indicators_file, i)
+
+    '''
     # save mean (fine)
     epsilon_fi = [ self.mean [level] [0] for level in self.levels ]
     helpers.dump (epsilon_fi, '%f', 'epsilon_fi', self.indicators_file, iteration)
@@ -198,10 +209,11 @@ class Indicators (object):
 
     # save correlation
     helpers.dump (self.correlation, '%f', 'correlation', self.indicators_file, iteration)
+    '''
 
   def load (self, config):
 
-    if config.iteration > 1:
+    if config.iteration > 0:
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
 

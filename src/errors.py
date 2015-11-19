@@ -21,7 +21,7 @@ class Errors (object):
     self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
     self.available   = 0
-    self.history     = None
+    self.history     = {}
 
   # compute errors
   def compute (self, indicators, counts):
@@ -113,6 +113,6 @@ class Errors (object):
 
   def load (self, config):
 
-    if config.iteration > 1:
+    if config.iteration > 0:
       self.history = {}
       execfile ( os.path.join (config.root, self.errors_file), globals(), self.history )

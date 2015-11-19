@@ -106,6 +106,10 @@ def intf (number, table=0, empty=0):
 def pair (a, b):
   return a ** 2 + a + b if a >= b else a + b ** 2
 
+# delete file
+def delete (filename):
+  os.remove (filename)
+
 # dump list to file
 def dump (listvar, listformat, listname, filename, iteration):
 
