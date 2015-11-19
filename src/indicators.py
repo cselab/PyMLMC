@@ -11,6 +11,7 @@
 
 # === global imports
 
+import os
 import numpy
 
 # === local imports
