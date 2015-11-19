@@ -1184,6 +1184,9 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   #budget_optimal     = [ mlmc.config.samples.counts_optimal           [level] * mlmc.config.samples.works [level] for level in levels ]
   budget_total       = sum (budget_final)
 
+  normalization    = 1e6
+  unit             = 'million'
+
   # === plot
 
   if not frame:
@@ -1194,19 +1197,19 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   basevalue = 0
   baseline  = [basevalue for level in levels]
   if warmup:
-    pylab.plot (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+    pylab.plot (levels, budget_warmup / normalization, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
     if fill:
-      pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5)
+      pylab.fill_between (levels, baseline / normalization, budget_warmup / normalization, facecolor=color_params('warmup'), alpha=0.5)
   if mlmc.config.iteration > 0:
-    pylab.plot (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    pylab.plot (levels, budget_final / normalization, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5)
+      pylab.fill_between (levels, budget_warmup / normalization, budget_final / normalization, facecolor=color_params('budget'), alpha=0.5)
   if total:
-    pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %s core hours' % helpers.intf (budget_total))
+    pylab.axhline (y=budget_total / normalization, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %s core hours' % helpers.intf (budget_total))
   #if optimal:
   #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
-  pylab.title  ('Number of samples')
-  pylab.ylabel ('number of samples')
+  pylab.title  ('Computational budget')
+  pylab.ylabel ('computational budget, %s cpu hours' % unit)
   pylab.xlabel ('mesh level')
   levels_extent (levels)
   pylab.ylim   (ymin=basevalue)
@@ -1222,7 +1225,7 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   if not frame:
     draw (mlmc, save, qoi)
 
-print ' done.'
+  print ' done.'
 
 # plot indicators
 def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
