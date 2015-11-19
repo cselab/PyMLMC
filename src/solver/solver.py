@@ -345,7 +345,7 @@ class Solver (object):
       stderr = subprocess.STDOUT
     
     # execute command
-    if not self.params.simulate:
+    if not self.params.simulate and not self.params.override:
       subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy() )
   
   # add job to batch

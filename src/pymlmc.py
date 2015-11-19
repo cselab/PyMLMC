@@ -111,7 +111,10 @@ class MLMC (object):
     self.config.scheduler.distribute ()
       
     # query for progress
-    helpers.query ('Submit jobs?')
+    if self.params.simulate:
+      helpers.query ('Simulate job submission (no actual submissions)?')
+    else:
+      helpers.query ('Submit jobs?')
 
     # compute initial samples
     self.run ()
@@ -230,7 +233,10 @@ class MLMC (object):
       self.config.scheduler.distribute ()
 
       # query for progress
-      helpers.query ('Submit jobs?')
+      if self.params.simulate:
+        helpers.query ('Simulate job submission (no actual submissions)?')
+      else:
+        helpers.query ('Submit jobs?')
 
       # compute required samples
       self.run ()
@@ -409,13 +415,10 @@ class MLMC (object):
             if walltime != 'unknown':
               percent = round ( 100 * (runtime / 3600) / walltime )
               args += ( runtimestr, '[%2d%%]' % percent )
-              #print format % ( args + ( runtimestr, '[%2d%%]' % percent, '    ') )
             else:
               args += ( runtimestr, '     ' )
-              #print format % ( args + ( runtimestr, '     ', '    ') )
           else:
             args += ( '  N/A  ', '     ' )
-            #print format % ( args + ( '  N/A  ', '     ', '    ') )
 
           # report if some simulations are pending
           if pending == 0:
@@ -430,29 +433,6 @@ class MLMC (object):
 
           self.finished = 0
           print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
-
-        '''
-        # if all samples are finished, report runtime
-        if pending == 0:
-
-          runtime = mc.timer (self.config.scheduler.batch)
-          if runtime != None:
-            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
-            walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
-            if walltime != 'unknown':
-              percent = round ( 100 * (runtime / 3600) / walltime )
-              print format % ( args + ( runtimestr, '[%2d%%]' % percent, '    ') )
-            else:
-              print format % ( args + ( runtimestr, '     ', '    ') )
-          else:
-            print format % ( args + ( '  N/A  ', '     ', '    ') )
-
-        # report if some simulations are pending
-        else:
-
-          self.finished = 0
-          print format % ( args + ( '       ', '     ', intf (pending, table=1), ) )
-        '''
 
     if not self.finished:
       # issue a warning and query for progress
