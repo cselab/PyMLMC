@@ -119,7 +119,7 @@ def dump (listvar, listformat, listname, filename, iteration):
     line = listname + ' [%d]' % iteration + ' = [ '
     for var in listvar:
       if str(var) == 'nan':
-        line += 'float('nan')' + ', '
+        line += 'float(\'nan\')' + ', '
       else:
         line += listformat % var + ', '
     f.write ( line + ']\n' )

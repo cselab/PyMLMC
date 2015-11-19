@@ -222,7 +222,7 @@ class MLMC (object):
       if not self.config.samples.available:
         helpers.warning ('samples not available -> exiting simulation...')
         return
-
+      
       # make indices for the required number of samples
       self.config.samples.make ()
       
