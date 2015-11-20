@@ -20,11 +20,6 @@ from solver import Solver
 import local
 import os, subprocess
 
-class Float (float):
-  
-  def zero (self):
-    self = 0
-
 class Example_Solver (Solver):
   
   # constructor for the example solver
