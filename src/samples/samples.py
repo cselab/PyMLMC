@@ -29,8 +29,8 @@ class Counts (object):
   def report (self):
 
     print '  :'
-    print '  :   LEVEL   :' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
+    print '  :   LEVEL   : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :-------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
 
     print '  : Computed  :',
     for level in self.levels:

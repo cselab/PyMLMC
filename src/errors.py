@@ -65,8 +65,8 @@ class Errors (object):
     print ' :: ERRORS: (normalized to %s)' % helpers.scif (self.normalization)
     
     print '  :'
-    print '  :  LEVEL  :' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :----------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :  LEVEL  :' + ' '.join ( [ '   ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :----------' + '-'.join ( [         helpers.scif (None, table=1, bar=1) for level in self.levels ] )
     print '  :  ERROR  :',
     for level in self.levels:
       print helpers.scif (self.relative_error [level], table=1),

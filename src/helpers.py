@@ -84,7 +84,7 @@ def grids_3d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
 # integer format with multipliers K, M, etc.
-def intf (number, table=0, empty=0, bar=0):
+def intf (number, table=0, empty=0, bar=0, plain=0):
   if bar:
     if table:
       return '----'

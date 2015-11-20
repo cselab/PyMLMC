@@ -108,8 +108,8 @@ class Indicators (object):
     print
     print ' :: INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
     print '  :'
-    print '  :    LEVEL    :' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :--------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :    LEVEL    : ' + ' '.join ( [ '   ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :---------------' + '-'.join ( [         helpers.scif (None, table=1, bar=1) for level in self.levels ] )
     
     # report mean (fine)
     print '  : EPSILON [FI]:',
