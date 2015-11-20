@@ -62,7 +62,7 @@ class Errors (object):
       return
 
     print
-    print ' :: ERRORS: (normalized to %s)' % helpers.scif (self.normalization)
+    print ' :: ERRORS: (normalized to %s [~%.1e])' % ( helpers.scif (self.normalization), self.normalization )
     
     print '  :'
     print '  :  LEVEL  :' + ' '.join ( [ '   ' + helpers.intf (level, table=1)       for level in self.levels ] )
@@ -73,7 +73,7 @@ class Errors (object):
     print
 
     print '  :'
-    print '  : Total sampling error : %s' % helpers.scif (self.total_relative_error)
+    print '  : Total sampling error : %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
 
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0
