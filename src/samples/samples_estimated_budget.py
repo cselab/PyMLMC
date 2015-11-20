@@ -15,13 +15,15 @@ import numpy
 # surpresses invalid division errors and simply returns 'nan' in such cases
 numpy.seterr ( divide='ignore', invalid='ignore' )
 
+# this Samples class updates the required number of samples based on the specified available computational budget
+
 class Estimated_Budget (Samples):
   
   def __init__ (self, budget=8, warmup=1, warmup_finest_level='last'):
     
     # save configuration
     vars (self) .update ( locals() )
-    self.counts_updated = None
+    self.counts_updated = []
   
   def init (self):
 
@@ -92,24 +94,14 @@ class Estimated_Budget (Samples):
     print
     print ' :: SAMPLES: (estimated for the specified budget)'
 
-    print '    -> Computed number of samples for each level:'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts.computed [level],
-    print
+    # report computed and additional number of samples
+    self.counts.report ()
 
-    if self.counts_updated != None:
-      print '    -> Updated number of samples for each level:'
-      print '      ',
+    # report additional specific information
+    if self.counts_updated != []:
+      print '  : Updated   :',
       for level in self.levels:
-        print '%d' % self.counts_updated [level],
-      print
-
-    if self.counts.additional != []:
-      print '    -> Pending number of samples for each level'
-      print '      ',
-      for level in self.levels:
-        print '%d' % self.counts.additional [level],
+        print helpers.intf (self.counts_updated [level], table=1),
       print
 
     # report budget status

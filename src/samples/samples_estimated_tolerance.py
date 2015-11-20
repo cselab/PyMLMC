@@ -17,7 +17,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 # this Samples class updates the required number of samples based on the desired tolerance
 
-class Estimated (Samples):
+class Estimated_Tolerance (Samples):
   
   def __init__ (self, tol=1e-1, warmup=1, aggressive=0, warmup_finest_level='last', evaluation_fraction=0.9, min_evaluation_fraction=0.1, aggression=0.1):
     
@@ -106,29 +106,26 @@ class Estimated (Samples):
   def report (self):
     
     print
-    print ' :: SAMPLES: (estimated for the specified tolerance)'
+    print ' :: SAMPLES: (estimated for the specified tolerance tol=%s)' % helpers.scif (self.tol)
 
-    print '    -> Computed number of samples for each level:'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts.computed [level],
-    print
+    #if self.tol:
+    #  print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
 
-    if self.counts_updated != None:
-      print '    -> Updated number of samples for each level:'
-      print '      ',
-      for level in self.levels:
-        print '%d' % self.counts_updated [level],
-      print
+    # report computed and additional number of samples
+    self.counts.report ()
 
+    # report additional specific information
     if self.counts.additional != []:
       fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-      print '    -> Pending number of samples for each level (%d%% of required, at least %d%% of all)' % fractions
-      print '      ',
+      print ' (%d%% of required, at least %d%% of all)' % fractions
+
+    # report additional specific information
+    if self.counts_updated != []:
+      print '  : Updated   :',
       for level in self.levels:
-        print '%d' % self.counts.additional [level],
+        print helpers.intf (self.counts_updated [level], table=1),
       print
-  
+
   # query for tolerance
   def query (self):
 

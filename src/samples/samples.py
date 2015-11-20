@@ -14,19 +14,43 @@ import os
 import numpy
 
 class Counts (object):
-  
+
   computed   = []
   additional = []
   combined   = []
+
   loaded     = []
   failed     = []
+
+  def __init__ (self, counts):
+
+    self.counts = counts
+
+  def report (self):
+
+    print '  :'
+    print '  :   LEVEL   :' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
+
+    print '  : Computed  :',
+    for level in self.levels:
+      print helpers.intf (computed [level], table=1),
+    print
+
+    if additional != []:
+      print '  : Pending   :',
+      for level in self.levels:
+        print helpers.intf (additional [level], table=1),
+      print
 
 class Indices (object):
   
   computed   = []
   additional = []
   combined   = []
+  
   loaded     = []
+  failed     = []
   
   def make (self, counts):
     
@@ -48,7 +72,7 @@ class Samples (object):
     # 'sample' is treated as a _pair_ of fine and coarse samples
     self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
 
-    self.counts  = Counts ()
+    self.counts  = Counts (levels)
     self.indices = Indices ()
     
     self.L       = len(levels) - 1
@@ -59,6 +83,7 @@ class Samples (object):
     self.counts.failed  = [ None for level in self.levels ]
 
     self.indices.loaded = [ None for level in self.levels ]
+    self.indices.failed = [ None for level in self.levels ]
   
   def validate (self):
     

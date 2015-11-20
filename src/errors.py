@@ -62,24 +62,18 @@ class Errors (object):
       return
 
     print
-    print ' :: ERRORS: (normalized to %.1e)' % self.normalization
-
+    print ' :: ERRORS: (normalized to %s)' % helpers.scif (self.normalization)
+    
     print '  :'
-    print '  :  LEVEL  :' + ''.join ( ['       %d' % level for level in self.levels ] )
-    print '  :----------' + (len (self.levels) * '--------')
+    print '  :  LEVEL  :' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :----------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
     print '  :  ERROR  :',
     for level in self.levels:
-      print '%.1e' % self.relative_error [level] if not numpy.isnan (self.relative_error [level]) and not numpy.isinf (self.relative_error [level]) else '    N/A',
+      print helpers.scif (self.relative_error [level], table=1),
     print
 
     print '  :'
-    print '  : Total sampling error : ' + ('%f [%.1e]' % (self.total_relative_error, self.total_relative_error) if not numpy.isnan (self.total_relative_error) and not numpy.isinf (self.total_relative_error) else 'N/A')
-    '''
-    if tol:
-      print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
-    else:
-      print
-    '''
+    print '  : Total sampling error : %s' % helpers.scif (self.total_relative_error)
 
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0

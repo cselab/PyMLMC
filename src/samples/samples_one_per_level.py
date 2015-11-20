@@ -24,8 +24,5 @@ class One_Per_Level (Samples):
     print
     print ' :: SAMPLES: (one sample per each level)'
 
-    print '    -> Number of samples for each level:'
-    print '      ',
-    for level in self.levels:
-      print '%d' % self.counts.additional [level],
-    print
+    # report computed and additional number of samples
+    self.counts.report ()

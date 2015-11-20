@@ -15,6 +15,7 @@ import sys
 import subprocess
 import argparse
 import collections
+import numpy
 
 params = None
 
@@ -83,7 +84,12 @@ def grids_3d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
 # integer format with multipliers K, M, etc.
-def intf (number, table=0, empty=0):
+def intf (number, table=0, empty=0, bar=0):
+  if bar:
+    if table:
+      return '----'
+    else:
+      return '-'
   if table:
     template = '%3d%1s'
   else:
@@ -103,6 +109,35 @@ def intf (number, table=0, empty=0):
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
   return template % ( sign * number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+
+# format by using standard format for numbers close to zero and scientific format otherwise
+def scif (number, table=0, empty=0, bar=0, nan=1):
+
+  if bar:
+    if table:
+      return '-------'
+    else:
+      return '-'
+
+  if number == 0:
+    if empty:
+      if table:
+        return '       '
+      else:
+        return ''
+
+  if numpy.isnan (number) or numpy.isinf (number):
+    return '    N/A'
+
+  if abs (number) >= 0.001 and abs (number) < 1000:
+    if table:
+      format = '%7.3f'
+    else:
+      format = '%7f'
+  else:
+    format = '%.1e'
+  
+  return format % number
 
 # pair two seeds into one
 def pair (a, b):
