@@ -1310,7 +1310,7 @@ def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, f
     if fill:
       pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('final'), alpha=0.5)
   if total:
-    pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %1.1e' % mlmc.errors.total_relative_error)
+    pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % mlmc.errors.total_relative_error)
   #if run == 1:
   #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
