@@ -87,28 +87,28 @@ def grids_3d_t (N, NS):
 def intf (number, table=0, empty=0, bar=0, plain=0):
   if bar:
     if table:
-      return '----'
+      return '-----'
     else:
       return '-'
   if table:
-    template = '%3d%1s'
+    template = '%1s%3d%1s'
   else:
-    template = '%d%s'
+    template = '%s%d%s'
   if number == 0:
     if empty:
       if table:
-        return '    '
+        return '     '
       else:
         return ''
     else:
-      return template % ( 0, '' )
+      return template % ( '', 0, '' )
   from math import log, floor
   sign = -1 if number < 0 else 1
   number = abs (number)
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
-  return template % ( sign * number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  return template % ( ' ' if sign == 1 else '-', sign * number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
 
 # format by using standard format for numbers close to zero and scientific format otherwise
 def scif (number, table=0, empty=0, bar=0, nan=1):

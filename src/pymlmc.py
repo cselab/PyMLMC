@@ -314,8 +314,8 @@ class MLMC (object):
     header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
     separator = '  :------------------------------------------------------------|'
     if local.cluster:
-      header    += '  WALLTIME  |  BATCH  |  JOBS  |'
-      separator += '-------------------------------|'
+      header    += '  WALLTIME  |  BATCH  |  JOBS   |'
+      separator += '--------------------------------|'
       if local.ensembles:
         header    += '  MERGE  |  ENSEMBLES  '
         separator += '-----------------------'
@@ -392,7 +392,7 @@ class MLMC (object):
       print ' :: STATUS of MC simulations:'
       print '  :  LEVEL  |   TYPE   |  SAMPLES  |  RUNTIME  |  USAGE  |  PENDING  |'
       print '  :------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |     %s  |  %s  |  %s  |    %s   |'
+      format = '  :      %d  |  %s  |    %s  |  %s  |  %s  |   %s   |'
 
       # for all MC simulations
       for mc in self.mcs:
@@ -421,10 +421,7 @@ class MLMC (object):
             args += ( '  N/A  ', '     ' )
 
           # report if some simulations are pending
-          if pending == 0:
-            args += ( '    ', )
-          else:
-            args += ( intf (pending, table=1), )
+          args += ( intf (pending, table=1, empty=1), )
 
           print format % args
 
@@ -485,7 +482,7 @@ class MLMC (object):
     print ' :: LOADING RESULTS...'
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
     print '  :------------------------------------------------------------------|'
-    format = '  :      %d  |  %s  |     %s  |   %s   |   %s   |    %s   |'
+    format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |'
 
     # candidate for the coarsest level
     self.L0 = None
@@ -533,7 +530,7 @@ class MLMC (object):
     print ' :: LOADED PAIRS (FINE & COARSE)...'
     print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |'
     print '  :-------------------------------------------|'
-    format = '  :      %d  |     %s  |   %s   |   %s   |'
+    format = '  :      %d  |    %s  |   %s  |   %s  |'
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
