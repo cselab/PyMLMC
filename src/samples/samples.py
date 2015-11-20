@@ -22,9 +22,9 @@ class Counts (object):
   loaded     = []
   failed     = []
 
-  def __init__ (self, counts):
+  def __init__ (self, levels):
 
-    self.counts = counts
+    self.levels = levels
 
   def report (self):
 
