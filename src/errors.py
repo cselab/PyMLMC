@@ -106,7 +106,7 @@ class Errors (object):
     # dump history
     helpers.delete (self.errors_file)
     for variable in self.history:
-      for i in range (iteration):
+      for i in range (iteration + 1):
         helpers.dump (self.history [variable] [i], '%f', variable, self.errors_file, i)
 
   def load (self, config):
