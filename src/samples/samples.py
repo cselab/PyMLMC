@@ -34,13 +34,13 @@ class Counts (object):
 
     print '  : Computed  :',
     for level in self.levels:
-      print helpers.intf (computed [level], table=1),
+      print helpers.intf (self.computed [level], table=1),
     print
 
-    if additional != []:
+    if self.additional != []:
       print '  : Pending   :',
       for level in self.levels:
-        print helpers.intf (additional [level], table=1),
+        print helpers.intf (self.additional [level], table=1),
       print
 
 class Indices (object):
