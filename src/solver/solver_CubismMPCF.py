@@ -22,7 +22,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None):
+  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -37,7 +37,7 @@ class CubismMPCF (Solver):
     if not path: self.path = self.env ('MPCF_CLUSTER_PATH')
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -tend %(tend)f -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -116,6 +116,8 @@ class CubismMPCF (Solver):
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
+
+    args ['tend'] = self.tend
     
     args ['spongewidth'] = discretization ['spongewidth']
     
@@ -215,8 +217,7 @@ class CubismMPCF (Solver):
       # interpolate time dependent results using linear interpolation
       # this is needed since number of time steps and time step sizes
       # are usually different for every simulation
-      # TODO: if simulation is not yet finished, interpolation interval must be adapted!
-      results .interpolate ( self.points + 1 )
+      results .interpolate ( self.points + 1, begin=0, end=tend )
       
       # compute meta parameters for interpolation
       results.meta ['dt'] = numpy.diff (results.meta ['t'])
