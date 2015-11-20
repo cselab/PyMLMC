@@ -108,7 +108,7 @@ def intf (number, table=0, empty=0, bar=0, plain=0):
   base = 1000
   magnitude = int ( floor ( log ( number, base ) ) )
   number    = int ( floor ( number / ( base ** magnitude ) ) )
-  return template % ( ' ' if sign == 1 else '-', sign * number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
+  return template % ( ' ' if sign == 1 else '-', number, ['', 'K', 'M', 'G', 'T', 'P', 'E'] [magnitude] )
 
 # format by using standard format for numbers close to zero and scientific format otherwise
 def scif (number, table=0, empty=0, bar=0, nan=1):
