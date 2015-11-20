@@ -174,7 +174,7 @@ class Indicators (object):
     self.history ['variance_diff'] [iteration] = self.variance_diff
     self.history ['covariance']    [iteration] = self.covariance
     self.history ['correlation']   [iteration] = self.correlation
-
+    
     # dump history
     helpers.delete (self.indicators_file)
     for variable in self.history:

@@ -158,7 +158,7 @@ def dump (var, format, name, filename, iteration):
   # write data
   with open ( filename, 'a') as f:
     if not isinstance (var, collections.Iterable):
-      line = name + ' [%d]' % iteration + ' = ' + format % var
+      line = name + ' [%d]' % iteration + ' = ' + (format % var if str(item) != 'nan' else 'float(\'nan\')')
     else:
       line = name + ' [%d]' % iteration + ' = [ '
       for item in var:
