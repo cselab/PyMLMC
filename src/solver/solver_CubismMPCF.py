@@ -217,7 +217,7 @@ class CubismMPCF (Solver):
       # interpolate time dependent results using linear interpolation
       # this is needed since number of time steps and time step sizes
       # are usually different for every simulation
-      results .interpolate ( self.points + 1, begin=0, end=tend )
+      results .interpolate ( self.points + 1, begin=0, end=self.tend )
       
       # compute meta parameters for interpolation
       results.meta ['dt'] = numpy.diff (results.meta ['t'])
