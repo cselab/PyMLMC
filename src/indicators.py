@@ -165,6 +165,18 @@ class Indicators (object):
   
   def save (self, iteration):
 
+    # initialize history
+    if len (self.history) == 0:
+      self.history ['epsilon_fi']    = {}
+      self.history ['epsilon_co']    = {}
+      self.history ['sigma_fi']      = {}
+      self.history ['sigma_co']      = {}
+      self.history ['epsilon_diff']  = {}
+      self.history ['variance_diff'] = {}
+      self.history ['covariance']    = {}
+      self.history ['correlation']   = {}
+
+
     # append history
     self.history ['epsilon_fi']    [iteration] = [ self.mean [level] [0] for level in self.levels ]
     self.history ['epsilon_co']    [iteration] = [ self.mean [level] [1] for level in self.levels ]

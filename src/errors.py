@@ -98,6 +98,13 @@ class Errors (object):
   
   def save (self, iteration):
 
+    # init history
+    if len (self.history) == 0:
+      self.history ['relative_error']       = {}
+      self.history ['total_relative_error'] = {}
+      self.history ['total_error']          = {}
+
+
     # append history
     self.history ['relative_error']       [iteration] = self.relative_error       if self.available else float ('NaN')
     self.history ['total_relative_error'] [iteration] = self.total_relative_error if self.available else float ('NaN')
