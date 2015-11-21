@@ -145,7 +145,8 @@ def pair (a, b):
 
 # delete file
 def delete (filename):
-  os.remove (filename)
+  if sys.path.exits (filename)
+    os.remove (filename)
 
 # dump variable or list (iterable object) to a file
 def dump (var, format, name, filename, iteration):
