@@ -257,7 +257,7 @@ class Interpolated_Time_Series (object):
     
     times = numpy.linspace ( begin, end, points )
     for key in self.data.keys():
-      self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=None, right=None )
+      self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=float('nan'), right=float('nan') )
     
     self.meta ['t']  = times
   
