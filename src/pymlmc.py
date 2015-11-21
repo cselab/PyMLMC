@@ -523,7 +523,7 @@ class MLMC (object):
 
       # compute auxiliary counts
       self.config.samples.counts.loaded [level] = len (self.config.samples.indices.loaded [level])
-      self.config.samples.counts.failed [level] = self.config.samples.counts.computed [level] - self.config.samples.counts.loaded [level]
+      self.config.samples.counts.failed [level] = self.config.samples.counts.combined [level] - self.config.samples.counts.loaded [level]
 
     # report how many pairs of fine and course samples were loaded
     print
