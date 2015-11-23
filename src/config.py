@@ -84,3 +84,13 @@ class MLMC_Config (object):
     # core ratios
     if self.ratios == None:
       self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
+
+  # report configuration
+  def report (self):
+
+    print
+    print ' :: CONFIGURATION:'
+    print '  : SOLVER       : %24s' % self.solver  .__class__.__name__ + ' [MODE: %s]' % ('deterministic' if self.deterministic else 'stochastic')
+    print '  : SAMPLES      : %24s' % self.samples .__class__.__name__
+    print '  : SCHEDULER    : %24s' % self.samples .__class__.__name__ + ' [RATIOS: %s]' % str (self.ratios)
+    print '  : ROOT         : %24s' % self.root

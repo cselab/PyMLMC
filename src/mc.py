@@ -150,7 +150,7 @@ class MC (object):
     config = self.config
     runtimes = [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ]
     if len (runtimes) > 1:
-      return max ( runtimes )
+      max ( runtimes )
     else:
       return None
 

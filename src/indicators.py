@@ -53,7 +53,7 @@ class Indicators (object):
 
     # evaluate indicators for all samples on all levels and types
     for i, (level, type) in enumerate (self.levels_types):
-
+      
       # compute plain values and values meant for level differences
       values      [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results if result != None ] )
       results_diff               = [ result for sample, result in enumerate (mcs [i] .results) if sample in loaded [level] ]
@@ -66,6 +66,7 @@ class Indicators (object):
         values_diff [level] [type] = numpy.array ( [ float('NaN') ] )
 
       # check if NaN's are present
+      # TODO: this should be checked later, after actual computations... :)
       if numpy.isnan ( values [level] [type] ) .any():
         self.nans = 1
       if numpy.isnan ( values_diff [level] [type] ) .any():
@@ -77,23 +78,24 @@ class Indicators (object):
     
     # compute plain indicators
     for level, type in self.levels_types:
-      self.mean     [level] [type] = numpy.abs ( numpy.mean (values [level] [type]) )
-      self.variance [level] [type] = numpy.cov ( values [level] [type] )
+      self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
+      self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
     
     # compute indicators for differences
-    self.mean_diff     [0] = numpy.abs ( numpy.mean (values_diff [0] [0]) )
-    self.variance_diff [0] = numpy.cov ( values_diff [0] [0] )
+    self.mean_diff     [0] = numpy.nanmean ( values_diff [0] [0] )
+    self.variance_diff [0] = numpy.nanvar  ( values_diff [0] [0] )
     for level in self.levels [1:] :
-      self.mean_diff     [level] = numpy.abs ( numpy.mean (values_diff [level] [0] - values_diff [level] [1]) )
-      self.variance_diff [level] = numpy.cov ( values_diff [level] [0] - values_diff [level] [1] )
+      self.mean_diff     [level] = numpy.nanmean ( values_diff [level] [0] - values_diff [level] [1] )
+      self.variance_diff [level] = numpy.nanvar  ( values_diff [level] [0] - values_diff [level] [1] )
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
-      self.covariance  [level] = numpy.cov      ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
+      print level, len (values_diff [level] [0]), len(values_diff [level] [1])
+      self.covariance  [level] = numpy.nanvar   ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
       self.correlation [level] = numpy.corrcoef ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
 
     # set the normalization
@@ -101,7 +103,10 @@ class Indicators (object):
       self.normalization = 1
       helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
-      self.normalization = self.mean [0] [0]
+      self.normalization = numpy.abs (self.mean [0] [0])
+
+    # set availability
+    self.available = 1
 
   def report (self):
 

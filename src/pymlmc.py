@@ -52,7 +52,10 @@ class MLMC (object):
 
     # setup samples
     self.config.samples.setup ( self.config.levels, self.config.works )
-    
+
+    # report config
+    self.config.report ()
+
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
     

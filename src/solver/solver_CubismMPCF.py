@@ -26,7 +26,7 @@ class CubismMPCF (Solver):
     
     # save configuration
     vars (self) .update ( locals() )
-    
+
     # set executable name
     if local.cluster:
       self.executable = 'mpcf-cluster'
@@ -51,7 +51,7 @@ class CubismMPCF (Solver):
     self.outputfileformat = 'statistics*.dat'
     self.outputfile_v1    = 'integrals.dat'
     self.qoi = 'p_sen1'
-    self.indicator = lambda x : numpy.max ( x [ 'p_sen1' ] )
+    self.indicator = lambda x : numpy.nanmax ( x [ 'p_sen1' ] )
   
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
