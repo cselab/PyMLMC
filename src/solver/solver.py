@@ -407,7 +407,7 @@ class Solver (object):
           if size <= parallelization.mergemax:
             filtered += [size]
           else:
-            chunks = 2 ** ceil ( numpy.log2 (size / parallelization.mergemax) )
+            chunks = 2 ** numpy.ceil ( numpy.log2 (size / parallelization.mergemax) )
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
         
