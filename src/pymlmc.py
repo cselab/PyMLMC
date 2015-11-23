@@ -330,7 +330,7 @@ class MLMC (object):
 
     # initialize submission file
     if not self.config.deterministic:
-      f = open (self.submission_file, 'wa')
+      f = open (self.submission_file + '.%d' % self.config.iteration, 'wa')
       f.write (header + '\n')
       f.write (separator + '\n')
 

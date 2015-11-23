@@ -30,7 +30,7 @@ class Status (object):
   # save status
   def save (self, config):
   
-    with open ( os.path.join (config.root, self.status_file), 'w' ) as f:
+    with open ( os.path.join (config.root, self.status_file + '.%d' % config.iteration), 'w' ) as f:
 
       f.write ( 'iteration = %d\n' % config.iteration )
 
@@ -73,6 +73,10 @@ class Status (object):
   def load (self, config):
     
     self.list = {}
+
+    # find the most recent status file
+    # TODO: search for self.status_file*, sort and take the last one
+
     execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
 
     config.iteration = self.list ['iteration']
