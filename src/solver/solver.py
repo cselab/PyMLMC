@@ -399,9 +399,18 @@ class Solver (object):
         # split parts into ensembles (with size being powers of 2)
         binary = bin ( len(parts) )
         decomposition = [ 2**(len(binary) - 1 - power) if flag == '1' else 0 for power, flag in enumerate(binary) ]
-        # TODO: enforce: ensemble <= parallelization.mergemax
-        decomposition = [ ensemble for ensemble in decomposition if ensemble != 0 ]
+        decomposition = [ size for size in decomposition if size != 0 ]
 
+        # respect parallelization.mergemax
+        filtered = []
+        for i, size in enumerate (decomposition):
+          if size <= parallelization.mergemax:
+            filtered += [size]
+          else:
+            chunks = 2 ** ceil ( numpy.log2 (size / parallelization.mergemax) )
+            filtered += [ size / chunks ] * chunks
+        decomposition = filtered
+        
         # submit each ensemble
         submitted = 0
         for i, size in enumerate (decomposition):
