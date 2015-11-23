@@ -104,11 +104,7 @@ class Scheduler (object):
     self.parallelizations = helpers.level_type_list (levels)
     self.batch = helpers.level_type_list (levels)
     #self.merge = helpers.level_type_list (levels)
-
-    print
-    print ' :: MACHINE:'
-    print '  : ' + local.name + (' (cluster)' if local.cluster else '')
-
+    
     # if 'cores' is not provided
     if self.cores == None:
 

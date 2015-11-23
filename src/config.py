@@ -90,6 +90,7 @@ class MLMC_Config (object):
 
     print
     print ' :: CONFIGURATION:'
+    print '  : MACHINE      : %24s' % local.name + (' (cluster)' if local.cluster else '')
     print '  : SOLVER       : %24s' % self.solver  .__class__.__name__ + ' [MODE: %s]' % ('deterministic' if self.deterministic else 'stochastic')
     print '  : SAMPLES      : %24s' % self.samples .__class__.__name__
     print '  : SCHEDULER    : %24s' % self.samples .__class__.__name__ + ' [RATIOS: %s]' % str (self.ratios)
