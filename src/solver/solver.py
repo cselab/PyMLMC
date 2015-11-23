@@ -35,6 +35,10 @@ class Solver (object):
     self.params        = params
     self.root          = root
     self.deterministic = deterministic
+
+    # setup name
+    if not hasattr (self, 'name'):
+      self.name = self.__class__.__name__
     
     # create output directory
     if not os.path.exists (self.outputdir):
