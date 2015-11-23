@@ -410,13 +410,10 @@ class Solver (object):
             chunks = 2 ** int ( math.ceil ( math.log ( float(size) / parallelization.mergemax, 2) ) )
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
-        print filtered
-        
+
         # submit each ensemble
         submitted = 0
         for i, size in enumerate (decomposition):
-
-          print size
 
           # set label
           label = self.label (level, type) + 'e%d' % (i+1)
