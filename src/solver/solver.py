@@ -27,6 +27,7 @@ class Solver (object):
   timerfile  = 'timerfile_%s.dat'
   inputdir   = 'input'
   outputdir  = 'output'
+  path       = None
   init       = None
   
   # common setup routines
