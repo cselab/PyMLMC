@@ -94,7 +94,6 @@ class Indicators (object):
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
-      print level, len (values_diff [level] [0]), len(values_diff [level] [1])
       self.covariance  [level] = numpy.cov      ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
       self.correlation [level] = numpy.corrcoef ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
 
