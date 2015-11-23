@@ -1308,7 +1308,7 @@ def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, f
   if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('final'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('errors'), alpha=0.5)
   if total:
     pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % mlmc.errors.total_relative_error)
   #if run == 1:
