@@ -1313,6 +1313,7 @@ def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, f
     pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % mlmc.errors.total_relative_error)
   #if run == 1:
   #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
+  pylab.plot([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % mlmc.errors.speedup)
   pylab.title  ('Relative sampling errors for Q = %s' % qoi)
   pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
   pylab.xlabel ('mesh level')
