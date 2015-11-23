@@ -53,9 +53,6 @@ class MLMC (object):
     # setup samples
     self.config.samples.setup ( self.config.levels, self.config.works )
 
-    # report config
-    self.config.report ()
-
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
     
@@ -76,6 +73,12 @@ class MLMC (object):
   
   # MLMC simulation
   def simulation (self):
+
+    # report config
+    self.config.report ()
+
+    # query for progress
+    helpers.query ('Continue?')
 
     # check for consistency
     if self.params.restart and self.params.proceed:
