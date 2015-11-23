@@ -105,4 +105,5 @@ class Status (object):
     print
     print (' :: INFO: MLMC status loaded from')
     print ('  : %s' % os.path.join (config.root, self.status_file))
+    print ('  : Simulation iteration: %d' % config.iteration )
     print ('  : Simulation was executed on \'%s\'' % self.list ['cluster'] )
