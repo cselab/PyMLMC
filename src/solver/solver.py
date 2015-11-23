@@ -410,7 +410,7 @@ class Solver (object):
             chunks = 2 ** int ( math.ceil ( math.log (size / parallelization.mergemax, 2) ) )
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
-        print fitered
+        print filtered
         
         # submit each ensemble
         submitted = 0
