@@ -399,9 +399,9 @@ class MLMC (object):
     else:
 
       print ' :: STATUS of MC simulations:'
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  RUNTIME  |  USAGE  |  PENDING  |'
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  RUNTIME  |  USAGE  |  PENDING  |'
       print '  :------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |  %s  |  %s  |   %s   |'
+      format = '  :      %d  |  %s  |    %s  |    %s   |  %s  |  %s  |   %s   |'
 
       # for all MC simulations
       for mc in self.mcs:
@@ -412,7 +412,7 @@ class MLMC (object):
         # check how many samples are still pending
         pending = mc.pending()
 
-        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1) )
+        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1) )
 
         # if some samples are finished, report runtime
         if finished > 0:
