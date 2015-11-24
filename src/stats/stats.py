@@ -19,6 +19,7 @@ class Stat (object):
     for sample in samples:
       if sample != None:
         stats = copy.deepcopy (sample)
+        break
     
     # compute sample statistics
     for key in stats.data.keys():
