@@ -400,7 +400,7 @@ class MLMC (object):
 
       print ' :: STATUS of MC simulations:'
       print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  RUNTIME  |  USAGE  |  PENDING  |'
-      print '  :------------------------------------------------------------------|'
+      print '  :-------------------------------------------------------------------------------|'
       format = '  :      %d  |  %s  |    %s  |    %s   |  %s  |  %s  |   %s   |'
 
       # for all MC simulations
