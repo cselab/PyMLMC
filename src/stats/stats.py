@@ -23,9 +23,8 @@ class Stat (object):
     
     # compute sample statistics
     for key in stats.data.keys():
-      stats.data [key] = []
       for step in xrange ( len ( stats.data [key] ) ):
         series = [ sample.data [key] [step] for sample in samples if sample != None ]
-        stats.data [key] .append ( self.compute ( series ) )
+        stats.data [key] [step] = self.compute (series)
     
     return stats
