@@ -414,6 +414,10 @@ class MLMC (object):
 
         args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1) )
 
+        # we are not finished if at least one simulation is pending
+        if pending > 0:
+          self.finished = 0
+
         # if some samples are finished, report runtime
         if finished > 0:
 
@@ -441,7 +445,6 @@ class MLMC (object):
         # report that all simulations are pending
         else:
 
-          self.finished = 0
           print format % ( args + ( '        ', '     ', '     ', intf (pending, table=1), ) )
 
     if not self.finished:
