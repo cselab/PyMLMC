@@ -132,8 +132,7 @@ class Solver (object):
       #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
-      #return '%s_%s.%d' % (self.name, dir, self.iteration)
-      return '%s_%s' % (self.name, dir)
+      return '%s_%s.%d' % (self.name, dir, self.iteration)
   
   # assemble args
   def args (self, parallelization):
