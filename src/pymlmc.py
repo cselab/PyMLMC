@@ -472,7 +472,7 @@ class MLMC (object):
         self.status.load (self.config)
       except:
         message = 'MLMC status could not be loaded from'
-        details = os.path.join (self.config.root, self.status.status_file)
+        details = os.path.join (self.config.root, self.status.status_file + '*')
         advice  = 'Run PyMLMC with \'-v 1\' option for verbose mode or with \'-r\' option to restart the simulation'
         helpers.error (message, details, advice)
 
@@ -551,9 +551,25 @@ class MLMC (object):
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
       print format % (mc.config.level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
+    
+    # report detailed progrees of individual samples
+    self.progress ()
 
     # query for progress
     helpers.query ('Continue?')
+
+  # report dedailed progress of individual samples
+  def progress (self):
+
+    yes = helpers.query ('Show detailed progress of individual samples?')
+
+    if not yes:
+      return
+
+    print
+    print ' :: PROGRESS: [not yet implemented]'
+
+    # TODO: implement this!
 
   # assemble MC and MLMC estimates
   def assemble (self, stats):

@@ -145,7 +145,12 @@ class CubismMPCF (Solver):
     
     # execute/submit job
     self.launch (args, parallelization, level, type, sample)
-  
+
+  def progress (self, results):
+
+    ts = [ t for step, t in enumerate (results.meta ['t']) if results.data [self.qoi] != None ]
+    return max (ts)
+
   def load (self, level=0, type=0, sample=0, file=None):
     
     # get all available output files for version 2.0

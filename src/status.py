@@ -72,13 +72,16 @@ class Status (object):
   
   # load status
   def load (self, config):
-    
+
+    # look for status files
+    from glob import glob
+    statusfiles = glob ( os.path.join (config.root, self.status_file + '.*') )
+    if len (statusfiles) == 0:
+      raise
+
+    # use the most recent status file
     self.list = {}
-
-    # find the most recent status file
-    # TODO: search for self.status_file*, sort and take the last one
-
-    execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
+    execfile ( statusfiles [-1], globals(), self.list )
 
     config.iteration = self.list ['iteration']
     config.solver.iteration = self.list ['iteration']

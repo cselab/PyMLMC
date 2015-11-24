@@ -96,3 +96,8 @@ class Example_Solver (Solver):
     lines = outputfile .readlines ()
     outputfile.close()
     return [ float ( lines[0] .strip() ) ]
+
+  # report progress of a pending simulation
+  def progress (self, results):
+
+    return None
