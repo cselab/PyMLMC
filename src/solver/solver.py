@@ -91,9 +91,10 @@ class Solver (object):
       helpers.error (message, details, advice)
 
   # initialize solver
-  def initialize (self, level, type, parallelization):
+  def initialize (self, level, type, parallelization, iteration):
     if parallelization.batch:
       self.batch = []
+    self.iteration = iteration
   
   # set default path from the environment variable
   def env (self, var):
@@ -124,14 +125,14 @@ class Solver (object):
   def label (self, level, type, sample=None):
     
     if self.deterministic:
-      return self.name
+      return self.name + '.%d' % self.iteration
     
     else:
       dir = '%d_%d' % (level, type)
       #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
-      return '%s_%s' % (self.name, dir)
+      return '%s_%s.%d' % (self.name, dir, self.iteration)
   
   # assemble args
   def args (self, parallelization):

@@ -80,6 +80,7 @@ class Status (object):
     execfile ( os.path.join (config.root, self.status_file), globals(), self.list )
 
     config.iteration = self.list ['iteration']
+    config.solver.iteration = self.list ['iteration']
     
     config.samples.counts.computed   = self.list ['samples']
     config.samples.counts.additional = self.list ['pending']

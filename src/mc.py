@@ -25,7 +25,7 @@ import local
 # configuration class for MC simulations
 class MC_Config (object):
   
-  def __init__ (self, mlmc_config, level, type, samples):
+  def __init__ (self, mlmc_config, level, type, samples, iteration):
     vars (self) .update ( locals() )
     self.solver         = mlmc_config.solver
     self.discretization = mlmc_config.discretizations [level - type]
@@ -106,7 +106,7 @@ class MC (object):
     info_mc = self.info()
     
     # initialize solver
-    config.solver.initialize (config.level, config.type, self.parallelization)
+    config.solver.initialize (config.level, config.type, self.parallelization, config.iteration)
 
     # use progress indicator, report MC info each time
     prefix = info_mc + '  Progress: '

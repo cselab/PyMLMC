@@ -173,6 +173,9 @@ class MLMC (object):
       # report number of samples used so far
       self.config.samples.report ()
 
+      # query for progress
+      helpers.query ('Continue?')
+
       # recursively query user for input for automated optimal sample adjustments
       while True:
 
@@ -244,11 +247,11 @@ class MLMC (object):
       else:
         helpers.query ('Submit jobs?')
 
-      # compute required samples
-      self.run ()
-
       # increment iteration
       self.config.iteration += 1
+
+      # compute required samples
+      self.run ()
 
       # save status of MLMC simulation
       self.save ()
@@ -295,16 +298,16 @@ class MLMC (object):
       sys.exit ()
 
   # create MC objects
-  def create_MCs (self, indices):
+  def create_MCs (self, indices, iteration):
     self.mcs = []
     for level, type in self.config.levels_types:
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level]), self.params, self.config.scheduler.parallelizations [level] [type] ) )
+      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level], iteration), self.params, self.config.scheduler.parallelizations [level] [type] ) )
   
   # run MC estimates
   def run (self):
     
     # create MC simulations
-    self.create_MCs (self.config.samples.indices.additional)
+    self.create_MCs (self.config.samples.indices.additional, self.config.iteration)
     
     # report samples that will be computed
     print
@@ -476,7 +479,7 @@ class MLMC (object):
     self.errors.load (self.config)
 
     # recreate MC simulations
-    self.create_MCs (self.config.samples.indices.combined)
+    self.create_MCs (self.config.samples.indices.combined, self.config.iteration)
     
     # if non-interactive session -> wait for jobs to finish
     if not self.params.interactive:

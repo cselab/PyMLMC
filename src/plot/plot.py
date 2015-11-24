@@ -573,6 +573,8 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     # general plotting
     else:
+      print len(ts)
+      print len(vs)
       pylab.plot (ts, vs, color=color, linestyle=style(run), alpha=alpha(run), label=stat_name)
   
   # plot percentiles
