@@ -145,12 +145,12 @@ class MC (object):
     return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
 
   # report timer results
-  def timer (self, batch):
+  def timer (self, batch, merge):
     
     config = self.config
-    runtimes = [ config.solver.timer ( config.level, config.type, sample, batch ) for sample in config.samples ]
+    runtimes = [ config.solver.timer ( config.level, config.type, sample, batch, merge ) for sample in config.samples ]
     if len (runtimes) > 1:
-      max ( runtimes )
+      return max ( runtimes )
     else:
       return None
 

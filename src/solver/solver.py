@@ -122,17 +122,17 @@ class Solver (object):
       return os.path.join (os.path.join (self.root, self.outputdir), dir)
   
   # return the label of a particular run
-  def label (self, level, type, sample=None):
+  def label (self, level, type, sample=None, suffix='', iteration=True):
     
     if self.deterministic:
-      return self.name + '.%d' % self.iteration
+      return self.name + suffix + ('.%d' % self.iteration if iteration else '')
     
     else:
       dir = '%d_%d' % (level, type)
       #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
-      return '%s_%s.%d' % (self.name, dir, self.iteration)
+      return '%s_%s%s' % (self.name, dir, suffix) + ('.%d' % self.iteration if iteration else '')
   
   # assemble args
   def args (self, parallelization):
@@ -284,7 +284,7 @@ class Solver (object):
     job = 'date\n' + job
 
     # append command to create status file
-    job += '\n' + 'touch %s' % ( self.statusfile % label )
+    job += '\n' + 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
 
     # prepare solver
     if not self.params.proceed:
@@ -389,7 +389,7 @@ class Solver (object):
           batch = ''.join (part)
         
           # set label
-          label = self.label (level, type) + '_b%d' % (i+1)
+          label = self.label (level, type, suffix='_b%d' % (i+1))
 
           # submit
           self.execute ( self.submit (batch, parallelization, label, directory), directory )
@@ -417,8 +417,8 @@ class Solver (object):
         for i, size in enumerate (decomposition):
 
           # set label
-          label = self.label (level, type) + 'e%d' % (i+1)
-
+          label = self.label (level, type, suffix='_e%d' % (i+1))
+          
           # initialize ensemble job
           ensemble = ''
 
@@ -464,22 +464,31 @@ class Solver (object):
     directory = self.directory ( level, type, sample )
 
     # get label
-    label = self.label ( level, type, sample )
+    label = self.label ( level, type, sample, iteration=None )
 
     # check if the status file exists
     return os.path.exists ( os.path.join (directory, self.statusfile % label) )
 
   # report timer results
-  def timer (self, level, type, sample, batch):
-    
-    if batch [level] [type]:
+  # TODO: if merge or batch, sample should map to correct '_b*' or '_e*'
+  def timer (self, level, type, sample, batch, merge):
+
+    if merge [level] [type]:
+
+      # get directory
+      directory = self.directory ( level, type )
+
+      # get label
+      label = self.label ( level, type, suffix = '_e1' )
+
+    elif batch [level] [type]:
       
       # get directory
       directory = self.directory ( level, type )
       
       # get label
-      label = self.label ( level, type ) + '_b1'
-    
+      label = self.label ( level, type, suffix = '_b1' )
+
     else:
       
       # get directory
@@ -487,7 +496,7 @@ class Solver (object):
       
       # get label
       label = self.label ( level, type, sample )
-    
+
     # read timer file
     timerfilepath = os.path.join (directory, self.timerfile % label)
     if os.path.exists (timerfilepath):

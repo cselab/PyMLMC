@@ -42,6 +42,7 @@ class Status (object):
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
 
       f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
+      f.write ( 'merge = %s' % str (config.scheduler.merge)  + '\n' )
 
       if 'cluster' in self.list:
         f.write ( 'cluster = \'%s\'' % self.list ['cluster']  + '\n' )
@@ -94,6 +95,7 @@ class Status (object):
       config.samples.tol = self.list ['tol']
     '''
     config.scheduler.batch = self.list ['batch']
+    config.scheduler.merge = self.list ['merge']
       
     if 'cluster' not in self.list:
       self.list ['cluster'] = 'unknown'
