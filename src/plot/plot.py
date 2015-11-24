@@ -573,8 +573,6 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     
     # general plotting
     else:
-      print len(ts)
-      print len(vs)
       pylab.plot (ts, vs, color=color, linestyle=style(run), alpha=alpha(run), label=stat_name)
   
   # plot percentiles
@@ -625,7 +623,6 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
     if mc.config.type != mlmc.config.FINE:
       continue
 
-    print mc.level. mc.type
     pylab.subplot ( 1, levels, mc.config.level + 1 )
     pylab.title ( 'level %d' % mc.config.level )
     if mc.available:
