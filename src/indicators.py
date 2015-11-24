@@ -78,17 +78,23 @@ class Indicators (object):
     
     # compute plain indicators
     for level, type in self.levels_types:
-      self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
-      self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )
+      self.mean     [level] [type] = numpy.mean ( values [level] [type] )
+      #self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
+      self.variance [level] [type] = numpy.var  ( values [level] [type] )
+      #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
     
     # compute indicators for differences
-    self.mean_diff     [0] = numpy.nanmean ( values_diff [0] [0] )
-    self.variance_diff [0] = numpy.nanvar  ( values_diff [0] [0] )
+    self.mean_diff     [0] = numpy.mean ( values_diff [0] [0] )
+    #self.mean_diff     [0] = numpy.nanmean ( values_diff [0] [0] )
+    self.variance_diff [0] = numpy.var  ( values_diff [0] [0] )
+    #self.variance_diff [0] = numpy.nanvar  ( values_diff [0] [0] )
     for level in self.levels [1:] :
-      self.mean_diff     [level] = numpy.nanmean ( values_diff [level] [0] - values_diff [level] [1] )
-      self.variance_diff [level] = numpy.nanvar  ( values_diff [level] [0] - values_diff [level] [1] )
+      self.mean_diff     [level] = numpy.mean ( values_diff [level] [0] - values_diff [level] [1] )
+      #self.mean_diff     [level] = numpy.nanmean ( values_diff [level] [0] - values_diff [level] [1] )
+      self.variance_diff [level] = numpy.var  ( values_diff [level] [0] - values_diff [level] [1] )
+      #self.variance_diff [level] = numpy.nanvar  ( values_diff [level] [0] - values_diff [level] [1] )
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
@@ -113,7 +119,7 @@ class Indicators (object):
     print ' :: INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
     print '  :'
     print '  :    LEVEL    : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :---------------' + '-'.join ( [         helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
     
     # report mean (fine)
     print '  : EPSILON [FI]:',
