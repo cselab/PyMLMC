@@ -91,7 +91,7 @@ def intf (number, table=0, empty=0, bar=0, plain=0):
     else:
       return '-'
   if table:
-    template = '%3d%1s'
+    template = '%4d%1s'
   else:
     template = '%d%s'
   if number == 0:
