@@ -56,13 +56,13 @@ class CubismMPCF (Solver):
 
     # set indicator
     if not self.indicator:
-      #self.indicator = lambda x : numpy.nanmax ( x.data ['p_sen1'] )
-      self.indicator = lambda x : numpy.nanmean ( numpy.abs (x.data ['p_sen1']) )
+      #self.indicator = lambda x : numpy.nanmax ( x.data [self.qoi] )
+      self.indicator = lambda x : numpy.nanmean ( numpy.abs (x.data [self.qoi]) )
 
     # set distance
     if not self.distance:
-      #self.distance = lambda f, c : numpy.abs ( numpy.nanmax (f.data ['p_sen1']) - numpy.nanmax (c.data ['p_sen1']) if c != None else numpy.nanmax (f.data ['p_sen1']) )
-      self.distance = lambda f, c : numpy.nanmean ( numpy.abs ( f.data ['p_sen1'] - c.data ['p_sen1'] if c != None else f.data ['p_sen1'] ) )
+      #self.distance = lambda f, c : numpy.abs ( numpy.nanmax (f.data [self.qoi]) - numpy.nanmax (c.data [self.qoi]) if c != None else numpy.nanmax (f.data [self.qoi]) )
+      self.distance = lambda f, c : numpy.nanmean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] if c != None else f.data [self.qoi] ) )
 
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
