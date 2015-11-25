@@ -57,7 +57,7 @@ class CubismMPCF (Solver):
     # set indicator
     if not self.indicator:
       #self.indicator = lambda x : numpy.nanmax ( x.data ['p_sen1'] )
-      self.indicator = lambda x : numpy.nanmean ( x.data ['p_sen1'] )
+      self.indicator = lambda x : numpy.nanmean ( numpy.abs (x.data ['p_sen1']) )
 
     # set distance
     if not self.distance:
