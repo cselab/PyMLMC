@@ -170,19 +170,18 @@ class MLMC (object):
       # query for progress
       helpers.query ('Continue?')
 
-      # report number of samples used so far
-      self.config.samples.report ()
-
-      # query for progress
-      helpers.query ('Continue?')
-
       # recursively query user for input for automated optimal sample adjustments
       while True:
 
         # return if the simulation is already finished
         if self.config.samples.finished (self.errors):
+
           print
           print ' :: Simulation finished.'
+
+          # report number of samples used so far
+          self.config.samples.report ()
+
           return
 
         # update, report, and validate the required number of samples
