@@ -176,15 +176,16 @@ class MLMC (object):
         # return if the simulation is already finished
         if self.config.samples.finished (self.errors):
 
+          # report final number of samples
+          self.config.samples.strip  ()
+          self.config.samples.report ()
+          
           print
           print ' :: Simulation finished.'
 
-          # report number of samples used so far
-          self.config.samples.report ()
-
           return
 
-        # update, report, and validate the required number of samples
+        # update, report, and validate the computed/required/pending number of samples
         if self.errors.available and self.indicators.available:
           self.config.samples.update   (self.errors, self.indicators)
           self.config.samples.report   ()

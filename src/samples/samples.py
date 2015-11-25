@@ -38,6 +38,12 @@ class Counts (object):
     print
 
     if self.additional != []:
+
+      print '  : Required  :',
+      for level in self.levels:
+        print helpers.intf (self.computed [level] + self.additional [level], table=1),
+      print
+
       print '  : Pending   :',
       for level in self.levels:
         print helpers.intf (self.additional [level], table=1),
@@ -107,7 +113,11 @@ class Samples (object):
     
     self.counts.computed   = [ self.counts.computed [level] + self.counts.additional [level] for level in self.levels ]
     self.counts.additional = [ 0 for level in self.levels ]
-  
+
+  def strip (self):
+
+    self.counts.additional = [ 0 for level in self.levels ]
+
   def manual (self):
 
     if helpers.query ('Do you want to manually adjust samples?', exit=0) != 'y':

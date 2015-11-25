@@ -47,6 +47,7 @@ class Estimated_Tolerance (Samples):
     
     if numpy.isnan (errors.total_relative_error):
       return 1
+    
     else:
       return errors.total_relative_error <= self.tol
 
@@ -118,13 +119,6 @@ class Estimated_Tolerance (Samples):
     if self.counts.additional != []:
       fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
       print ' (%d%% of required, at least %d%% of all)' % fractions
-
-    # report additional specific information
-    if self.counts_updated != []:
-      print '  : Updated   :',
-      for level in self.levels:
-        print helpers.intf (self.counts_updated [level], table=1),
-      print
 
   # query for tolerance
   def query (self):

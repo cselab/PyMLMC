@@ -97,13 +97,6 @@ class Estimated_Budget (Samples):
     # report computed and additional number of samples
     self.counts.report ()
 
-    # report additional specific information
-    if self.counts_updated != []:
-      print '  : Updated   :',
-      for level in self.levels:
-        print helpers.intf (self.counts_updated [level], table=1),
-      print
-
     # report budget status
     self.report_budget()
 
