@@ -44,6 +44,10 @@ class Example_Solver (Solver):
     # indicator function: given the results of the output file,
     # picks out (or computes) the required quantity of interest
     self.indicator = lambda x : x
+
+    # distance function: given the results of two output files,
+    # picks out and computes the required distance in quantity of interest
+    self.distance = lambda f, c : abs ( f - c if c != None else f )
     
     # enable shared memory (i.e. 1 MPI-rank per node)
     # self.sharedmem = 1

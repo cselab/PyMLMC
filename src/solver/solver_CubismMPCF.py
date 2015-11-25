@@ -22,7 +22,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None, indicator=None, difference=None):
+  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None, indicator=None, distance=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -54,14 +54,15 @@ class CubismMPCF (Solver):
     # set default quantity of interest
     self.qoi = 'p_sen1'
 
-    # set plain indicator
+    # set indicator
     if not self.indicator:
-      #self.indicator = lambda x : numpy.nanmax ( x [ 'p_sen1' ] )
-      self.indicator = lambda x : numpy.nanmean ( x [ 'p_sen1' ] )
+      #self.indicator = lambda x : numpy.nanmax ( x.data ['p_sen1'] )
+      self.indicator = lambda x : numpy.nanmean ( x.data ['p_sen1'] )
 
-    # set difference indicator
-    if not self.difference:
-      self.difference = lambda f, c : numpy.nanmean ( numpy.abs (f [ 'p_sen1' ] - c [ 'p_sen1' ]) ** 2 )
+    # set distance
+    if not self.distance:
+      #self.distance = lambda f, c : numpy.abs ( numpy.nanmax (f.data ['p_sen1']) - numpy.nanmax (c.data ['p_sen1']) if c != None else numpy.nanmax (f.data ['p_sen1']) )
+      self.distance = lambda f, c : numpy.nanmean ( numpy.abs ( f.data ['p_sen1'] - c.data ['p_sen1'] if c != None else f.data ['p_sen1'] ) )
 
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
