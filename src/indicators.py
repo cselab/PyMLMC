@@ -27,7 +27,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, levels, levels_types):
+  def __init__ (self, indicator, difference, levels, levels_types, pick):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -48,16 +48,21 @@ class Indicators (object):
     self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
     self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
 
+    '''
     values      = helpers.level_type_list (self.levels)
     values_diff = helpers.level_type_list (self.levels)
+    '''
+    values = helpers.level_type_list (self.levels)
+    diffs  = helpers.level_list      (self.levels)
 
+    '''
     # evaluate indicators for all samples on all levels and types
     for i, (level, type) in enumerate (self.levels_types):
       
       # compute plain values and values meant for level differences
-      values      [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in mcs [i] .results if result != None ] )
+      values      [level] [type] = numpy.array ( [ self.indicator (result.data) for result in mcs [i] .results if result != None ] )
       results_diff               = [ result for sample, result in enumerate (mcs [i] .results) if sample in loaded [level] ]
-      values_diff [level] [type] = numpy.array ( [ self.indicator ( result.data ) for result in results_diff ] )
+      values_diff [level] [type] = numpy.array ( [ self.indicator (result.data) for result in results_diff ] )
 
       # handle unavailable simulations
       if len (values [level] [type]) == 0:
@@ -67,15 +72,52 @@ class Indicators (object):
 
       # check if NaN's are present
       # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan ( values [level] [type] ) .any():
+      if numpy.isnan (values [level] [type]) .any():
         self.nans = 1
-      if numpy.isnan ( values_diff [level] [type] ) .any():
+      if numpy.isnan (values_diff [level] [type]) .any():
         self.nans = 1
-      if len ( values_diff [level] [type] ) < 2:
+      if len (values [level] [type]) < 2:
         self.nans = 1
-      if len ( values_diff [level] [type] ) < 2:
+      if len (values_diff [level] [type]) < 2:
         self.nans = 1
-    
+    '''
+
+    # evaluate plain indicators for all samples on all levels and types
+    for i, (level, type) in enumerate (self.levels_types):
+
+      # compute plain values
+      values [level] [type] = numpy.array ( [ self.indicator (result.data) for result in mcs [i] .results if result != None ] )
+
+      # handle unavailable simulations
+      if len (values [level] [type]) == 0:
+        values [level] [type] = numpy.array ( [ float('NaN') ] )
+
+      # check if NaN's are present
+      # TODO: this should be checked later, after actual computations... :)
+      if numpy.isnan (values [level] [type]) .any():
+        self.nans = 1
+      if len (values [level] [type]) < 2:
+        self.nans = 1
+
+    # evaluate level difference indicators for all samples on all levels
+    for level in self.levels [1:]:
+
+      # compute values meant for level differences
+      fine   = [ result for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in loaded [level] ]
+      coarse = [ result for sample, result in enumerate (mcs [ self.pick [level][1] ] .results) if sample in loaded [level] ]
+      diffs [level] = numpy.array ( [ self.difference (fi, ci) for fi, ci in zip (fine, coarse) ] )
+
+      # handle unavailable simulations
+      if len (diffs [level]) == 0:
+        diffs [level] = numpy.array ( [ float('NaN') ] )
+
+      # check if NaN's are present
+      # TODO: this should be checked later, after actual computations... :)
+      if numpy.isnan (diffs [level]) .any():
+        self.nans = 1
+      if len (diffs [level]) < 2:
+        self.nans = 1
+
     # compute plain indicators
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.mean ( values [level] [type] )
@@ -84,7 +126,8 @@ class Indicators (object):
       #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
-    
+
+    '''
     # compute indicators for differences
     self.mean_diff     [0] = numpy.mean ( values_diff [0] [0] )
     #self.mean_diff     [0] = numpy.nanmean ( values_diff [0] [0] )
@@ -95,13 +138,30 @@ class Indicators (object):
       #self.mean_diff     [level] = numpy.nanmean ( values_diff [level] [0] - values_diff [level] [1] )
       self.variance_diff [level] = numpy.var  ( values_diff [level] [0] - values_diff [level] [1] )
       #self.variance_diff [level] = numpy.nanvar  ( values_diff [level] [0] - values_diff [level] [1] )
+    '''
+
+    # compute indicators for differences
+    self.mean_diff     [0] = numpy.mean ( values [0] [0] )
+    #self.mean_diff     [0] = numpy.nanmean ( values [0] [0] )
+    self.variance_diff [0] = numpy.var  ( values [0] [0] )
+    #self.variance_diff [0] = numpy.nanvar  ( values [0] [0] )
+    for level in self.levels [1:] :
+      self.mean_diff     [level] = numpy.mean ( diffs [level] )
+      #self.mean_diff     [level] = numpy.nanmean ( diffs [level] )
+      self.variance_diff [level] = numpy.var  ( diffs [level] )
+      #self.variance_diff [level] = numpy.nanvar  ( diffs [level] )
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
+      '''
       self.covariance  [level] = numpy.cov      ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
       self.correlation [level] = numpy.corrcoef ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
+      '''
+      self.covariance  [level] = float ('NaN')
+      self.correlation [level] = float ('NaN')
+
 
     # set the normalization
     if numpy.isnan (self.mean [0] [0]):

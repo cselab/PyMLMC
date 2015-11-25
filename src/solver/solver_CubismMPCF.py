@@ -22,7 +22,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None):
+  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=1, init=None, indicator=None, difference=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -46,13 +46,23 @@ class CubismMPCF (Solver):
     # enable shared memory (i.e. 1 MPI-rank per node)
     self.sharedmem = 1
     
-    # set files, default quantity of interest, and indicator
+    # set files
     self.outputfile       = 'statistics.dat'
     self.outputfileformat = 'statistics*.dat'
     self.outputfile_v1    = 'integrals.dat'
+
+    # set default quantity of interest
     self.qoi = 'p_sen1'
-    self.indicator = lambda x : numpy.nanmax ( x [ 'p_sen1' ] )
-  
+
+    # set plain indicator
+    if not self.indicator:
+      #self.indicator = lambda x : numpy.nanmax ( x [ 'p_sen1' ] )
+      self.indicator = lambda x : numpy.nanmean ( x [ 'p_sen1' ] )
+
+    # set difference indicator
+    if not self.difference:
+      self.difference = lambda f, c : numpy.nanmean ( numpy.abs (f [ 'p_sen1' ] - c [ 'p_sen1' ]) ** 2 )
+
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
     from helpers import intf

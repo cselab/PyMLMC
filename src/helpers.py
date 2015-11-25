@@ -41,6 +41,10 @@ def parse ():
 
   return params
 
+# creates an empty nested list iterating over levels
+def level_list (levels):
+  return [ None for level in levels ]
+
 # creates an empty nested list iterating over levels and types
 def level_type_list (levels):
   return [ [None, None] for level in levels ]

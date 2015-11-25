@@ -54,7 +54,7 @@ class MLMC (object):
     self.config.samples.setup ( self.config.levels, self.config.works )
 
     # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.config.levels, self.config.levels_types )
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.difference, self.config.levels, self.config.levels_types, self.config.pick )
     
     # errors
     self.errors = Errors (self.config.levels)
