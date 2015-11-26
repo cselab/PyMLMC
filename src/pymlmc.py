@@ -165,7 +165,7 @@ class MLMC (object):
       self.errors.save    (self.config.iteration)
       
       # report speedup (MLMC vs MC)
-      self.errors.speedup (self.config.works, self.config.samples.counts)
+      self.errors.speedup (self.indicators, self.config.works, self.config.samples.counts)
 
       # query for progress
       helpers.query ('Continue?')
