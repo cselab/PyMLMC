@@ -440,8 +440,8 @@ class Solver (object):
             batch = '(%s) &\n' % batch
 
             # header for the ensemble job
-            ensemble += '\n# === BATCH JOB id %d\n' % j
-
+            ensemble += '\n# === BATCH JOB %d [id=%d]\n' % (j + 1, j)
+            
             # add batch job to the ensemble
             ensemble += batch
 
