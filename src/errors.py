@@ -26,27 +26,23 @@ class Errors (object):
   # compute errors
   def compute (self, indicators, counts):
     
-    # save configuration
-    self.indicators = indicators
-    self.counts     = counts
-    
     # extrapolate missing indicators
     if indicators.nans:
       helpers.warning ('Missing indicator values are extrapolated!')
-      self.indicators.extrapolate ()
+      indicators.extrapolate ()
     
     # set the normalization
-    self.normalization = self.indicators.normalization
+    self.normalization = indicators.normalization
 
     # check if indicators are available
-    if self.indicators.available == 1:
+    if indicators.available == 1:
       self.available = 1
     else:
       self.available = 0
       return
     
-    # compute relative sampling errors
-    self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.loaded ) / self.normalization
+    # compute relative sampling errors (if only one sample is loaded, use indicator value)
+    self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.max ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
     
     # compute the cumulative relative sampling error
     self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
