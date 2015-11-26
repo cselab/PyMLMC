@@ -39,11 +39,11 @@ class Errors (object):
     self.normalization = self.indicators.normalization
 
     # check if indicators are available
-    if not self.indicators.available:
+    if self.indicators.available == 1:
+      self.available = 1
+    else:
       self.available = 0
       return
-    else:
-      self.available = 1
     
     # compute relative sampling errors
     self.relative_error = numpy.sqrt ( self.indicators.variance_diff / self.counts.loaded ) / self.normalization
@@ -66,7 +66,7 @@ class Errors (object):
     
     print '  :'
     print '  :  LEVEL  :' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :----------' + '-'.join ( [         helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :----------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
     print '  :  ERROR  :',
     for level in self.levels:
       print helpers.scif (self.relative_error [level], table=1),
