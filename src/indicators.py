@@ -120,13 +120,15 @@ class Indicators (object):
         self.nans = 1
       if len (distances [level]) < 2:
         self.nans = 1
+      if len (distances [level]) < 1: # zero variance is NOT an option! (should be extrapolated!)
+        self.nans = 1
 
     # compute indicators
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.mean ( values [level] [type] )
       #self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
-      self.variance [level] [type] = numpy.var  ( values [level] [type] )
-      #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )
+      self.variance [level] [type] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float('nan')
+      #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )  if len (values [level] [type]) > 1 else float('nan')
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
 
@@ -147,16 +149,16 @@ class Indicators (object):
     for level in self.levels:
       self.mean_diff     [level] = numpy.mean ( distances [level] )
       #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
-      self.variance_diff [level] = numpy.var  ( distances [level] )
-      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )
+      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level] [type]) > 1 else float('nan')
+      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level] [type]) > 1 else float('nan')
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
     for level in self.levels [1:] :
       '''
-      self.covariance  [level] = numpy.cov      ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
-      self.correlation [level] = numpy.corrcoef ( values_diff [level] [0], values_diff [level] [1] ) [0][1]
+      self.covariance  [level] = numpy.cov      ( values_diff [level] [0], values_diff [level] [1] ) [0][1] if len (values_diff [level] [0]) > 1 else float('nan')
+      self.correlation [level] = numpy.corrcoef ( values_diff [level] [0], values_diff [level] [1] ) [0][1] if len (values_diff [level] [0]) > 1 else float('nan')
       '''
       self.covariance  [level] = float ('NaN')
       self.correlation [level] = float ('NaN')
