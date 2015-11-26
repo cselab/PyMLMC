@@ -149,8 +149,8 @@ class Indicators (object):
     for level in self.levels:
       self.mean_diff     [level] = numpy.mean ( distances [level] )
       #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
-      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level] [type]) > 1 else float('nan')
-      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level] [type]) > 1 else float('nan')
+      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float('nan')
+      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float('nan')
 
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
