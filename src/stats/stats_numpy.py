@@ -10,6 +10,7 @@
 
 from stats import Stat
 import numpy
+import warnings
 
 class NumPy_Stat (Stat):
   
@@ -23,6 +24,8 @@ class NumPy_Stat (Stat):
   
   # compute statistic 'self.stat' of given samples
   def compute (self, samples):
+
+    warnings.simplefilter ('ignore')
     
     if self.params:
       return self.stat (samples, self.params)
