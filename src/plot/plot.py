@@ -20,6 +20,10 @@ import pylab
 import numpy
 import sys
 
+# warnings management
+import warnings
+warnings.filter ('No labelled objects found. ')
+
 # figure configuration
 matplotlib.rcParams ['figure.max_open_warning'] = 100 # not working on MIRA
 matplotlib.rcParams ['savefig.dpi']             = 300
