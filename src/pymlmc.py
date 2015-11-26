@@ -187,11 +187,16 @@ class MLMC (object):
 
         # update, report, and validate the computed/required/pending number of samples
         if self.errors.available and self.indicators.available:
+
           self.config.samples.update   (self.errors, self.indicators)
           self.config.samples.report   ()
           self.config.samples.validate ()
+
+        # if samples can not be updated, display warning and skip user input query
         else:
+
           helpers.warning ('indicators or errors not available - samples can not be updated')
+          break
 
         # for interactive sessions
         if self.params.query:
@@ -207,23 +212,23 @@ class MLMC (object):
         else:
           break
 
-      # recursively query user for manual sample adjustments
+      # recursively query user for manual sample specification or adjustment
       while True:
 
         # for interactive sessions
         if self.params.query:
 
           # query user for input
-          adjusted = self.config.samples.manual()
+          manual = self.config.samples.manual()
 
-          # always report manual adjustments
-          if adjusted:
+          # always report manual sample specification or adjustment
+          if manual:
             self.config.samples.available = 1
             self.config.samples.report   ()
             self.config.samples.validate ()
 
-          # proceed if no adjustments were requested
-          if not adjusted:
+          # proceed if no specification or adjustment were requested
+          if not manual:
             break
 
         # for non-interactive sessions, proceed immediately

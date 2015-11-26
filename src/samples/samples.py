@@ -143,6 +143,7 @@ class Samples (object):
             parsed = 1
           for level in self.levels:
             self.counts.additional [level] = int (samples [level])
+          self.available = 1
         else:
           parsed = 1
 
