@@ -42,7 +42,7 @@ class Errors (object):
       return
     
     # compute relative sampling errors (if only one sample is loaded, use indicator value)
-    self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.max ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
+    self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
     
     # compute the cumulative relative sampling error
     self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
