@@ -35,6 +35,7 @@ def parse ():
   parser.add_argument ('-o', '--override',      action = "count", default = 0,  help = 'override configurations')
   parser.add_argument ('-n', '--noinit',        action = "count", default = 0,  help = 'do not execute solver init scripts')
   parser.add_argument ('-b', '--batch',         action = "store", default = 1,  help = 'group small jobs of the same level and type into a single batch job', type=int)
+  parser.add_argument ('-t', '--tolerate',      action = "count", default = 0,  help = 'tolerate faults and continue using loaded samples only, discarding failed samples')
 
   global params
   params = parser.parse_args()

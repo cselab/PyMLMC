@@ -24,7 +24,6 @@ class Estimated_Budget (Samples):
     # save configuration
     vars (self) .update ( locals() )
     self.counts_updated = []
-    self.use_loaded     = False
   
   def init (self):
 
@@ -49,7 +48,7 @@ class Estimated_Budget (Samples):
   def update (self, errors, indicators):
 
     # use loaded number of samples or computed number of samples, as specified
-    if self.use_loaded:
+    if self.tolerate:
       counts_available = self.counts.loaded
     else:
       counts_available = self.counts.computed
@@ -86,7 +85,7 @@ class Estimated_Budget (Samples):
     print ' :: BUDGET:'
 
     # use loaded number of samples or computed number of samples, as specified
-    if self.use_loaded:
+    if self.tolerate:
       counts_available = self.counts.loaded
     else:
       counts_available = self.counts.computed

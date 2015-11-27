@@ -70,7 +70,7 @@ class Samples (object):
   available    = 0
   history      = None
   
-  def setup (self, levels, works):
+  def setup (self, levels, works, tolerate):
     
     # store configuration
     vars (self) .update ( locals() )
@@ -90,6 +90,8 @@ class Samples (object):
 
     self.indices.loaded = [ None for level in self.levels ]
     self.indices.failed = [ None for level in self.levels ]
+
+    self.tolerate       = 0
   
   def validate (self):
     

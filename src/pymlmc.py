@@ -51,7 +51,7 @@ class MLMC (object):
     self.config.scheduler.setup (self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
 
     # setup samples
-    self.config.samples.setup ( self.config.levels, self.config.works )
+    self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate )
 
     # indicators
     self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick )

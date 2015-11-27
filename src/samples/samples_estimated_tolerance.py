@@ -24,7 +24,6 @@ class Estimated_Tolerance (Samples):
     # save configuration
     vars (self) .update ( locals() )
     self.counts_updated = None
-    self.use_loaded     = False
   
   def init (self):
     
@@ -65,7 +64,7 @@ class Estimated_Tolerance (Samples):
       self.required_error = self.tol * errors.normalization
 
     # use loaded number of samples or computed number of samples, as specified
-    if self.use_loaded:
+    if self.tolerate:
       counts_available = self.counts.loaded
     else:
       counts_available = self.counts.computed
