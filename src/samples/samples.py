@@ -42,14 +42,14 @@ class Counts (object):
 
     print '  : Computed  :',
     for level in self.levels:
-      print helpers.intf (self.counts.available() [level], table=1),
+      print helpers.intf (self.available() [level], table=1),
     print
 
     if self.additional != []:
 
       print '  : Required  :',
       for level in self.levels:
-        print helpers.intf (self.counts.available() [level] + self.additional [level], table=1),
+        print helpers.intf (self.available() [level] + self.additional [level], table=1),
       print
 
       print '  : Pending   :',
