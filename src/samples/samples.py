@@ -22,9 +22,17 @@ class Counts (object):
   loaded     = []
   failed     = []
 
-  def __init__ (self, levels):
+  def __init__ (self, levels, tolerate):
 
-    self.levels = levels
+    self.levels   = levels
+    self.tolerate = tolerate
+
+  def available (self):
+
+    if self.tolerate:
+      return self.counts.loaded
+    else:
+      return self.counts.computed
 
   def report (self):
 
@@ -32,22 +40,16 @@ class Counts (object):
     print '  :   LEVEL   : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :-------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
 
-    # use loaded number of samples or computed number of samples, as specified
-    if self.tolerate:
-      counts_available = self.counts.loaded
-    else:
-      counts_available = self.counts.computed
-
     print '  : Computed  :',
     for level in self.levels:
-      print helpers.intf (counts_available [level], table=1),
+      print helpers.intf (self.counts.available() [level], table=1),
     print
 
     if self.additional != []:
 
       print '  : Required  :',
       for level in self.levels:
-        print helpers.intf (counts_available [level] + self.additional [level], table=1),
+        print helpers.intf (self.counts.available() [level] + self.additional [level], table=1),
       print
 
       print '  : Pending   :',
@@ -84,7 +86,7 @@ class Samples (object):
     # 'sample' is treated as a _pair_ of fine and coarse samples
     self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
 
-    self.counts  = Counts (levels)
+    self.counts  = Counts (levels, tolerate)
     self.indices = Indices ()
     
     self.L       = len(levels) - 1

@@ -47,28 +47,22 @@ class Estimated_Budget (Samples):
 
   def update (self, errors, indicators):
 
-    # use loaded number of samples or computed number of samples, as specified
-    if self.tolerate:
-      counts_available = self.counts.loaded
-    else:
-      counts_available = self.counts.computed
-
     # compute optimal number of samples
     # assuming that no samples were computed so far
     self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.budget, indicators )
     
     # compute optimal number of samples
     # assuming that self.counts.computed samples are already computed on each level
-    self.counts_updated = self.optimal ( counts_available, self.budget, indicators)
+    self.counts_updated = self.optimal ( self.counts.available(), self.budget, indicators)
     
     # compute additional number of samples from counts_updated
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
     for level in self.levels:
-      if self.counts_updated [level] > counts_available [level]:
-        self.counts.additional [level] = counts_available [level] - self.counts.loaded [level]
+      if self.counts_updated [level] > self.counts.available() [level]:
+        self.counts.additional [level] = self.counts.available() [level] - self.counts.loaded [level]
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (counts_available + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
@@ -84,13 +78,7 @@ class Estimated_Budget (Samples):
     print
     print ' :: BUDGET:'
 
-    # use loaded number of samples or computed number of samples, as specified
-    if self.tolerate:
-      counts_available = self.counts.loaded
-    else:
-      counts_available = self.counts.computed
-
-    budget_used = sum ( [ self.works [level] * counts_available [level] for level in self.levels ] )
+    budget_used = sum ( [ self.works [level] * self.counts.available() [level] for level in self.levels ] )
     budget_left = self.budget - budget_used
     if self.counts.additional != []:
       budget_reqd = sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] )
