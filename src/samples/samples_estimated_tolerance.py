@@ -24,6 +24,7 @@ class Estimated_Tolerance (Samples):
     # save configuration
     vars (self) .update ( locals() )
     self.counts_updated = None
+    self.use_loaded     = False
   
   def init (self):
     
@@ -62,38 +63,44 @@ class Estimated_Tolerance (Samples):
       self.required_error = self.tol * errors.normalization * max (0.5, 1.0 - self.aggression)
     else:
       self.required_error = self.tol * errors.normalization
-    
+
+    # use loaded number of samples or computed number of samples, as specified
+    if self.use_loaded:
+      counts_available = self.counts.loaded
+    else:
+      counts_available = self.counts.computed
+
     # compute optimal number of samples
     # assuming that no samples were computed so far
     self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error, indicators )
     
     # compute optimal number of samples
     # assuming that self.counts.loaded samples are already computed on each level
-    self.counts_updated = self.optimal ( self.counts.loaded, self.required_error, indicators)
+    self.counts_updated = self.optimal ( counts_available, self.required_error, indicators)
     
     # compute additional number of samples from counts_updated
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
     for level in self.levels:
-     if self.counts_updated [level] > self.counts.loaded [level]:
+     if self.counts_updated [level] > counts_available [level]:
        
        # assign all required additional number of samples
        if self.aggressive:
-         self.counts.additional [level] = self.counts_updated [level] - self.counts.loaded [level]
+         self.counts.additional [level] = self.counts_updated [level] - counts_available [level]
        
        # compute required additional number of samples according to (min_)evaluation_fraction
        else:
-         self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.loaded [level] ) )
+         self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - counts_available [level] ) )
          if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
-           self.counts.additional [level] = self.counts_updated [level] - self.counts.loaded [level]
+           self.counts.additional [level] = self.counts_updated [level] - counts_available [level]
     
     # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
     # this prevents assigning wrong number of samples based on _extrapolated_ indicators
     for level in self.levels:
-      if self.counts.loaded [level] == 1 and self.counts.additional [level] > 1:
+      if counts_available [level] == 1 and self.counts.additional [level] > 1:
         self.counts.additional [level] = 1;
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.loaded + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (counts_available + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
