@@ -30,9 +30,9 @@ class Counts (object):
   def available (self):
 
     if self.tolerate:
-      return self.counts.loaded
+      return self.loaded
     else:
-      return self.counts.computed
+      return self.computed
 
   def report (self):
 
