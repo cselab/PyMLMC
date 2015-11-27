@@ -32,16 +32,22 @@ class Counts (object):
     print '  :   LEVEL   : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :-------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
 
+    # use loaded number of samples or computed number of samples, as specified
+    if self.tolerate:
+      counts_available = self.counts.loaded
+    else:
+      counts_available = self.counts.computed
+
     print '  : Computed  :',
     for level in self.levels:
-      print helpers.intf (self.computed [level], table=1),
+      print helpers.intf (counts_available [level], table=1),
     print
 
     if self.additional != []:
 
       print '  : Required  :',
       for level in self.levels:
-        print helpers.intf (self.computed [level] + self.additional [level], table=1),
+        print helpers.intf (counts_available [level] + self.additional [level], table=1),
       print
 
       print '  : Pending   :',
