@@ -68,7 +68,7 @@ class Estimated_Tolerance (Samples):
     self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error, indicators )
     
     # compute optimal number of samples
-    # assuming that self.counts.loaded samples are already computed on each level
+    # assuming that self.counts.available() samples are already available on each level
     self.counts_updated = self.optimal ( self.counts.available(), self.required_error, indicators)
     
     # compute additional number of samples from counts_updated
@@ -84,7 +84,7 @@ class Estimated_Tolerance (Samples):
        else:
          self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (self.counts_updated [level] - self.counts.available() [level] ) )
          if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
-           self.counts.additional [level] = self.counts_updated [level] - counts_available [level]
+           self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
     
     # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
     # this prevents assigning wrong number of samples based on _extrapolated_ indicators

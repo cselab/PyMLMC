@@ -52,14 +52,14 @@ class Estimated_Budget (Samples):
     self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.budget, indicators )
     
     # compute optimal number of samples
-    # assuming that self.counts.computed samples are already computed on each level
+    # assuming that self.counts.available() samples are already available on each level
     self.counts_updated = self.optimal ( self.counts.available(), self.budget, indicators)
     
     # compute additional number of samples from counts_updated
     self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
     for level in self.levels:
       if self.counts_updated [level] > self.counts.available() [level]:
-        self.counts.additional [level] = self.counts.available() [level] - self.counts.loaded [level]
+        self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
     
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
