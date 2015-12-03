@@ -382,12 +382,13 @@ class MLMC (object):
         if pending == 0:
 
           runtime = mc.timer (self.config.scheduler.batch)
-          if runtime != None:
-            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+          if runtime ['max'] != None:
+            runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
             walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
             if walltime != 'unknown':
-              percent = round ( 100 * (runtime / 3600) / walltime )
-              print format % ('Completed in ' + runtimestr + (' [%2d%%]' % percent) )
+              walltimestr = time.strftime ( '%H:%M:%S', time.gmtime (walltime * 3600) )
+              percent = round ( 100 * (runtime ['max'] / 3600) / walltime )
+              print format % ('Completed in ' + runtimestr + (' [%2d%% of %s]' % (percent, walltimestr)) )
             else:
               print format % ('Completed in ' + runtimestr)
           else:
@@ -404,9 +405,9 @@ class MLMC (object):
     else:
 
       print ' :: STATUS of MC simulations:'
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |   RUNTIME  |  BUDGET  |  USAGE  |  PENDING  |'
-      print '  :-------------------------------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |    %s   |  %s  |   %s  |  %s  |   %s   |'
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET     |'
+      print '  :-------------------------------------------------------------------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |   %s - %s  |'
 
       # for all MC simulations
       for mc in self.mcs:
@@ -417,7 +418,7 @@ class MLMC (object):
         # check how many samples are still pending
         pending = mc.pending()
 
-        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1) )
+        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1), intf (pending, table=1, empty=1) )
 
         # we are not finished if at least one simulation is pending
         if pending > 0:
@@ -427,30 +428,32 @@ class MLMC (object):
         if finished > 0:
 
           runtime = mc.timer (self.config.scheduler.batch, self.config.scheduler.merge)
-          if runtime != None:
-            runtimestr      = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
+          if runtime ['min'] != None and runtime ['max'] != None:
+            minruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['min']) )
+            maxruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
             walltime        = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
             parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
             if walltime != 'unknown':
-              #budget = mc.parallelization.batchmax * float (self.config.works [mc.config.level]) / parallelization
-              budget = float (self.config.works [mc.config.level]) / parallelization
-              budget_percent   = round ( 100 * (runtime / 3600) / budget )
-              walltime_percent = round ( 100 * (runtime / 3600) / walltime )
-              args += ( runtimestr, '%4d%%' % budget_percent, '%4d%%' % walltime_percent )
+              walltimestr = time.strftime ( '%H:%M:%S', time.gmtime (walltime * 3600) )
+              budget = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
+              if self.config.scheduler.batch [mc.config.level] [mc.config.type]:
+                budget *= self.config.scheduler.batch [mc.config.level] [mc.config.type]
+              budget_percent_min   = round ( 100 * (runtime ['min'] / 3600) / budget )
+              budget_percent_max   = round ( 100 * (runtime ['max'] / 3600) / budget )
+              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / walltime )
+              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / walltime )
+              args += ( walltimestr, minruntimestr, maxruntimestr, '%3d%%' % walltime_percent_min, '%3d%%' % walltime_percent_max, '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
             else:
-              args += ( runtimestr, '     ', '     ' )
+              args += ( '   N/A  ', minruntimestr, maxruntimestr, '    ', '    ', '    ', '    ' )
           else:
-            args += ( '   N/A  ', '     ', '     ' )
-
-          # report if some simulations are pending
-          args += ( intf (pending, table=1, empty=1), )
+            args += ( '   N/A  ', '   N/A  ', '   N/A  ', '    ', '    ', '    ', '    ' )
 
           print format % args
 
         # report that all simulations are pending
         else:
 
-          print format % ( args + ( '        ', '     ', '     ', intf (pending, table=1), ) )
+          print format % ( args + ( '        ', '        ', '        ', '    ', '    ', '    ', '    ', ) )
 
     if not self.finished:
       # issue a warning and query for progress

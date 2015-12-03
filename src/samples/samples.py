@@ -12,6 +12,7 @@ import helpers
 
 import os
 import numpy
+import copy
 
 class Counts (object):
 
@@ -84,6 +85,7 @@ class Samples (object):
     vars (self) .update ( locals() )
     
     # 'sample' is treated as a _pair_ of fine and coarse samples
+    self.works = copy.deepcopy (works)
     self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
 
     self.counts  = Counts (levels, tolerate)

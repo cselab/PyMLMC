@@ -93,14 +93,11 @@ class MC (object):
     
     config = self.config
     
-    # if the simulation is not supposed to proceed further,
     # check if nothing is overwritten
+    # unless the simulation is specified to proceed further or override is allowed
     if not self.params.proceed and not self.params.override:
       for sample in config.samples:
         config.solver.check ( config.level, config.type, sample )
-    
-    # adjust parallelization according to the number of samples
-    self.parallelization.adjust ( len (config.samples) )
     
     # get information of the MC run and the prescribed parallelization
     info_mc = self.info()
@@ -150,9 +147,9 @@ class MC (object):
     config = self.config
     runtimes = [ config.solver.timer ( config.level, config.type, sample, batch, merge ) for sample in config.samples ]
     if len (runtimes) > 1:
-      return max ( runtimes )
+      return { 'min' : min (runtimes), 'max' : max ( runtimes ) }
     else:
-      return None
+      return None, None
 
   # load the results
   def load (self):
@@ -160,7 +157,7 @@ class MC (object):
     config = self.config
 
     for i, sample in enumerate (config.samples):
-      if self.params.verbose >= 1:
+      if self.params.verbose >= 2:
         self.results [i] = config.solver.load ( config.level, config.type, sample )
       else:
         try:
@@ -177,9 +174,14 @@ class MC (object):
   # assmble MC estimates
   def assemble (self, stats, indices):
 
+    if self.params.verbose:
+      print '  : -> level %d, type %d' % (self.config.level, self.config.type)
+
     # assemble MC estimates from all available samples
     self.stats_all = {}
     for stat in stats:
+      if self.params.verbose:
+        print '  : stat (all samples): %s' % stat.name
       if self.available:
         self.stats_all [ stat.name ] = stat.compute_all ( self.results )
       else:
@@ -188,6 +190,8 @@ class MC (object):
     # assemble MC estimates using only specified subset of all samples
     self.stats = {}
     for stat in stats:
+      if self.params.verbose:
+        print '  : stat (specified subset): %s' % stat.name
       if self.available:
         results = [ result for sample, result in enumerate (self.results) if sample in indices ]
         self.stats [ stat.name ] = stat.compute_all ( self.results )

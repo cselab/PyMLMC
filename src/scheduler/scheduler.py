@@ -8,96 +8,12 @@
 # sukys.jonas@gmail.com                           #
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-import helpers
-from math import modf, ceil
-import local
-
-import sys
-
-class Parallelization (object):
-  
-  def __init__ (self, cores, walltime, sharedmem, batch, batchmax=None, mergemax=None, email=''):
-    
-    # save configuration
-    vars (self) .update ( locals() )
-    self.batchsize = None
-    
-    # convert walltime to hours and minutes
-    self.set_walltime (walltime)
-    
-    # memory usage is per core
-    self.memory  = local.memory
-    
-    # compute nodes
-    self.nodes = max ( 1, self.cores / local.cores )
-    
-    # if shared memory is available, use one rank per node
-    if sharedmem:
-      self.ranks    = self.nodes
-      self.threads  = local.threads * min ( local.cores, cores )
-    
-    # otherwise, use 'local.threads' ranks per core
-    else:
-      self.ranks   = self.cores * local.threads
-      self.threads = 1
-    
-    # set number of cores per cpu
-    self.cpucores = local.cores
-    
-    # compute tasks = ranks_per_node
-    self.tasks = self.ranks / self.nodes
-  
-  # convert walltime to hours and minutes
-  def set_walltime (self, walltime):
-    
-    if walltime == None and local.walltime != None:
-      walltime = local.walltime
-    
-    self.walltime = walltime
-    
-    if walltime:
-      frac, whole  = modf ( walltime )
-      self.hours   = int  ( whole )
-      self.minutes = int  ( ceil ( 60 * frac ) )
-    else:
-      self.hours   = None
-      self.minutes = None
-
-  # adjust 'batchsize' and 'walltime' based on 'count' and 'batchmax'
-  def adjust (self, count):
-    
-    # only for batch mode
-    if not self.batch:
-      return
-    
-    # check if we are not adjusting twice
-    if self.batchsize != None:
-      helpers.error ('Parallelization.adjust() can be called only once!')
-    
-    # determine 'batchsize': required size of one part of the batch job
-    if self.batchmax != None:
-      self.batchsize = self.batchmax
-    else:
-      self.batchsize = count
-    
-    # adjust 'walltime' according to 'batchsize'
-    if self.walltime != None:
-      self.set_walltime ( self.walltime * self.batchsize )
-
-  # distribute ranks for ndims dimensions
-  def reshape (self, ndims):
-    counts = [1 for dim in range(ndims)]
-    dim = 0
-    from operator import mul
-    while reduce (mul, counts, 1) != self.ranks:
-      counts [ dim % ndims ] *= 2
-      dim += 1
-    return counts
+from parallelization import *
 
 class Scheduler (object):
-  
+
   def setup (self, levels, levels_types, works, ratios, sharedmem):
-    
+
     vars (self) .update ( locals() )
     
     self.L = len(levels) - 1
@@ -126,7 +42,7 @@ class Scheduler (object):
       self.walltime = local.walltime
 
     # dimensionalize work to CPU hours
-    self.works = [ work * self.walltime * self.cores / float(works [self.L]) for work in works ]
+    self.works = [ work * self.walltime * self.cores / float (works [self.L]) for work in works ]
 
   def report (self):
     
@@ -135,7 +51,8 @@ class Scheduler (object):
     print '  : SPECIFICATIONS:'
     print '    Cores per node: %d' % local.cores
     print '    Threads per core: %d' % local.threads
-    if local.memory:    print '    Memory (MB) per core: %d' % local.memory
+    if local.memory:
+      print '    Memory (MB) per core: %d' % local.memory
     print '  : CONSTRAINTS:'
     if local.min_cores:    print '    Min cores: %d' % local.min_cores
     if local.max_cores:    print '    Max cores: %d' % local.max_cores
@@ -143,4 +60,3 @@ class Scheduler (object):
     if local.max_cores:    print '    Max nodes: %d' % (local.max_cores / local.cores)
     if local.min_walltime: print '    Min walltime (h): %s' % str(local.min_walltime ('default'))
     if local.max_walltime: print '    Max walltime (h): %s' % str(local.max_walltime ('default'))
-

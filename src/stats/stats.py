@@ -9,6 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import copy
+import numpy
 
 class Stat (object):
   
@@ -24,7 +25,7 @@ class Stat (object):
     # compute sample statistics
     for key in stats.data.keys():
       for step in xrange ( len ( stats.data [key] ) ):
-        series = [ sample.data [key] [step] for sample in samples if sample != None ]
+        series = numpy.array ( [ sample.data [key] [step] for sample in samples if sample != None ] )
         stats.data [key] [step] = self.compute (series)
     
     return stats

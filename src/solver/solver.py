@@ -194,7 +194,7 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', merge=None, timer=1):
+  def submit (self, job, parallelization, label, directory='.', timer=1):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
@@ -212,25 +212,11 @@ class Solver (object):
       self.chmodx (jobfile)
     
     # assemble arguments for job submission
-    args              = {}
+    args              = parallelization.args()
     args ['job']      = job
     args ['jobfile']  = self.jobfile % label
-    args ['ranks']    = parallelization.ranks
-    args ['threads']  = parallelization.threads
-    args ['cores']    = parallelization.cores
-    args ['nodes']    = parallelization.nodes
-    args ['tasks']    = parallelization.tasks
-    args ['hours']    = parallelization.hours
-    args ['minutes']  = parallelization.minutes
-    args ['memory']   = parallelization.memory
-    args ['cpucores'] = parallelization.cpucores
     args ['label']    = label
-    args ['email']    = parallelization.email
     args ['xopts']    = self.params.xopts
-    
-    # take bootup time into account
-    if args ['hours'] == 0 and args ['minutes'] < 2 * local.bootup:
-      args ['minutes'] += local.bootup
 
     # assemble submission script (if enabled)
     if local.script:
@@ -246,13 +232,9 @@ class Solver (object):
         print args ['script']
         print '==='
 
-    # take ensemble size into account, if specified
-    if merge:
-      if merge <= parallelization.mergemax:
-        args ['cores'] *= merge
-        args ['nodes'] *= merge
-      else:
-        helpers.error ('\'merge\' exceeds \'parallelization.mergemax\' in \'solver.submit()\'', details = '%d > %d' % (merge, parallelization.mergemax))
+    # adjust parallelization to take into account 'batch' and 'merge' modes
+    # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
+    args.update ( parallelization.adjust().args() )
 
     # assemble submission command
     submit = local.submit % args
@@ -268,7 +250,7 @@ class Solver (object):
   
   # launch a job from the specified 'args' and 'parallelization'
   # depending on parameters, job will be run immediately or will be submitted to a queueing system
-  # for parallelization.batch = 1, all jobs (for specified level and type) are combined into a single script
+  # for parallelization.batch = 1, all jobs (for specified level and type) are combined into several batch scripts
   def launch (self, args, parallelization, level, type, sample):
     
     # assemble job
@@ -377,7 +359,10 @@ class Solver (object):
       directory = self.directory (level, type)
       
       # split batch jobs into parts
-      parts = [ self.batch [i:i+parallelization.batchsize] for i in range (0, len(self.batch), parallelization.batchsize) ]
+      if parallelization.batchmax:
+        parts = [ self.batch [i:i+parallelization.batchmax] for i in range (0, len (self.batch), parallelization.batchmax) ]
+      else:
+        parts = [ self.batch [:] ]
 
       # if merging into ensembles is disabled
       if not local.ensembles:
@@ -387,7 +372,10 @@ class Solver (object):
 
           # construct batch job
           batch = ''.join (part)
-        
+
+          # set batch in parallelization
+          parallelization.batch = len (part)
+
           # set label
           label = self.label (level, type, suffix='_b%d' % (i+1))
 
@@ -405,7 +393,7 @@ class Solver (object):
         # respect parallelization.mergemax
         filtered = []
         for i, size in enumerate (decomposition):
-          if size <= parallelization.mergemax:
+          if parallelization.mergemax == None or size <= parallelization.mergemax:
             filtered += [size]
           else:
             chunks = 2 ** int ( math.ceil ( math.log ( float(size) / parallelization.mergemax, 2) ) )
@@ -445,16 +433,21 @@ class Solver (object):
             # add batch job to the ensemble
             ensemble += batch
 
+          # set batch and merge in parallelization
+          parallelization.batch = len (part)
+          parallelization.merge = size
+
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, size, timer=0), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, timer=0), directory )
 
           # update 'submitted' counter
           submitted += size
 
         # return information about ensembles
         from helpers import intf
+        # TODO: this is not very clean: 'parallelization.nodes * size'
         info = [ '%s (%s N)' % ( intf (size), intf (parallelization.nodes * size) ) for size in decomposition ]
-        return ' + '.join(info)
+        return ' + '.join (info)
 
   # check if the job is finished
   # (required only for non-interactive sessions)

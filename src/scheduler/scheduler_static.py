@@ -51,25 +51,11 @@ class Static (Scheduler):
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
 
-      '''
-      # merge layers which are processed in batch, if ensembles are supported
+      # merge layers which are processed in batch to ensembles, if ensembles are supported
       if local.ensembles:
         self.merge [level] [type] = self.batch [level] [type]
       else:
         self.merge [level] [type] = 0
-      '''
-      
-      # set maximal batch size such that the required walltime does not exceed specified walltime
-      if local.max_walltime (cores) != None:
-        batchmax = int ( floor ( min ( local.max_walltime (cores), self.walltime ) / float(walltime) ) )
-      else:
-        batchmax = None
-
-      # set maximal merge size such that the maximum number of cores is not exceeded
-      if local.max_cores != None:
-        mergemax = int ( floor ( local.max_cores / float(cores) ) )
-      else:
-        mergemax = None
 
       # construct parallelization according to all computed parameters
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], batchmax, mergemax, self.email )
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], self.merge [level] [type], self.email )

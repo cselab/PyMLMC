@@ -41,7 +41,14 @@ class Status (object):
       #if not config.deterministic:
       #  f.write ( 'tol      = ' + str (config.samples.tol) + '\n' )
 
-      f.write ( 'batch = %s' % str (config.scheduler.batch)  + '\n' )
+      batch = helpers.level_type_list (config.levels)
+      for level, type in config.levels_types:
+        if config.scheduler.parallelizations [level] [type] .batch:
+          batch [level] [type] = config.scheduler.parallelizations [level] [type] .batchmax
+        else:
+          batch [level] [type] = None
+      f.write ( 'batch = %s' % batch + '\n' )
+
       f.write ( 'merge = %s' % str (config.scheduler.merge)  + '\n' )
 
       if 'cluster' in self.list:
@@ -49,24 +56,18 @@ class Status (object):
       else:
         f.write ( 'cluster = \'%s\'' % local.name  + '\n' )
 
-      try:
-        cores = helpers.level_type_list (config.levels)
-        for level, type in config.levels_types:
-          cores [level] [type] = config.scheduler.parallelizations [level] [type] .cores
-        f.write ( 'parallelization = %s' % cores + '\n' )
-      except:
-        f.write ( 'parallelization = %s' % self.list ['parallelization'] + '\n' )
-      
+      cores = helpers.level_type_list (config.levels)
+      for level, type in config.levels_types:
+        cores [level] [type] = config.scheduler.parallelizations [level] [type] .cores
+      f.write ( 'parallelization = %s' % cores + '\n' )
+
       f.write ( 'works = %s' % str(config.works) + '\n' )
 
-      try:
-        walltimes = helpers.level_type_list (config.levels)
-        for level, type in config.levels_types:
-          walltimes [level] [type] = config.scheduler.parallelizations [level] [type] .walltime
-        f.write ( 'walltimes = %s' % walltimes + '\n' )
-      except:
-        f.write ( 'walltimes = %s' % self.list ['walltimes'] + '\n' )
-    
+      walltimes = helpers.level_type_list (config.levels)
+      for level, type in config.levels_types:
+        walltimes [level] [type] = config.scheduler.parallelizations [level] [type] .walltime
+      f.write ( 'walltimes = %s' % walltimes + '\n' )
+
     print
     print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, self.status_file))
   
@@ -97,6 +98,7 @@ class Status (object):
         print ('  : -> Tolerance from the status file will be used.')
       config.samples.tol = self.list ['tol']
     '''
+
     config.scheduler.batch = self.list ['batch']
     config.scheduler.merge = self.list ['merge']
       
