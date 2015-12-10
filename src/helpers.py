@@ -210,7 +210,7 @@ class Progress (object):
       return
     self.percent = percent
     text  = '\r' + self.prefix
-    text += '[' + '█' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
+    text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
     text += ' ' + str (percent) + '%'
     self.stdout.write (text)
     self.stdout.flush ()

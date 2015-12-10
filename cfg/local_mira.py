@@ -130,15 +130,18 @@ BLOCKS=($(for i in ${BLOCKS[@]} ; do echo ${#i}$'\t'${i}; done | sort -n -r | cu
 
 # print info about blocks
 echo
-echo 'Obtained blocks:'
+echo 'Obtained blocks (sorted by name length):'
 for BLOCK in ${BLOCKS[@]}
 do
   echo $BLOCK
 done
 echo
 
+# boot blocks (3 attempts are recommended)
 for BLOCK in ${BLOCKS[@]}
 do
+  boot-block --block $BLOCK &
+  boot-block --block $BLOCK &
   boot-block --block $BLOCK &
 done
 wait
@@ -147,6 +150,7 @@ wait
 
 wait
 
+# free blocks
 for BLOCK in ${BLOCKS[@]}
 do
   boot-block --block $BLOCK --free &
