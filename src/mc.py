@@ -198,6 +198,6 @@ class MC (object):
         print '       %s' % stat.name
       if self.available:
         results = [ result for sample, result in enumerate (self.results) if sample in indices ]
-        self.stats [ stat.name ] = stat.compute_all ( self.results )
+        self.stats [ stat.name ] = stat.compute_all ( results )
       else:
         self.stats [ stat.name ] = None
