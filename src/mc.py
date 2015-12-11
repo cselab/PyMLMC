@@ -186,11 +186,11 @@ class MC (object):
       if self.params.verbose:
         print '       %s' % stat.name
       if self.available:
-        self.stats_all [ stat.name ] = stat.compute_all ( self.results, filter=True )
+        self.stats_all [ stat.name ] = stat.compute_all ( self.results, check=1 )
       else:
         self.stats_all [ stat.name ] = None
     '''
-
+    
     # assemble MC estimates using only specified subset of all samples
     if self.params.verbose:
       print '    -> specified subset:'
@@ -199,7 +199,6 @@ class MC (object):
       if self.params.verbose:
         print '       %s' % stat.name
       if self.available:
-        results = [ result for sample, result in enumerate (self.results) if sample in indices ]
-        self.stats [ stat.name ] = stat.compute_all ( results )
+        self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
       else:
         self.stats [ stat.name ] = None

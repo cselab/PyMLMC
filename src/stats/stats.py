@@ -14,7 +14,7 @@ import numpy
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
-  def compute_all (self, samples, filter=False):
+  def compute_all (self, samples, indices=None, check=0):
     
     # copy data class from the first valid sample
     for sample in samples:
@@ -25,10 +25,25 @@ class Stat (object):
     # compute sample statistics
     for key in stats.data.keys():
       for step in xrange ( len ( stats.data [key] ) ):
-        if filter:
-          series = [ sample.data [key] [step] for sample in samples if sample != None ]
+
+        # check for unavailable samples
+        if check:
+
+          # if spedific indices are required, take this into account
+          if indices != None:
+            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if sample != None and index in indices ]
+          else:
+            series = [ sample.data [key] [step] for sample in samples if sample != None ]
+
+        # assume all samples are available
         else:
-          series = [ sample.data [key] [step] for sample in samples ]
+
+          # if spedific indices are required, take this into account
+          if indices != None:
+            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices ]
+          else:
+            series = [ sample.data [key] [step] for sample in samples ]
+
         stats.data [key] [step] = self.compute (series)
     
     return stats
