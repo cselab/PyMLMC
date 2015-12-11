@@ -177,6 +177,7 @@ class MC (object):
     if self.params.verbose:
       print '  : -> level %d, type %d' % (self.config.level, self.config.type)
 
+    '''
     # assemble MC estimates from all available samples
     if self.params.verbose:
       print '    -> all samples:'
@@ -185,9 +186,10 @@ class MC (object):
       if self.params.verbose:
         print '       %s' % stat.name
       if self.available:
-        self.stats_all [ stat.name ] = stat.compute_all ( self.results )
+        self.stats_all [ stat.name ] = stat.compute_all ( self.results, filter=True )
       else:
         self.stats_all [ stat.name ] = None
+    '''
 
     # assemble MC estimates using only specified subset of all samples
     if self.params.verbose:
