@@ -183,8 +183,6 @@ class MC (object):
       print '    -> all samples:'
     self.stats_all = {}
     for stat in stats:
-      if self.params.verbose:
-        print '       %s' % stat.name
       if self.available:
         self.stats_all [ stat.name ] = stat.compute_all ( self.results, check=1 )
       else:
