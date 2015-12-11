@@ -223,6 +223,9 @@ class Progress (object):
     self.stdout.write('\r')
     self.stdout.flush()
 
+  def finalize (self):
+    print
+
 # info
 def info (message, details=None, advice=None):
   print

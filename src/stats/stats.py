@@ -55,7 +55,7 @@ class Stat (object):
       # update progress
       progress.update (i + 1)
 
-    # reset progress indicator
-    progress.reset()
+    # finalize progress indicator
+    progress.finalize()
 
     return stats
