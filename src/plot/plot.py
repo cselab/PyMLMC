@@ -616,7 +616,8 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates of \'%s\'...' % qoi,
+  self.stdout.flush()
 
   levels = len (mlmc.config.levels)
 
@@ -650,7 +651,8 @@ def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yo
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates (both types) of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates (both types) of \'%s\'...' % qoi,
+  self.stdout.flush()
   
   levels = len (mlmc.config.levels)
   
@@ -702,7 +704,8 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting differences of MC estimates of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
+  self.stdout.flush()
 
   if not frame:
     figure (infolines, subplots=mlmc.config.L)
@@ -757,7 +760,8 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates AND differences of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates AND differences of \'%s\'...' % qoi,
+  self.stdout.flush()
 
   levels = len (mlmc.config.levels)
 
@@ -829,7 +833,8 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorig
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MLMC estimates of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
+  self.stdout.flush()
   
   if not mlmc.available:
     print ' NOT available.'
@@ -861,7 +866,8 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting sample of \'%20s\' for level %d and type %d...' % (qoi, level, type),
+  print ' :: INFO: Plotting sample of \'%s\' for level %d and type %d...' % (qoi, level, type),
+  self.stdout.flush()
 
   if trendline == None:
     if '_pos' in qoi:
@@ -966,7 +972,8 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensemble of \'%20s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
+  print ' :: INFO: Plotting ensemble of \'%s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
+  self.stdout.flush()
 
   xend = float('nan')
 
@@ -1018,6 +1025,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
   if not qoi: qoi = mlmc.config.solver.qoi
 
   print ' :: INFO: Plotting ensembles of \'%20s\' for all levels (limit set to %d)...' % (qoi, limit),
+  self.stdout.flush()
 
   levels = len (mlmc.config.levels)
 
@@ -1076,6 +1084,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
   if not qoi: qoi = solver.qoi
 
   print ' :: INFO: Plotting diagram of \'%20s\'...' % qoi,
+  self.stdout.flush()
   
   vs = []
   for outputfilename in outputfilenames:
@@ -1124,6 +1133,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
 def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, fill=1, save=None):
 
   print ' :: INFO: Plotting samples...',
+  self.stdout.flush()
 
   # === load all required data
 
@@ -1176,6 +1186,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
 def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False, total=1, fill=1, normalization=1e6, unit='million', save=None):
 
   print ' :: INFO: Plotting budget...',
+  self.stdout.flush()
 
   # === load all required data
 
@@ -1231,6 +1242,7 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
 def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
   
   print ' :: INFO: Plotting indicators...',
+  self.stdout.flush()
   
   # === load all required data
   
@@ -1293,6 +1305,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
 def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
   
   print ' :: INFO: Plotting errors...',
+  self.stdout.flush()
 
   if not mlmc.errors.available:
     print ' NOT available.'
