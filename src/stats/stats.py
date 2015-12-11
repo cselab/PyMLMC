@@ -10,6 +10,7 @@
 
 import copy
 import numpy
+from helpers import Progress
 
 class Stat (object):
   
@@ -21,9 +22,13 @@ class Stat (object):
       if sample != None:
         stats = copy.deepcopy (sample)
         break
-    
+
+    # use progress indicator, report current statistic each time
+    prefix = '       %s: ' % stat.name
+    progress = Progress (prefix=prefix, steps=len(stats.data.keys()), length=20)
+
     # compute sample statistics
-    for key in stats.data.keys():
+    for i, key in enumerate (stats.data.keys()):
       for step in xrange ( len ( stats.data [key] ) ):
 
         # check for unavailable samples
@@ -44,6 +49,13 @@ class Stat (object):
           else:
             series = [ sample.data [key] [step] for sample in samples ]
 
+        # compute statistic
         stats.data [key] [step] = self.compute (series)
+
+      # update progress
+      progress.update (i + 1)
     
+    # reset progress indicator
+    progress.reset()
+
     return stats

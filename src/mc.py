@@ -196,8 +196,6 @@ class MC (object):
       print '    -> specified subset:'
     self.stats = {}
     for stat in stats:
-      if self.params.verbose:
-        print '       %s' % stat.name
       if self.available:
         self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
       else:

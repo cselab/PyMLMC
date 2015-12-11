@@ -861,7 +861,7 @@ def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, exten
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting sample of \'%s\' for level %d and type %d...' % (qoi, level, type),
+  print ' :: INFO: Plotting sample of \'%20s\' for level %d and type %d...' % (qoi, level, type),
 
   if trendline == None:
     if '_pos' in qoi:
@@ -966,7 +966,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensemble of \'%s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
+  print ' :: INFO: Plotting ensemble of \'%20s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
 
   xend = float('nan')
 
@@ -1017,7 +1017,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensembles of \'%s\' for all levels (limit set to %d)...' % (qoi, limit),
+  print ' :: INFO: Plotting ensembles of \'%20s\' for all levels (limit set to %d)...' % (qoi, limit),
 
   levels = len (mlmc.config.levels)
 
