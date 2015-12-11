@@ -439,9 +439,10 @@ def draw (mlmc, save, qoi=None, legend=False, loc='best'):
   pylab.draw ()
 
 # show plots
-def show ():
-  pylab.show  ()
-  #pylab.show  (block=false)
+def show (block=1):
+  pylab.show (block=block)
+  if block:
+    pylab.close ('all')
 
 # query for action
 def query ():
@@ -1014,7 +1015,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensembles of \'%s\' for all levels (limit set to %d)...' % (qoi, limit)
+  print ' :: INFO: Plotting ensembles of \'%s\' for all levels (limit set to %d)...' % (qoi, limit),
 
   levels = len (mlmc.config.levels)
 
