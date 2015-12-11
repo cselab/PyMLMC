@@ -443,6 +443,8 @@ def show (block=1):
   pylab.show (block=block)
   if block:
     pylab.close ('all')
+    pylab.close (0)
+    pylab.close (1)
 
 # query for action
 def query ():
@@ -614,7 +616,7 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates of \'%20s\'...' % qoi,
 
   levels = len (mlmc.config.levels)
 
@@ -648,7 +650,7 @@ def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yo
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates (both types) of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates (both types) of \'%20s\'...' % qoi,
   
   levels = len (mlmc.config.levels)
   
@@ -700,7 +702,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting differences of MC estimates of \'%20s\'...' % qoi,
 
   if not frame:
     figure (infolines, subplots=mlmc.config.L)
@@ -755,7 +757,7 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MC estimates AND differences of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting MC estimates AND differences of \'%20s\'...' % qoi,
 
   levels = len (mlmc.config.levels)
 
@@ -827,7 +829,7 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorig
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting MLMC estimates of \'%20s\'...' % qoi,
   
   if not mlmc.available:
     print ' NOT available.'
@@ -1073,7 +1075,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
   
   if not qoi: qoi = solver.qoi
 
-  print ' :: INFO: Plotting diagram of \'%s\'...' % qoi,
+  print ' :: INFO: Plotting diagram of \'%20s\'...' % qoi,
   
   vs = []
   for outputfilename in outputfilenames:
