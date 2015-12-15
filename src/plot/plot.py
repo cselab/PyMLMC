@@ -1154,7 +1154,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
     pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5)
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   if mlmc.config.iteration > 0:
-    pylab.semilogy (levels, mlmc.config.samples.counts.loaded, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    pylab.semilogy (levels, mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
       pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
   #if optimal:
