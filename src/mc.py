@@ -189,7 +189,7 @@ class MC (object):
     '''
     
     # assemble MC estimates using only specified subset of all samples
-    print '    -> specified subset:'
+    print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
       if self.available:
