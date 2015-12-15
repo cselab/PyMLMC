@@ -174,8 +174,7 @@ class MC (object):
   # assmble MC estimates
   def assemble (self, stats, indices):
 
-    if self.params.verbose:
-      print '  : -> level %d, type %d' % (self.config.level, self.config.type)
+    print '  : -> level %d, type %d' % (self.config.level, self.config.type)
 
     '''
     # assemble MC estimates from all available samples
@@ -190,8 +189,7 @@ class MC (object):
     '''
     
     # assemble MC estimates using only specified subset of all samples
-    if self.params.verbose:
-      print '    -> specified subset:'
+    print '    -> specified subset:'
     self.stats = {}
     for stat in stats:
       if self.available:
