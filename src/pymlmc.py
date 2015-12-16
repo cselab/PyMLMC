@@ -605,17 +605,19 @@ class MLMC (object):
     # assemble MC estimates of differences between type = 0 and type = 1 on all levels for each statistic
     print '  : MC estimates of differences...'
     self.diffs = [ {} for level in self.config.levels ]
-    for stat in stats:
 
-      # mark all levels as unavailable until the valid coarsest level L0
-      for level in self.config.levels [0 : self.L0]:
+    # mark all levels as unavailable until the valid coarsest level L0
+    for level in self.config.levels [0 : self.L0]:
+      for stat in stats:
         self.diffs [level] [stat.name] = None
 
-      # on the coarsest level, MC estimate of difference is just a plain MC estimate
+    # on the coarsest level, MC estimate of difference is just a plain MC estimate
+    for stat in stats:
       self.diffs [self.L0] [stat.name] = copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [stat.name])
 
-      # assemble MC estimates of differences on the remaining levels
-      for level in self.config.levels [self.L0 + 1 : ]:
+    # assemble MC estimates of differences on the remaining levels
+    for level in self.config.levels [self.L0 + 1 : ]:
+      for stat in stats:
 
         print '  : -> level %d' % level
 
@@ -627,7 +629,7 @@ class MLMC (object):
           differences [i] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .results [i]
 
         # assemble MC estimate of difference
-        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level], qois )
+        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level], qois=qois )
 
     '''
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
