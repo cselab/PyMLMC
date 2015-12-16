@@ -34,7 +34,7 @@ class Stat (object):
       keys = qois
 
     # use progress indicator, report current statistic each time
-    prefix = '       %-30s: ' % self.name
+    prefix = '       %-30s' % self.name
     progress = Progress (prefix=prefix, steps=len(keys), length=20)
 
     # compute sample statistics
