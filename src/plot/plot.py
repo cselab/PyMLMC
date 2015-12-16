@@ -668,8 +668,8 @@ def plot_mc (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigi
 
   xlabel = '%s [%s]' % (name('t'), unit('t'))
 
-  pylab.title ( 'level %d' % mc.config.level )
   mc = mcs [ self.config.pick [level] [type] ]
+  pylab.title ( 'level %d' % mc.config.level )
   if mc.available:
     plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
