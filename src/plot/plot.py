@@ -1037,8 +1037,9 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     pylab.title ( 'samples of level %d' % level )
 
     xend = float('nan')
-    
-    for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
+
+    #for sample in range ( min (limit, mlmc.config.samples.counts.computed [level]) ):
+    for sample in mlmc.config.samples.indices.loaded [level]:
 
       for type in mlmc.config.types (level):
 
