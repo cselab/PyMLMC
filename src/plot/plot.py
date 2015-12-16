@@ -1156,7 +1156,7 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.loaded, facecolor=color_params('samples'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5)
   #if optimal:
   #  pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
   pylab.title  ('Number of samples')
