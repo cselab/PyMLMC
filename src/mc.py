@@ -192,7 +192,10 @@ class MC (object):
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
-      if self.available:
+      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
+      '''
+      if self.samples.counts.loaded > 1:
         self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
       else:
         self.stats [ stat.name ] = None
+      '''

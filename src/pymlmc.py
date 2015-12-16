@@ -596,6 +596,34 @@ class MLMC (object):
     for mc in self.mcs:
       mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level])
 
+    # assemble MC estimates of differences between type = 0 and type = 1 on all levels for each statistic
+    print '  : MC estimates of differences...'
+    self.diffs = [ {} for level in self.config.levels ]
+    for stat in stats:
+
+      # mark all levels as unavailable until the valid coarsest level L0
+      for level in self.config.levels [0 : self.L0]:
+        self.diffs [level] [stat.name] = None
+
+      # on the coarsest level, MC estimate of difference is just a plain MC estimate
+      self.diffs [self.L0] [stat.name] = copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [stat.name])
+
+      # assemble MC estimates of differences on the remaining levels
+      for level in self.config.levels [self.L0 + 1 : ]:
+
+        print '  : -> level %d, type %d' % (self.config.level, self.config.type)
+        
+        # assemble difference
+        # TODO: this should be moved to a new class, say 'Difference'
+        differences = [ None ] * len ( self.config.samples.counts.computed )
+        for i in self.config.samples.indices.computed:
+          differences [i]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .results [i])
+          differences [i] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .results [i]
+
+        # assemble MC estimate of difference
+        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level] )
+
+    '''
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
     self.diffs = [ {} for level in self.config.levels ]
@@ -619,7 +647,7 @@ class MLMC (object):
         # else mark level as unavailable
         else:
           self.diffs [level] [name] = None
-
+    '''
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = {}

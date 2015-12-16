@@ -16,7 +16,11 @@ class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
   def compute_all (self, samples, indices=None, check=0):
-    
+
+    # check if sufficiently many samples are provided
+    if len (samples) == 0 or (indices and len (indices) == 0):
+      return None
+
     # copy data class from the first valid sample
     for sample in samples:
       if sample != None:
