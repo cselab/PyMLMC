@@ -19,6 +19,7 @@ import matplotlib
 import pylab
 import numpy
 import sys
+import time
 
 # warnings management
 import warnings
@@ -443,8 +444,7 @@ def show (block=1):
   pylab.show (block=block)
   if block:
     pylab.close ('all')
-    pylab.close (0)
-    pylab.close (1)
+    time.sleep (0.1) # to make sure all figures are closed
 
 # query for action
 def query ():
