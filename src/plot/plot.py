@@ -1023,7 +1023,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
-  print ' :: INFO: Plotting ensembles of \'%20s\' for all levels (limit set to %d)...' % (qoi, limit),
+  print ' :: INFO: Plotting ensembles of \'%-20s\' for all levels (limit set to %d)...' % (qoi, limit),
   sys.stdout.flush()
 
   levels = len (mlmc.config.levels)
@@ -1083,7 +1083,7 @@ def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=N
   
   if not qoi: qoi = solver.qoi
 
-  print ' :: INFO: Plotting diagram of \'%20s\'...' % qoi,
+  print ' :: INFO: Plotting diagram of \'%-20s\'...' % qoi,
   sys.stdout.flush()
   
   vs = []

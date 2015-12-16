@@ -28,7 +28,7 @@ class Stat (object):
         break
 
     # use progress indicator, report current statistic each time
-    prefix = '       %s: ' % self.name
+    prefix = '       %-30s: ' % self.name
     progress = Progress (prefix=prefix, steps=len(stats.data.keys()), length=20)
 
     # compute sample statistics

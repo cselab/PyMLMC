@@ -612,7 +612,7 @@ class MLMC (object):
       for level in self.config.levels [self.L0 + 1 : ]:
 
         print '  : -> level %d, type %d' % (self.config.level, self.config.type)
-        
+
         # assemble difference
         # TODO: this should be moved to a new class, say 'Difference'
         differences = [ None ] * len ( self.config.samples.counts.computed )
