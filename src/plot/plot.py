@@ -664,7 +664,7 @@ def plot_mc (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigi
   levels = len (mlmc.config.levels)
 
   if not frame:
-    figure (infolines, subplots=levels)
+    figure (infolines)
 
   xlabel = '%s [%s]' % (name('t'), unit('t'))
 
