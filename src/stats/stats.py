@@ -15,7 +15,7 @@ from helpers import Progress
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
-  def compute_all (self, samples, indices=None, check=0):
+  def compute_all (self, samples, indices=None, check=0, qois='all'):
 
     # check if sufficiently many samples are provided
     if len (samples) == 0 or (indices and len (indices) == 0):
@@ -31,8 +31,14 @@ class Stat (object):
     prefix = '       %-30s: ' % self.name
     progress = Progress (prefix=prefix, steps=len(stats.data.keys()), length=20)
 
+    # quantities of interest to be assembled
+    if qois == 'all':
+      keys = stats.data.keys()
+    else:
+      keys = qois
+    
     # compute sample statistics
-    for i, key in enumerate (stats.data.keys()):
+    for i, key in enumerate (keys):
       for step in xrange ( len ( stats.data [key] ) ):
 
         # check for unavailable samples

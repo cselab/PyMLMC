@@ -553,6 +553,8 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
   
   percentiles = []
 
+  color = color (qoi)
+
   for stat_name, stat in stats.iteritems():
     
     ts = numpy.array ( stat.meta ['t'] )
@@ -563,15 +565,16 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       ts = ts [1:]
       vs = vs [1:]
 
-    if stat_name in ['mean', 'std. deviation':
-      color = (qoi)
+    '''
+    if 'percentile' in stat_name or stat_name in ['mean', 'std. deviation']:
+      color = color (qoi)
     else:
       color = color_stats (stat_name)
-    
+    '''
+
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      color = color_stats ('std. deviation')
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color, alpha=0.5)
       # hack to show the legend entry
       pylab.plot([], [], color=color, alpha=0.5, linewidth=10, label='mean +/- std. dev.')
@@ -597,7 +600,6 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     upper  = percentiles [1] ['vs']
     ts     = percentiles [0] ['ts']
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
-    color  = color_stats ('percentile')
     
     pylab.fill_between (ts, lower, upper, facecolor=color, edgecolor=color, alpha=0.5)
     # hack to show the legend entry

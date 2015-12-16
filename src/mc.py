@@ -172,7 +172,7 @@ class MC (object):
     return loaded
   
   # assmble MC estimates
-  def assemble (self, stats, indices):
+  def assemble (self, stats, indices, qois):
 
     print '  : -> level %d, type %d' % (self.config.level, self.config.type)
 
@@ -192,7 +192,7 @@ class MC (object):
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
+      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
       '''
       if self.samples.counts.loaded > 1:
         self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )

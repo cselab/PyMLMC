@@ -580,10 +580,16 @@ class MLMC (object):
     # TODO: implement this!
 
   # assemble MC and MLMC estimates
-  def assemble (self, stats):
+  def assemble (self, stats, qois='all'):
 
     print
     print ' :: ASSEMBLING:'
+
+    # report quantities of interest to be assembled
+    print '  :',
+    for qoi in qois:
+      print qoi,
+    print
 
     import copy
 
@@ -594,7 +600,7 @@ class MLMC (object):
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
     for mc in self.mcs:
-      mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level])
+      mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level], qois)
 
     # assemble MC estimates of differences between type = 0 and type = 1 on all levels for each statistic
     print '  : MC estimates of differences...'
