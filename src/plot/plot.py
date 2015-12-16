@@ -444,7 +444,6 @@ def show (block=1):
   pylab.show (block=block)
   if block:
     pylab.close ('all')
-    time.sleep (0.1) # to make sure all figures are closed
 
 # query for action
 def query ():
