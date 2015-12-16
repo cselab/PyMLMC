@@ -40,21 +40,21 @@ class Stat (object):
 
           # if spedific indices are required, take this into account
           if indices != None:
-            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if sample != None and index in indices ]
+            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if sample != None and index in indices and not numpy.isnan (sample.data [key] [step]) ]
           else:
-            series = [ sample.data [key] [step] for sample in samples if sample != None ]
+            series = [ sample.data [key] [step] for sample in samples if sample != None and not numpy.isnan (sample.data [key] [step]) ]
 
         # assume all samples are available
         else:
 
           # if spedific indices are required, take this into account
           if indices != None:
-            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices ]
+            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [key] [step]) ]
           else:
-            series = [ sample.data [key] [step] for sample in samples ]
+            series = [ sample.data [key] [step] for sample in samples if not numpy.isnan (sample.data [key] [step]) ]
 
         # remove NaN's
-        series = [ value for value in series if not numpy.isnan (value) ]
+        #series = [ value for value in series if not numpy.isnan (value) ]
 
         # compute statistic
         if len (series) > 0:

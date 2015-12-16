@@ -611,7 +611,7 @@ class MLMC (object):
       # assemble MC estimates of differences on the remaining levels
       for level in self.config.levels [self.L0 + 1 : ]:
 
-        print '  : -> level %d, type %d' % (self.config.level, self.config.type)
+        print '  : -> level %d' % level
 
         # assemble difference
         # TODO: this should be moved to a new class, say 'Difference'

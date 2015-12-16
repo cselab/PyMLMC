@@ -562,8 +562,11 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     if '_pos' in qoi:
       ts = ts [1:]
       vs = vs [1:]
-    
-    color = color_stats (stat_name)
+
+    if stat_name in ['mean', 'std. deviation':
+      color = (qoi)
+    else:
+      color = color_stats (stat_name)
     
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
