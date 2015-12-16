@@ -27,16 +27,16 @@ class Stat (object):
         stats = copy.deepcopy (sample)
         break
 
-    # use progress indicator, report current statistic each time
-    prefix = '       %-30s: ' % self.name
-    progress = Progress (prefix=prefix, steps=len(stats.data.keys()), length=20)
-
     # quantities of interest to be assembled
     if qois == 'all':
       keys = stats.data.keys()
     else:
       keys = qois
-    
+
+    # use progress indicator, report current statistic each time
+    prefix = '       %-30s: ' % self.name
+    progress = Progress (prefix=prefix, steps=len(keys), length=20)
+
     # compute sample statistics
     for i, key in enumerate (keys):
       for step in xrange ( len ( stats.data [key] ) ):
