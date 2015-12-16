@@ -621,13 +621,13 @@ class MLMC (object):
 
         # assemble difference
         # TODO: this should be moved to a new class, say 'Difference'
-        differences = [ None ] * len ( self.config.samples.counts.computed [level] )
+        differences = [ None ] * len ( self.config.samples.indices.computed [level] )
         for i in self.config.samples.indices.computed [level]:
           differences [i]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .results [i])
           differences [i] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .results [i]
 
         # assemble MC estimate of difference
-        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level] )
+        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level], qois )
 
     '''
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
