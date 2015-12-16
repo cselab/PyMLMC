@@ -622,7 +622,7 @@ class MLMC (object):
         # assemble difference
         # TODO: this should be moved to a new class, say 'Difference'
         differences = [ None ] * len ( self.config.samples.counts.computed )
-        for i in self.config.samples.indices.computed:
+        for i in self.config.samples.indices.computed [level]:
           differences [i]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .results [i])
           differences [i] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .results [i]
 
