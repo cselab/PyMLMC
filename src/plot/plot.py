@@ -574,9 +574,9 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.5)
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.3)
       # hack to show the legend entry
-      pylab.plot([], [], color=color(qoi), alpha=0.5, linewidth=10, label='mean +/- std. dev.')
+      pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
     elif 'percentile' in stat_name:
@@ -600,9 +600,9 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     ts     = percentiles [0] ['ts']
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
     
-    pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.5)
+    pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.3)
     # hack to show the legend entry
-    pylab.plot([], [], color=color(qoi), alpha=0.5, linewidth=10, label=label)
+    pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label=label)
   
   adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
