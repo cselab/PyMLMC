@@ -53,8 +53,11 @@ class Stat (object):
         series = [ value for value in series if not numpy.isnan (value) ]
 
         # compute statistic
-        stats.data [key] [step] = self.compute (series)
-
+        if len (series) > 0:
+          stats.data [key] [step] = self.compute (series)
+        else:
+          stats.data [key] [step] = float ('nan')
+      
       # update progress
       progress.update (i + 1)
 
