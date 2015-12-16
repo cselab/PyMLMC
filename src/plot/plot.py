@@ -98,11 +98,11 @@ def color_params (name):
 
 colors = {}
 
-colors ['default'] = 'custom_blue'
+colors ['default']   = 'custom_blue'
 colors ['pos_light'] = 'lightgrey'
-colors ['pos'] = 'dimgrey'
+colors ['pos']       = 'dimgrey'
 colors ['trendline'] = 'darkorange'
-colors ['t'] = 'grey'
+colors ['t']         = 'grey'
 
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
