@@ -99,7 +99,8 @@ def color_params (name):
 colors = {}
 
 colors ['default'] = 'custom_blue'
-colors ['pos'] = 'lightgrey'
+colors ['pos_light'] = 'lightgrey'
+colors ['pos'] = 'dimgrey'
 colors ['trendline'] = 'darkorange'
 colors ['t'] = 'grey'
 
@@ -614,7 +615,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     pylab.legend (loc='best')
 
 # plot computed MC estimators of statistics
-def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+def plot_mcs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
@@ -648,8 +649,41 @@ def plot_mc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin
 
   print ' done.'
 
+# plot computed MC estimators of statistics
+def plot_mc (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+  # some dynamic values
+  if level  == 'finest':   level = mlmc.config.L
+  if level  == 'coarsest': level = 0
+
+  if not qoi: qoi = mlmc.config.solver.qoi
+
+  print ' :: INFO: Plotting MC estimates of \'%s\' for level %d...' % (qoi, level),
+  sys.stdout.flush()
+
+  levels = len (mlmc.config.levels)
+
+  if not frame:
+    figure (infolines, subplots=levels)
+
+  xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+  pylab.title ( 'level %d' % mc.config.level )
+  if mc.available:
+    plot_stats ( qoi, mcs [ self.config.pick [level] [type] ] .stats, extent, xorigin, yorigin, xlabel, run )
+
+  if infolines:
+    plot_infolines (self)
+
+  adjust (infolines)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+  print ' done.'
+
 # plot computed MC estimators of statistics for both types
-def plot_mc_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+def plot_mcs_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
   
   if not qoi: qoi = mlmc.config.solver.qoi
 
