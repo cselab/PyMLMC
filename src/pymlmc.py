@@ -601,7 +601,7 @@ class MLMC (object):
     print '  : MC estimates...'
     for mc in self.mcs:
       mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level], qois)
-
+    '''
     # assemble MC estimates of differences between type = 0 and type = 1 on all levels for each statistic
     print '  : MC estimates of differences...'
     self.diffs = [ {} for level in self.config.levels ]
@@ -657,7 +657,7 @@ class MLMC (object):
         # else mark level as unavailable
         else:
           self.diffs [level] [name] = None
-    '''
+    
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = {}

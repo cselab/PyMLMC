@@ -1014,13 +1014,19 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   xend = float('nan')
 
   figure (infolines, subplots=1)
-  
-  for sample in range ( min (limit, mlmc.config.samples.counts.computed[level]) ):
+
+  count = 0
+  for sample in mlmc.config.samples.indices.loaded [level]:
+
+    if count == limit:
+      break
     
     results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
 
     if results == None:
       continue
+    else:
+      count += 1
 
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi] )
@@ -1043,7 +1049,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   adjust_axes (qoi, extent, xorigin, yorigin, xend=xend)
   
-  if mlmc.config.samples.counts.computed[level] <= legend:
+  if mlmc.config.samples.counts.computed [level] <= legend:
     pylab.legend (loc='best')
   
   if infolines:
@@ -1074,8 +1080,11 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     xend = float('nan')
 
-    #for sample in range ( min (limit, mlmc.config.samples.counts.computed [level]) ):
+    count == 0
     for sample in mlmc.config.samples.indices.loaded [level]:
+
+      if count == limit:
+        break
 
       for type in mlmc.config.types (level):
 
@@ -1083,6 +1092,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
         if results == None:
           continue
+        else:
+          count += 1
 
         ts = numpy.array ( results.meta ['t'] )
         vs = numpy.array ( results.data [qoi]  )
