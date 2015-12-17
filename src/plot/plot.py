@@ -1047,9 +1047,9 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   
   plot_helper_lines (qoi)
   
-  adjust_axes (qoi, extent, xorigin, yorigin, xend=xend)
+  adjust_axes (qoi, extent, xorigin, yorigin) #, xend=xend) # xend does not work when failed jobs are present
   
-  if mlmc.config.samples.counts.computed [level] <= legend:
+  if min (limit, mlmc.config.samples.counts.loaded [level]) <= legend:
     pylab.legend (loc='best')
   
   if infolines:
