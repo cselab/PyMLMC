@@ -1080,7 +1080,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     xend = float('nan')
 
-    count == 0
+    count = 0
     for sample in mlmc.config.samples.indices.loaded [level]:
 
       if count == limit:
