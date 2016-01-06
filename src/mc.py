@@ -73,11 +73,12 @@ class MC (object):
       args = ( config.level, typestr, resolution, intf(len(config.samples), table=1), intf(self.parallelization.cores, table=1), 'C' )
     
     if self.parallelization.walltime and local.cluster:
-      batch = '    '
-      count = intf (1, table=1)
       if self.parallelization.batch and self.parallelization.batchmax != None:
         batch = intf (self.parallelization.batchmax, table=1)
         count = intf (math.ceil (float (len(config.samples)) / self.parallelization.batchmax), table=1)
+      else:
+        batch = intf (0,                   table=1, empty=1)
+        count = intf (len(config.samples), table=1, empty=1)
       args += ( self.parallelization.hours, self.parallelization.minutes, batch, count )
       if local.ensembles:
         merge = intf (self.parallelization.mergemax, table=1)
