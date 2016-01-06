@@ -99,7 +99,7 @@ def intf (number, table=0, empty=0, bar=0, plain=0):
     template = '%4d%1s'
   else:
     template = '%d%s'
-  if number == 0:
+  if number == 0 or number == None:
     if empty:
       if table:
         return '     '
