@@ -328,10 +328,10 @@ class MLMC (object):
     header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
     separator = '  :------------------------------------------------------------|'
     if local.cluster:
-      header    += '  WALLTIME  |  BATCH  |  JOBS   |'
+      header    += '  WALLTIME  |  BATCH  &  JOBS   |'
       separator += '--------------------------------|'
       if local.ensembles:
-        header    += '  MERGE  |  ENSEMBLES  '
+        header    += '  MERGE  &  ENSEMBLES  '
         separator += '-----------------------'
     print header
     print separator
