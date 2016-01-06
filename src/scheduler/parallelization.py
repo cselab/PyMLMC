@@ -104,16 +104,16 @@ class Parallelization (object):
 
     args = {}
 
-    args ['ranks']    = parallelization.ranks
-    args ['threads']  = parallelization.threads
-    args ['cores']    = parallelization.cores
-    args ['nodes']    = parallelization.nodes
-    args ['tasks']    = parallelization.tasks
-    args ['cpucores'] = parallelization.cpucores
-    args ['hours']    = parallelization.hours
-    args ['minutes']  = parallelization.minutes
-    args ['memory']   = parallelization.memory
-    args ['email']    = parallelization.email
+    args ['ranks']    = self.ranks
+    args ['threads']  = self.threads
+    args ['cores']    = self.cores
+    args ['nodes']    = self.nodes
+    args ['tasks']    = self.tasks
+    args ['cpucores'] = self.cpucores
+    args ['hours']    = self.hours
+    args ['minutes']  = self.minutes
+    args ['memory']   = self.memory
+    args ['email']    = self.email
 
     return args
 

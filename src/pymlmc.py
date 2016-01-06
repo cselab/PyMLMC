@@ -118,9 +118,9 @@ class MLMC (object):
       
     # query for progress
     if self.params.simulate:
-      helpers.query ('Simulate job submission (no actual submissions)?')
+      helpers.query ('Simulate initial job submission (no actual submissions)?')
     else:
-      helpers.query ('Submit jobs?')
+      helpers.query ('Submit initial jobs?')
 
     # compute initial samples
     self.run ()
@@ -248,9 +248,9 @@ class MLMC (object):
 
       # query for progress
       if self.params.simulate:
-        helpers.query ('Simulate job submission (no actual submissions)?')
+        helpers.query ('Simulate additional job submission (no actual submissions)?')
       else:
-        helpers.query ('Submit jobs?')
+        helpers.query ('Submit additional jobs?')
 
       # increment iteration
       self.config.iteration += 1
