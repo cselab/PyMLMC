@@ -315,7 +315,8 @@ def getTexTableConfig (mlmc):
   values ['cluster']   = mlmc.status.list ['cluster']
   
   if mlmc.finished:
-    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime ( mlmc.mcs[mlmc.config.L].timer (mlmc.config.scheduler.batch, mlmc.config.scheduler.merge) ) )
+    runtime = mlmc.mcs[mlmc.config.L].timer (mlmc.config.scheduler.batch, mlmc.config.scheduler.merge) ['max']
+    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
   else:
     values ['runtime'] = mlmc.status.list ['walltimes'] [-1] [0]
   
