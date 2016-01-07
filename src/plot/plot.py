@@ -744,6 +744,10 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
   sys.stdout.flush()
 
+  if mlmc.config.L == 0:
+    print 'skipped since only one level is present'
+    return
+
   if not frame:
     figure (infolines, subplots=mlmc.config.L)
 
