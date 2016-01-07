@@ -86,6 +86,10 @@ class Errors (object):
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
     work_mc      = works [self.L] * samples_mc
     self.speedup = work_mc / work_mlmc
+
+    # avoid round-off errors for pure MC runs
+    if len (self.levels) == 1:
+      self.speedup = 1.0
     
     print
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup
