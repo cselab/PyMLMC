@@ -745,7 +745,7 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   sys.stdout.flush()
 
   if mlmc.config.L == 0:
-    print 'skipped since only one level is present'
+    print 'skipped (since L=0).'
     return
 
   if not frame:

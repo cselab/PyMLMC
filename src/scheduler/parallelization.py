@@ -16,7 +16,7 @@ import copy
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem, batch=None, merge=None, email=''):
+  def __init__ (self, cores, walltime, sharedmem, batch=None, limit=None, merge=None, email=''):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -46,12 +46,17 @@ class Parallelization (object):
     # compute tasks = ranks_per_node
     self.tasks = self.ranks / self.nodes
 
-    # set maximal batch size such that the required walltime does not exceed specified walltime
+    # set maximal batch size such that the total walltime does not exceed maximum walltime
+    # remark: total walltime might still exceed the user-specified walltime
     if local.max_walltime (cores) != None:
-      self.batchmax = int ( floor ( local.max_walltime (cores) / float(walltime) ) )
+      self.batchmax = int ( floor ( local.max_walltime (cores) / float (walltime) ) )
     else:
       self.batchmax = None
 
+    # batchsize should not exceed the limit
+    if limit != None:
+      self.batchmax = min ( self.batchmax, int ( floor ( limit / float (walltime) ) ) )
+    
     # set maximal merge size such that the maximum number of cores is not exceeded
     if local.max_cores != None:
       self.mergemax = int ( floor ( local.max_cores / float(cores) ) )
