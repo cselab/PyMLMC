@@ -15,7 +15,7 @@ from numpy import round, floor, ceil
 
 class Static (Scheduler):
   
-  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, batchsize=1, ratios=None ):
+  def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, batchsize=1, limit=None, ratios=None ):
     
     self.walltime  = walltime
     self.nodes     = nodes
@@ -23,6 +23,7 @@ class Static (Scheduler):
     self.email     = email
     self.separate  = separate
     self.batchsize = batchsize
+    self.limit     = limit
     self.ratios    = ratios
   
   def distribute (self):
@@ -52,8 +53,9 @@ class Static (Scheduler):
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
 
       # set walltime limit
-      limit = self.walltime
-
+      if self.limit == None:
+        limit = self.walltime
+      
       # merge layers which are processed in batch to ensembles, if ensembles are supported
       if local.ensembles:
         self.merge [level] [type] = self.batch [level] [type]
