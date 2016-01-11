@@ -430,7 +430,7 @@ class MLMC (object):
           runtime = mc.timer (self.config.scheduler.batch, self.config.scheduler.merge)
           if runtime ['min'] != None and runtime ['max'] != None:
             batch           = self.status.list ['batch'] [mc.config.level] [mc.config.type]
-            batchstr        = helpers.intf (batch, table=1)
+            batchstr        = helpers.intf (batch, table=1, empty=1)
             minruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['min']) )
             maxruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
             walltime        = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
