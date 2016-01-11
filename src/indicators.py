@@ -164,7 +164,7 @@ class Indicators (object):
       self.covariance  [level] = float ('NaN')
       self.correlation [level] = float ('NaN')
       '''
-      self.covariance  [level] = 0.5 * (self.variance_diff [level] - self.variance [level] [0] self.variance [level] [1])
+      self.covariance  [level] = 0.5 * (self.variance_diff [level] - self.variance [level] [0] - self.variance [level] [1])
       self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
 
     # set the normalization
