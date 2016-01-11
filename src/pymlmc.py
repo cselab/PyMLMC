@@ -442,8 +442,8 @@ class MLMC (object):
                 budget *= self.config.scheduler.batch [mc.config.level] [mc.config.type]
               budget_percent_min   = round ( 100 * (runtime ['min'] / 3600) / budget )
               budget_percent_max   = round ( 100 * (runtime ['max'] / 3600) / budget )
-              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / (walltime * batch) )
-              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / (walltime * batch) )
+              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / (walltime * batch if batch != None else walltime) )
+              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / (walltime * batch if batch != None else walltime) )
               args += ( walltimestr, batchstr, minruntimestr, maxruntimestr, '%3d%%' % walltime_percent_min, '%3d%%' % walltime_percent_max, '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
             else:
               args += ( '   N/A  ', batchstr, minruntimestr, maxruntimestr, '    ', '    ', '    ', '    ' )
