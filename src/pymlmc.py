@@ -405,9 +405,9 @@ class MLMC (object):
     else:
 
       print ' :: STATUS of MC simulations:'
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET     |'
-      print '  :-------------------------------------------------------------------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |   %s - %s  |'
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |  BATCH  |        RUNTIME        |     USAGE     |     BUDGET    |'
+      print '  :----------------------------------------------------------------------------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
 
       # for all MC simulations
       for mc in self.mcs:
@@ -429,6 +429,8 @@ class MLMC (object):
 
           runtime = mc.timer (self.config.scheduler.batch, self.config.scheduler.merge)
           if runtime ['min'] != None and runtime ['max'] != None:
+            batch           = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+            batchstr        = helpers.intf (batch, table=1)
             minruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['min']) )
             maxruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
             walltime        = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
@@ -440,13 +442,13 @@ class MLMC (object):
                 budget *= self.config.scheduler.batch [mc.config.level] [mc.config.type]
               budget_percent_min   = round ( 100 * (runtime ['min'] / 3600) / budget )
               budget_percent_max   = round ( 100 * (runtime ['max'] / 3600) / budget )
-              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / walltime )
-              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / walltime )
-              args += ( walltimestr, minruntimestr, maxruntimestr, '%3d%%' % walltime_percent_min, '%3d%%' % walltime_percent_max, '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
+              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / (walltime * batch) )
+              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / (walltime * batch) )
+              args += ( walltimestr, batchstr, minruntimestr, maxruntimestr, '%3d%%' % walltime_percent_min, '%3d%%' % walltime_percent_max, '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
             else:
-              args += ( '   N/A  ', minruntimestr, maxruntimestr, '    ', '    ', '    ', '    ' )
+              args += ( '   N/A  ', batchstr, minruntimestr, maxruntimestr, '    ', '    ', '    ', '    ' )
           else:
-            args += ( '   N/A  ', '   N/A  ', '   N/A  ', '    ', '    ', '    ', '    ' )
+            args += ( '   N/A  ', batchstr, '   N/A  ', '   N/A  ', '    ', '    ', '    ', '    ' )
 
           print format % args
 
