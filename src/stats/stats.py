@@ -30,7 +30,8 @@ class Stat (object):
 
     # check if at least one sample is available
     if stats == None:
-      return stats
+      print '       %-30s [%s]' % (self.name, 'unavailable')
+      return None
 
     # quantities of interest to be assembled
     if qois == 'all':

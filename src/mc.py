@@ -192,8 +192,4 @@ class MC (object):
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
-      #self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
-      if len (indices) > 0:
-        self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
-      else:
-        self.stats [ stat.name ] = None
+      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
