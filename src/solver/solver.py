@@ -255,7 +255,10 @@ class Solver (object):
   # depending on parameters, job will be run immediately or will be submitted to a queueing system
   # for parallelization.batch = 1, all jobs (for specified level and type) are combined into several batch scripts
   def launch (self, args, parallelization, level, type, sample):
-    
+
+    # append options to args
+    args ['options'] = self.options
+
     # assemble job
     job = self.job (args)
     
