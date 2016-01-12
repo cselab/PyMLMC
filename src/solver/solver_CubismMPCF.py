@@ -120,9 +120,8 @@ class CubismMPCF (Solver):
   # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
   def run (self, level, type, sample, seed, discretization, params, parallelization):
     
-    # initialize arguments for the specified parallelization
-    #TODO: move this to Scheduler base class?
-    args = self.args (parallelization)
+    # get parallelization args
+    args = parallelization.args()
     
     # === set additional arguments
     
