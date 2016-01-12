@@ -124,7 +124,7 @@ read -r -a BLOCKS <<< $BLOCKS
 
 # sort array by length (longest to shortest)
 # sorting is required since sometimes 2 versions of the _same_ block are provided - need to choose longer version
-BLOCKS=($(for i in ${BLOCKS[@]} ; do echo ${#i}$'\t'${i}; done | sort -n -r | cut -f 2-))
+BLOCKS=($(for i in ${BLOCKS[@]} ; do echo ${#i}$'\\t'${i}; done | sort -n -r | cut -f 2-))
 
 # print info about blocks
 echo
