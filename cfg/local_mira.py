@@ -126,12 +126,24 @@ read -r -a BLOCKS <<< $BLOCKS
 # sorting is required since sometimes 2 versions of the _same_ block are provided - need to choose longer version
 BLOCKS=($(for i in ${BLOCKS[@]} ; do echo ${#i}$'\\t'${i}; done | sort -n -r | cut -f 2-))
 
-# print info about blocks
+# print info about all blocks
 echo
 echo 'Obtained blocks (sorted by name length):'
 for BLOCK in ${BLOCKS[@]}
 do
   echo $BLOCK
+done
+echo
+
+# truncate array to the required number of blocks
+BLOCKS=($(for ((i=0; i<%(merge)d; i++)); do echo ${BLOCKS[$i]}; done))
+
+# print info about selected blocks
+echo
+echo 'First %(merge)d selected block(s):'
+for BLOCK in ${BLOCKS[@]}
+do
+echo $BLOCK
 done
 echo
 

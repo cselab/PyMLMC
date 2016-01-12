@@ -62,6 +62,9 @@ class Parallelization (object):
       self.mergemax = int ( floor ( local.max_cores / float(cores) ) )
     else:
       self.mergemax = None
+    
+    # default merge size is 1 (no merging)
+    self.merge = 1
   
   # convert walltime to hours and minutes
   def set_walltime (self, walltime):
@@ -115,10 +118,12 @@ class Parallelization (object):
     args ['nodes']    = self.nodes
     args ['tasks']    = self.tasks
     args ['cpucores'] = self.cpucores
+    args ['merge']    = self.merge
     args ['hours']    = self.hours
     args ['minutes']  = self.minutes
     args ['memory']   = self.memory
     args ['email']    = self.email
+    args ['envs']     = local.envs
 
     return args
 

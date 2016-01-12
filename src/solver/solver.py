@@ -133,7 +133,9 @@ class Solver (object):
       if sample != None:
         dir += '_%d' % sample
       return '%s_%s%s' % (self.name, dir, suffix) + ('.%d' % self.iteration if iteration else '')
-  
+
+  '''
+  # DEPRECATED
   # assemble args
   def args (self, parallelization):
     
@@ -160,7 +162,7 @@ class Solver (object):
     
     # number of cores per node
     args ['cpucores'] = parallelization.cpucores
-    
+
     # email for notification
     args ['email'] = parallelization.email
     
@@ -168,6 +170,7 @@ class Solver (object):
     args ['envs'] = local.envs
     
     return args
+  '''
   
   # assemble job command
   def job (self, args):
