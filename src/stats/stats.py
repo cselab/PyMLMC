@@ -30,7 +30,7 @@ class Stat (object):
 
     # check if at least one sample is available
     if stats == None:
-      print '       %-30s [%s]' % (self.name, 'unavailable')
+      print '       %-30s[%s]' % (self.name, 'unavailable')
       return None
 
     # quantities of interest to be assembled
