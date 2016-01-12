@@ -179,12 +179,11 @@ class MC (object):
 
     '''
     # assemble MC estimates from all available samples
-    if self.params.verbose:
-      print '    -> all samples:'
+    print '    -> all samples:'
     self.stats_all = {}
     for stat in stats:
       if self.available:
-        self.stats_all [ stat.name ] = stat.compute_all ( self.results, check=1 )
+        self.stats_all [ stat.name ] = stat.compute_all ( self.results, qois=qois, check=1 )
       else:
         self.stats_all [ stat.name ] = None
     '''
@@ -193,10 +192,8 @@ class MC (object):
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
-      '''
-      if self.samples.counts.loaded > 1:
-        self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices )
+      #self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
+      if len (indices) > 0:
+        self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
       else:
         self.stats [ stat.name ] = None
-      '''

@@ -22,10 +22,15 @@ class Stat (object):
       return None
 
     # copy data class from the first valid sample
+    stats = None
     for sample in samples:
       if sample != None:
         stats = copy.deepcopy (sample)
         break
+
+    # check if at least one sample is available
+    if stats == None:
+      return stats
 
     # quantities of interest to be assembled
     if qois == 'all':
