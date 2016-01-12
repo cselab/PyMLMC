@@ -118,7 +118,7 @@ class MLMC (object):
       
     # query for progress
     if self.params.simulate:
-      helpers.query ('Simulate initial job submission (no actual submissions)?')
+      helpers.query ('Simulate (no actual submissions) initial job submission?')
     else:
       helpers.query ('Submit initial jobs?')
 
