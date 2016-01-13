@@ -404,10 +404,19 @@ class MLMC (object):
     # stochastic reporting
     else:
 
+
+      header    = '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |'
+      separator = '  :------------------------------------------------------------------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
+
+      if local.cluster:
+        header    += '  BATCH  |     BATCH RUNTIME     |'
+        separator += '---------------------------------|'
+        format    += '  %s  |  %s - %s  |'
+
       print ' :: STATUS of MC simulations:'
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |  BATCH  |        RUNTIME        |     USAGE     |     BUDGET    |'
-      print '  :----------------------------------------------------------------------------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
+      print header
+      print separator
 
       # for all MC simulations
       for mc in self.mcs:
@@ -427,35 +436,84 @@ class MLMC (object):
         # if some samples are finished, report runtime
         if finished > 0:
 
-          batch           = self.status.list ['batch'] [mc.config.level] [mc.config.type]
-          batchstr        = helpers.intf (batch, table=1, empty=1)
-          runtime = mc.timer (self.config.scheduler.batch, self.config.scheduler.merge)
-          if runtime ['min'] != None and runtime ['max'] != None:
-            minruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['min']) )
-            maxruntimestr   = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
-            walltime        = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
-            parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
-            if walltime != 'unknown':
-              walltimestr = time.strftime ( '%H:%M:%S', time.gmtime (walltime * 3600) )
-              budget = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
-              if self.config.scheduler.batch [mc.config.level] [mc.config.type]:
-                budget *= self.config.scheduler.batch [mc.config.level] [mc.config.type]
-              budget_percent_min   = round ( 100 * (runtime ['min'] / 3600) / budget )
-              budget_percent_max   = round ( 100 * (runtime ['max'] / 3600) / budget )
-              walltime_percent_min = round ( 100 * (runtime ['min'] / 3600) / (walltime * batch if batch != None else walltime) )
-              walltime_percent_max = round ( 100 * (runtime ['max'] / 3600) / (walltime * batch if batch != None else walltime) )
-              args += ( walltimestr, batchstr, minruntimestr, maxruntimestr, '%3d%%' % walltime_percent_min, '%3d%%' % walltime_percent_max, '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
-            else:
-              args += ( '   N/A  ', batchstr, minruntimestr, maxruntimestr, '    ', '    ', '    ', '    ' )
+          # parallelization
+          parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
+
+          # walltime
+          walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+          if walltime_sample != 'unknown':
+            walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
+            args += (walltime_sample_str, )
           else:
-            args += ( '   N/A  ', batchstr, '   N/A  ', '   N/A  ', '    ', '    ', '    ', '    ' )
+            args += ('   N/A  ', )
+
+          # runtimes, walltime, budget, batching, etc.
+          runtime_sample = mc.timer ()
+          if runtime_sample ['min'] != None and runtime_sample ['max'] != None:
+
+            # runtimes of individual samples
+            min_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['min']) )
+            max_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['max']) )
+            args += ( min_runtime_sample_str, max_runtime_sample_str )
+
+            # walltime usage
+            if walltime_sample != 'unknown':
+              walltime_sample_percent_min = round ( 100 * (runtime_sample ['min'] / 3600) / walltime_sample )
+              walltime_sample_percent_max = round ( 100 * (runtime_sample ['max'] / 3600) / walltime_sample )
+              args += ( '%3d%%' % walltime_sample_percent_min, '%3d%%' % walltime_sample_percent_max )
+            else:
+              args += ('    ', '    ')
+
+            # budget usage
+            budget_percent_min = round ( 100 * (runtime_sample ['min'] / 3600) / budget_sample )
+            budget_percent_max = round ( 100 * (runtime_sample ['max'] / 3600) / budget_sample )
+            budget_sample      = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
+            args += ( '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
+
+          # default values if runtime measurements are not available
+          else:
+            args += ( '   N/A  ', '   N/A  ' )
+            args += ( '    ', '    ' )
+            args += ( '    ', '    ' )
+
+          # batch runtime
+          if local.cluster:
+
+            # batch
+            batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+            batch_str = helpers.intf (batch, table=1, empty=1)
+            args += (batch_str, )
+
+            # runtimes of the entire batches
+            runtime_batch  = mc.timer (batch=1)
+            if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
+              min_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['min']) )
+              max_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['max']) )
+              args += ( min_runtime_batch_str, max_runtime_batch_str )
+
+              '''
+              # walltime usage of the entire batches
+              if walltime_sample != 'unknown':
+                budget_batch   = budget_sample * batch if batch != None else budget_sample
+                walltime_batch = walltime_sample * batch if batch != None else walltime_sample
+                walltime_batch_percent_min  = round ( 100 * (runtime_batch  ['min'] / 3600) / walltime_batch )
+                walltime_batch_percent_max  = round ( 100 * (runtime_batch  ['max'] / 3600) / walltime_batch )
+              '''
+
+            # default values if runtime measurements are not available
+            else:
+              args += ( '   N/A  ', '   N/A  ' )
+
 
           print format % args
 
         # report that all simulations are pending
         else:
 
-          print format % ( args + ( '        ', '        ', '        ', '    ', '    ', '    ', '    ', ) )
+          args += ( '        ', '        ', '    ', '    ', '    ', '    ' )
+          if local.cluster:
+            args += ( '    ', '        ', '        ' )
+          print format % args
 
     if not self.finished:
       # issue a warning and query for progress

@@ -121,7 +121,7 @@ class MC (object):
 
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
-
+    
     # print combined info: MC info and additional (scheduler-related) information from the solver
     info_solver = info_solver if info_solver != None else ''
     info = info_mc + '  ' + info_solver
@@ -143,7 +143,7 @@ class MC (object):
     return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
 
   # report timer results
-  def timer (self, batch, merge):
+  def timer (self, batch=0):
     
     config = self.config
     if batch:
