@@ -147,9 +147,9 @@ class MC (object):
     
     config = self.config
     if batch:
-      runtimes = config.solver.timer ( config.level, config.type, batch )
+      runtimes = config.solver.timer ( config.level, config.type )
     else:
-      runtimes = [ config.solver.timer ( config.level, config.type, batch, sample ) for sample in config.samples ]
+      runtimes = [ config.solver.timer ( config.level, config.type, sample ) for sample in config.samples ]
 
     if len (runtimes) > 0:
       return { 'min' : min (runtimes), 'max' : max (runtimes) }

@@ -438,38 +438,10 @@ class Solver (object):
     # check if the status file exists
     return os.path.exists ( os.path.join (directory, self.statusfile % label) )
 
-  # report timer results
-  # TODO: if merge or batch, sample should map to correct '_b*' or '_e*'
-  # ALTERNATIVE: already in mc.timer(), load all using glob(*_b*.iteration) + glob(*_e*.iteration)
-  # REMARK: 'glob(*_e*.iteration)' is required for legacy simulations
-  def timer (self, level, type, batch, sample=None):
+  # read 'timerfile' from 'directory' and return runtime
+  def runtime (self, directory, timerfile):
 
-    if merge [level] [type]:
-
-      # get directory
-      directory = self.directory ( level, type )
-
-      # get label
-      label = self.label ( level, type, suffix = '_e1' )
-
-    elif batch [level] [type]:
-      
-      # get directory
-      directory = self.directory ( level, type )
-      
-      # get label
-      label = self.label ( level, type, suffix = '_b1' )
-
-    else:
-      
-      # get directory
-      directory = self.directory ( level, type, sample )
-      
-      # get label
-      label = self.label ( level, type, sample )
-
-    # read timer file
-    timerfilepath = os.path.join (directory, self.timerfile % label)
+    timerfilepath = os.path.join (directory, timerfile)
     if os.path.exists (timerfilepath):
       with open ( timerfilepath, 'r' ) as f:
         lines = f.readlines()
@@ -480,8 +452,40 @@ class Solver (object):
           time = None
     else:
       time = None
-    
+
     try:
       return float (time)
     except:
       return None
+
+  # report timer results
+  def timer (self, level, type, sample='all'):
+
+    if sample == 'all':
+
+      # get directory
+      directory = self.directory ( level, type )
+
+      # get label
+      label = self.label ( level, type, suffix = '_b*' )
+
+      # get all timerfiles
+      from glob import glob
+      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile % label) ) )
+
+      # legacy support
+      timerfiles += sorted ( glob ( os.path.join (directory, self.timerfile % self.label ( level, type, suffix = '_e*' )) ) )
+
+      # read and return runtimes
+      return [ self.runtime ( directory, os.path.basename (timerfile) ) for timerfile in timerfiles ]
+
+    else:
+      
+      # get directory
+      directory = self.directory ( level, type, sample )
+      
+      # get label
+      label = self.label ( level, type, sample )
+
+      # read and return runtime
+      return self.runtime (directory, self.timerfile % label)
