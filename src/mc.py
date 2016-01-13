@@ -148,7 +148,7 @@ class MC (object):
     config = self.config
     runtimes = [ config.solver.timer ( config.level, config.type, sample, batch, merge ) for sample in config.samples ]
     if len (runtimes) > 1:
-      return { 'min' : min (runtimes), 'max' : max ( runtimes ) }
+      return { 'min' : min (runtimes), 'max' : max (runtimes) }
     else:
       return None, None
 
