@@ -394,7 +394,7 @@ class Solver (object):
             # add timer
             if local.timer:
               laber_timer = self.label (level, type, suffix='_b%d' % batch_index)
-              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label }
+              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % laber_timer }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(\n\n%s\n\n) &\n' % batch
