@@ -167,7 +167,7 @@ class Solver (object):
     
     # add timer
     if timer and local.timer:
-      job = local.timer % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
+      job = local.timer % { 'job' : '\n\n' + job + '\n', 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -233,12 +233,8 @@ class Solver (object):
     # prepend command to print date
     job = 'date\n' + job
 
-    # append carriage return if needed
-    if job [-1] != '\n':
-      job += '\n'
-
     # append command to create status file
-    job += 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
+    job = job.rstrip() + '\n' + 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
 
     # prepare solver
     if not self.params.proceed:
@@ -373,7 +369,7 @@ class Solver (object):
 
         # submit each ensemble
         submitted   = 0
-        batch_index = 1
+        batch_index = 0
         for i, size in enumerate (decomposition):
 
           # set label
@@ -392,13 +388,13 @@ class Solver (object):
             # construct batch job
             batch = '\n'.join (part)
 
-            # increment batch_index
+            # increment 'batch_index' counter
             batch_index += 1
 
             # add timer
             if local.timer:
               laber_timer = self.label (level, type, suffix='_b%d' % batch_index)
-              batch = local.timer % { 'job' : '\n' + batch + '\n', 'timerfile' : self.timerfile % label }
+              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(\n\n%s\n\n) &\n' % batch
