@@ -409,10 +409,9 @@ class MLMC (object):
       separator = '  :------------------------------------------------------------------------------------------------------------------------------|'
       format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
 
-      if local.cluster:
-        header    += '  BATCH  |     BATCH RUNTIME     |'
-        separator += '---------------------------------|'
-        format    += '  %s  |  %s - %s  |'
+      header    += '  BATCH  |     BATCH RUNTIME     |'
+      separator += '---------------------------------|'
+      format    += '  %s  |  %s - %s  |'
 
       print ' :: STATUS of MC simulations:'
       print header
@@ -476,34 +475,30 @@ class MLMC (object):
             args += ( '    ', '    ' )
             args += ( '    ', '    ' )
 
-          # batch runtime
-          if local.cluster:
+          # batch
+          batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          batch_str = helpers.intf (batch, table=1, empty=1)
+          args += (batch_str, )
 
-            # batch
-            batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
-            batch_str = helpers.intf (batch, table=1, empty=1)
-            args += (batch_str, )
+          # runtimes of the entire batches
+          runtime_batch  = mc.timer (batch=1)
+          if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
+            min_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['min']) )
+            max_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['max']) )
+            args += ( min_runtime_batch_str, max_runtime_batch_str )
 
-            # runtimes of the entire batches
-            runtime_batch  = mc.timer (batch=1)
-            if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
-              min_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['min']) )
-              max_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['max']) )
-              args += ( min_runtime_batch_str, max_runtime_batch_str )
+            '''
+            # walltime usage of the entire batches
+            if walltime_sample != 'unknown':
+              budget_batch   = budget_sample * batch if batch != None else budget_sample
+              walltime_batch = walltime_sample * batch if batch != None else walltime_sample
+              walltime_batch_percent_min  = round ( 100 * (runtime_batch  ['min'] / 3600) / walltime_batch )
+              walltime_batch_percent_max  = round ( 100 * (runtime_batch  ['max'] / 3600) / walltime_batch )
+            '''
 
-              '''
-              # walltime usage of the entire batches
-              if walltime_sample != 'unknown':
-                budget_batch   = budget_sample * batch if batch != None else budget_sample
-                walltime_batch = walltime_sample * batch if batch != None else walltime_sample
-                walltime_batch_percent_min  = round ( 100 * (runtime_batch  ['min'] / 3600) / walltime_batch )
-                walltime_batch_percent_max  = round ( 100 * (runtime_batch  ['max'] / 3600) / walltime_batch )
-              '''
-
-            # default values if runtime measurements are not available
-            else:
-              args += ( '   N/A  ', '   N/A  ' )
-
+          # default values if runtime measurements are not available
+          else:
+            args += ( '   N/A  ', '   N/A  ' )
 
           print format % args
 
@@ -511,8 +506,7 @@ class MLMC (object):
         else:
 
           args += ( '        ', '        ', '    ', '    ', '    ', '    ' )
-          if local.cluster:
-            args += ( '    ', '        ', '        ' )
+          args += ( '    ', '        ', '        ' )
           print format % args
 
     if not self.finished:
