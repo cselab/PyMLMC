@@ -132,7 +132,7 @@ class MC (object):
 
   # check how many runs are already finished
   def finished (self):
-    
+
     config = self.config
     return sum ( [ config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
 

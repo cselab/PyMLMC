@@ -167,7 +167,7 @@ class Solver (object):
     
     # add timer
     if timer and local.timer:
-      job = local.timer % { 'job' : job, 'timerfile' : self.timerfile % label }
+      job = local.timer % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -232,7 +232,7 @@ class Solver (object):
 
     # prepend command to print date
     job = 'date\n' + job
-    
+
     # append carriage return if needed
     if job [-1] != '\n':
       job += '\n'
@@ -309,7 +309,6 @@ class Solver (object):
   def add (self, job, sample):
     
     # add cmd to the script
-    cmd = '\n'
     cmd += 'cd %s\n' % sample
     cmd += job + '\n'
     cmd += 'cd ..\n'
@@ -343,7 +342,7 @@ class Solver (object):
         for i, part in enumerate (parts):
 
           # construct batch job
-          batch = ''.join (part)
+          batch = '\n'.join (part)
 
           # set batch in parallelization
           parallelization.batch = len (part)
@@ -373,7 +372,8 @@ class Solver (object):
         decomposition = filtered
 
         # submit each ensemble
-        submitted = 0
+        submitted   = 0
+        batch_index = 1
         for i, size in enumerate (decomposition):
 
           # set label
@@ -383,24 +383,28 @@ class Solver (object):
           ensemble = ''
 
           # prepare each part of the batch job
-          for j, part in enumerate (parts [submitted : submitted + size]):
+          for batch_index_local, part in enumerate (parts [submitted : submitted + size]):
 
             # prepare job to be part of an ensemble with batch job id = i
             # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
-            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : j} for job in part ]
+            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : batch_index_local} for job in part ]
 
             # construct batch job
-            batch = ''.join (part)
+            batch = '\n'.join (part)
+
+            # increment batch_index
+            batch_index += 1
 
             # add timer
             if local.timer:
+              laber_timer = self.label (level, type, suffix='_b%d' % batch_index)
               batch = local.timer % { 'job' : '\n' + batch + '\n', 'timerfile' : self.timerfile % label }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
-            batch = '(\n%s\n\n) &\n' % batch
+            batch = '(\n\n%s\n\n) &\n' % batch
 
             # header for the ensemble job
-            ensemble += '\n# === BATCH JOB %d [id=%d]\n' % (j + 1, j)
+            ensemble += '\n# === BATCH JOB %d [local index %d]\n' % (batch_index, batch_index_local)
             
             # add batch job to the ensemble
             ensemble += batch
@@ -436,6 +440,8 @@ class Solver (object):
 
   # report timer results
   # TODO: if merge or batch, sample should map to correct '_b*' or '_e*'
+  # ALTERNATIVE: already in mc.timer(), load all using glob(*_b*.iteration) + glob(*_e*.iteration)
+  # REMARK: 'glob(*_e*.iteration)' is required for legacy simulations
   def timer (self, level, type, sample, batch, merge):
 
     if merge [level] [type]:
