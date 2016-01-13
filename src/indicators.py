@@ -159,7 +159,7 @@ class Indicators (object):
 
       self.covariance  [level] = numpy.cov      ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
       self.correlation [level] = numpy.corrcoef ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
-      
+
       '''
       self.covariance  [level] = float ('NaN')
       self.correlation [level] = float ('NaN')
