@@ -146,8 +146,12 @@ class MC (object):
   def timer (self, batch, merge):
     
     config = self.config
-    runtimes = [ config.solver.timer ( config.level, config.type, sample, batch, merge ) for sample in config.samples ]
-    if len (runtimes) > 1:
+    if batch:
+      runtimes = config.solver.timer ( config.level, config.type, batch )
+    else:
+      runtimes = [ config.solver.timer ( config.level, config.type, batch, sample ) for sample in config.samples ]
+
+    if len (runtimes) > 0:
       return { 'min' : min (runtimes), 'max' : max (runtimes) }
     else:
       return None, None

@@ -159,7 +159,7 @@ class Solver (object):
       return local.mpi_job % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', timer=1):
+  def submit (self, job, parallelization, label, directory='.', timer=0):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
@@ -167,7 +167,7 @@ class Solver (object):
     
     # add timer
     if timer and local.timer:
-      job = local.timer % { 'job' : '\n\n' + job + '\n', 'timerfile' : self.timerfile % label }
+      job = local.timer % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -235,6 +235,10 @@ class Solver (object):
 
     # append command to create status file
     job = job.rstrip() + '\n' + 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
+
+    # add timer
+    if local.timer:
+      job = local.timer % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
 
     # prepare solver
     if not self.params.proceed:
@@ -347,7 +351,7 @@ class Solver (object):
           label = self.label (level, type, suffix='_b%d' % (i+1))
 
           # submit
-          self.execute ( self.submit (batch, parallelization, label, directory), directory )
+          self.execute ( self.submit (batch, parallelization, label, directory, timer=1), directory )
 
       # else if merging into ensembles is enabled
       else:
@@ -393,8 +397,8 @@ class Solver (object):
 
             # add timer
             if local.timer:
-              laber_timer = self.label (level, type, suffix='_b%d' % batch_index)
-              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % laber_timer }
+              label_timer = self.label (level, type, suffix='_b%d' % batch_index)
+              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label_timer }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(\n\n%s\n\n) &\n' % batch
@@ -410,7 +414,7 @@ class Solver (object):
           parallelization.merge = size
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, timer=0), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory), directory )
 
           # update 'submitted' counter
           submitted += size
@@ -438,7 +442,7 @@ class Solver (object):
   # TODO: if merge or batch, sample should map to correct '_b*' or '_e*'
   # ALTERNATIVE: already in mc.timer(), load all using glob(*_b*.iteration) + glob(*_e*.iteration)
   # REMARK: 'glob(*_e*.iteration)' is required for legacy simulations
-  def timer (self, level, type, sample, batch, merge):
+  def timer (self, level, type, batch, sample=None):
 
     if merge [level] [type]:
 
