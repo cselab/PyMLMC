@@ -232,9 +232,13 @@ class Solver (object):
 
     # prepend command to print date
     job = 'date\n' + job
+    
+    # append carriage return if needed
+    if job [-1] != '\n':
+      job += '\n'
 
     # append command to create status file
-    job += '\n' + 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
+    job += 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
 
     # prepare solver
     if not self.params.proceed:
@@ -390,10 +394,10 @@ class Solver (object):
 
             # add timer
             if local.timer:
-              batch = local.timer % { 'job' : batch, 'timerfile' : self.timerfile % label }
+              batch = local.timer % { 'job' : '\n' + batch + '\n', 'timerfile' : self.timerfile % label }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
-            batch = '(%s) &\n' % batch
+            batch = '(\n%s\n\n) &\n' % batch
 
             # header for the ensemble job
             ensemble += '\n# === BATCH JOB %d [id=%d]\n' % (j + 1, j)
