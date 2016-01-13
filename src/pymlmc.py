@@ -432,7 +432,7 @@ class MLMC (object):
         if pending > 0:
           self.finished = 0
 
-        # if some samples are finished, report runtime
+        # if some samples are finished, report runtimes, walltime, budget, batching, etc.
         if finished > 0:
 
           # parallelization
@@ -446,11 +446,11 @@ class MLMC (object):
           else:
             args += ('   N/A  ', )
 
-          # runtimes, walltime, budget, batching, etc.
+          # runtimes, walltime usage, budget usage, etc. of individual samples
           runtime_sample = mc.timer ()
           if runtime_sample ['min'] != None and runtime_sample ['max'] != None:
 
-            # runtimes of individual samples
+            # runtimes
             min_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['min']) )
             max_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['max']) )
             args += ( min_runtime_sample_str, max_runtime_sample_str )
@@ -464,33 +464,58 @@ class MLMC (object):
               args += ('    ', '    ')
 
             # budget usage
-            budget_percent_min = round ( 100 * (runtime_sample ['min'] / 3600) / budget_sample )
-            budget_percent_max = round ( 100 * (runtime_sample ['max'] / 3600) / budget_sample )
-            budget_sample      = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
-            args += ( '%3d%%' % budget_percent_min, '%3d%%' % budget_percent_max )
+            budget_sample             = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
+            budget_sample_percent_min = round ( 100 * (runtime_sample ['min'] / 3600) / budget_sample )
+            budget_sample_percent_max = round ( 100 * (runtime_sample ['max'] / 3600) / budget_sample )
+            args += ( '%3d%%' % budget_sample_percent_min, '%3d%%' % budget_sample_percent_max )
 
           # default values if runtime measurements are not available
           else:
+
             args += ( '   N/A  ', '   N/A  ' )
-            args += ( '    ', '    ' )
-            args += ( '    ', '    ' )
+
+            # LEGACY: instead, report walltime and budget usage for entire batches
+            batch         = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+            runtime_batch = mc.timer (batch=1)
+            if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
+
+              # walltime usage
+              if walltime_sample != 'unknown':
+                walltime_batch = walltime_sample * batch if batch != None else walltime_sample
+                walltime_batch_percent_min  = round ( 100 * (runtime_batch  ['min'] / 3600) / walltime_batch )
+                walltime_batch_percent_max  = round ( 100 * (runtime_batch  ['max'] / 3600) / walltime_batch )
+                args += ( '%3d%%' % walltime_batch_percent_min, '%3d%%' % walltime_batch_percent_max )
+              else:
+                args += ('    ', '    ')
+
+              # budget usage
+              budget_sample  = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
+              budget_batch   = budget_sample * batch if batch != None else budget_sample
+              budget_batch_percent_min = round ( 100 * (runtime_batch ['min'] / 3600) / budget_batch )
+              budget_batch_percent_max = round ( 100 * (runtime_batch ['max'] / 3600) / budget_batch )
+              args += ( '%3d%%' % budget_batch_percent_min, '%3d%%' % budget_batch_percent_max )
+
+            else:
+              args += ( '    ', '    ' )
+              args += ( '    ', '    ' )
 
           # batch
           batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
           args += (batch_str, )
 
-          # runtimes of the entire batches
+          # runtimes, usage, budget of the entire batches
           runtime_batch  = mc.timer (batch=1)
           if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
+
+            # runtimes
             min_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['min']) )
             max_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['max']) )
             args += ( min_runtime_batch_str, max_runtime_batch_str )
 
             '''
-            # walltime usage of the entire batches
+            # walltime usage
             if walltime_sample != 'unknown':
-              budget_batch   = budget_sample * batch if batch != None else budget_sample
               walltime_batch = walltime_sample * batch if batch != None else walltime_sample
               walltime_batch_percent_min  = round ( 100 * (runtime_batch  ['min'] / 3600) / walltime_batch )
               walltime_batch_percent_max  = round ( 100 * (runtime_batch  ['max'] / 3600) / walltime_batch )
