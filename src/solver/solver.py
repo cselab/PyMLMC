@@ -154,9 +154,9 @@ class Solver (object):
     
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
-      return local.simple_job % args
+      return local.simple_job.rstrip() % args
     else:
-      return local.mpi_job % args
+      return local.mpi_job.rstrip() % args
   
   # assemble the submission command
   def submit (self, job, parallelization, label, directory='.', timer=0):
@@ -167,7 +167,7 @@ class Solver (object):
     
     # add timer
     if timer and local.timer:
-      job = local.timer % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
+      job = local.timer.rstrip() % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile % label)
@@ -185,7 +185,7 @@ class Solver (object):
 
     # assemble submission script (if enabled)
     if local.script:
-      args ['script']     = local.script % args
+      args ['script']     = local.script.rstrip() % args
       args ['scriptfile'] = self.scriptfile % label
       scriptfile = os.path.join (directory, self.scriptfile % label)
       with open (scriptfile, 'w') as f:
@@ -238,7 +238,7 @@ class Solver (object):
 
     # add timer
     if local.timer:
-      job = local.timer % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
+      job = local.timer.rstrip() % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
 
     # prepare solver
     if not self.params.proceed:
@@ -398,7 +398,7 @@ class Solver (object):
             # add timer
             if local.timer:
               label_timer = self.label (level, type, suffix='_b%d' % batch_index)
-              batch = local.timer % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label_timer }
+              batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label_timer }
 
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(\n\n%s\n\n) &\n' % batch

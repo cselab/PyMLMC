@@ -123,7 +123,7 @@ class Parallelization (object):
     args ['minutes']  = self.minutes
     args ['memory']   = self.memory
     args ['email']    = self.email
-    args ['envs']     = local.envs
+    args ['envs']     = local.envs.rstrip()
 
     return args
 

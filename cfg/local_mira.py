@@ -60,7 +60,8 @@ scratch = '/projects/CloudPredict/sukysj/pymlmc'
 ensembles = 1
 
 # default environment variables
-envs = '''  --envs PAMI_DEVICE=B \
+envs = '''\
+--envs PAMI_DEVICE=B \
 --envs BG_MEMSIZE=16384 \
 --envs BG_THREADLAYOUT=2 \
 --envs OMP_STACKSIZE=4M \
@@ -100,7 +101,8 @@ runjob \
 '''
 
 # MPI run command
-mpi_job = '''ulimit -c 0; runjob \
+mpi_job = '''ulimit -c 0
+runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
 --cwd $PWD \
