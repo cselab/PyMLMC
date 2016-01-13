@@ -238,7 +238,7 @@ class Solver (object):
 
     # add timer
     if local.timer:
-      job = local.timer % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
+      job = local.timer % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
 
     # prepare solver
     if not self.params.proceed:
