@@ -309,7 +309,7 @@ class Solver (object):
   def add (self, job, sample):
     
     # add cmd to the script
-    cmd += 'cd %s\n' % sample
+    cmd  = 'cd %s\n' % sample
     cmd += job + '\n'
     cmd += 'cd ..\n'
     
