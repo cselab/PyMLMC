@@ -104,3 +104,8 @@ class Example_Solver (Solver):
   def progress (self, results):
 
     return None
+
+  # report efficiency
+  def efficiency (self, level=0, type=0, sample=0, file=None):
+
+    return None

@@ -121,7 +121,7 @@ class MC (object):
 
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
-    
+
     # print combined info: MC info and additional (scheduler-related) information from the solver
     info_solver = info_solver if info_solver != None else ''
     info = info_mc + '  ' + info_solver
@@ -151,10 +151,28 @@ class MC (object):
     else:
       runtimes = [ config.solver.timer ( config.level, config.type, sample ) for sample in config.samples ]
 
+    runtimes = [ runtime for runtime in runtimes if runtime != None ]
+
     if len (runtimes) > 0:
       return { 'min' : min (runtimes), 'max' : max (runtimes) }
     else:
-      return None, None
+      return { 'min' : None, 'max' : None }
+
+  # report efficiency
+  def efficiency (self, batch=0):
+
+    config = self.config
+    if batch:
+      efficiencies = config.solver.efficiencies ( config.level, config.type )
+    else:
+      efficiencies = [ config.solver.efficiencies ( config.level, config.type, sample ) for sample in config.samples ]
+
+    efficiencies = [ efficiency for efficiency in efficiencies if efficiency != None ]
+
+    if len (efficiencies) > 0:
+      return { 'min' : min (efficiencies), 'max' : max (efficiencies) }
+    else:
+      return { 'min' : None, 'max' : None }
 
   # load the results
   def load (self):

@@ -405,9 +405,9 @@ class MLMC (object):
     else:
 
 
-      header    = '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |'
-      separator = '  :------------------------------------------------------------------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
+      header    = '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |   EFFICIENCY  |'
+      separator = '  :----------------------------------------------------------------------------------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
 
       header    += '  BATCH  |     BATCH RUNTIME     |'
       separator += '---------------------------------|'
@@ -432,19 +432,19 @@ class MLMC (object):
         if pending > 0:
           self.finished = 0
 
-        # if some samples are finished, report runtimes, walltime, budget, batching, etc.
+        # report walltime
+        walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+        if walltime_sample != 'unknown':
+          walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
+          args += (walltime_sample_str, )
+        else:
+          args += ('   N/A  ', )
+
+        # if some samples are finished, report runtimes, budget, efficiency, batching, etc.
         if finished > 0:
 
           # parallelization
           parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
-
-          # walltime
-          walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
-          if walltime_sample != 'unknown':
-            walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
-            args += (walltime_sample_str, )
-          else:
-            args += ('   N/A  ', )
 
           # runtimes, walltime usage, budget usage, etc. of individual samples
           runtime_sample = mc.timer ()
@@ -499,6 +499,19 @@ class MLMC (object):
               args += ( '    ', '    ' )
               args += ( '    ', '    ' )
 
+          # efficiency
+          efficiency_sample = mc.efficiency ()
+          if efficiency_sample ['min'] != None and efficiency_sample ['max'] != None:
+            args += ( '%3d%%' % efficiency_sample ['min'], '%3d%%' % efficiency_sample ['max'] )
+          
+          # LEGACY: instead, report efficiency for entire batches
+          else:
+            efficiency_batch = mc.efficiency (batch=1)
+            if efficiency_batch ['min'] != None and efficiency_batch ['max'] != None:
+              args += ( '%3d%%' % efficiency_sample ['min'], '%3d%%' % efficiency_sample ['max'] )
+            else:
+              args += ( '    ', '    ' )
+
           # batch
           batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
@@ -530,8 +543,10 @@ class MLMC (object):
         # report that all simulations are pending
         else:
 
-          args += ( '        ', '        ', '    ', '    ', '    ', '    ' )
-          args += ( '    ', '        ', '        ' )
+          args += ( '        ', '        ', '    ', '    ', '    ', '    ', '    ', '    ' )
+          batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          batch_str = helpers.intf (batch, table=1, empty=1)
+          args += ( batch_str, '        ', '        ' )
           print format % args
 
     if not self.finished:

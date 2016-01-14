@@ -489,3 +489,28 @@ class Solver (object):
 
       # read and return runtime
       return self.runtime (directory, self.timerfile % label)
+
+  # read 'timerfile' from 'directory' and extract efficiency
+  def efficiencies (self, level, type, sample='all'):
+
+    if sample == 'all':
+
+      # get directory
+      directory = self.directory ( level, type )
+
+      # get label
+      label = self.label ( level, type, suffix = '_b*' )
+
+      # get all timerfiles
+      from glob import glob
+      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile % label) ) )
+
+      # legacy support
+      timerfiles += sorted ( glob ( os.path.join (directory, self.timerfile % self.label ( level, type, suffix = '_e*' )) ) )
+
+      # read and return runtimes
+      return [ self.efficiency (file=timerfile) for timerfile in timerfiles ]
+
+    else:
+
+      return self.efficiency (level, type, sample)

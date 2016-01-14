@@ -240,3 +240,38 @@ class CubismMPCF (Solver):
       results.meta ['dt'] = numpy.diff (results.meta ['t'])
     
     return results
+
+  def efficiency (self, level=0, type=0, sample=0, file=None):
+
+    # set lookup prefix
+    prefix = '[           STEP]:'
+
+    # configure file
+    if file == None:
+
+      # get directory
+      directory = self.directory ( level, type, sample )
+
+      # get label
+      label = self.label ( level, type, sample )
+
+      # use the 'timerfile'
+      file = os.path.join (directory, self.timerfile % label)
+
+    # parse the file
+    efficiencies = []
+    if os.path.exists (file):
+      with open ( file, 'r' ) as f:
+        lines = f.readlines()
+        for line in lines:
+          if line.startswith (prefix):
+            tail = line [ len (prefix) : ]
+            head = tail [ 0 : tail.index ('-') ]
+            head = head.strip()
+            efficiencies.append ( float (head) )
+
+    # return the average
+    if len (efficiencies) > 0:
+      return numpy.mean (efficiencies)
+    else:
+      return None
