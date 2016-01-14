@@ -144,20 +144,13 @@ class MLMC (object):
       # load MLMC simulation
       self.load ()
 
-      # check if we are on the same machine
-      if self.status.list ['cluster'] != local.name:
-        warning = 'Simulation machine [%s] differs from this machine [%s]' % (self.status.list ['cluster'], local.name)
-        message = 'Skip update phase?'
-        if helpers.query (message, warning=warning, exit=0) == 'y':
-          return
-
       # update the computed number of samples
       self.config.samples.append ()
 
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
-      
+
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
       self.indicators.report  ()
@@ -176,6 +169,13 @@ class MLMC (object):
 
       # query for progress
       helpers.query ('Continue?')
+
+      # check if we are on the same machine
+      if self.status.list ['cluster'] != local.name:
+        warning = 'Simulation machine [%s] differs from this machine [%s]' % (self.status.list ['cluster'], local.name)
+        message = 'Skip update phase?'
+        if helpers.query (message, warning=warning, exit=0) == 'y':
+          return
 
       # recursively query user for input for automated optimal sample adjustments
       while True:
