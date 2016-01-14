@@ -145,8 +145,8 @@ class MLMC (object):
       self.load ()
 
       # check if we are on the same machine
-      if self.status.list ['cluster'] != local.cluster:
-        warning = 'Different clusters detected: simulation - %s, current - %s' % (self.status.list ['cluster'], local.cluster)
+      if self.status.list ['cluster'] != local.name:
+        warning = 'Different clusters detected: simulation - %s, current - %s' % (self.status.list ['cluster'], local.name)
         message = 'Skip update phase?'
         if helpers.query (message, warning=warning, exit=0) == 'y':
           return

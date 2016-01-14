@@ -286,7 +286,7 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
     else:
       print '  : %s' % str  (input)
     
-    return input
+  return input
 
 # error
 def error (message, details=None, advice=None):
