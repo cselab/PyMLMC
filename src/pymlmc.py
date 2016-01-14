@@ -87,15 +87,6 @@ class MLMC (object):
     # initial phase
     if self.params.restart:
       self.init ()
-    
-    # check if we are on the same machine
-    if self.status.list ['cluster'] != local.cluster:
-      warning = 'Different cluster detected'
-      message = 'Skip update phase and continue with data analysis?'
-      input = helpers.query (message, warning=warning, exit=0)
-      if input == 'y':
-        print
-        return
 
     # proceed with the existing simulation (no modification in setup)
     if self.params.proceed:
@@ -152,6 +143,13 @@ class MLMC (object):
 
       # load MLMC simulation
       self.load ()
+
+      # check if we are on the same machine
+      if self.status.list ['cluster'] != local.cluster:
+      warning = 'Different cluster detected'
+      message = 'Skip update phase?'
+      if helpers.query (message, warning=warning, exit=0) == 'y':
+        return
 
       # update the computed number of samples
       self.config.samples.append ()
