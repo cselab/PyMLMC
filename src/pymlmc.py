@@ -597,7 +597,7 @@ class MLMC (object):
     # load the results from MC simulations and report
     from helpers import intf
     print
-    print ' :: LOADING RESULTS...'
+    print ' :: LOADING RESULTS:'
     print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
     print '  :------------------------------------------------------------------|'
     format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |'
@@ -645,7 +645,7 @@ class MLMC (object):
 
     # report how many pairs of fine and course samples were loaded
     print
-    print ' :: LOADED PAIRS (FINE & COARSE)...'
+    print ' :: LOADED PAIRS (FINE & COARSE):'
     print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |'
     print '  :-------------------------------------------|'
     format = '  :      %d  |    %s  |   %s  |   %s  |'
