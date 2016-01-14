@@ -146,10 +146,10 @@ class MLMC (object):
 
       # check if we are on the same machine
       if self.status.list ['cluster'] != local.cluster:
-      warning = 'Different cluster detected'
-      message = 'Skip update phase?'
-      if helpers.query (message, warning=warning, exit=0) == 'y':
-        return
+        warning = 'Different cluster detected'
+        message = 'Skip update phase?'
+        if helpers.query (message, warning=warning, exit=0) == 'y':
+          return
 
       # update the computed number of samples
       self.config.samples.append ()
