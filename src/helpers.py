@@ -222,7 +222,7 @@ class Progress (object):
 
   def message (self, message):
     self.reset()
-    self.lineline = self.prefix + message
+    self.line = self.prefix + message
     self.stdout.write ('\r' + self.line)
     self.stdout.flush()
     return self.line
