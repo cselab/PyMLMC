@@ -118,7 +118,7 @@ class MC (object):
       progress.update (step + 1)
 
     # reset progress indicator
-    progress.message ('Finalizing...')
+    progress.message ('finalizing...')
 
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
