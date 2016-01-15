@@ -107,7 +107,7 @@ class MC (object):
     config.solver.initialize (config.level, config.type, self.parallelization, config.iteration)
 
     # use progress indicator, report MC info each time
-    prefix = info_mc + '  Progress: '
+    prefix = info_mc + '  '
     progress = Progress (prefix=prefix, steps=len(config.samples), length=20)
 
     import time
@@ -117,15 +117,15 @@ class MC (object):
       progress.update (step + 1)
 
     # reset progress indicator
-    progress.reset()
+    progress.message ('Finalizing...')
 
     # finalize solver
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
 
     # print combined info: MC info and additional (scheduler-related) information from the solver
     info_solver = info_solver if info_solver != None else ''
-    info = info_mc + '  ' + info_solver
-    print info
+    progress.message (info_solver)
+    progress.finalize ()
 
     # return combined info
     return info

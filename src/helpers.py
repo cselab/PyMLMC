@@ -191,12 +191,14 @@ def load (dir):
 # provides an update'able progress bar for the command line
 class Progress (object):
 
-  def __init__ (self, prefix, steps, length=20):
+  def __init__ (self, prefix, steps, length=20, caption='Progress: '):
 
     self.prefix  = prefix
     self.length  = length
     self.steps   = steps
     self.percent = None
+    self.caption = caption
+    self.line    = ''
 
     from sys import stdout
     self.stdout = stdout
@@ -209,17 +211,23 @@ class Progress (object):
     if percent == self.percent:
       return
     self.percent = percent
-    text  = '\r' + self.prefix
-    text += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
-    text += ' ' + str (percent) + '%'
-    self.stdout.write (text)
+    self.line  = self.prefix + self.caption
+    self.line += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
+    self.line += ' ' + str (percent) + '%'
+    self.stdout.write ('\r' + self.line)
     self.stdout.flush ()
+
+  def message (self, message):
+    self.reset()
+    self.lineline = self.prefix + message
+    self.stdout.write ('\r' + self.line)
+    self.stdout.flush()
 
   def reset (self):
     self.stdout.write('\r')
-    length = len (self.prefix) + 8 + self.length
-    self.stdout.write(' ' * length)
+    self.stdout.write(' ' * len (self.line))
     self.stdout.flush()
+    self.line = ''
     self.stdout.write('\r')
     self.stdout.flush()
 
