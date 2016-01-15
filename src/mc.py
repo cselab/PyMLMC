@@ -123,8 +123,7 @@ class MC (object):
     info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
 
     # print combined info: MC info and additional (scheduler-related) information from the solver
-    info_solver = info_solver if info_solver != None else ''
-    progress.message (info_solver)
+    info = progress.message (info_solver)
     progress.finalize ()
 
     # return combined info

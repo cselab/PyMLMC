@@ -424,6 +424,8 @@ class Solver (object):
         # TODO: this is not very clean: 'parallelization.nodes * size'
         info = [ '%s (%s N)' % ( intf (size), intf (parallelization.nodes * size) ) for size in decomposition ]
         return ' + '.join (info)
+    
+    return ''
 
   # check if the job is finished
   # (required only for non-interactive sessions)

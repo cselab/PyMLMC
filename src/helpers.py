@@ -204,24 +204,27 @@ class Progress (object):
     self.stdout = stdout
     
     self.update (0)
+    return self.line
 
   def update (self, step):
     fraction = float(step) / self.steps
     percent = int(round(100*fraction))
     if percent == self.percent:
-      return
+      return self.line
     self.percent = percent
     self.line  = self.prefix + self.caption
     self.line += '[' + '#' * int(round(fraction*self.length)) + ' ' * int((self.length-round(fraction*self.length))) + ']'
     self.line += ' ' + str (percent) + '%'
     self.stdout.write ('\r' + self.line)
     self.stdout.flush ()
+    return self.line
 
   def message (self, message):
     self.reset()
     self.lineline = self.prefix + message
     self.stdout.write ('\r' + self.line)
     self.stdout.flush()
+    return self.line
 
   def reset (self):
     self.stdout.write('\r')
@@ -230,9 +233,11 @@ class Progress (object):
     self.line = ''
     self.stdout.write('\r')
     self.stdout.flush()
+    return self.line
 
   def finalize (self):
     print
+    return self.line
 
 # info
 def info (message, details=None, advice=None):
