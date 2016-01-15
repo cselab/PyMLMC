@@ -109,6 +109,7 @@ class MC (object):
     # use progress indicator, report MC info each time
     prefix = info_mc + '  '
     progress = Progress (prefix=prefix, steps=len(config.samples), length=20)
+    progress.init ()
 
     import time
     # run all samples

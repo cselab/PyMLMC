@@ -202,7 +202,8 @@ class Progress (object):
 
     from sys import stdout
     self.stdout = stdout
-    
+
+  def init (self):
     self.update (0)
     return self.line
 
