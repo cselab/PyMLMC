@@ -426,10 +426,7 @@ def saveall (mlmc, save, qoi=None):
   pylab.savefig    (base_name + '.' + 'pdf')
   generateTexTable (mlmc, base_name)
 
-#def draw (mlmc, save, qoi=None, legend=False, loc='best', extent=None, xorigin=True, yorigin=True):
 def draw (mlmc, save, qoi=None, legend=False, loc='best'):
-  
-  #adjust_axes (qoi, extent, xorigin, yorigin)
   
   # reset xend_max
   global xend_max
@@ -443,9 +440,20 @@ def draw (mlmc, save, qoi=None, legend=False, loc='best'):
 
 # show plots
 def show (block=1):
+
+  # show all figures
   pylab.show (block=block)
+
+  # close all figures
+  # REMARK: does not work for some reason
   if block:
+    print ' :: Closing figures...',
+    sys.stdout.flush()
+    import time
+    time.sleep (1)
     pylab.close ('all')
+    time.sleep (1)
+    print 'done.'
 
 # query for action
 def query ():
@@ -500,7 +508,8 @@ def plot_helper_lines (qoi, run=1):
       print
       sys.exit()
     if surface != None:
-      pylab.axhline (y=surface, color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+      pylab.axhline (y=surface,  color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+      pylab.axhline (y=-surface, color='maroon', linestyle='--', alpha=alpha(run))
 
 # adjust axes
 def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
@@ -511,6 +520,7 @@ def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
   # adjust x-axis
   if xorigin:
     pylab.gca().set_xlim (left = 0)
+
   if xend != None:
     global xend_max
     if xend_max == None:
@@ -541,7 +551,8 @@ def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
     ylim = pylab.ylim() [1]
 
     if '_pos_d' in qoi and surface != None:
-      pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
+      pylab.gca().set_ylim (top = 1.05 * surface)
+      #pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
 
     if '_pos_x' in qoi and extent_x != None:
       pylab.gca().set_ylim (top = max (extent_x, ylim))
@@ -756,6 +767,8 @@ def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yori
   if extent:
     extent_range = extent [1] - extent [0]
     extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
+  elif '_pos_d' in qoi:
+    extent_diff = ( - 1.05 * surface, 1.05 * surface )
   else:
     extent_diff = None
 
@@ -828,6 +841,8 @@ def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=Tru
   if extent:
     extent_range = extent [1] - extent [0]
     extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
+  elif '_pos_d' in qoi:
+    extent_diff = ( - 1.05 * surface, 1.05 * surface )
   else:
     extent_diff = None
 

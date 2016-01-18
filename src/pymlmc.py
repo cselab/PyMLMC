@@ -515,7 +515,7 @@ class MLMC (object):
           else:
             efficiency_batch = mc.efficiency (batch=1)
             if efficiency_batch ['min'] != None and efficiency_batch ['max'] != None:
-              args += ( '%3d%%' % efficiency_sample ['min'], '%3d%%' % efficiency_sample ['max'] )
+              args += ( '%3d%%' % efficiency_batch ['min'], '%3d%%' % efficiency_batch ['max'] )
             else:
               args += ( '    ', '    ' )
 
