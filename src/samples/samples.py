@@ -124,10 +124,10 @@ class Samples (object):
 
     # dump history
     helpers.delete (self.samples_file)
-    for entry in self.history:
-      for i in range (iteration + 1):
+    for i in range (iteration + 1):
+      for entry in self.history:
         helpers.dump (self.history [entry] [i], '%d', entry, self.samples_file, i)
-    
+
     '''
     # remove old samples file to avoid trashing
     if iteration == 0:
