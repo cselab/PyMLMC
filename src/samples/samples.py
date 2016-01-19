@@ -110,11 +110,34 @@ class Samples (object):
         Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
 
   def save (self, iteration):
+
+    # initialize history
+    if len (self.history) == 0:
+      self.history ['computed']   = {}
+      self.history ['additional'] = {}
+      self.history ['combined']   = {}
+
+    # append history
+    self.history ['computed']   [iteration] = self.counts.computed
+    self.history ['additional'] [iteration] = self.counts.additional
+    self.history ['combined']   [iteration] = self.counts.combined
+
+    # dump history
+    helpers.delete (self.samples_file)
+    for entry in self.history:
+      for i in range (iteration + 1):
+        helpers.dump (self.history [entry] [i], '%d', entry, self.samples_file, i)
     
-    from helpers import dump
-    dump (self.counts.computed,   '%d', 'computed',   self.samples_file, iteration)
-    dump (self.counts.additional, '%d', 'additional', self.samples_file, iteration)
-    dump (self.counts.combined,   '%d', 'combined',   self.samples_file, iteration)
+    '''
+    # remove old samples file to avoid trashing
+    if iteration == 0:
+      helpers.delete (self.samples_file)
+
+    # dump samples counts
+    helpers.dump (self.counts.computed,   '%d', 'computed',   self.samples_file, iteration)
+    helpers.dump (self.counts.additional, '%d', 'additional', self.samples_file, iteration)
+    helpers.dump (self.counts.combined,   '%d', 'combined',   self.samples_file, iteration)
+    '''
   
   def make (self):
 

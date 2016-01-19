@@ -47,40 +47,9 @@ class Indicators (object):
     self.variance_diff  = numpy.zeros ( self.L + 1, dtype=float)
     self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
     self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
-
-    '''
-    values      = helpers.level_type_list (self.levels)
-    values_diff = helpers.level_type_list (self.levels)
-    '''
+    
     values    = helpers.level_type_list (self.levels)
     distances = helpers.level_list      (self.levels)
-
-    '''
-    # evaluate indicators for all samples on all levels and types
-    for i, (level, type) in enumerate (self.levels_types):
-      
-      # compute plain values and values meant for level differences
-      values      [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [i] .results if result != None ] )
-      results_diff               = [ result for sample, result in enumerate (mcs [i] .results) if sample in loaded [level] ]
-      values_diff [level] [type] = numpy.array ( [ self.indicator (result) for result in results_diff ] )
-
-      # handle unavailable simulations
-      if len (values [level] [type]) == 0:
-        values [level] [type] = numpy.array ( [ float('NaN') ] )
-      if len (values_diff [level] [type]) == 0:
-        values_diff [level] [type] = numpy.array ( [ float('NaN') ] )
-
-      # check if NaN's are present
-      # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan (values [level] [type]) .any():
-        self.nans = 1
-      if numpy.isnan (values_diff [level] [type]) .any():
-        self.nans = 1
-      if len (values [level] [type]) < 2:
-        self.nans = 1
-      if len (values_diff [level] [type]) < 2:
-        self.nans = 1
-    '''
 
     # evaluate indicators for all samples on all levels and types
     for i, (level, type) in enumerate (self.levels_types):
@@ -132,19 +101,6 @@ class Indicators (object):
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
 
-    '''
-    # compute indicators for differences
-    self.mean_diff     [0] = numpy.mean ( values_diff [0] [0] )
-    #self.mean_diff     [0] = numpy.nanmean ( values_diff [0] [0] )
-    self.variance_diff [0] = numpy.var  ( values_diff [0] [0] )
-    #self.variance_diff [0] = numpy.nanvar  ( values_diff [0] [0] )
-    for level in self.levels [1:] :
-      self.mean_diff     [level] = numpy.mean ( values_diff [level] [0] - values_diff [level] [1] )
-      #self.mean_diff     [level] = numpy.nanmean ( values_diff [level] [0] - values_diff [level] [1] )
-      self.variance_diff [level] = numpy.var  ( values_diff [level] [0] - values_diff [level] [1] )
-      #self.variance_diff [level] = numpy.nanvar  ( values_diff [level] [0] - values_diff [level] [1] )
-    '''
-
     # compute level distances
     for level in self.levels:
       self.mean_diff     [level] = numpy.mean ( distances [level] )
@@ -155,15 +111,12 @@ class Indicators (object):
     # compute covariance and correlation
     self.covariance  [0] = float ('NaN')
     self.correlation [0] = float ('NaN')
+
     for level in self.levels [1:] :
 
       self.covariance  [level] = numpy.cov      ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
       self.correlation [level] = numpy.corrcoef ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
 
-      '''
-      self.covariance  [level] = float ('NaN')
-      self.correlation [level] = float ('NaN')
-      '''
       '''
       self.covariance  [level] = 0.5 * (self.variance [level] [0] + self.variance [level] [1] - self.variance_diff [level])
       self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
@@ -252,7 +205,6 @@ class Indicators (object):
       self.history ['covariance']    = {}
       self.history ['correlation']   = {}
 
-
     # append history
     self.history ['epsilon_fi']    [iteration] = [ self.mean [level] [0] for level in self.levels ]
     self.history ['epsilon_co']    [iteration] = [ self.mean [level] [1] for level in self.levels ]
@@ -262,7 +214,7 @@ class Indicators (object):
     self.history ['variance_diff'] [iteration] = self.variance_diff
     self.history ['covariance']    [iteration] = self.covariance
     self.history ['correlation']   [iteration] = self.correlation
-    
+
     # dump history
     helpers.delete (self.indicators_file)
     for variable in self.history:
