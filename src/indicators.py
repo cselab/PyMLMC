@@ -304,7 +304,6 @@ class Indicators (object):
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
           self.variance [level] [1] = numpy.nan
-          self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
 
     # report indicators including extrapolated values
