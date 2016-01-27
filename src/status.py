@@ -84,6 +84,10 @@ class Status (object):
     self.list = {}
     execfile ( statusfiles [-1], globals(), self.list )
 
+    # check if the number of levels is the same
+    if len (self.list ['samples']) != len (config.levels):
+      helpers.error ('Number of levels does not match: %d (status file) and %d (specified)' % (len (self.list ['samples']), len (config.levels)) )
+
     config.iteration = self.list ['iteration']
     config.solver.iteration = self.list ['iteration']
     
