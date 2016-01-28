@@ -400,6 +400,13 @@ class Solver (object):
               label_timer = self.label (level, type, suffix='_b%d' % batch_index)
               batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label_timer }
 
+            # add block booting and block freeing
+            if local.boot and local.free:
+              boot = local.boot % {'batch_id' : batch_index_local}
+              free = local.free % {'batch_id' : batch_index_local}
+              batch = '%s\n\n%s\n\n%s' % (boot, batch, free)
+
+
             # fork to background (such that other batch jobs in ensemble could proceed)
             batch = '(\n\n%s\n\n) &\n' % batch
 

@@ -116,6 +116,12 @@ runjob \
 # batch job block hook
 BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
 
+# block boot
+boot = 'boot-block --block ${BLOCKS[%(batch_id)d]}'
+
+# block free
+free = 'boot-block --block ${BLOCKS[%(batch_id)d]} --free'
+
 # submission script template (required for support of batch jobs ensembles)
 script = '''#!/bin/bash
 
@@ -146,10 +152,16 @@ echo
 echo 'First %(merge)d selected block(s):'
 for BLOCK in ${BLOCKS[@]}
 do
-echo $BLOCK
+  echo $BLOCK
 done
 echo
 
+%(job)s
+
+wait
+'''
+
+'''
 # boot blocks (3 attempts are recommended)
 for BLOCK in ${BLOCKS[@]}
 do
@@ -158,11 +170,9 @@ do
   boot-block --block $BLOCK &
 done
 wait
+'''
 
-%(job)s
-
-wait
-
+'''
 # free blocks
 for BLOCK in ${BLOCKS[@]}
 do
