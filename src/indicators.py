@@ -114,8 +114,16 @@ class Indicators (object):
 
     for level in self.levels [1:] :
 
-      self.covariance  [level] = numpy.cov      ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
-      self.correlation [level] = numpy.corrcoef ( values [level] [0], values [level] [1] ) [0][1] if len (values [level] [0]) > 1 else float('nan')
+      results_f = [ result for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in loaded [level] ]
+      results_c = [ result for sample, result in enumerate (mcs [ self.pick [level][1] ] .results) if sample in loaded [level] ]
+      values_f  = numpy.array ( [ self.indicator (result) for result in results_f ] )
+      values_c  = numpy.array ( [ self.indicator (result) for result in results_c ] )
+      if len (loaded [level]) > 1:
+        self.covariance  [level] = numpy.cov      ( values_f, values_c ) [0][1]
+        self.correlation [level] = numpy.corrcoef ( values_f, values_c ) [0][1]
+      else:
+        self.covariance  [level] = float('nan')
+        self.correlation [level] = float('nan')
 
       '''
       self.covariance  [level] = 0.5 * (self.variance [level] [0] + self.variance [level] [1] - self.variance_diff [level])
