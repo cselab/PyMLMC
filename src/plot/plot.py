@@ -586,7 +586,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.3)
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.3, linewidth=0.0)
       # hack to show the legend entry
       pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label='mean +/- std. dev.')
     
@@ -612,7 +612,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     ts     = percentiles [0] ['ts']
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
     
-    pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.3)
+    pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.3, linewidth=0.0)
     # hack to show the legend entry
     pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label=label)
   
@@ -1219,12 +1219,12 @@ def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame
   baseline  = [basevalue for level in levels]
   pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
   if fill:
-    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5)
+    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
   #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
   if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5, linewidth=0.0)
   #if optimal:
   #  pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
   pylab.title  ('Number of samples')
@@ -1278,11 +1278,11 @@ def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False,
   if warmup:
     pylab.plot (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
     if fill:
-      pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5)
+      pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
   if mlmc.config.iteration > 0:
     pylab.plot (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5)
+      pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5, linewidth=0.0)
   if total:
     pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
   #if optimal:
@@ -1396,7 +1396,7 @@ def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, f
   if mlmc.config.iteration > 0:
     pylab.semilogy (levels, mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
     if fill:
-      pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('errors'), alpha=0.5)
+      pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('errors'), alpha=0.5, linewidth=0.0)
   if total:
     pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % mlmc.errors.total_relative_error)
   #if run == 1:

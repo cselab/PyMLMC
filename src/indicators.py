@@ -227,7 +227,7 @@ class Indicators (object):
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
 
-  # extrapolate missing variance estimates using available estimates
+  # extrapolate missing indicators from the courser levels
   def extrapolate (self):
     
     self.available = 1
@@ -235,17 +235,21 @@ class Indicators (object):
     for level in self.levels:
       if numpy.isnan ( self.variance_diff [level] ):
         if level != 0:
+          self.mean_diff     [level] = self.mean_diff     [level-1] / 2
           self.variance_diff [level] = self.variance_diff [level-1] / 2
         else:
+          self.mean_diff     [level] = numpy.nan
           self.variance_diff [level] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
-
+    
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
         if level != 0:
+          self.mean     [level] [0] = self.mean     [level-1] [0]
           self.variance [level] [0] = self.variance [level-1] [0]
         else:
+          self.mean     [level] [0] = numpy.nan
           self.variance [level] [0] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA [FINE]\' not possible!')
@@ -253,8 +257,10 @@ class Indicators (object):
     for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
         if level != 1:
+          self.mean     [level] [1] = self.mean     [level-1] [1]
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
+          self.mean     [level] [1] = numpy.nan
           self.variance [level] [1] = numpy.nan
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
 
