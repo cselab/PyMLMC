@@ -399,7 +399,7 @@ class Solver (object):
             if local.boot and local.free:
               boot = local.boot % {'batch_id' : batch_index_local}
               free = local.free % {'batch_id' : batch_index_local}
-              batch = '%s\n%s\n\n%s\n' % (boot, batch, free)
+              batch = '%s\n\n%s\n%s\n' % (boot, batch, free)
 
             # add timer
             if local.timer:
