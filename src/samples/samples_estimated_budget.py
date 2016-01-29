@@ -88,7 +88,7 @@ class Estimated_Budget (Samples):
     print '  : -> Consumed  budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_used), table=1), helpers.intf (numpy.ceil(budget_used/local.cores), table=1))
     print '  : -> Remaining budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_left), table=1), helpers.intf (numpy.ceil(budget_left/local.cores), table=1))
     if self.counts.additional != []:
-      print '  : -> Requested budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_reqd), table=1), helpers.intf (numpy.ceil(budget_reqd), table=1))
+      print '  : -> Requested budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_reqd), table=1), helpers.intf (numpy.ceil(budget_reqd/local.cores), table=1))
 
   def report (self):
 
