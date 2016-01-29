@@ -48,7 +48,7 @@ performance = 1
 scratch = '/scratch/daint/sukysj/pymlmc'
 
 # ensemble support
-ensembles = 1
+ensembles = 0
 
 # default environment variables
 envs = ''
