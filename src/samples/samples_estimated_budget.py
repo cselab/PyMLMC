@@ -10,6 +10,7 @@
 
 from samples import *
 import helpers
+import local
 import numpy
 
 # surpresses invalid division errors and simply returns 'nan' in such cases
@@ -78,16 +79,16 @@ class Estimated_Budget (Samples):
     print
     print ' :: BUDGET:'
 
-    budget_used = sum ( [ self.works [level] * self.counts.available() [level] for level in self.levels ] )
-    budget_left = self.budget - budget_used
+    budget_used = float (sum ( [ self.works [level] * self.counts.available() [level] for level in self.levels ] ))
+    budget_left = float (self.budget - budget_used)
     if self.counts.additional != []:
-      budget_reqd = sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] )
+      budget_reqd = float (sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] ))
 
-    print '  : -> Specified budget: %s CPU hours' % helpers.intf (numpy.ceil(self.budget), table=1)
-    print '  : -> Consumed  budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_used), table=1)
-    print '  : -> Remaining budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_left), table=1)
+    print '  : -> Specified budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(self.budget), table=1), helpers.intf (numpy.ceil(self.budget/local.cores), table=1))
+    print '  : -> Consumed  budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_used), table=1), helpers.intf (numpy.ceil(budget_used/local.cores), table=1))
+    print '  : -> Remaining budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_left), table=1), helpers.intf (numpy.ceil(budget_left/local.cores), table=1))
     if self.counts.additional != []:
-      print '  : -> Requested budget: %s CPU hours' % helpers.intf (numpy.ceil(budget_reqd), table=1)
+      print '  : -> Requested budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_reqd), table=1), helpers.intf (numpy.ceil(budget_reqd), table=1))
 
   def report (self):
 
