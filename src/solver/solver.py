@@ -183,6 +183,10 @@ class Solver (object):
     args ['label']    = label
     args ['xopts']    = self.params.xopts
 
+    # adjust parallelization to take into account 'batch' and 'merge' modes
+    # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
+    args.update ( parallelization.adjust().args() )
+
     # assemble submission script (if enabled)
     if local.script:
       args ['script']     = local.script.rstrip() % args
@@ -196,10 +200,6 @@ class Solver (object):
         print '=== SCRIPT ==='
         print args ['script']
         print '==='
-
-    # adjust parallelization to take into account 'batch' and 'merge' modes
-    # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
-    args.update ( parallelization.adjust().args() )
 
     # assemble submission command
     submit = local.submit % args

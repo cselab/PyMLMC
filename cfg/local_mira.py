@@ -126,7 +126,7 @@ free = 'boot-block --block ${BLOCKS[%(batch_id)d]} --free'
 script = '''#!/bin/bash
 
 # get blocks for each batch job in the ensemble
-BLOCKS=`get-bootable-blocks --size %(nodes)d $COBALT_PARTNAME`
+BLOCKS=`get-bootable-blocks --size $((%(nodes)d/%(merge)d)) $COBALT_PARTNAME`
 
 # split string of blocks into array elements
 read -r -a BLOCKS <<< $BLOCKS

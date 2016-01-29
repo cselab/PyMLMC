@@ -124,7 +124,7 @@ class Parallelization (object):
     args ['memory']   = self.memory
     args ['email']    = self.email
     args ['envs']     = local.envs.rstrip()
-
+    
     return args
 
   # distribute ranks for ndims dimensions
