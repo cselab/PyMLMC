@@ -118,9 +118,15 @@ class MLMC (object):
       
     # query for progress
     if self.params.simulate:
-      helpers.query ('Simulate (no actual submissions) initial job submission?')
+      if self.config.deterministic:
+        helpers.query ('Simulate (no actual submissions) job submission?')
+      else:
+        helpers.query ('Simulate (no actual submissions) initial job submission?')
     else:
-      helpers.query ('Submit initial jobs?')
+      if self.config.deterministic:
+        helpers.query ('Submit job?')
+      else:
+        helpers.query ('Submit initial jobs?')
 
     # compute initial samples
     self.run ()
@@ -322,11 +328,12 @@ class MLMC (object):
     self.create_MCs (self.config.samples.indices.additional, self.config.iteration)
     
     # report samples that will be computed
-    print
-    print ' :: SAMPLES TO COMPUTE:',
-    for count in self.config.samples.counts.additional:
-      print helpers.intf (count, table=0), 
-    print
+    if not self.config.deterministic:
+      print
+      print ' :: SAMPLES TO COMPUTE:',
+      for count in self.config.samples.counts.additional:
+        print helpers.intf (count, table=0),
+      print
     
     # validate MC simulations
     for mc in self.mcs:
