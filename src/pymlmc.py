@@ -151,12 +151,12 @@ class MLMC (object):
       # load MLMC simulation
       self.load ()
 
-      # update the computed number of samples
-      self.config.samples.append ()
-
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
+
+      # update the computed number of samples
+      self.config.samples.append ()
 
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
@@ -345,7 +345,7 @@ class MLMC (object):
     if local.cluster:
       header    += '  WALLTIME  |  BATCH  ->  JOBS   |'
       separator += '---------------------------------|'
-      if local.ensembles:
+      if local.ensembles and not self.config.deterministic:
         header    += '  MERGE  ->  ENSEMBLES  '
         separator += '------------------------'
     print header
@@ -595,14 +595,16 @@ class MLMC (object):
         advice  = 'Run PyMLMC with \'-v 1\' option for verbose mode or with \'-r\' option to restart the simulation'
         helpers.error (message, details, advice)
 
-    # load samples history
-    self.config.samples.load (self.config)
+    if not self.config.deterministic:
 
-    # load indicators history
-    self.indicators.load (self.config)
+      # load samples history
+      self.config.samples.load (self.config)
 
-    # load errors history
-    self.errors.load (self.config)
+      # load indicators history
+      self.indicators.load (self.config)
+
+      # load errors history
+      self.errors.load (self.config)
 
     # recreate MC simulations
     self.create_MCs (self.config.samples.indices.combined, self.config.iteration)
@@ -712,39 +714,7 @@ class MLMC (object):
     print '  : MC estimates...'
     for mc in self.mcs:
       mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level], qois)
-    '''
-    # assemble MC estimates of differences between type = 0 and type = 1 on all levels for each statistic
-    print '  : MC estimates of differences...'
-    self.diffs = [ {} for level in self.config.levels ]
 
-    # mark all levels as unavailable until the valid coarsest level L0
-    for level in self.config.levels [0 : self.L0]:
-      for stat in stats:
-        self.diffs [level] [stat.name] = None
-
-    # on the coarsest level, MC estimate of difference is just a plain MC estimate
-    for stat in stats:
-      self.diffs [self.L0] [stat.name] = copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [stat.name])
-
-    # assemble MC estimates of differences on the remaining levels
-    for level in self.config.levels [self.L0 + 1 : ]:
-
-      print '  : -> level %d' % level
-
-      # assemble all stats
-      for stat in stats:
-
-        # assemble difference
-        # TODO: this should be moved to a new class, say 'Difference'
-        differences = [ None ] * len ( self.config.samples.indices.computed [level] )
-        for i in self.config.samples.indices.computed [level]:
-          differences [i]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .results [i])
-          differences [i] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .results [i]
-
-        # assemble MC estimate of difference
-        self.diffs [level] [stat.name] = stat.compute_all ( differences, indices=self.config.samples.indices.loaded [level], qois=qois )
-
-    '''
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
     self.diffs = [ {} for level in self.config.levels ]
