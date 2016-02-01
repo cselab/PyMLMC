@@ -46,7 +46,7 @@ class Scheduler (object):
 
   def report (self):
 
-    if len (ratios) > 1:
+    if len (self.ratios) > 1:
       print '  : Requested level allocation ratios:'
       print '    %s' % str(self.ratios)
     print '  : SPECIFICATIONS:'
