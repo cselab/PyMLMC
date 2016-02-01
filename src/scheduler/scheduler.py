@@ -45,9 +45,10 @@ class Scheduler (object):
     self.works = [ work * self.walltime * self.cores / float (works [self.L]) for work in works ]
 
   def report (self):
-    
-    print '  : Requested level allocation ratios:'
-    print '    %s' % str(self.ratios)
+
+    if len (ratios) > 1:
+      print '  : Requested level allocation ratios:'
+      print '    %s' % str(self.ratios)
     print '  : SPECIFICATIONS:'
     print '    Cores per node: %d' % local.cores
     print '    Threads per core: %d' % local.threads
