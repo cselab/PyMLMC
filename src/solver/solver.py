@@ -290,8 +290,8 @@ class Solver (object):
   def boot (self, job, block=0):
 
     if local.boot and local.free:
-      boot = local.boot % {'batch_id' : block}
-      free = local.free % {'batch_id' : block}
+      boot = local.boot % {'block' : block}
+      free = local.free % {'block' : block}
       job = '%s\n\n%s\n%s\n' % (boot, job, free)
       return job
 
