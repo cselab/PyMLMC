@@ -76,7 +76,7 @@ class Status (object):
 
     # look for status files
     from glob import glob
-    statusfiles = glob ( os.path.join (config.root, self.status_file + '.*') )
+    statusfiles = glob ( os.path.join (config.root, self.status_file + '*') )
     if len (statusfiles) == 0:
       raise
 
