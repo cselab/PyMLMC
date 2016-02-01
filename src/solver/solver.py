@@ -125,7 +125,7 @@ class Solver (object):
   def label (self, level, type, sample=None, suffix='', iteration=True):
     
     if self.deterministic:
-      return self.name + suffix + ('.%d' % self.iteration if iteration else '')
+      return self.name + suffix
     
     else:
       dir = '%d_%d' % (level, type)
