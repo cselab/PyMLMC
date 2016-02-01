@@ -95,8 +95,11 @@ class MLMC_Config (object):
     print ' :: CONFIGURATION:    '
     print '  : MACHINE      :    %-30s' % local.name                         + '    ' + '[TYPE: %s]' % ('cluster' if local.cluster else 'standalone')
     print '  : SOLVER       :    %-30s' % self.solver    .__class__.__name__ + '    ' + '[MODE: %s]' % ('deterministic' if self.deterministic else 'stochastic')
-    if self.levels > 0:
+    if self.levels > 0 and not self.deterministic:
       print '  : WORK RATIOS  :    %-30s' % ' '                                + '    ' + '%s' % str (self.work_ratios)
     print '  : SAMPLES      :    %-30s' % self.samples   .__class__.__name__
-    print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__ + '    ' + ('[RATIOS: %s]' % str (self.ratios) if self.levels > 0 else '')
+    if self.deterministic:
+      print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
+    else:
+      print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__ + '    ', + ('[RATIOS: %s]' % str (self.ratios) if self.levels > 0 else '')
     print '  : ROOT         :    %-30s' % self.root
