@@ -159,12 +159,20 @@ class Solver (object):
       return local.mpi_job.rstrip() % args
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', timer=0):
+  def submit (self, job, parallelization, label, directory='.', hooks=1, boot=1, block=0, timer=0):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
-    
+
+    # process hooks
+    if hooks:
+      job = job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block}
+
+    # add block booting and block freeing
+    if boot:
+      job = self.boot (job, block)
+
     # add timer
     if timer and local.timer:
       job = local.timer.rstrip() % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
@@ -255,9 +263,6 @@ class Solver (object):
       # else submit job to job management system
       else:
 
-        # else set block hook
-        job = job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : 0}
-
         # submit
         self.execute ( self.submit (job, parallelization, label, directory), directory )
     
@@ -280,7 +285,19 @@ class Solver (object):
     # if specified, execute solver init script
     if self.init and not self.params.noinit:
       self.init ( directory, seed )
-  
+
+  # add block booting and block freeing
+  def boot (self, job, block=0):
+
+    if local.boot and local.free:
+      boot = local.boot % {'batch_id' : block}
+      free = local.free % {'batch_id' : block}
+      job = '%s\n\n%s\n%s\n' % (boot, job, free)
+      return job
+
+    else:
+      return job
+
   # execute the command
   def execute (self, cmd, directory='.'):
     
@@ -319,7 +336,7 @@ class Solver (object):
     # report command
     if self.params.verbose >= 1:
       print cmd
-  
+
   # finalize solver
   def finalize (self, level, type, parallelization):
     
@@ -383,11 +400,11 @@ class Solver (object):
           ensemble = ''
 
           # prepare each part of the batch job
-          for batch_index_local, part in enumerate (parts [submitted : submitted + size]):
+          for block, part in enumerate (parts [submitted : submitted + size]):
 
-            # prepare job to be part of an ensemble with batch job id = i
+            # prepare job to be part of an ensemble with batch job id = block
             # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
-            part = [ job.replace ('BATCH_JOB_BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'batch_id' : batch_index_local} for job in part ]
+            part = [ job.replace ('BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'block' : block} for job in part ]
 
             # construct batch job
             batch = '\n'.join (part)
@@ -396,10 +413,7 @@ class Solver (object):
             batch_index += 1
 
             # add block booting and block freeing
-            if local.boot and local.free:
-              boot = local.boot % {'batch_id' : batch_index_local}
-              free = local.free % {'batch_id' : batch_index_local}
-              batch = '%s\n\n%s\n%s\n' % (boot, batch, free)
+            batch = self.boot (batch, block)
 
             # add timer
             if local.timer:
@@ -410,7 +424,7 @@ class Solver (object):
             batch = '(\n\n%s\n\n) &\n' % batch
 
             # header for the ensemble job
-            ensemble += '\n# === BATCH JOB %d [local index %d]\n' % (batch_index, batch_index_local)
+            ensemble += '\n# === BATCH JOB %d [block %d]\n' % (batch_index, block)
             
             # add batch job to the ensemble
             ensemble += batch
@@ -420,7 +434,7 @@ class Solver (object):
           parallelization.merge = size
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, hooks=0, boot=0), directory )
 
           # update 'submitted' counter
           submitted += size

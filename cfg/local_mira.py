@@ -95,7 +95,7 @@ runjob \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
---block BATCH_JOB_BLOCK_HOOK \
+--block BLOCK_HOOK \
 %(envs)s \
 : %(cmd)s %(options)s
 '''
@@ -108,19 +108,19 @@ runjob \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
---block BATCH_JOB_BLOCK_HOOK \
+--block BLOCK_HOOK \
 %(envs)s \
 : %(cmd)s %(options)s
 '''
 
 # batch job block hook
-BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(batch_id)d]}'
+BATCH_JOB_BLOCK_HOOK = '${BLOCKS[%(block)d]}'
 
 # block boot
-boot = 'boot-block --block ${BLOCKS[%(batch_id)d]}'
+boot = 'boot-block --block ${BLOCKS[%(block)d]}'
 
 # block free
-free = 'boot-block --block ${BLOCKS[%(batch_id)d]} --free'
+free = 'boot-block --block ${BLOCKS[%(block)d]} --free'
 
 # submission script template (required for support of batch jobs ensembles)
 script = '''#!/bin/bash
