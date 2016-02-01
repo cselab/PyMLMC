@@ -74,7 +74,7 @@ class Solver (object):
         if os.path.exists ( executablepath ):
           shutil.copy ( executablepath, self.outputdir)
         else:
-          helpers.error ('executable not found at ' + executablepath)
+          helpers.error ('executable not found!', details='at ' + executablepath, advice='Make sure executable exists or modify \'solver.executable\' value.')
   
   # check if nothing will be overwritten
   def check (self, level, type, sample):

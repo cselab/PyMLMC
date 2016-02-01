@@ -305,11 +305,12 @@ def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', wa
 # error
 def error (message, details=None, advice=None):
   print
-  print ' :: ERROR: %s -> exiting...' % message
+  print ' :: ERROR: %s' % message
   if details != None:
     print '  : %s' % details
   if advice != None:
     print '  : -> %s' % advice
+  print '  : -> exiting...'
   print
   sys.exit()
 
