@@ -30,7 +30,7 @@ class Status (object):
   # save status
   def save (self, config):
   
-    with open ( os.path.join (config.root, self.status_file + '.%d' % config.iteration), 'w' ) as f:
+    with open ( os.path.join (config.root, self.status_file + ('' if config.deterministic else '.%d' % config.iteration)), 'w' ) as f:
 
       f.write ( 'iteration = %d\n' % config.iteration )
 
