@@ -351,10 +351,13 @@ class MLMC (object):
     print separator
 
     # initialize submission file
-    if not self.config.deterministic:
+    if self.config.deterministic:
+      f = open (self.submission_file, 'wa')
+    else:
       f = open (self.submission_file + '.%d' % self.config.iteration, 'wa')
-      f.write (header + '\n')
-      f.write (separator + '\n')
+
+    f.write (header + '\n')
+    f.write (separator + '\n')
 
     # run MC simulations and update submission file
     for mc in self.mcs:
@@ -362,9 +365,8 @@ class MLMC (object):
       f.write (info + '\n')
 
     # finalize submission file
-    if not self.config.deterministic:
-      f.write ('\n')
-      f.close()
+    f.write ('\n')
+    f.close()
   
   # query user for additional information
   def query (self):
