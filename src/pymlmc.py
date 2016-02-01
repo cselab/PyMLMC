@@ -107,7 +107,8 @@ class MLMC (object):
 
     # initialize, report, validate, and save the required number of samples
     self.config.samples.init     ()
-    self.config.samples.report   ()
+    if not self.config.deterministic:
+      self.config.samples.report   ()
     self.config.samples.validate ()
     
     # make indices for the required number of samples
