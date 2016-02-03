@@ -101,5 +101,5 @@ class MLMC_Config (object):
     if self.deterministic:
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
     else:
-      print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__ + '    ', + ('[RATIOS: %s]' % str (self.ratios) if self.levels > 0 else '')
+      print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__ + '    ' + ('[RATIOS: %s]' % str (self.ratios) if self.levels > 0 else '')
     print '  : ROOT         :    %-30s' % self.root

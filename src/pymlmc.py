@@ -116,7 +116,7 @@ class MLMC (object):
     
     # distribute initial samples
     self.config.scheduler.distribute ()
-      
+    
     # query for progress
     if self.params.simulate:
       if self.config.deterministic:
