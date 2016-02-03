@@ -404,7 +404,7 @@ class Solver (object):
 
             # prepare job to be part of an ensemble with batch job id = block
             # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
-            part = [ job.replace ('BLOCK_HOOK', local.BATCH_JOB_BLOCK_HOOK) % {'block' : block} for job in part ]
+            part = [ job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block} for job in part ]
 
             # construct batch job
             batch = '\n'.join (part)
