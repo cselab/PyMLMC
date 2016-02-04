@@ -45,10 +45,10 @@ class MLMC (object):
     self.status = Status ()
     
     # setup solver
-    self.config.solver.setup (self.params, self.config.root, self.config.deterministic)
+    self.config.solver.setup ( self.params, self.config.root, self.config.deterministic )
 
     # setup scheduler
-    self.config.scheduler.setup (self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
+    self.config.scheduler.setup ( self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
 
     # setup samples
     self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate )

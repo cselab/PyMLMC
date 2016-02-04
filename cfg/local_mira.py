@@ -182,7 +182,7 @@ wait
 '''
 
 # submit command
-submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script %(scriptfile)s'
+submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script /soft/debuggers/scripts/bin/nofail %(scriptfile)s'
 
 # timer
 #timer = 'time --portability --output=%(timerfile)s --append (%(job)s)'
