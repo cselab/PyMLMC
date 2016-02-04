@@ -104,6 +104,7 @@ colors ['pos']       = 'dimgrey'
 colors ['trendline'] = 'darkorange'
 colors ['t']         = 'grey'
 
+colors ['a']   = 'dodgerblue'
 colors ['r']   = 'saddlebrown'
 colors ['r2']  = 'burlywood'
 colors ['u']   = 'red'
@@ -165,6 +166,7 @@ units = {}
 units ['t']   = r'$\mu s$'
 units ['pos'] = r'$mm$'
 
+units ['a']   = r'$-$'
 units ['r']   = r'$kg/m^3$'
 units ['r2']  = r'$kg/m^3$'
 units ['u']   = r'$mm/\mu s$'
@@ -198,6 +200,7 @@ def unit (qoi):
 names = {}
 
 names ['t']   = 'time'
+names ['r']   = 'void fraction'
 names ['r']   = 'density'
 names ['r2']  = 'gas density'
 names ['u']   = 'x-velocity'
