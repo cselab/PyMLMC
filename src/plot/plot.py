@@ -200,7 +200,7 @@ def unit (qoi):
 names = {}
 
 names ['t']   = 'time'
-names ['r']   = 'void fraction'
+names ['a']   = 'void fraction'
 names ['r']   = 'density'
 names ['r2']  = 'gas density'
 names ['u']   = 'x-velocity'
