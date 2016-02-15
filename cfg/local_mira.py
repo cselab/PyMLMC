@@ -27,8 +27,10 @@ rack      = 1024 # nodes
 # constraints
 
 bootup       = 5   # minutes
-min_cores    = 512 * cores
-max_cores    = 49152 * cores
+#min_cores    = 512 * cores
+#max_cores    = 49152 * cores
+min_cores    = 128 * cores
+max_cores    = 1024 * cores
 
 def min_walltime (cores): # hours
   return 0.5
