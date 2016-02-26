@@ -20,7 +20,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated_Budget (Samples):
   
-  def __init__ (self, budget=8, warmup=1, warmup_finest_level='last'):
+  def __init__ (self, budget=8, warmup=1, finest='last'):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -29,15 +29,15 @@ class Estimated_Budget (Samples):
   def init (self):
 
     # set range for multiple warmup samples
-    if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
-    elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
+    if   self.finest == 'last': self.finest = self.L
+    elif self.finest == 'half': self.finest = ( self.L + 1 ) / 2
 
     # compute warmup samples based on works
     counts = numpy.array ( [ self.warmup * numpy.ceil ( float (self.works [self.L] / self.works [level]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
 
     # adjust warmup samples w.r.t. set range for multiple warmup samples
-    counts [0 : self.warmup_finest_level+1] = counts [self.L - self.warmup_finest_level : self.L+1]
-    counts [self.warmup_finest_level : ]    = counts [self.L]
+    counts [0 : self.finest+1] = counts [self.L - self.finest : self.L+1]
+    counts [self.finest : ]    = counts [self.L]
 
     self.counts.additional = numpy.array ( counts, copy=True )
 
