@@ -417,10 +417,8 @@ class MLMC (object):
           self.finished = 0
           print format % 'Pending'
 
-
     # stochastic reporting
     else:
-
 
       header    = '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |   EFFICIENCY  |'
       separator = '  :----------------------------------------------------------------------------------------------------------------------------------------------|'
