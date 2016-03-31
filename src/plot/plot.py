@@ -37,9 +37,9 @@ matplotlib.rcParams ['lines.markeredgewidth'] = 3
 matplotlib.rcParams ['lines.markersize']      = 10
 
 # additional colors
-matplotlib.colors.ColorConverter.colors['custom_blue'] = (38/256.0,135/256.0,203/256.0)
-matplotlib.colors.ColorConverter.colors['custom_orange'] = (251/256.0,124/256.0,42/256.0)
-matplotlib.colors.ColorConverter.colors['custom_green'] = (182/256.0,212/256.0,43/256.0)
+matplotlib.colors.ColorConverter.colors ['custom_blue']   = ( 38/256.0, 135/256.0, 203/256.0)
+matplotlib.colors.ColorConverter.colors ['custom_orange'] = (251/256.0, 124/256.0,  42/256.0)
+matplotlib.colors.ColorConverter.colors ['custom_green']  = (182/256.0, 212/256.0,  43/256.0)
 
 # default color cycle (not working on MIRA)
 matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
@@ -261,10 +261,22 @@ def name (qoi, short=False):
 
 # === helper routines
 
+# create a new solid color which is slighly brighter
+def brighten (color, factor=0.7):
+  rgb = list (matplotlib.colors.ColorConverter.colors [color])
+  brighter = rgb
+  for channel, value in enumerate (rgb):
+    brighter [channel] += factor * (1.0 - value)
+  return tuple (brighter)
+
 # set levels extent
 def levels_extent (levels):
   pylab.xlim ( [ -0.2, levels[-1]+0.2 ] )
   pylab.xticks (levels)
+
+def adjust_extent (data, factor=1.5, offset=0):
+  pylab.gca().set_ylim (top    = numpy.max (data) * factor + offset)
+  pylab.gca().set_ylim (bottom = numpy.min (data) / factor - offset)
 
 # generate figure name using the format 'figpath/pwd_suffix.extension'
 def figname (suffix='', extension='pdf'):
@@ -589,15 +601,14 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
-      pylab.plot (ts, ms - vs, color=color(qoi), alpha=0.3)
-      pylab.plot (ts, ms + vs, color=color(qoi), alpha=0.3)
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.3, linewidth=0.0)
+      bright = brighten(color(qoi), factor=0.7)
+      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
       # hack to show the legend entry
-      pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label='mean +/- std. dev.')
+      pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
     elif 'percentile' in stat_name:
-      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : float ( stat_name.split(' ') [0] ) } )
+      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
     
     # general plotting
     else:
@@ -615,14 +626,14 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     lower  = percentiles [0] ['vs']
     upper  = percentiles [1] ['vs']
     ts     = percentiles [0] ['ts']
-    label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
+    levels = [ percentile ['level'] for percentile in percentiles ]
+    label  = 'confidence %d%% - %d%%' % ( min (levels), max (levels) )
 
-    pylab.plot (ts, lower, color=color(qoi), alpha=0.3)
-    pylab.plot (ts, upper, color=color(qoi), alpha=0.3)
-    pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.3, linewidth=0.0)
+    bright = brighten(color(qoi), factor=0.7)
+    pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
     # hack to show the legend entry
-    pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label=label)
-  
+    pylab.plot([], [], color=bright, linewidth=10, label=label)
+
   adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
   pylab.xlabel (xlabel)
@@ -1343,7 +1354,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   # plot EPSILON
   
   pylab.subplot(121)
-  pylab.semilogy (levels, [e / NORMALIZATION for e in EPSILON], color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
+  means = [e / NORMALIZATION for e in EPSILON]
+  pylab.semilogy (levels, means, color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
   if run == 1:
     if exact:
       pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
@@ -1351,6 +1363,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   pylab.title  ('Rel. level means for Q = %s' % qoi)
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
+  adjust_extent (means, factor=1.5)
   levels_extent (levels)
   if exact:
     pylab.legend (loc='upper right')
@@ -1358,12 +1371,14 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   # plot SIGMA
   
   pylab.subplot(122)
-  pylab.semilogy (levels, numpy.sqrt(SIGMA) / NORMALIZATION, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
+  deviations = numpy.sqrt(SIGMA) / NORMALIZATION
+  pylab.semilogy (levels, deviations, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
   #if run == 1:
   #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
   pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
+  adjust_extent (deviations, factor=1.5)
   levels_extent (levels)
   #pylab.legend (loc='best')
   
