@@ -589,6 +589,8 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
+      pylab.plot (ts, ms - vs, color=color(qoi), alpha=0.3)
+      pylab.plot (ts, ms + vs, color=color(qoi), alpha=0.3)
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=color(qoi), alpha=0.3, linewidth=0.0)
       # hack to show the legend entry
       pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label='mean +/- std. dev.')
@@ -614,7 +616,9 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     upper  = percentiles [1] ['vs']
     ts     = percentiles [0] ['ts']
     label  = 'confidence %.2f - %.2f' % ( percentiles [0] ['level'], percentiles [1] ['level'] )
-    
+
+    pylab.plot (ts, lower, color=color(qoi), alpha=0.3)
+    pylab.plot (ts, upper, color=color(qoi), alpha=0.3)
     pylab.fill_between (ts, lower, upper, facecolor=color(qoi), edgecolor=color(qoi), alpha=0.3, linewidth=0.0)
     # hack to show the legend entry
     pylab.plot([], [], color=color(qoi), alpha=0.3, linewidth=10, label=label)
