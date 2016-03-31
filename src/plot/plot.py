@@ -591,13 +591,6 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       ts = ts [1:]
       vs = vs [1:]
 
-    '''
-    if 'percentile' in stat_name or stat_name in ['mean', 'std. deviation']:
-      color = color (qoi)
-    else:
-      color = color_stats (stat_name)
-    '''
-
     # stat-specific plotting: std. deviation
     if stat_name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
