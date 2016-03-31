@@ -1348,7 +1348,8 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   levels_extent (levels)
-  pylab.legend (loc='upper right')
+  if exact:
+    pylab.legend (loc='upper right')
   
   # plot SIGMA
   
@@ -1360,7 +1361,7 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
   pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
   pylab.xlabel ('mesh level')
   levels_extent (levels)
-  pylab.legend (loc='best')
+  #pylab.legend (loc='best')
   
   adjust (infolines, subplots=2)
   
