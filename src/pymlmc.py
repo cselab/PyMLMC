@@ -629,7 +629,7 @@ class MLMC (object):
 
       # load both types
       for type in reversed (self.config.types (level)):
-
+        
         mc = self.mcs [ self.config.pick [level] [type] ]
         pending = mc.pending()
         loaded [type] = mc.load ()
@@ -693,6 +693,10 @@ class MLMC (object):
   # assemble MC and MLMC estimates
   def assemble (self, stats, qois='all'):
 
+    # check if statistics can be assembled (at least one sample at some level with type 0)
+    if not self.available:
+      helpers.error ('Statistics can not be assembled')
+
     print
     print ' :: ASSEMBLING:'
 
@@ -703,10 +707,6 @@ class MLMC (object):
     print
 
     import copy
-
-    # check if statistics can be assembled (at least one sample at some level with type 0)
-    if not self.available:
-      helpers.error ('Statistics can not be assembled')
     
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
@@ -723,15 +723,15 @@ class MLMC (object):
         self.diffs [level] [name] = None
 
       # coarsest level difference is just a plain MC estimate
-      self.diffs [self.L0] [name] = copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name])
+      self.diffs [self.L0] [name] = self.indicators.coefficients.values [self.L0] * copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name])
 
       # assemble differences of the remaining levels
       for level in self.config.levels [self.L0 + 1 : ]:
 
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
-          self.diffs [level] [name]  = copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name])
-          self.diffs [level] [name] -=                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
+          self.diffs [level] [name]  = self.indicators.coefficients.values [level]     * copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name])
+          self.diffs [level] [name] -= self.indicators.coefficients.values [level - 1] *                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
 
         # else mark level as unavailable
         else:
@@ -749,6 +749,8 @@ class MLMC (object):
       for diff in self.diffs [self.L0 + 1 : ]:
         if diff [name] != None:
           self.stats [name] += diff [name]
+
+    # TODO: issue at least a warning if some levels are missing in the _middle_ of level hierarchy (additional bias in introduced!)
 
     print '  : DONE'
     print

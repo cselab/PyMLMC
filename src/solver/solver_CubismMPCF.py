@@ -12,7 +12,7 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-from dataclass import Interpolated_Time_Series
+from dataclass import Time_Series
 import local
 import helpers
 
@@ -184,7 +184,7 @@ class CubismMPCF (Solver):
         helpers.warning ('Output file does not exist (version 1.0 is also absent)', details = outputfileformat)
       raise Exception ('Output file does not exist')
     
-    results = Interpolated_Time_Series ()
+    results = Time_Series ()
     
     # meta data
     meta_keys    = ( 'step', 't',  'dt' )

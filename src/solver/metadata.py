@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Container for various data classes used in solvers
+# Container used to separate simulation data and meta data
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -10,7 +10,9 @@
 
 import numpy
 
-class Time_Series (object):
+# TODO: filter out core objects from this that can be reused for snapshots too
+
+class MetaDataDict (object):
   
   def __init__ (self):
     
@@ -273,7 +275,7 @@ class Time_Series (object):
       for step in xrange ( len ( self.data [key] ) ):
         self.data [key] [step] *= a
     return self
-
+  
   def __iadd__ (self, a):
     if not self.data:
       self.init (a)

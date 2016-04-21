@@ -64,7 +64,11 @@ class Estimated_Budget (Samples):
     
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
-    
+
+    # compute optimal control variate coefficients
+    if self.optimal:
+      self.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
+
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
     
@@ -94,6 +98,9 @@ class Estimated_Budget (Samples):
 
     print
     print ' :: SAMPLES: (estimated for the specified budget)'
+
+    # report coefficients
+    self.coefficients.report()
 
     # report computed and additional number of samples
     self.counts.report ()
@@ -139,12 +146,11 @@ class Estimated_Budget (Samples):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( sqrt ( indicators.variance_diff [level] / self.works [level] ) * budget / variance_work_sum )
+        updated [level] = floor ( sqrt ( indicators.variance_diff [level] / self.works [level] ) * budget / variance_work_sum )
 
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
-        # remark: comparison must include '=' since the upper bound for optimal number of samples is used
-        if updated [level] <= computed [level]:
+        if updated [level] < computed [level]:
           
           # leave the sample number unchanged
           updated [level] = computed [level]

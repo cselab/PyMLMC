@@ -93,7 +93,7 @@ class Samples (object):
     
     self.L       = len(levels) - 1
 
-    self.counts.computed = numpy.zeros ( len(self.levels), dtype=int )
+    self.counts.computed = numpy.zeros ( len (self.levels), dtype=int )
 
     self.counts.loaded  = [ None for level in self.levels ]
     self.counts.failed  = [ None for level in self.levels ]
@@ -113,15 +113,15 @@ class Samples (object):
 
     # initialize history
     if len (self.history) == 0:
-      self.history ['computed']   = {}
-      self.history ['additional'] = {}
-      self.history ['combined']   = {}
+      self.history ['computed']     = {}
+      self.history ['additional']   = {}
+      self.history ['combined']     = {}
 
     # append history
-    self.history ['computed']   [iteration] = self.counts.computed
-    self.history ['additional'] [iteration] = self.counts.additional
-    self.history ['combined']   [iteration] = self.counts.combined
-
+    self.history ['computed']     [iteration] = self.counts.computed
+    self.history ['additional']   [iteration] = self.counts.additional
+    self.history ['combined']     [iteration] = self.counts.combined
+    
     # dump history
     helpers.delete (self.samples_file)
     for i in range (iteration + 1):

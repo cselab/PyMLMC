@@ -52,31 +52,31 @@ class Stat (object):
 
           # if spedific indices are required, take this into account
           if indices != None:
-            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if sample != None and index in indices and not numpy.isnan (sample.data [key] [step]) ]
+            ensemble = [ sample.data [key] [step] for index, sample in enumerate (samples) if sample != None and index in indices and not numpy.isnan (sample.data [key] [step]) ]
           else:
-            series = [ sample.data [key] [step] for sample in samples if sample != None and not numpy.isnan (sample.data [key] [step]) ]
+            ensemble = [ sample.data [key] [step] for sample in samples if sample != None and not numpy.isnan (sample.data [key] [step]) ]
 
         # assume all samples are available
         else:
 
           # if spedific indices are required, take this into account
           if indices != None:
-            series = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [key] [step]) ]
+            ensemble = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [key] [step]) ]
           else:
-            series = [ sample.data [key] [step] for sample in samples if not numpy.isnan (sample.data [key] [step]) ]
+            ensemble = [ sample.data [key] [step] for sample in samples if not numpy.isnan (sample.data [key] [step]) ]
 
         # remove NaN's
-        #series = [ value for value in series if not numpy.isnan (value) ]
+        #ensemble = [ element for element in ensemble if not numpy.isnan (element) ]
 
         # compute statistic
-        if len (series) > 0:
-          stats.data [key] [step] = self.compute (series)
+        if len (ensemble) > 0:
+          stats.data [key] [step] = self.compute (ensemble)
         else:
           stats.data [key] [step] = float ('nan')
       
       # update progress
       progress.update (i + 1)
-
+      
     # finalize progress indicator
     progress.finalize()
 

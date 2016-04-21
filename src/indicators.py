@@ -13,10 +13,12 @@
 
 import os
 import numpy
+from itertools import izip
 
 # === local imports
 
 import helpers
+from coefficients import *
 
 # === warnings suppression
 
@@ -38,61 +40,20 @@ class Indicators (object):
     self.nans            = 0
     self.history         = {}
   
-  def compute (self, mcs, loaded):
+  def compute (self, mcs, indices):
 
-    # list of results
-    self.mean           = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
-    self.variance       = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
-    self.mean_diff      = numpy.zeros ( self.L + 1, dtype=float)
-    self.variance_diff  = numpy.zeros ( self.L + 1, dtype=float)
-    self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
-    self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
-    
-    values    = helpers.level_type_list (self.levels)
-    distances = helpers.level_list      (self.levels)
+    # set availability
+    self.available = 1
 
-    # evaluate indicators for all samples on all levels and types
-    for i, (level, type) in enumerate (self.levels_types):
+    # === EPSILON (mean) & SIGMA (variance) indicators
 
-      # compute plain values
-      values [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [i] .results if result != None ] )
+    self.mean     = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
+    self.variance = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
 
-      # handle unavailable simulations
-      if len (values [level] [type]) == 0:
-        values [level] [type] = numpy.array ( [ float('NaN') ] )
+    # evaluates indicators for each sample
+    values = self.values (mcs)
 
-      # check if NaN's are present
-      # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan (values [level] [type]) .any():
-        self.nans = 1
-      if len (values [level] [type]) < 2:
-        self.nans = 1
-
-    # evaluate level distances for all samples on all levels
-    for level in self.levels:
-
-      # compute distances for level differences
-      results_f = [ result for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in loaded [level] ]
-      if level == 0:
-        distances [level] = numpy.array ( [ self.distance (fi, None) for fi in results_f ] )
-      else:
-        results_c = [ result for sample, result in enumerate (mcs [ self.pick [level][1] ] .results) if sample in loaded [level] ]
-        distances [level] = numpy.array ( [ self.distance (rf, rc) for rf, rc in zip (results_f, results_c) ] )
-
-      # handle unavailable simulations
-      if len (distances [level]) == 0:
-        distances [level] = numpy.array ( [ float('NaN') ] )
-
-      # check if NaN's are present
-      # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan (distances [level]) .any():
-        self.nans = 1
-      if len (distances [level]) < 2:
-        self.nans = 1
-      if len (distances [level]) < 1: # zero variance is NOT an option! (should be extrapolated!)
-        self.nans = 1
-
-    # compute indicators
+    # compute mean and variance for all levels and types
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.mean ( values [level] [type] )
       #self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
@@ -101,35 +62,6 @@ class Indicators (object):
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
 
-    # compute level distances
-    for level in self.levels:
-      self.mean_diff     [level] = numpy.mean ( distances [level] )
-      #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
-      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float('nan')
-      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float('nan')
-
-    # compute covariance and correlation
-    self.covariance  [0] = float ('NaN')
-    self.correlation [0] = float ('NaN')
-
-    for level in self.levels [1:] :
-
-      results_f = [ result for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in loaded [level] ]
-      results_c = [ result for sample, result in enumerate (mcs [ self.pick [level][1] ] .results) if sample in loaded [level] ]
-      values_f  = numpy.array ( [ self.indicator (result) for result in results_f ] )
-      values_c  = numpy.array ( [ self.indicator (result) for result in results_c ] )
-      if len (loaded [level]) > 1:
-        self.covariance  [level] = numpy.cov      ( values_f, values_c ) [0][1]
-        self.correlation [level] = numpy.corrcoef ( values_f, values_c ) [0][1]
-      else:
-        self.covariance  [level] = float('nan')
-        self.correlation [level] = float('nan')
-
-      '''
-      self.covariance  [level] = 0.5 * (self.variance [level] [0] + self.variance [level] [1] - self.variance_diff [level])
-      self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
-      '''
-
     # set the normalization
     if numpy.isnan (self.mean [0] [0]):
       self.normalization = 1
@@ -137,8 +69,119 @@ class Indicators (object):
     else:
       self.normalization = numpy.abs (self.mean [0] [0])
 
-    # set availability
-    self.available = 1
+    # === covariances and correlations
+
+    self.covariance     = numpy.zeros ( self.L + 1, dtype=float)
+    self.correlation    = numpy.zeros ( self.L + 1, dtype=float)
+
+    # compute covariance and correlation
+
+    self.covariance  [0] = float ('NaN')
+    self.correlation [0] = float ('NaN')
+
+    # evaluates indicators for each level, type and sample for the specified indices
+    values = self.values (mcs, indices)
+
+    for level in self.levels [1:] :
+      if len (indices [level]) > 1:
+        self.covariance  [level] = numpy.cov      ( values [level] [0], values [level] [1] ) [0][1]
+        self.correlation [level] = numpy.corrcoef ( values [level] [0], values [level] [1] ) [0][1]
+        #self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
+      else:
+        self.covariance  [level] = float('nan')
+        self.correlation [level] = float('nan')
+        self.nans = 1
+
+    # extrapolate missing indicators
+    if self.nans:
+      helpers.warning ('Missing indicator values are extrapolated!')
+      self.extrapolate ()
+
+    # === optimal control variate coefficients
+
+    self.coefficients = Coefficients (self.levels)
+
+    # compute optimal control variate coefficients
+    self.coefficients.optimize (self)
+
+    # === EPSILON_DIFF and SIGMA_DIFF level distance indicators
+    # (with optimal control variate coefficients computed above)
+
+    self.mean_diff     = numpy.zeros ( self.L + 1, dtype=float)
+    self.variance_diff = numpy.zeros ( self.L + 1, dtype=float)
+
+    # evaluate distances between indicators for every two consecute levels of each sample for the specified indices
+    distances = self.distances (mcs, indices)
+
+    # compute level distances
+    for level in self.levels:
+      self.mean_diff     [level] = numpy.mean ( distances [level] )
+      #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
+      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float('nan')
+      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float('nan')
+
+  # evaluates indicators for each sample (alternatively, specific indices can also be provided)
+  def values (self, mcs, indices=None):
+
+    # container for results
+    values = helpers.level_type_list (self.levels)
+
+    # evaluate indicators for all samples on all levels and types
+    for level, type in self.levels_types:
+
+      # evaluate indicators
+      if indices == None:
+        values [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [ self.pick [level][type] ] .results if result != None ] )
+      else:
+        values [level] [type] = numpy.array ( [ self.indicator (result) for sample, result in enumerate (mcs [ self.pick [level][type] ] .results) if sample in indices [level] ] )
+
+      # handle unavailable simulations
+      if len (values [level] [type]) == 0:
+        values [level] [type] = numpy.array ( [ float('NaN') ] )
+
+      # check if NaN's are present
+      # TODO: this should be checked later, after actual computations... :)
+      if numpy.isnan (values [level] [type]) .any() or len (values [level] [type]) < 2:
+        self.nans = 1
+
+    return values
+
+  # evaluates distances between indicators on every two consecute levels for each sample (alternatively, specific indices can also be provided)
+  def distances (self, mcs, indices=None):
+
+    # container for results
+    distances = helpers.level_list (self.levels)
+
+    # evaluate level distances for all samples on all levels
+    for level in self.levels:
+
+      # TODO: take into account optimal control variate coefficients!
+
+      # for coarsest level, distance is taken w.r.t. 'None'
+      if level == 0:
+        if indices == None:
+          distances [level] = numpy.array ( [ self.distance (result, None) for result in mcs [ self.pick [level][0] ] .results ] )
+        else:
+          distances [level] = numpy.array ( [ self.distance (result, None) for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in indices [level] ] )
+
+      # for the remaining levels, evaluate distance indicators between every two consecutive levels
+      else:
+        zipped = izip (mcs [ self.pick [level][0] ] .results, mcs [ self.pick [level][1] ] .results)
+        if indices == None:
+          distances [level] = numpy.array ( [ self.distance (fine, coarse) for fine, coarse in zipped ] )
+        else:
+          distances [level] = numpy.array ( [ self.distance (fine, coarse) for sample, (fine, coarse) in enumerate (zipped) if sample in indices [level] ] )
+
+      # handle unavailable simulations
+      if len (distances [level]) == 0:
+        distances [level] = numpy.array ( [ float('NaN') ] )
+
+      # check if NaN's are present
+      # TODO: this should be checked later, after actual computations... :)
+      if numpy.isnan (distances [level]) .any() or len (distances [level]) < 2:
+        self.nans = 1
+
+    return distances
 
   def report (self):
 
@@ -147,7 +190,7 @@ class Indicators (object):
     print '  :'
     print '  :    LEVEL    : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
-    
+
     # report mean (fine)
     print '  : EPSILON [FI]:',
     for level in self.levels:
@@ -159,12 +202,6 @@ class Indicators (object):
     print '    ---',
     for level in self.levels [1:]:
       print helpers.scif (self.mean [level] [1] / self.normalization, table=1),
-    print
-    
-    # report mean_diff
-    print '  : EPSILON DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.mean_diff [level] / self.normalization, table=1),
     print
     
     # report variance (fine)
@@ -180,24 +217,39 @@ class Indicators (object):
       print helpers.scif (self.variance [level] [1] / (self.normalization) ** 2, table=1),
     print
 
-    # report variance_diff
-    print '  : SIGMA   DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.variance_diff [level] / (self.normalization) ** 2, table=1),
-    print
-    
     # report covariance
     print '  : COVARIANCE  :',
     print '    ---',
     for level in self.levels [1:]:
       print helpers.scif (self.covariance [level] / (self.normalization) ** 2, table=1),
     print
-    
+
     # report correlation
     print '  : CORRELATION :',
     print '    ---',
     for level in self.levels [1:]:
       print helpers.scif (self.correlation [level], table=1),
+    print
+
+    # splitter
+    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report coefficients
+    print '  : COEFFICIENT :',
+    for level in self.levels:
+      print helpers.scif (self.coefficients.values [level], table=1),
+    print
+
+    # report mean_diff
+    print '  : EPSILON DIFF:',
+    for level in self.levels:
+      print helpers.scif (self.mean_diff [level] / self.normalization, table=1),
+    print
+
+    # report variance_diff
+    print '  : SIGMA   DIFF:',
+    for level in self.levels:
+      print helpers.scif (self.variance_diff [level] / (self.normalization) ** 2, table=1),
     print
   
   def save (self, iteration):
@@ -208,20 +260,22 @@ class Indicators (object):
       self.history ['epsilon_co']    = {}
       self.history ['sigma_fi']      = {}
       self.history ['sigma_co']      = {}
-      self.history ['epsilon_diff']  = {}
-      self.history ['variance_diff'] = {}
       self.history ['covariance']    = {}
       self.history ['correlation']   = {}
+      self.history ['coefficients']  = {}
+      self.history ['epsilon_diff']  = {}
+      self.history ['variance_diff'] = {}
 
     # append history
     self.history ['epsilon_fi']    [iteration] = [ self.mean [level] [0] for level in self.levels ]
     self.history ['epsilon_co']    [iteration] = [ self.mean [level] [1] for level in self.levels ]
     self.history ['sigma_fi']      [iteration] = [ self.variance [level] [0] for level in self.levels ]
     self.history ['sigma_co']      [iteration] = [ self.variance [level] [1] for level in self.levels ]
-    self.history ['epsilon_diff']  [iteration] = self.mean_diff
-    self.history ['variance_diff'] [iteration] = self.variance_diff
     self.history ['covariance']    [iteration] = self.covariance
     self.history ['correlation']   [iteration] = self.correlation
+    self.history ['coefficients']  [iteration] = self.coefficients.values
+    self.history ['epsilon_diff']  [iteration] = self.mean_diff
+    self.history ['variance_diff'] [iteration] = self.variance_diff
 
     # dump history
     helpers.delete (self.indicators_file)
@@ -235,42 +289,75 @@ class Indicators (object):
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
 
-  # extrapolate missing indicators from the courser levels
+  # extrapolate missing indicators from the coarser levels
   def extrapolate (self):
     
     self.available = 1
 
     for level in self.levels:
-      if numpy.isnan ( self.variance_diff [level] ):
+      if numpy.isnan ( self.mean [level] [0] ):
         if level != 0:
-          self.mean_diff     [level] = self.mean_diff     [level-1] / 2
-          self.variance_diff [level] = self.variance_diff [level-1] / 2
+          self.mean     [level] [0] = self.mean [level-1] [0]
         else:
-          self.mean_diff     [level] = numpy.nan
-          self.variance_diff [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
-    
+          self.mean     [level] [0] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'EPSILON [FINE]\' not possible!')
+
     for level in self.levels:
       if numpy.isnan ( self.variance [level] [0] ):
         if level != 0:
-          self.mean     [level] [0] = self.mean     [level-1] [0]
           self.variance [level] [0] = self.variance [level-1] [0]
         else:
-          self.mean     [level] [0] = numpy.nan
           self.variance [level] [0] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA [FINE]\' not possible!')
-    
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.mean [level] [1] ):
+        if level != 1:
+          self.mean     [level] [1] = self.mean [level-1] [1]
+        else:
+          self.mean     [level] [1] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'EPSILON [COARSE]\' not possible!')
+
     for level in self.levels [1:]:
       if numpy.isnan ( self.variance [level] [1] ):
         if level != 1:
-          self.mean     [level] [1] = self.mean     [level-1] [1]
           self.variance [level] [1] = self.variance [level-1] [1]
         else:
-          self.mean     [level] [1] = numpy.nan
           self.variance [level] [1] = numpy.nan
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
 
-    # report indicators including extrapolated values
-    self.report ()
+    '''
+    for level in self.levels:
+      if numpy.isnan ( self.mean_diff [level] ):
+        if level != 0:
+          self.mean_diff     [level] = self.mean_diff [level-1] / 2
+        else:
+          self.mean_diff     [level] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
+
+    for level in self.levels:
+      if numpy.isnan ( self.variance_diff [level] ):
+        if level != 0:
+          self.variance_diff [level] = self.variance_diff [level-1] / 2
+        else:
+          self.variance_diff [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
+    '''
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.covariance [level] ):
+        if level != 0:
+          self.covariance [level] = self.covariance [level-1]
+        else:
+          self.covariance [level] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.correlation [level] ):
+        if level != 0:
+          self.correlation [level] = self.correlation [level-1] + 0.5 * (1.0 - self.correlation [level-1])
+        else:
+          self.correlation [level] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'CORRELATION\' not possible!')

@@ -1385,6 +1385,44 @@ def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=
 
   print ' done.'
 
+# plot correlations
+def plot_correlations (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+
+  print ' :: INFO: Plotting correlations...',
+  sys.stdout.flush()
+
+  # === load all required data
+
+  correlation = mlmc.indicators.correlation
+  levels      = mlmc.config.levels
+  qoi         = mlmc.config.solver.qoi
+
+  # === plot
+
+  if not frame:
+    figure (infolines, subplots=1)
+
+  # plot correlations
+
+  pylab.plot (levels, correlation, color=color_params('correlation'), linestyle=style(run), alpha=alpha(run), marker='x', label='level correlations')
+  pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
+  pylab.title  ('Level correlations for Q = %s' % qoi)
+  pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
+  pylab.xlabel ('mesh level')
+  pylab.ylim ([-0.1, 1.1])
+  levels_extent (levels)
+  #pylab.legend (loc='upper right')
+
+  adjust (infolines, subplots=1)
+
+  if infolines:
+    show_info(self)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+
+  print ' done.'
+
 # plot errors
 def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
   
@@ -1529,6 +1567,7 @@ def plot_hinton (matrix, scale=0.95):
   ax.autoscale_view ()
   ax.invert_yaxis ()
 
+'''
 # plot correlations between different qois
 def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None):
   
@@ -1582,3 +1621,4 @@ def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None)
   pylab.subplots_adjust (top=0.80)
   
   draw (mlmc, save)
+'''
