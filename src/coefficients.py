@@ -64,4 +64,4 @@ class Coefficients (object):
     self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # simpler solution
-    self.values = 
+    #self.values =

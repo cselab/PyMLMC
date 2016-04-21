@@ -39,9 +39,8 @@ class Errors (object):
       return
 
     # compute relative sampling errors (if only one sample is loaded, use indicator value)
-    # REMARK: the commented option will be actually correct once variance_diff will hold values with optimal control variate coefficients
-    self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
-    '''
+    # REMARK: the commented option does not work at the moment since variance_diff are no longer extrapolated, and are not easy to do so
+    #self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
     self.relative_error = numpy.zeros ( len (self.levels) )
     self.relative_error [0] = indicators.coefficients.values [0] ** 2 * indicators.variance [0] [0] / max (counts.loaded [0], 1)
     for level in self.levels [ 1 : ]:
@@ -51,8 +50,7 @@ class Errors (object):
       self.relative_error [level] /= max (counts.loaded [level], 1)
       self.relative_error [level]  = max ( self.relative_error [level], 0 )
     self.relative_error = numpy.sqrt (self.relative_error) / self.normalization
-    '''
-    
+
     # compute the cumulative relative sampling error
     self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
     

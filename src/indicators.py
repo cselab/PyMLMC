@@ -294,6 +294,8 @@ class Indicators (object):
     
     self.available = 1
 
+    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
+
     for level in self.levels:
       if numpy.isnan ( self.mean [level] [0] ):
         if level != 0:
@@ -347,17 +349,19 @@ class Indicators (object):
     '''
 
     for level in self.levels [1:]:
-      if numpy.isnan ( self.covariance [level] ):
-        if level != 0:
-          self.covariance [level] = self.covariance [level-1]
-        else:
-          self.covariance [level] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
-
-    for level in self.levels [1:]:
       if numpy.isnan ( self.correlation [level] ):
         if level != 0:
           self.correlation [level] = self.correlation [level-1] + 0.5 * (1.0 - self.correlation [level-1])
         else:
           self.correlation [level] = numpy.nan
+          self.available = 0
           helpers.warning ('Extrapolation of indicators \'CORRELATION\' not possible!')
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.covariance [level] ):
+        if level != 0 and not numpy.isnan ( self.correlation [level] ):
+          self.covariance [level] = self.correlation [level] * self.variance [level] [0] * self.variance [level-1] [0]
+        else:
+          self.covariance [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
