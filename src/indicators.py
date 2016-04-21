@@ -160,17 +160,17 @@ class Indicators (object):
       # for coarsest level, distance is taken w.r.t. 'None'
       if level == 0:
         if indices == None:
-          distances [level] = numpy.array ( [ self.distance (result, None) for result in mcs [ self.pick [level][0] ] .results ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for result in mcs [ self.pick [level][0] ] .results ] )
         else:
-          distances [level] = numpy.array ( [ self.distance (result, None) for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in indices [level] ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in indices [level] ] )
 
       # for the remaining levels, evaluate distance indicators between every two consecutive levels
       else:
         zipped = izip (mcs [ self.pick [level][0] ] .results, mcs [ self.pick [level][1] ] .results)
         if indices == None:
-          distances [level] = numpy.array ( [ self.distance (fine, coarse) for fine, coarse in zipped ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * fine, self.coefficients.values [level - 1] * coarse) for fine, coarse in zipped ] )
         else:
-          distances [level] = numpy.array ( [ self.distance (fine, coarse) for sample, (fine, coarse) in enumerate (zipped) if sample in indices [level] ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * fine, self.coefficients.values [level - 1] * coarse) for sample, (fine, coarse) in enumerate (zipped) if sample in indices [level] ] )
 
       # handle unavailable simulations
       if len (distances [level]) == 0:
