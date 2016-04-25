@@ -360,7 +360,7 @@ class Indicators (object):
     for level in self.levels [1:]:
       if numpy.isnan ( self.covariance [level] ):
         if level != 0 and not numpy.isnan ( self.correlation [level] ):
-          self.covariance [level] = self.correlation [level] * self.variance [level] [0] * self.variance [level-1] [0]
+          self.covariance [level] = self.correlation [level] * numpy.sqrt (self.variance [level] [0] * self.variance [level-1] [0])
         else:
           self.covariance [level] = numpy.nan
           self.available = 0
