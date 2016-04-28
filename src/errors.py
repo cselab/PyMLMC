@@ -17,9 +17,12 @@ from coefficients import *
 
 class Errors (object):
   
-  def __init__ (self, levels):
+  def __init__ (self, levels, recycle):
     
-    self.levels      = levels
+    # save configuration
+    vars (self) .update ( locals() )
+
+    # additional setup
     self.L           = len(levels) - 1
     self.errors_file = 'errors.dat'
     self.available   = 0

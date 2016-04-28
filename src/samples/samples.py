@@ -79,19 +79,20 @@ class Samples (object):
   available    = 0
   history      = {}
   
-  def setup (self, levels, works, tolerate):
+  def setup (self, levels, works, tolerate, recycle):
     
     # store configuration
     vars (self) .update ( locals() )
     
-    # 'sample' is treated as a _pair_ of fine and coarse samples
-    self.works = copy.deepcopy (works)
-    self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
+    # if recycling is disabled, a 'sample' is considered to be a _pair_ of fine and coarse samples
+    if not self.recycle:
+      self.works = copy.deepcopy (works)
+      self.works [1:] = [ works [level] + works [level-1] for level in self.levels [1:] ]
 
     self.counts  = Counts (levels, tolerate)
     self.indices = Indices ()
     
-    self.L       = len(levels) - 1
+    self.L = len(levels) - 1
 
     self.counts.computed = numpy.zeros ( len (self.levels), dtype=int )
 
@@ -101,26 +102,26 @@ class Samples (object):
     self.indices.loaded = [ None for level in self.levels ]
     self.indices.failed = [ None for level in self.levels ]
 
-    self.tolerate       = 0
+    self.tolerate = 0
   
   def validate (self):
     
     for level in self.levels:
-      if self.counts.additional [level] == 0:
-        Exception (" :: ERROR: Encountered a level with no samples: counts.updated [%d] = 0" % level )
+      if self.counts.additional [level] < 0:
+        Exception (" :: ERROR: Encountered a level with negative number of samples: counts.updated [%d] = %d" % (level, self.counts.additional [level]) )
 
   def save (self, iteration):
 
     # initialize history
     if len (self.history) == 0:
-      self.history ['computed']     = {}
-      self.history ['additional']   = {}
-      self.history ['combined']     = {}
+      self.history ['computed']   = {}
+      self.history ['additional'] = {}
+      self.history ['combined']   = {}
 
     # append history
-    self.history ['computed']     [iteration] = self.counts.computed
-    self.history ['additional']   [iteration] = self.counts.additional
-    self.history ['combined']     [iteration] = self.counts.combined
+    self.history ['computed']   [iteration] = self.counts.computed
+    self.history ['additional'] [iteration] = self.counts.additional
+    self.history ['combined']   [iteration] = self.counts.combined
     
     # dump history
     helpers.delete (self.samples_file)

@@ -45,19 +45,19 @@ class MLMC (object):
     self.status = Status ()
     
     # setup solver
-    self.config.solver.setup ( self.params, self.config.root, self.config.deterministic )
+    self.config.solver.setup ( self.params, self.config.root, self.config.deterministic, self.config.recycle )
 
     # setup scheduler
     self.config.scheduler.setup ( self.config.levels, self.config.levels_types, self.config.works, self.config.ratios, self.config.solver.sharedmem )
 
     # setup samples
-    self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate )
+    self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate, self.config.recycle )
 
     # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick )
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick, self.config.recycle )
     
     # errors
-    self.errors = Errors (self.config.levels)
+    self.errors = Errors (self.config.levels, self.config.recycle)
 
     # availability
     self.available = 0
@@ -318,10 +318,18 @@ class MLMC (object):
 
   # create MC objects
   def create_MCs (self, indices, iteration):
+
     self.mcs = []
-    for level, type in self.config.levels_types:
-      self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level], iteration), self.params, self.config.scheduler.parallelizations [level] [type] ) )
-  
+
+    if self.config.recycle:
+      for level in self.config.levels:
+        type = self.config.FINE
+        self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level], iteration), self.params, self.config.scheduler.parallelizations [level] [type], self.config.recycle ) )
+
+    else:
+      for level, type in self.config.levels_types:
+        self.mcs.append ( MC ( MC_Config (self.config, level, type, indices [level], iteration), self.params, self.config.scheduler.parallelizations [level] [type], self.config.recycle ) )
+
   # run MC estimates
   def run (self):
     
@@ -340,8 +348,13 @@ class MLMC (object):
     for mc in self.mcs:
       mc.validate ()
 
-    header    = '  :  LEVEL  |   TYPE   |  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
-    separator = '  :------------------------------------------------------------|'
+    header    = '  :  LEVEL  |'
+    separator = '  :----------'
+    if not self.config.recycle:
+      header    += '   TYPE   |'
+      separator += '-----------'
+    header    += '  RESOLUTION  |  SAMPLES  |  HARDWARE  |'
+    separator += '---------------------------------------|'
     if local.cluster:
       header    += '  WALLTIME  |  BATCH  ->  JOBS   |'
       separator += '---------------------------------|'
@@ -420,9 +433,18 @@ class MLMC (object):
     # stochastic reporting
     else:
 
-      header    = '  :  LEVEL  |   TYPE   |  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |   EFFICIENCY  |'
-      separator = '  :----------------------------------------------------------------------------------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
+      header     = '  :  LEVEL  |'
+      separator  = '  :----------'
+      format     = '  :      %d  |'
+
+      if not self.config.recycle:
+        header    += '   TYPE   |'
+        separator += '-----------'
+        format    += '  %s  |'
+
+      header    += '  SAMPLES  |  FINISHED  |  PENDING  |  WALLTIME  |        RUNTIME        |     USAGE     |     BUDGET    |   EFFICIENCY  |'
+      separator += '-------------------------------------------------------------------------------------------------------------------------|'
+      format    += '    %s  |    %s   |   %s   |  %s  |  %s - %s  |  %s - %s  |  %s - %s  |  %s - %s  |'
 
       header    += '  BATCH  |     BATCH RUNTIME     |'
       separator += '---------------------------------|'
@@ -441,14 +463,20 @@ class MLMC (object):
         # check how many samples are still pending
         pending = mc.pending()
 
-        args = ( mc.config.level, [' FINE ', 'COARSE'] [mc.config.type], intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1), intf (pending, table=1, empty=1) )
+        args = ( mc.config.level, )
+        if not self.config.recycle:
+          args += ( [' FINE ', 'COARSE'] [mc.config.type], )
+        args += ( intf(len(mc.config.samples), table=1), intf (finished, table=1, empty=1), intf (pending, table=1, empty=1) )
 
         # we are not finished if at least one simulation is pending
         if pending > 0:
           self.finished = 0
 
         # report walltime
-        walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+        if self.config.recycle:
+          walltime_sample = self.status.list ['walltimes'] [mc.config.level]
+        else:
+          walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
         if walltime_sample != 'unknown':
           walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
           args += (walltime_sample_str, )
@@ -459,7 +487,10 @@ class MLMC (object):
         if finished > 0:
 
           # parallelization
-          parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
+          if self.config.recycle:
+            parallelization = self.status.list ['parallelization'] [mc.config.level]
+          else:
+            parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
 
           # runtimes, walltime usage, budget usage, etc. of individual samples
           runtime_sample = mc.timer ()
@@ -490,7 +521,10 @@ class MLMC (object):
             args += ( '   N/A  ', '   N/A  ' )
 
             # LEGACY: instead, report walltime and budget usage for entire batches
-            batch         = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+            if self.config.recycle:
+              batch = self.status.list ['batch'] [mc.config.level]
+            else:
+              batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
             runtime_batch = mc.timer (batch=1)
             if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
 
@@ -528,7 +562,10 @@ class MLMC (object):
               args += ( '    ', '    ' )
 
           # batch
-          batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          if self.config.recycle:
+            batch = self.status.list ['batch'] [mc.config.level]
+          else:
+            batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
           args += (batch_str, )
 
@@ -559,7 +596,10 @@ class MLMC (object):
         else:
 
           args += ( '        ', '        ', '    ', '    ', '    ', '    ', '    ', '    ' )
-          batch     = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          if self.config.recycle:
+            batch = self.status.list ['batch'] [mc.config.level]
+          else:
+            batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
           args += ( batch_str, '        ', '        ' )
           print format % args

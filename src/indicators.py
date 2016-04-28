@@ -29,7 +29,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, recycle):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -57,8 +57,8 @@ class Indicators (object):
     for level, type in self.levels_types:
       self.mean     [level] [type] = numpy.mean ( values [level] [type] )
       #self.mean     [level] [type] = numpy.nanmean ( values [level] [type] )
-      self.variance [level] [type] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float('nan')
-      #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )  if len (values [level] [type]) > 1 else float('nan')
+      self.variance [level] [type] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
+      #self.variance [level] [type] = numpy.nanvar  ( values [level] [type] )  if len (values [level] [type]) > 1 else float ('nan')
     self.mean     [0] [1] = float ('NaN')
     self.variance [0] [1] = float ('NaN')
 
@@ -88,8 +88,8 @@ class Indicators (object):
         self.correlation [level] = numpy.corrcoef ( values [level] [0], values [level] [1] ) [0][1]
         #self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
       else:
-        self.covariance  [level] = float('nan')
-        self.correlation [level] = float('nan')
+        self.covariance  [level] = float ('nan')
+        self.correlation [level] = float ('nan')
         self.nans = 1
 
     # extrapolate missing indicators
@@ -99,7 +99,7 @@ class Indicators (object):
 
     # === optimal control variate coefficients
 
-    self.coefficients = Coefficients (self.levels)
+    self.coefficients = Coefficients (self.levels, self.recycle)
 
     # compute optimal control variate coefficients
     self.coefficients.optimize (self)
@@ -117,8 +117,8 @@ class Indicators (object):
     for level in self.levels:
       self.mean_diff     [level] = numpy.mean ( distances [level] )
       #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
-      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float('nan')
-      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float('nan')
+      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float ('nan')
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
   def values (self, mcs, indices=None):

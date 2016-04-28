@@ -2,6 +2,8 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Class for optimal coefficients for control variates
 # TODO: add paper, description and link
+# Recycling  enabled: Peterstorfer, Willcox, Gunzburger, "Optimal model management for multifidelity Monte Carlo estimation", 2015.
+# Recycling disabled: TODO
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
@@ -21,7 +23,7 @@ import helpers
 
 class Coefficients (object):
   
-  def __init__ (self, levels, ):
+  def __init__ (self, levels, recycle):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -36,6 +38,14 @@ class Coefficients (object):
     if len (self.levels) == 0:
       self.values = numpy.array ( [1.0] )
       return
+
+    # === if recycling is enabled, coefficients can be computed explicitely
+
+    if self.recycle:
+      self.values [ : -1 ] = indicators.correlation * numpy.sqrt ( indicators.variance [self.L] / indicators.variance [ : -1 ] )
+      return self.values
+
+    # === if recycling is disabled, coefficients are obtained by solving a linear system of equations
 
     # assemble matrix from indicators
     A = numpy.zeros ( [self.L, self.L] )
@@ -62,6 +72,3 @@ class Coefficients (object):
 
     # solve linear system
     self.values [ : -1 ] = numpy.linalg.solve (A, b)
-
-    # simpler solution
-    #self.values =

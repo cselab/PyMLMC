@@ -127,7 +127,8 @@ class Estimated_Budget (Samples):
     updated = numpy.array ( computed, dtype=int, copy=True )
     
     # compute the work-weighted sum of all variances
-    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
+    #variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
+    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] / self.works [level] for level in self.levels ] ) )
 
     # perform iterative optimization until valid number of samples is obtained
     optimize = 1

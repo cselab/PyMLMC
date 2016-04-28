@@ -31,11 +31,10 @@ class Solver (object):
   init       = None
   
   # common setup routines
-  def setup (self, params, root, deterministic):
+  def setup (self, params, root, deterministic, recycle):
     
-    self.params        = params
-    self.root          = root
-    self.deterministic = deterministic
+    # save configuration
+    vars (self) .update ( locals() )
 
     # setup name
     if not hasattr (self, 'name'):
@@ -115,8 +114,11 @@ class Solver (object):
       return os.path.join (self.root, self.outputdir)
     
     else:
-      dir = '%d_%d' % (level, type)
-      #dir = '%d%s' % (level, ['f', 'c'] [type])
+      if self.recycle:
+        dir = '%d' % level
+      else:
+        dir = '%d_%d' % (level, type)
+        #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '/%d' % sample
       return os.path.join (os.path.join (self.root, self.outputdir), dir)
@@ -128,8 +130,11 @@ class Solver (object):
       return self.name + suffix
     
     else:
-      dir = '%d_%d' % (level, type)
-      #dir = '%d%s' % (level, ['f', 'c'] [type])
+      if self.recycle:
+        dir = '%d' % level
+      else:
+        dir = '%d_%d' % (level, type)
+        #dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
       return '%s_%s%s' % (self.name, dir, suffix) + ('.%d' % self.iteration if iteration else '')

@@ -36,7 +36,7 @@ class MC_Config (object):
 class MC (object):
   
   # initialize MC
-  def __init__ (self, config, params, parallelization):
+  def __init__ (self, config, params, parallelization, recycle):
     
     # store configuration
     vars (self) .update ( locals() )
@@ -67,12 +67,21 @@ class MC (object):
     resolution = config.solver.resolution_string (config.discretization)
     resolution = resolution.rjust ( len ('RESOLUTION') )
 
+    format = '  :  %5d  |'
+    args   = ( config.level, )
+    if not config.recycle:
+      format += '  %s  |'
+      args   += ( typestr, )
+
+    format += '  %s  |    %s  |  %s %s   |'
+    args += ( config.level, typestr, resolution, intf(len(config.samples), table=1) )
     if self.parallelization.cores % local.cores == 0:
-      args = ( config.level, typestr, resolution, intf(len(config.samples), table=1), intf(self.parallelization.cores/local.cores, table=1), 'N' )
+      args += ( intf(self.parallelization.cores/local.cores, table=1), 'N' )
     else:
-      args = ( config.level, typestr, resolution, intf(len(config.samples), table=1), intf(self.parallelization.cores, table=1), 'C' )
+      args += ( intf(self.parallelization.cores, table=1), 'C' )
     
     if self.parallelization.walltime and local.cluster:
+      format += '   %2dh %2dm  |  %s  ->  %s  |'
       if self.parallelization.batch and self.parallelization.batchmax != None:
         batch = intf (self.parallelization.batchmax, table=1)
         count = intf (math.ceil (float (len(config.samples)) / self.parallelization.batchmax), table=1)
@@ -82,12 +91,10 @@ class MC (object):
       args += ( self.parallelization.hours, self.parallelization.minutes, batch, count )
       if local.ensembles and not self.parallelization.batch:
         merge = intf (self.parallelization.mergemax, table=1)
-        args += (merge, )
-        return '  :  %5d  |  %s  |  %s  |    %s  |  %s %s   |   %2dh %2dm  |  %s  ->  %s  |  %s  ->' % args
-      else:
-        return '  :  %5d  |  %s  |  %s  |    %s  |  %s %s   |   %2dh %2dm  |  %s  ->  %s  |' % args
-    else:
-      return '  :  %5d  |  %s  |  %s  |    %s  |  %s %s   |' % args
+        format += '  %s  ->'
+        args   += (merge, )
+    
+    return format % args
 
   # launch all samples
   def run (self):

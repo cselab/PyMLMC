@@ -47,6 +47,7 @@ class MLMC_Config (object):
   scheduler       = Static ()
   root            = '.'
   deterministic   = 0
+  recycle         = 0
   iteration       = None
   ratios          = None
   
@@ -76,7 +77,10 @@ class MLMC_Config (object):
     self.levels_types   = [ [0, self.FINE] ]  + [ level_type for levels_types in zip (levels_types_coarse, levels_types_fine) for level_type in levels_types ]
 
     # setup mapping of level and type to levels_types
-    self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
+    if self.recycle:
+      self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
+    else:
+      self.pick = [ [0, None] ] + [ [level, level - 1] for level in self.levels [1:] ]
 
     # works
     self.works = [ self.solver.work (discretization) / float (local.performance) for discretization in self.discretizations ]
@@ -103,3 +107,4 @@ class MLMC_Config (object):
     else:
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__ + '    ' + ('[RATIOS: %s]' % str (self.ratios) if self.levels > 0 else '')
     print '  : ROOT         :    %-30s' % self.root
+    print '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
