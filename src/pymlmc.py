@@ -709,7 +709,7 @@ class MLMC (object):
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
-      print format % (mc.config.level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
+      print format % (level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
     
     # report detailed progrees of individual samples
     self.progress ()
