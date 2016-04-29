@@ -263,7 +263,7 @@ def name (qoi, short=False):
 
 # create a new solid color which is slighly brighter
 def brighten (color, factor=0.7):
-  rgb = list (matplotlib.colors.ColorConverter.to_rgb [color])
+  rgb = list (matplotlib.colors.ColorConverter.to_rgb (color))
   brighter = rgb
   for channel, value in enumerate (rgb):
     brighter [channel] += factor * (1.0 - value)
