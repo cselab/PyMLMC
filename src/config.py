@@ -78,9 +78,9 @@ class MLMC_Config (object):
 
     # setup mapping of level and type to levels_types
     if self.recycle:
-      self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
-    else:
       self.pick = [ [0, None] ] + [ [level, level - 1] for level in self.levels [1:] ]
+    else:
+      self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] 
 
     # works
     self.works = [ self.solver.work (discretization) / float (local.performance) for discretization in self.discretizations ]

@@ -268,7 +268,10 @@ class CubismMPCF (Solver):
             tail = line [ len (prefix) : ]
             head = tail [ 0 : tail.index ('-') ]
             head = head.strip()
-            efficiencies.append ( float (head) )
+            try:
+              efficiencies.append ( float (head) )
+            except:
+              efficiencies.append ( float ('nan') )
 
     # return the average
     if len (efficiencies) > 0:

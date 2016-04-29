@@ -273,7 +273,8 @@ class Indicators (object):
     self.history ['sigma_co']      [iteration] = [ self.variance [level] [1] for level in self.levels ]
     self.history ['covariance']    [iteration] = self.covariance
     self.history ['correlation']   [iteration] = self.correlation
-    self.history ['coefficients']  [iteration] = self.coefficients.values
+    if 'coefficients' in self.history:
+      self.history ['coefficients']  [iteration] = self.coefficients.values
     self.history ['epsilon_diff']  [iteration] = self.mean_diff
     self.history ['variance_diff'] [iteration] = self.variance_diff
 
