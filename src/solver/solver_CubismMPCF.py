@@ -43,7 +43,7 @@ class CubismMPCF (Solver):
     else:
       self.cmd = self.executable + ' ' + args
     
-    # enable shared memory (i.e. 1 MPI-rank per node)
+    # shared memory support (i.e. 1 MPI-rank per node)
     self.sharedmem = 1
     
     # set files

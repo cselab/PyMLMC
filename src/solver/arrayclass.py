@@ -11,7 +11,8 @@
 import numpy
 from PIL import Image
 
-# dataclass for loading full snapshots of the computational domain
+# dataclass for loading snapshots of the multi-dimensional array-valued fields,
+# e.g. cell values of a (possibly sliced) computational domain
 class Domain_Snapshot (object):
   
   def __init__ (self):

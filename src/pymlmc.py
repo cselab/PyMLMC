@@ -671,7 +671,7 @@ class MLMC (object):
       for type in reversed (self.config.types (level)):
         
         mc = self.mcs [ self.config.pick [level] [type] ]
-        pending = mc.pending()
+        pending = mc.pending ()
         loaded [type] = mc.load ()
 
         # check if at least one sample at some level with type FINE

@@ -1,6 +1,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Example solver class
+# Performs integration of a two-dimensional random function using rectangle rule
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -13,30 +14,31 @@
 # a directory is created and the run (together with input and output) is restricted to that directory.
 #
 # Discretization format:
-# discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?}
+# discretization = N
 #
 
 from solver import Solver
 import local
 import os, subprocess
 
-class Example_Solver (Solver):
+class Integral2D (Solver):
   
-  # constructor for the example solver
-  # 'options'       options for the solver
+  # constructor for the example solver, all arguments are optional
+  # 'options'       additional options for the solver
   # 'path'          path to the executable; if local.cluster = 1 and path != None, a local copy of the executable is created
   # 'name'          name of this solver (used as prefix for the job names)
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', path=None, name='example', init=None):
+  def __init__ (self, options='', path=None, name='Integral2D', init=None):
     
     # save configuration
     vars (self) .update ( locals() )
     
     # command to be executed in terminal
-    self.cmd  = 'echo $RANDOM'
-    
+    # see available list of dynamic arguments in '/doc' directory, others can be set in 'self.run()'
+    self.cmd  = 'python -c "from numpy import *; f = lambda x, y, u : u**2 * x**2 * cos(y); random.seed (%(seed)d); u = random.uniform(); g = linspace (0, 2, %(N)d); x,y = meshgrid (g,g); I = 1.0 / %(N)d ** 2 * sum (f(x,y,u)); print I; f = open (\'output.dat\', \'w\'); f.write (str(I)); f.close()"'
+
     # set path from the environment variable
-    # if not path: self.path = self.env('ENV_VARIABLE_FOR_PATH')
+    #if not path: self.path = self.env ('ENV_VARIABLE_FOR_PATH')
     
     # name of the relevant output file
     self.outputfile = 'output.dat'
@@ -49,26 +51,23 @@ class Example_Solver (Solver):
     # picks out and computes the required distance in quantity of interest
     self.distance = lambda f, c : abs ( f - c if c != None else f )
     
-    # enable shared memory (i.e. 1 MPI-rank per node)
-    # self.sharedmem = 1
+    # shared memory support (i.e. 1 MPI-rank per node)
+    self.sharedmem = 0
 
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
     from helpers import intf
-    if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:
-      return intf (d['NX']) + '^3'
-    else:
-      return intf (d['NX']) + 'x' + intf (d['NY']) + 'x' + intf (d['NZ'])
+    return intf (d)
 
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return d ['NX'] * d ['NY'] * d ['NZ']
+    return d ** 2
   
   # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):
     
-    return d1 ['NX'] / d2 ['NX'] * d1 ['NY'] / d2 ['NY'] * d1 ['NZ'] / d2 ['NZ']
+    return self.work (d1) / self.work (d2)
   
   # validate the proposed parallelization for the specified discretization
   def validate (self, discretization, parallelization):
@@ -86,8 +85,8 @@ class Example_Solver (Solver):
     # print args
     
     # here, args can be modified and additional args can be added
-    # args ['parameter'] = value
-    # args ['seed'] = seed
+    args ['N']    = discretization
+    args ['seed'] = seed
     
     # execute/submit job
     self.launch (args, parallelization, level, type, sample)
@@ -98,7 +97,7 @@ class Example_Solver (Solver):
     outputfile = open ( os.path.join (self.directory (level, type, sample), self.outputfile), 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
-    return [ float ( lines[0] .strip() ) ]
+    return float ( lines[0] .strip() )
 
   # report progress of a pending simulation
   def progress (self, results):

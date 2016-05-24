@@ -105,7 +105,7 @@ class Indicators (object):
     self.coefficients = Coefficients (self.levels, self.recycle)
 
     # compute optimal control variate coefficients
-    #self.coefficients.optimize (self)
+    self.coefficients.optimize (self)
 
     # === EPSILON_DIFF and SIGMA_DIFF level distance indicators
     # (with optimal control variate coefficients computed above)
