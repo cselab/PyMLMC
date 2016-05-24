@@ -73,6 +73,9 @@ if __name__ == '__main__':
   stats.append ( NumPy_Stat ('percentile', '0.05 percentile',  5) )
   stats.append ( NumPy_Stat ('percentile', '0.95 percentile', 95) )
 
+  # TOOD: add histograms?
+  #stats.append ( NumPy_Stat ('histogram') )
+
   # assemble MLMC estimates
   mlmc.assemble (stats, qois.keys())
 

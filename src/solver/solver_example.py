@@ -28,14 +28,14 @@ class Integral2D (Solver):
   # 'path'          path to the executable; if local.cluster = 1 and path != None, a local copy of the executable is created
   # 'name'          name of this solver (used as prefix for the job names)
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', path=None, name='Integral2D', init=None):
+  def __init__ (self, options='', path=None, name='Integral2D', workunit=1, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
     
     # command to be executed in terminal
     # see available list of dynamic arguments in '/doc' directory, others can be set in 'self.run()'
-    self.cmd  = 'python -c "from numpy import *; f = lambda x, y, u : u**2 * x**2 * cos(y); random.seed (%(seed)d); u = random.uniform(); g = linspace (0, 2, %(N)d); x,y = meshgrid (g,g); I = 1.0 / %(N)d ** 2 * sum (f(x,y,u)); print I; f = open (\'output.dat\', \'w\'); f.write (str(I)); f.close()"'
+    self.cmd  = 'python -c "from numpy import *; f = lambda x, y, t, u : u**2 * x**2 * cos(y) * sqrt(t); random.seed (%(seed)d); u = random.uniform(); g = linspace (0, 2, %(N)d); x,y = meshgrid (g,g); I = [1.0 / %(N)d ** 2 * sum (f(x,y,t,u)) for t in arange (10)]; print I; f = open (\'output.dat\', \'w\'); f.write (str(I)); f.close()"'
 
     # set path from the environment variable
     #if not path: self.path = self.env ('ENV_VARIABLE_FOR_PATH')
@@ -62,7 +62,7 @@ class Integral2D (Solver):
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return d ** 2
+    return self.workunit * d ** 2
   
   # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):
@@ -97,7 +97,7 @@ class Integral2D (Solver):
     outputfile = open ( os.path.join (self.directory (level, type, sample), self.outputfile), 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
-    return float ( lines[0] .strip() )
+    return { 't' : [0:10], 'I' : [ float ( lines[0] .strip() ) ] }
 
   # report progress of a pending simulation
   def progress (self, results):

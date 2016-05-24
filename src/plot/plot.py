@@ -78,17 +78,19 @@ def color_stats (name):
 
 colors_params = {}
 
-colors_params ['default'] = 'custom_blue'
+colors_params ['default']     = 'custom_blue'
 
-colors_params ['epsilon'] = 'custom_blue'
-colors_params ['sigma']   = 'custom_orange'
-colors_params ['samples'] = 'custom_green'
-colors_params ['budget']  = 'olivedrab'
-colors_params ['warmup']  = 'saddlebrown'
-colors_params ['optimal'] = 'yellowgreen'
-colors_params ['errors']  = 'coral'
-colors_params ['error']   = 'lightskyblue'
-colors_params ['tol']     = 'darkorchid'
+colors_params ['epsilon']     = 'custom_blue'
+colors_params ['sigma']       = 'custom_orange'
+colors_params ['samples']     = 'custom_green'
+colors_params ['budget']      = 'olivedrab'
+colors_params ['warmup']      = 'saddlebrown'
+colors_params ['optimal']     = 'yellowgreen'
+colors_params ['correlation'] = 'darkorchid'
+colors_params ['coefficient'] = 'darkorchid'
+colors_params ['errors']      = 'coral'
+colors_params ['error']       = 'lightskyblue'
+colors_params ['tol']         = 'darkorchid'
 
 def color_params (name):
   color = colors_params [name] if name in colors_params else colors_params ['default']
@@ -1421,6 +1423,43 @@ def plot_correlations (mlmc, exact=None, infolines=False, run=1, frame=False, to
   if not frame:
     draw (mlmc, save, qoi)
 
+  print ' done.'
+
+# plot coefficients
+def plot_coefficiens (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+
+  print ' :: INFO: Plotting coefficients...',
+  sys.stdout.flush()
+
+  # === load all required data
+
+  coefficients = mlmc.indicators.coefficients.values
+  levels       = mlmc.config.levels
+  qoi          = mlmc.config.solver.qoi
+
+  # === plot
+
+  if not frame:
+    figure (infolines, subplots=1)
+
+  # plot correlations
+
+  pylab.plot (levels, correlation, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
+  pylab.title  ('Level correlations for Q = %s' % qoi)
+  pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
+  pylab.xlabel ('mesh level')
+  pylab.ylim ([-0.1, 1.1])
+  levels_extent (levels)
+  #pylab.legend (loc='upper right')
+
+  adjust (infolines, subplots=1)
+
+  if infolines:
+    show_info(self)
+
+  if not frame:
+    draw (mlmc, save, qoi)
+  
   print ' done.'
 
 # plot errors

@@ -767,7 +767,7 @@ class MLMC (object):
 
       # assemble differences of the remaining levels
       for level in self.config.levels [self.L0 + 1 : ]:
-
+        
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
           self.diffs [level] [name]  = self.indicators.coefficients.values [level]     * copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name])
