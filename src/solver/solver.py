@@ -29,6 +29,7 @@ class Solver (object):
   outputdir  = 'output'
   path       = None
   init       = None
+  workunit   = 1
   
   # common setup routines
   def setup (self, params, root, deterministic, recycle):

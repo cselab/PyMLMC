@@ -30,7 +30,7 @@ sys.path.append ( os.path.join (os.path.dirname(__file__), 'plot' ) )
 
 # === default MLMC configuration
 
-from solver_example    import Example_Solver
+from solver_example    import Integral2D
 from samples_estimated import Estimated
 from scheduler_static  import Static
 
@@ -41,8 +41,8 @@ from scheduler_static  import Static
 class MLMC_Config (object):
   
   # default configuration
-  solver          = Example_Solver ()
-  discretizations = helpers.grids_3d ( helpers.grids (1) )
+  solver          = Integral2D ()
+  discretizations = helpers.grids (4)
   samples         = Estimated ()
   scheduler       = Static ()
   root            = '.'
@@ -83,7 +83,7 @@ class MLMC_Config (object):
       self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
 
     # works
-    self.works = [ self.solver.work (discretization) / float (local.performance) for discretization in self.discretizations ]
+    self.works = [ self.solver.workunit * self.solver.work (discretization) / float (local.performance) for discretization in self.discretizations ]
 
     # work ratios
     self.work_ratios = [ self.works [level] / self.works [0] for level in self.levels ]

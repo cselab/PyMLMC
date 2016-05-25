@@ -22,7 +22,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=16, workunit=1, init=None, indicator=None, distance=None):
+  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=16, workunit=None, init=None, indicator=None, distance=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -45,6 +45,9 @@ class CubismMPCF (Solver):
     
     # shared memory support (i.e. 1 MPI-rank per node)
     self.sharedmem = 1
+
+    # default workunit
+    if not workunit: workunit = tend * float (8192 * 16 * 24) / (4096 ** 4)
     
     # set files
     self.outputfile       = 'statistics.dat'
@@ -77,7 +80,7 @@ class CubismMPCF (Solver):
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return self.workunit * d ['NX'] * d ['NY'] * d ['NZ'] * numpy.max ( [ d['NX'], d['NY'], d['NZ'] ] )
+    return d ['NX'] * d ['NY'] * d ['NZ'] * numpy.max ( [ d['NX'], d['NY'], d['NZ'] ] )
   
   # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):

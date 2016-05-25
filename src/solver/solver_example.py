@@ -26,9 +26,10 @@ class Integral2D (Solver):
   # constructor for the example solver, all arguments are optional
   # 'options'       additional options for the solver
   # 'path'          path to the executable; if local.cluster = 1 and path != None, a local copy of the executable is created
-  # 'name'          name of this solver (used as prefix for the job names)
+  # 'name'          name of this solver (used as prefix for the job names, so better keep it short, ~4-6 characters)
+  # 'workunit'      estimated workunit (in core hours), such that runtime = workunit * solver.work (resolution)
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', path=None, name='Integral2D', workunit=1, init=None):
+  def __init__ (self, options='', path=None, name='int2d', workunit=None, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -39,7 +40,10 @@ class Integral2D (Solver):
 
     # set path from the environment variable
     #if not path: self.path = self.env ('ENV_VARIABLE_FOR_PATH')
-    
+
+    # default workunit
+    if not workunit: workunit = 1
+
     # name of the relevant output file
     self.outputfile = 'output.dat'
     
@@ -62,7 +66,7 @@ class Integral2D (Solver):
   # return amount of work needed for a given discretization 'd'
   def work (self, d):
     
-    return self.workunit * d ** 2
+    return d ** 2
   
   # return the prefered ratio of the number of cores between two discretizations
   def ratio (self, d1, d2):
