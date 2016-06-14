@@ -5,7 +5,7 @@ from pymlmc import *
 
 # === global configuration
 
-name  = 'Integral2D'
+name  = 'int2d'
 email = 'sukys.jonas@gmail.com'
 
 N0 = 8          # coarsest resolution
@@ -24,8 +24,8 @@ budget   = 10   # prescribed total budget (in core hours) for all samples on all
 config = MLMC_Config ()
 
 # solver
-from solver_example import Integral2D
-config.solver = CubismMPCF (name=name, workunit=workunit)
+from solver_Integral2D import Integral2D
+config.solver = Integral2D (name=name, workunit=workunit)
 
 # discretizations
 config.discretizations = helpers.grids (N0, L)
@@ -73,7 +73,7 @@ if __name__ == '__main__':
   stats.append ( NumPy_Stat ('percentile', '0.05 percentile',  5) )
   stats.append ( NumPy_Stat ('percentile', '0.95 percentile', 95) )
 
-  # TOOD: add histograms?
+  # TOOD: add histograms as image plots?
   #stats.append ( NumPy_Stat ('histogram') )
 
   # assemble MLMC estimates

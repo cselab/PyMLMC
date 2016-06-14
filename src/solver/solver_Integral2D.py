@@ -76,6 +76,7 @@ class Integral2D (Solver):
   # validate the proposed parallelization for the specified discretization
   def validate (self, discretization, parallelization):
     
+    # TODO: parallelization can not be larger than 1?
     return 1
   
   # run the specified deterministic simulation (level, type, sample)

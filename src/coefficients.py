@@ -39,7 +39,7 @@ class Coefficients (object):
       self.values = numpy.array ( [1.0] )
       return
 
-    # === if recycling is enabled, coefficients can be computed explicitely
+    # === if recycling is enabled, coefficients can be computed explicitly
 
     if self.recycle:
       self.values [ : -1 ] = indicators.correlation * numpy.sqrt ( indicators.variance [self.L] / indicators.variance [ : -1 ] )

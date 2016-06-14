@@ -30,7 +30,7 @@ sys.path.append ( os.path.join (os.path.dirname(__file__), 'plot' ) )
 
 # === default MLMC configuration
 
-from solver_example    import Integral2D
+from solver_Integral2D import Integral2D
 from samples_estimated import Estimated
 from scheduler_static  import Static
 
