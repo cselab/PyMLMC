@@ -53,7 +53,7 @@ class Scheduler (object):
   def report (self):
 
     if len (self.ratios) > 1:
-      print '  : Requested level core ratios:'
+      print '  : Requested core ratios on each resolution level:'
       print '    %s' % str (self.ratios)
     if self.limit != None:
       print '  : Requested global walltime limit:'
