@@ -69,7 +69,7 @@ class MC (object):
 
     format = '  :  %5d  |'
     args   = ( config.level, )
-    if not config.recycle:
+    if not config.solver.recycle:
       format += '  %s  |'
       args   += ( typestr, )
 
