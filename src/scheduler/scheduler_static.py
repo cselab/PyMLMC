@@ -41,7 +41,7 @@ class Static (Scheduler):
       cores = max ( min ( local.min_cores, self.cores ), int ( round ( required ) ) )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
-      walltime = self.walltime * (float(self.works [level - type]) / self.works [self.L]) * (float(self.cores) / cores)
+      walltime = self.walltime * (float (self.works [level - type]) / self.works [self.L]) * (float (self.cores) / cores)
 
       # walltime is decreased if batching is enabled also on the finest level
       walltime /= self.batchsize
