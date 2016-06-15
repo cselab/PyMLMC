@@ -74,7 +74,7 @@ class MC (object):
       args   += ( typestr, )
 
     format += '  %s  |    %s  |  %s %s   |'
-    args += ( config.level, typestr, resolution, intf(len(config.samples), table=1) )
+    args += ( resolution, intf(len(config.samples), table=1) )
     if self.parallelization.cores % local.cores == 0:
       args += ( intf(self.parallelization.cores/local.cores, table=1), 'N' )
     else:
