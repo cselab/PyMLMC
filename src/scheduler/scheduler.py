@@ -12,15 +12,17 @@ from parallelization import *
 
 class Scheduler (object):
 
-  def setup (self, levels, levels_types, works, ratios, sharedmem):
+  def setup (self, levels, levels_types, works, core_ratios, sharedmem):
 
     vars (self) .update ( locals() )
+    if self.ratios == None:
+      self.ratios = core_ratios
     
     self.L = len(levels) - 1
     self.parallelizations = helpers.level_type_list (levels)
     self.batch = helpers.level_type_list (levels)
     self.merge = helpers.level_type_list (levels)
-    
+
     # if 'cores' is not provided
     if self.cores == None:
 
@@ -41,6 +43,10 @@ class Scheduler (object):
     if self.walltime == None:
       self.walltime = local.walltime
 
+    # set global walltime limit across all levels
+    if self.limit == None:
+      self.limit = self.walltime
+
     # dimensionalize work to CPU hours
     self.works = [ work * self.walltime * self.cores / float (works [self.L]) for work in works ]
 
@@ -48,7 +54,10 @@ class Scheduler (object):
 
     if len (self.ratios) > 1:
       print '  : Requested level allocation ratios:'
-      print '    %s' % str(self.ratios)
+      print '    %s' % str (self.ratios)
+    if self.limit != None:
+      print '  : Requested global walltime limit:'
+      print '    %s hours' % str (self.limit)
     print '  : SPECIFICATIONS:'
     print '    Cores per node: %d' % local.cores
     print '    Threads per core: %d' % local.threads

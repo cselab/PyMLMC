@@ -49,7 +49,6 @@ class MLMC_Config (object):
   deterministic   = 0
   recycle         = 0
   iteration       = None
-  ratios          = None
   
   def __init__ (self, id=0):
     
@@ -88,9 +87,8 @@ class MLMC_Config (object):
     # work ratios
     self.work_ratios = [ self.works [level] / self.works [0] for level in self.levels ]
 
-    # core ratios
-    if self.ratios == None:
-      self.ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
+    # default core ratios
+    self.core_ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
 
   # report configuration
   def report (self):
@@ -101,6 +99,7 @@ class MLMC_Config (object):
     print '  : SOLVER       :    %-30s' % self.solver    .__class__.__name__ + '    ' + '[MODE: %s]' % ('deterministic' if self.deterministic else 'stochastic')
     if self.levels > 0 and not self.deterministic:
       print '  : WORK RATIOS  :    %-30s' % ' '                                + '    ' + '%s' % str (self.work_ratios)
+      print '  : CORE RATIOS  :    %-30s' % ' '                                + '    ' + '%s' % str (self.core_ratios)
     print '  : SAMPLES      :    %-30s' % self.samples   .__class__.__name__
     if self.deterministic:
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
