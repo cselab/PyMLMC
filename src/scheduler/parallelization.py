@@ -82,10 +82,6 @@ class Parallelization (object):
       self.hours   = None
       self.minutes = None
 
-    # take bootup time into account
-    if self.hours == 0 and self.minutes < 2 * local.bootup:
-      self.minutes += local.bootup
-
   # adjust 'walltime' and 'cores'/'nodes' based on 'batch' and 'merge'
   def adjust (self):
 
@@ -106,6 +102,24 @@ class Parallelization (object):
       adjusted.nodes *= self.merge
 
     return adjusted
+
+  # validate parallelization: minimum and maximum walltimes, bootup time, etc.
+  def validate (self):
+
+    # check if walltime does not exceed 'local.max_walltime'
+    if self.walltime > local.max_walltime (self.cores):
+      helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (self.walltime, local.max_walltime))
+
+    # respect the minimal walltime of the machine
+    if local.min_walltime != None:
+      walltime = max ( local.min_walltime (self.cores), self.walltime )
+      self.set_walltime (walltime)
+
+    # take bootup time into account
+    if self.hours == 0 and self.minutes < 2 * local.bootup:
+      self.minutes += local.bootup
+
+    return self
 
   # return dictionary of arguments
   def args (self):
