@@ -102,7 +102,7 @@ class Integral2D (Solver):
     outputfile = open ( os.path.join (self.directory (level, type, sample), self.outputfile), 'r' )
     lines = outputfile .readlines ()
     outputfile.close()
-    return { 't' : [0:10], 'I' : [ float ( lines[0] .strip() ) ] }
+    return { 't' : [0, 1, 2, 3], 'I' : [ float ( lines[0] .strip() ) ] }
 
   # report progress of a pending simulation
   def progress (self, results):
