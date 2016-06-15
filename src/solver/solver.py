@@ -206,8 +206,8 @@ class Solver (object):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
 
     # respect the minimal walltime of the machine
-    if local.min_walltime (parallelization.cores) != None:
-      walltime = max ( local.min_walltime (cores), walltime )
+    if local.min_walltime != None:
+      walltime = max ( local.min_walltime (parallelization.cores), parallelization.walltime )
       parallelization.set_walltime (walltime)
 
     # update args with adjusted parallelization
