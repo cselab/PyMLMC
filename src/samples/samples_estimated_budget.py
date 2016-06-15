@@ -67,7 +67,7 @@ class Estimated_Budget (Samples):
 
     # compute optimal control variate coefficients
     if self.optimal:
-      self.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
+      indicators.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
 
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
@@ -100,7 +100,8 @@ class Estimated_Budget (Samples):
     print ' :: SAMPLES: (estimated for the specified budget)'
 
     # report coefficients
-    self.coefficients.report()
+    # TODO: indicators is not a member of Samples
+    #indicators.coefficients.report()
 
     # report computed and additional number of samples
     self.counts.report ()
