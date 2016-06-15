@@ -88,7 +88,7 @@ class MLMC_Config (object):
     self.work_ratios = [ self.works [level] / self.works [0] for level in self.levels ]
 
     # default core ratios
-    self.core_ratios = [ self.solver.ratio (self.discretizations [self.L], discretization) for discretization in self.discretizations ]
+    self.core_ratios = [ self.solver.ratio (discretization, self.discretizations [0]) for discretization in self.discretizations ]
 
   # report configuration
   def report (self):
