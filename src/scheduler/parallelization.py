@@ -49,9 +49,6 @@ class Parallelization (object):
     # set maximal batch size such that the total walltime does not exceed maximum walltime
     # remark: total walltime might still exceed the user-specified walltime
     if local.max_walltime (cores) != None:
-      print
-      print local.max_walltime (cores)
-      print float (walltime)
       self.batchmax = int ( floor ( local.max_walltime (cores) / float (walltime) ) )
     else:
       self.batchmax = None

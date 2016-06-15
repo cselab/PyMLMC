@@ -45,14 +45,10 @@ class Static (Scheduler):
       # walltime is decreased if batching is enabled also on the finest level
       walltime /= self.batchsize
 
-      # respect the minimal walltime of the machine
-      if local.min_walltime (cores) != None:
-        walltime = max ( local.min_walltime (cores), walltime )
-
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
 
-      # set walltime limit
+      # set global walltime limit across all levels
       if self.limit == None:
         limit = self.walltime
       

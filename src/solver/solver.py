@@ -199,7 +199,20 @@ class Solver (object):
 
     # adjust parallelization to take into account 'batch' and 'merge' modes
     # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
-    args.update ( parallelization.adjust().args() )
+    parallelization.adjust()
+
+    # check if walltime does not exceed 'local.max_walltime'
+    if parallelization.walltime > local.max_walltime (parallelization.cores):
+      helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
+
+    # respect the minimal walltime of the machine
+    if local.min_walltime (parallelization.cores) != None:
+      walltime = max ( local.min_walltime (cores), walltime )
+      parallelization.set_walltime (walltime)
+
+    # update args with adjusted parallelization
+    # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
+    args.update ( parallelization.args() )
 
     # assemble submission script (if enabled)
     if local.script:
