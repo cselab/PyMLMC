@@ -25,12 +25,9 @@ memory    = 1024 # MB per core
 rack      = 1024 # nodes
 
 # constraints
-
 bootup       = 5   # minutes
-#min_cores    = 512 * cores
-#max_cores    = 49152 * cores
-min_cores    = 128 * cores
-max_cores    = 2048 * cores
+min_cores    = 512 * cores
+max_cores    = 49152 * cores
 
 def min_walltime (cores): # hours
   return 0.5
@@ -94,10 +91,12 @@ simple_job = '''ulimit -c 0
 runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
+--block ${BLOCKS[%(block)d]} \
+--corner ${CORNERS[%(corner)d]} \
+--shape %(shape)s \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
---block BLOCK_HOOK \
 %(envs)s \
 : %(cmd)s %(options)s
 '''
@@ -107,22 +106,69 @@ mpi_job = '''ulimit -c 0
 runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
+--block ${BLOCKS[%(block)d]} \
+--corner ${CORNERS[%(corner)d]} \
+--shape %(shape)s \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
---block BLOCK_HOOK \
 %(envs)s \
 : %(cmd)s %(options)s
 '''
 
 # batch job block hook
-BLOCK_HOOK = '${BLOCKS[%(block)d]}'
+#BLOCK_HOOK = '${BLOCKS[%(block)d]}'
 
 # block boot
 boot = 'boot-block --block ${BLOCKS[%(block)d]}'
 
+'''
+# boot blocks (3 attempts are recommended)
+for BLOCK in ${BLOCKS[@]}
+do
+  boot-block --block $BLOCK &
+  boot-block --block $BLOCK &
+  boot-block --block $BLOCK &
+done
+wait
+'''
+
+# get shape from number of nodes
+def shape (nodes):
+  shape = [1, 1, 1, 1, 1]
+  index = 0
+  while nodes != 1:
+    shape [index] *= 2
+    nodes /= 2
+    index = (index + 1) % 5
+  return '%dx%dx%dx%dx%d' % tuple (shape)
+
+# get corners for sub-blocks
+corners = '''
+# get corners of sub-blocks for each batch job in the ensemble
+CORNERS=`/soft/cobalt/bgq_hardware_mapper/get-corners.py ${BLOCKS[%(block)d]} %(shape)s`
+
+# split string of sub-blocks into array elements
+read -r -a CORNERS <<< $CORNERS
+
+# print info about all corners of sub-blocks
+echo
+echo 'Obtained corners:'
+for CORNER in ${CORNERS[@]}
+do
+  echo $CORNER
+done
+echo
+'''
+
 # block free
 free = 'boot-block --block ${BLOCKS[%(block)d]} --free'
+
+# batch job corner hook
+#CORNER_HOOK = '${CORNERS[%(corner)d]}'
+
+# batch job shape hook
+#SHAPE_HOOK = '%(shape)s'
 
 # submission script template (required for support of batch jobs ensembles)
 script = '''#!/bin/bash
@@ -160,26 +206,6 @@ echo
 
 %(job)s
 
-wait
-'''
-
-'''
-# boot blocks (3 attempts are recommended)
-for BLOCK in ${BLOCKS[@]}
-do
-  boot-block --block $BLOCK &
-  boot-block --block $BLOCK &
-  boot-block --block $BLOCK &
-done
-wait
-'''
-
-'''
-# free blocks
-for BLOCK in ${BLOCKS[@]}
-do
-  boot-block --block $BLOCK --free &
-done
 wait
 '''
 

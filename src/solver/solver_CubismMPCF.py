@@ -255,11 +255,8 @@ class CubismMPCF (Solver):
       # get directory
       directory = self.directory ( level, type, sample )
 
-      # get label
-      label = self.label ( level, type, sample )
-
       # use the 'timerfile'
-      file = os.path.join (directory, self.timerfile % label)
+      file = os.path.join (directory, self.timerfile)
 
     # parse the file
     efficiencies = []

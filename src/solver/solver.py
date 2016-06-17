@@ -23,8 +23,8 @@ class Solver (object):
   jobfile    = 'job_%s.sh'
   scriptfile = 'script_%s.sh'
   submitfile = 'submit_%s.sh'
-  statusfile = 'status_%s.dat'
-  timerfile  = 'timerfile_%s.dat'
+  statusfile = 'status.dat'
+  timerfile  = 'timerfile.dat'
   inputdir   = 'input'
   outputdir  = 'output'
   path       = None
@@ -160,9 +160,21 @@ class Solver (object):
     
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
-      return local.simple_job.rstrip() % args
+      job = local.simple_job.rstrip() % args
     else:
-      return local.mpi_job.rstrip() % args
+      job = local.mpi_job.rstrip() % args
+
+    # prepend command to print date
+    job = 'date\n' + job
+
+    # append command to create status file
+    job = job.rstrip() + '\n' + 'touch %s' % self.statusfile
+
+    # add timer
+    if local.timer:
+      job = local.timer.rstrip() % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile }
+
+    return job
   
   # assemble the submission command
   def submit (self, job, parallelization, label, directory='.', hooks=1, boot=1, block=0, timer=0):
@@ -235,24 +247,11 @@ class Solver (object):
     # append options to args
     args ['options'] = self.options
 
-    # assemble job
-    job = self.job (args)
-    
+    # append sample to args
+    args ['sample'] = sample
+
     # get directory
     directory = self.directory (level, type, sample)
-    
-    # get label
-    label = self.label (level, type, sample)
-
-    # prepend command to print date
-    job = 'date\n' + job
-
-    # append command to create status file
-    job = job.rstrip() + '\n' + 'touch %s' % ( self.statusfile % self.label (level, type, sample, iteration=None) )
-
-    # add timer
-    if local.timer:
-      job = local.timer.rstrip() % { 'job' : '\n' + job + '\n', 'timerfile' : self.timerfile % label }
 
     # prepare solver
     if not self.params.proceed:
@@ -261,36 +260,39 @@ class Solver (object):
     # cluster run 
     if local.cluster:
       
-      # if batch mode -> add job to batch script
-      # all jobs are combined into a single script
+      # if batch mode -> add job to batch
       if parallelization.batch:
-        self.add ( job, sample )
+        #self.add (job, sample)
+        self.batch.append (args)
       
-      # else submit job to job management system
+      # else submit job to job management system under specified label
       else:
 
+        # get label
+        label = self.label (level, type, sample)
+
         # submit
-        self.execute ( self.submit (job, parallelization, label, directory), directory )
+        self.execute (self.submit (self.job (args), parallelization, label, directory), directory)
     
     # node run -> execute job directly
     else:
-      self.execute ( job )
+      self.execute (self.job (args))
   
   # prepare solver - create directories, copy files, execute init script
   def prepare (self, directory, seed):
     
     # create directory
     if not self.deterministic and not os.path.exists (directory):
-      os.makedirs ( directory )
+      os.makedirs (directory)
 
     # copy needed input files
     if os.path.exists (self.inputdir):
       for inputfile in os.listdir (self.inputdir):
-        shutil.copy ( os.path.join (self.inputdir, inputfile), directory )
+        shutil.copy (os.path.join (self.inputdir, inputfile), directory)
 
     # if specified, execute solver init script
     if self.init and not self.params.noinit:
-      self.init ( directory, seed )
+      self.init (directory, seed)
 
   # add block booting and block freeing
   def boot (self, job, block=0):
@@ -321,27 +323,26 @@ class Solver (object):
       stdout = None
       stderr = None
     else:
-      stdout = open ( os.devnull, 'w' )
+      stdout = open (os.devnull, 'w')
       stderr = subprocess.STDOUT
     
     # execute command
     if not self.params.simulate:
-      subprocess.check_call ( cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy() )
+      subprocess.check_call (cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy())
   
-  # add job to batch
-  def add (self, job, sample):
+  # wrap job inside the batch
+  def wrap (self, job, sample):
     
     # add cmd to the script
     cmd  = 'cd %s\n' % sample
     cmd += job + '\n'
     cmd += 'cd ..\n'
     
-    # add cmd to the batch
-    self.batch.append (cmd)
-    
     # report command
     if self.params.verbose >= 1:
       print cmd
+
+    return cmd
 
   # finalize solver
   def finalize (self, level, type, parallelization):
@@ -364,8 +365,8 @@ class Solver (object):
         # submit each part of the batch job
         for i, part in enumerate (parts):
 
-          # construct batch job
-          batch = '\n'.join (part)
+          # construct batch job from all jobs in current part
+          batch = '\n'.join ( [ self.wrap (self.job (args), args ['sample']) for args in part ] )
 
           # set batch in parallelization
           parallelization.batch = len (part)
@@ -376,8 +377,15 @@ class Solver (object):
           # submit
           self.execute ( self.submit (batch, parallelization, label, directory, timer=1), directory )
 
+        return ''
+
       # else if merging into ensembles is enabled
       else:
+
+        # TODO: if parallelization.nodes < local.min_cores, need to form sub-block groups of batch jobs, which are then joined into ensembles
+        if parallelization.nodes < local.min_cores:
+          subblocks = local.min_cores / parallelization.nodes
+          
 
         # split parts into ensembles (with size being powers of 2)
         binary = bin ( len(parts) )
@@ -394,6 +402,8 @@ class Solver (object):
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
 
+        # respect minimum node count (somehow later?)
+
         # submit each ensemble
         submitted   = 0
         batch_index = 0
@@ -408,12 +418,28 @@ class Solver (object):
           # prepare each part of the batch job
           for block, part in enumerate (parts [submitted : submitted + size]):
 
-            # prepare job to be part of an ensemble with batch job id = block
-            # TODO: replace this by proper formatting, i.e. in job: %(batch_id_hook)s, set from local.cfg and using %(batch_id)d, and then set batch_id here
-            part = [ job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block} for job in part ]
+            # append additional parameters to 'args'
+            jobs = []
+            for args in part:
+
+              # prepare job to be part of an ensemble with batch job id = block
+              #part = [ job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block} for job in part ]
+              args ['block'] = block
+
+            # TODO: loop over subblocks
+
+              # TODO: append 'local.corners'
+
+              # prepare job to run as a sub-block with specified corner and shape
+              args ['corner'] = ??
+              args ['shape']  = local.shape (parallelization.nodes)
+
+              # add job
+              jobs.append ( self.wrap (self.job (args), args ['sample']) )
 
             # construct batch job
-            batch = '\n'.join (part)
+            batch = '\n'.join (jobs)
+            #batch = '\n'.join ( [ self.wrap (self.job (args), args ['sample']) for args in part ] )
 
             # increment 'batch_index' counter
             batch_index += 1
@@ -512,11 +538,8 @@ class Solver (object):
       # get directory
       directory = self.directory ( level, type, sample )
       
-      # get label
-      label = self.label ( level, type, sample )
-
       # read and return runtime
-      return self.runtime (directory, self.timerfile % label)
+      return self.runtime (directory, self.timerfile)
 
   # read 'timerfile' from 'directory' and extract efficiency
   def efficiencies (self, level, type, sample='all'):

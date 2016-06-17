@@ -13,7 +13,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Argonne Cetus (IBM BlueGene/Q)'
+name = 'Argonne Cetus (IBM BlueGene/Q) [OUTDATED!!!]'
 
 # Cetus is a cluster
 cluster = 1
