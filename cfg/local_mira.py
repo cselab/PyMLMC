@@ -92,12 +92,6 @@ runjob \
 : %(cmd)s %(options)s
 '''
 
-'''
---block ${BLOCKS[%(block)d]} \
---corner ${CORNERS[%(corner)d]} \
---shape %(shape)s \
-'''
-
 # MPI run command
 mpi_job = '''ulimit -c 0
 runjob \
@@ -108,12 +102,6 @@ runjob \
 --envs XLSMPOPTS=parthds=%(threads)d \
 %(envs)s \
 : %(cmd)s %(options)s
-'''
-
-'''
---block ${BLOCKS[%(block)d]} \
---corner ${CORNERS[%(corner)d]} \
---shape %(shape)s \
 '''
 
 # block boot
@@ -145,7 +133,7 @@ wait
 # get shape from number of nodes
 def shape (nodes):
   if nodes >= 512:
-    return '$COBALT_SHAPE'
+    return None
   shape = [1, 1, 1, 1, 1]
   index = 0
   while nodes != 1:
@@ -158,12 +146,6 @@ def shape (nodes):
 corners = '''
 # get corners of subblocks for each batch job in the ensemble
 CORNERS=`/soft/cobalt/bgq_hardware_mapper/get-corners.py ${BLOCKS[%(block)d]} %(shape)s`
-
-# if 512 or more nodes are needed, return default corner
-if (( %(nodes)d >= 512 ))
-then
-  CORNERS=$COBALT_CORNER
-fi
 
 # split string of subblocks into array elements
 read -r -a CORNERS <<< $CORNERS
@@ -211,15 +193,6 @@ do
   echo $BLOCK
 done
 echo
-
-# get default subblock
-CORNERS=$COBALT_CORNER
-
-# print default subblock
-echo $CORNERS
-
-# split string of subblocks into array elements
-read -r -a CORNERS <<< $CORNERS
 
 %(job)s
 

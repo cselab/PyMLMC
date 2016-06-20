@@ -471,7 +471,7 @@ class Solver (object):
               # append additional parameters to 'args'
               jobs = []
               for args in batch:
-
+                
                 # determine the shape of a sub-block
                 shape = local.shape (parallelization.nodes)
 
