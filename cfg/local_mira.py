@@ -206,6 +206,9 @@ echo
 # get default subblock
 CORNERS=$COBALT_CORNER
 
+# print default subblock
+echo $CORNERS
+
 # split string of subblocks into array elements
 read -r -a CORNERS <<< $CORNERS
 
