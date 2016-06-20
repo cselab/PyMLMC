@@ -163,8 +163,6 @@ class Solver (object):
     args ['block']  = block
     args ['corner'] = corner
     args ['shape']  = shape
-    #if shape == None and local.shape != None:
-    #  args ['shape'] = local.shape (args ['nodes'])
 
     # TODO: this is a dirty fix
     args ['envs'] += ' ' + local.block % args
@@ -459,6 +457,13 @@ class Solver (object):
             # initialize subensemble job
             subensemble = ''
 
+            # determine the shape of a subblock
+            shape = local.shape (parallelization.nodes)
+
+            # add corner initialization
+            if shape != None:
+              subensemble += local.corners % { 'block' : block, 'shape' : shape } + '\n'
+
             # submit each batch
             for corner, batch in enumerate (batches):
 
@@ -471,9 +476,6 @@ class Solver (object):
               # append additional parameters to 'args'
               jobs = []
               for args in batch:
-
-                # determine the shape of a sub-block
-                shape = local.shape (parallelization.nodes)
 
                 # add batch job of 'shape' to 'corner' within block which is part of an entire ensemble
                 jobs.append ( self.wrap (self.job (args, block, corner, shape), args ['sample']) )
@@ -490,9 +492,6 @@ class Solver (object):
 
               # add batch job to the subensemble
               subensemble += batch
-
-            # add corner initialization
-            subensemble = local.corners % args + '\n' + subensemble
 
             # add block booting and block freeing
             subensemble = self.boot (subensemble, block)
