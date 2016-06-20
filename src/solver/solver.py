@@ -338,8 +338,7 @@ class Solver (object):
       failed  = process.poll()
       if failed:
         message = 'Submission failed'
-        details = 'output'
-        helpers.warning (message, details=details)
+        helpers.warning (message, details=output)
   
   # wrap job inside the batch
   def wrap (self, job, sample):
