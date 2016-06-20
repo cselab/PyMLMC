@@ -135,6 +135,8 @@ wait
 
 # get shape from number of nodes
 def shape (nodes):
+  if nodes >= 512:
+    return '$COBALT_SHAPE'
   shape = [1, 1, 1, 1, 1]
   index = 0
   while nodes != 1:
@@ -147,6 +149,12 @@ def shape (nodes):
 corners = '''
 # get corners of sub-blocks for each batch job in the ensemble
 CORNERS=`/soft/cobalt/bgq_hardware_mapper/get-corners.py ${BLOCKS[%(block)d]} %(shape)s`
+
+# if 512 or more nodes are needed, return default corner
+if (( %(nodes)d >= 512 ))
+then
+  CORNERS=$COBALT_CORNER
+fi
 
 # split string of sub-blocks into array elements
 read -r -a CORNERS <<< $CORNERS
@@ -210,7 +218,7 @@ wait
 '''
 
 # submit command
-submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix report.%(label)s --notify %(email)s --disable_preboot %(xopts)s --mode script /soft/debuggers/scripts/bin/nofail ./%(scriptfile)s'
+submit = 'qsub --project CloudPredict --nodecount %(nodes)d --time %(hours).2d:%(minutes).2d:00 --outputprefix %(reportfile)s --notify %(email)s --disable_preboot %(xopts)s --mode script /soft/debuggers/scripts/bin/nofail ./%(scriptfile)s'
 
 # timer
 #timer = 'time --portability --output=%(timerfile)s --append (%(job)s)'

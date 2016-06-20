@@ -25,15 +25,15 @@ class Parallelization (object):
     self.set_walltime (walltime)
     
     # memory usage is per core
-    self.memory  = local.memory
+    self.memory = local.memory
     
     # compute nodes
     self.nodes = max ( 1, self.cores / local.cores )
     
     # if shared memory is available, use one rank per node
     if sharedmem:
-      self.ranks    = self.nodes
-      self.threads  = local.threads * min ( local.cores, cores )
+      self.ranks   = self.nodes
+      self.threads = local.threads * min ( local.cores, cores )
     
     # otherwise, use 'local.threads' ranks per core
     else:
@@ -49,17 +49,17 @@ class Parallelization (object):
     # set maximal batch size such that the total walltime does not exceed maximum walltime
     # remark: total walltime might still exceed the user-specified walltime
     if local.max_walltime (cores) != None:
-      self.batchmax = int ( floor ( local.max_walltime (cores) / float (walltime) ) )
+      self.batchmax = max ( 1, int ( floor ( local.max_walltime (cores) / float (walltime) ) ) )
     else:
       self.batchmax = None
 
     # batchsize should not exceed the limit
     if limit != None:
       self.batchmax = min ( self.batchmax, int ( floor ( limit / float (walltime) ) ) )
-    
+
     # set maximal merge size such that the maximum number of cores is not exceeded
     if local.max_cores != None:
-      self.mergemax = int ( floor ( local.max_cores / float(cores) ) )
+      self.mergemax = int ( floor ( local.max_cores / float (cores) ) )
     else:
       self.mergemax = None
     

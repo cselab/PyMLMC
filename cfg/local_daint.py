@@ -68,7 +68,7 @@ script = '''#!/bin/bash
 #SBATCH --cpus-per-task=%(threads)d
 #SBATCH --time=%(hours).2d:%(minutes).2d:00
 #SBATCH --mem=%(memory)d
-#SBATCH --output=report.%(label)s
+#SBATCH --output=%(reportfile)s
 #SBATCH --account=s500
 %(xopts)s
 ulimit -c 0

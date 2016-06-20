@@ -20,11 +20,12 @@ import helpers
 
 class Solver (object):
   
-  jobfile    = 'job_%s.sh'
-  scriptfile = 'script_%s.sh'
-  submitfile = 'submit_%s.sh'
+  jobfile    = 'job.sh'
+  scriptfile = 'script.sh'
+  submitfile = 'submit.sh'
   statusfile = 'status.dat'
   timerfile  = 'timerfile.dat'
+  reportfile = 'report.dat'
   inputdir   = 'input'
   outputdir  = 'output'
   path       = None
@@ -177,37 +178,38 @@ class Solver (object):
     return job
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', hooks=1, boot=1, block=0, timer=0):
+  def submit (self, job, parallelization, label, directory='.', timer=1, suffix='', boot=1):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
 
-    # process hooks
-    if hooks:
-      job = job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block}
+    ## process hooks
+    #if hooks:
+    #  job = job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block}
 
-    # add block booting and block freeing
+    # add booting and freeing
     if boot:
-      job = self.boot (job, block)
+      job = self.boot (job)
 
     # add timer
     if timer and local.timer:
-      job = local.timer.rstrip() % { 'job' : '\n' + job, 'timerfile' : self.timerfile % label }
+      job = local.timer.rstrip() % { 'job' : '\n' + job, 'timerfile' : self.timerfile + suffix }
     
     # create jobfile
-    jobfile = os.path.join (directory, self.jobfile % label)
+    jobfile = os.path.join (directory, self.jobfile + suffix)
     with open ( jobfile, 'w') as f:
       f.write ('#!/bin/bash\n')
       f.write (job)
       self.chmodx (jobfile)
     
     # assemble arguments for job submission
-    args              = parallelization.args()
-    args ['job']      = job
-    args ['jobfile']  = self.jobfile % label
-    args ['label']    = label
-    args ['xopts']    = self.params.xopts
+    args                = parallelization.args()
+    args ['job']        = job
+    args ['jobfile']    = self.jobfile + suffix
+    args ['reportfile'] = self.reportfile + suffix
+    args ['label']      = label
+    args ['xopts']      = self.params.xopts
 
     # update args with adjusted parallelization
     # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
@@ -216,8 +218,8 @@ class Solver (object):
     # assemble submission script (if enabled)
     if local.script:
       args ['script']     = local.script.rstrip() % args
-      args ['scriptfile'] = self.scriptfile % label
-      scriptfile = os.path.join (directory, self.scriptfile % label)
+      args ['scriptfile'] = self.scriptfile + suffix
+      scriptfile = os.path.join (directory, self.scriptfile + suffix)
       with open (scriptfile, 'w') as f:
         f.write ( args ['script'] )
         self.chmodx (scriptfile)
@@ -231,7 +233,7 @@ class Solver (object):
     submit = local.submit % args
 
     # create submit script
-    submitfile = os.path.join (directory, self.submitfile % label)
+    submitfile = os.path.join (directory, self.submitfile + suffix)
     with open (submitfile, 'w') as f:
       f.write (submit)
       self.chmodx (submitfile)
@@ -294,7 +296,7 @@ class Solver (object):
     if self.init and not self.params.noinit:
       self.init (directory, seed)
 
-  # add block booting and block freeing
+  # add booting and freeing
   def boot (self, job, block=0):
 
     if local.boot and local.free:
@@ -332,149 +334,155 @@ class Solver (object):
   
   # wrap job inside the batch
   def wrap (self, job, sample):
-    
-    # add cmd to the script
-    cmd  = 'cd %s\n' % sample
-    cmd += job + '\n'
-    cmd += 'cd ..\n'
+
+    # add directory changes
+    wrapped = ('cd %s\n' % sample) + job + '\n' + 'cd ..\n'
     
     # report command
     if self.params.verbose >= 1:
-      print cmd
+      print wrapped
 
-    return cmd
+    return wrapped
 
   # finalize solver
   def finalize (self, level, type, parallelization):
     
     # if batch mode -> submit batch job(s)
     if local.cluster and parallelization.batch:
-      
+
+      # suffix format for batch jobs and ensembles
+      suffix_format = '.%s%03d'
+
       # get directory
       directory = self.directory (level, type)
       
-      # split batch jobs into parts
+      # split batch job into smaller batches according to 'parallelization.batchmax'
       if parallelization.batchmax:
-        parts = [ self.batch [i:i+parallelization.batchmax] for i in range (0, len (self.batch), parallelization.batchmax) ]
+        batches = helpers.chunks (self.batch, parallelization.batchmax)
       else:
-        parts = [ self.batch [:] ]
+        batches = [ self.batch [:] ]
 
       # if merging into ensembles is disabled
       if not local.ensembles:
 
-        # submit each part of the batch job
-        for i, part in enumerate (parts):
+        # submit each batch
+        for index, batch in enumerate (batches):
 
-          # construct batch job from all jobs in current part
-          batch = '\n'.join ( [ self.wrap (self.job (args), args ['sample']) for args in part ] )
+          # set batch in parallelization (last batch might be smaller)
+          parallelization.batch = len (batch)
 
-          # set batch in parallelization
-          parallelization.batch = len (part)
+          # construct batch job from all jobs in the current batch
+          batch = '\n'.join ( [ self.wrap (self.job (args), args ['sample']) for args in batch ] )
+
+          # set suffix
+          suffix = suffix_format % ('b', index + 1)
 
           # set label
-          label = self.label (level, type, suffix='_b%d' % (i+1))
+          label = self.label (level, type, suffix=suffix)
 
           # submit
-          self.execute ( self.submit (batch, parallelization, label, directory, timer=1), directory )
+          self.execute ( self.submit (batch, parallelization, label, directory, suffix=suffix), directory )
 
         return ''
 
       # else if merging into ensembles is enabled
       else:
 
-        # TODO: if parallelization.nodes < local.min_cores, need to form sub-block groups of batch jobs, which are then joined into ensembles
-        if parallelization.nodes < local.min_cores:
-          subblocks = local.min_cores / parallelization.nodes
-          
+        # form blocks of batch jobs (non-degenerate for parallelization.nodes < local.min_cores only)
+        subblocks = max (1, local.min_cores / parallelization.cores)
+        blocks = helpers.chunks (batches, subblocks)
 
-        # split parts into ensembles (with size being powers of 2)
-        binary = bin ( len(parts) )
+        # split blocks into ensembles (with ensemble sizes being powers of 2)
+        binary = bin ( len (blocks) )
         decomposition = [ 2**(len(binary) - 1 - power) if flag == '1' else 0 for power, flag in enumerate(binary) ]
         decomposition = [ size for size in decomposition if size != 0 ]
 
         # respect parallelization.mergemax
         filtered = []
         for i, size in enumerate (decomposition):
-          if parallelization.mergemax == None or size <= parallelization.mergemax:
+          if parallelization.mergemax == None or size * subblocks <= parallelization.mergemax:
             filtered += [size]
           else:
-            chunks = 2 ** int ( math.ceil ( math.log ( float(size) / parallelization.mergemax, 2) ) )
+            chunks = 2 ** int ( math.ceil ( math.log ( float (size * subblocks) / parallelization.mergemax, 2) ) )
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
 
-        # respect minimum node count (somehow later?)
-
         # submit each ensemble
-        submitted   = 0
-        batch_index = 0
-        for i, size in enumerate (decomposition):
+        index     = 0
+        submitted = 0
+        for i, merge in enumerate (decomposition):
+
+          # set suffix
+          suffix = suffix_format % ('e', i + 1)
 
           # set label
-          label = self.label (level, type, suffix='_e%d' % (i+1))
-          
+          label = self.label (level, type, suffix=suffix)
+
           # initialize ensemble job
           ensemble = ''
 
-          # prepare each part of the batch job
-          for block, part in enumerate (parts [submitted : submitted + size]):
-
-            # append additional parameters to 'args'
-            jobs = []
-            for args in part:
-
-              # prepare job to be part of an ensemble with batch job id = block
-              #part = [ job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block} for job in part ]
-              args ['block'] = block
-
-            # TODO: loop over subblocks
-
-              # TODO: append 'local.corners'
-
-              # prepare job to run as a sub-block with specified corner and shape
-              args ['corner'] = ??
-              args ['shape']  = local.shape (parallelization.nodes)
-
-              # add job
-              jobs.append ( self.wrap (self.job (args), args ['sample']) )
-
-            # construct batch job
-            batch = '\n'.join (jobs)
-            #batch = '\n'.join ( [ self.wrap (self.job (args), args ['sample']) for args in part ] )
-
-            # increment 'batch_index' counter
-            batch_index += 1
-
-            # add block booting and block freeing
-            batch = self.boot (batch, block)
-
-            # add timer
-            if local.timer:
-              label_timer = self.label (level, type, suffix='_b%d' % batch_index)
-              batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile % label_timer }
-
-            # fork to background (such that other batch jobs in ensemble could proceed)
-            batch = '(\n\n%s\n\n) &\n' % batch
-
-            # header for the ensemble job
-            ensemble += '\n# === BATCH JOB %d [block %d]\n' % (batch_index, block)
-            
-            # add batch job to the ensemble
-            ensemble += batch
-
           # set batch and merge in parallelization
-          parallelization.batch = len (part)
-          parallelization.merge = size
+          parallelization.batch = len (blocks [0][0])
+          parallelization.merge = merge
+
+          # submit each block
+          for block, batches in enumerate (blocks [submitted : submitted + merge]):
+
+            # submit each batch
+            for corner, batch in enumerate (batches):
+
+              # append additional parameters to 'args'
+              jobs = []
+              for args in batch:
+
+                # prepare job to be part of an ensemble with batch job id = block
+                args ['block'] = block
+
+                # prepare job to run as a sub-block with specified corner and shape
+                args ['corner'] = corner
+                args ['shape']  = local.shape (parallelization.nodes)
+
+                # add job
+                jobs.append ( self.wrap (self.job (args), args ['sample']) )
+
+              # construct batch job
+              batch = '\n'.join (jobs)
+
+              # add corner initialization
+              batch = local.corners % args + '\n' + batch
+
+              # add block booting and block freeing
+              batch = self.boot (batch, block)
+
+              # increment 'index' counter
+              index += 1
+
+              # add timer
+              if local.timer:
+                batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile + suffix_format % ('b', index) }
+
+              # fork to background (such that other batch jobs in ensemble could proceed)
+              batch = '(\n\n%s\n\n) &\n' % batch
+
+              # header for the ensemble job
+              ensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
+
+              # add batch job to the ensemble
+              ensemble += batch
+
+          # adjust parallelization according to the number of subblocks
+          parallelization.nodes *= subblocks
+          parallelization.cores *= subblocks
 
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, hooks=0, boot=0), directory )
+          self.execute ( self.submit (ensemble, parallelization, label, directory, suffix=suffix, boot=0, timer=0), directory )
 
           # update 'submitted' counter
           submitted += size
 
         # return information about ensembles
         from helpers import intf
-        # TODO: this is not very clean: 'parallelization.nodes * size'
-        info = [ '%s (%s N)' % ( intf (size), intf (parallelization.nodes * size) ) for size in decomposition ]
+        info = [ '%s (%s N)' % ( intf (subblocks * merge), intf (parallelization.nodes * merge) ) for merge in decomposition ]
         return ' + '.join (info)
     
     return ''
@@ -486,11 +494,8 @@ class Solver (object):
     # get directory
     directory = self.directory ( level, type, sample )
 
-    # get label
-    label = self.label ( level, type, sample, iteration=None )
-
     # check if the status file exists
-    return os.path.exists ( os.path.join (directory, self.statusfile % label) )
+    return os.path.exists ( os.path.join (directory, self.statusfile) )
 
   # read 'timerfile' from 'directory' and return runtime
   def runtime (self, directory, timerfile):
@@ -520,15 +525,9 @@ class Solver (object):
       # get directory
       directory = self.directory ( level, type )
 
-      # get label
-      label = self.label ( level, type, suffix = '_b*' )
-
       # get all timerfiles
       from glob import glob
-      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile % label) ) )
-
-      # legacy support
-      timerfiles += sorted ( glob ( os.path.join (directory, self.timerfile % self.label ( level, type, suffix = '_e*' )) ) )
+      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile + '*') ) )
 
       # read and return runtimes
       return [ self.runtime ( directory, os.path.basename (timerfile) ) for timerfile in timerfiles ]
@@ -549,15 +548,9 @@ class Solver (object):
       # get directory
       directory = self.directory ( level, type )
 
-      # get label
-      label = self.label ( level, type, suffix = '_b*' )
-
       # get all timerfiles
       from glob import glob
-      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile % label) ) )
-
-      # legacy support
-      timerfiles += sorted ( glob ( os.path.join (directory, self.timerfile % self.label ( level, type, suffix = '_e*' )) ) )
+      timerfiles = sorted ( glob ( os.path.join (directory, self.timerfile + '*') ) )
 
       # read and return runtimes
       return [ self.efficiency (file=timerfile) for timerfile in timerfiles ]

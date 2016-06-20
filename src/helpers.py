@@ -88,6 +88,10 @@ def grids_3d (N, S = None):
 def grids_3d_t (N, NS):
   return [ { 'NX' : n, 'NY' : n, 'NZ' : n, 'NS' : n } for n in N ]
 
+# split list into successive equally sized chunks
+def chunks (list, size):
+  return [ list [i : i+size] for i in range (0, len (list), size) ]
+
 # integer format with multipliers K, M, etc.
 def intf (number, table=0, empty=0, bar=0, plain=0):
   if bar:

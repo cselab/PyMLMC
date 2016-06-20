@@ -33,12 +33,15 @@ class Static (Scheduler):
     self.report ()
 
     for level, type in self.levels_types:
-      
-      #required = self.cores / float (self.ratios [level - type])
+
+      # compute the required number of cores based on pre-computed ratios between resolution levels
       required = self.cores * float (self.ratios [level - type]) / float (self.ratios [self.L])
 
+      # round the result
+      cores = int ( round ( required ) )
+
       # respect the minimal amount of cores on the machine
-      cores = max ( min ( local.min_cores, self.cores ), int ( round ( required ) ) )
+      #cores = max ( min ( local.min_cores, self.cores ), cores )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
       walltime = self.walltime * (float (self.works [level - type]) / self.works [self.L]) * (float (self.cores) / cores)
@@ -49,7 +52,7 @@ class Static (Scheduler):
       # process in batch all levels, except the 'self.separate' finest ones
       self.batch [level] [type] = ( level - type <= self.L - self.separate )
       
-      # merge layers which are processed in batch to ensembles, if ensembles are supported
+      # merge levels which are processed in batch to ensembles, if ensembles are supported
       if local.ensembles:
         self.merge [level] [type] = self.batch [level] [type]
       else:
