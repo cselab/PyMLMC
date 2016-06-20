@@ -388,8 +388,14 @@ class Solver (object):
       # else if merging into ensembles is enabled
       else:
 
-        # form blocks of batch jobs (non-degenerate for parallelization.nodes < local.min_cores only)
-        subblocks = max (1, local.min_cores / parallelization.cores)
+        # check if blocks need to be split into subblocks
+        subblocks = local.min_cores / parallelization.cores
+        if not subblocks >= 1:
+          details = '%s < %s' % ( helpers.intf (parallelization.cores), helpers.intf (local.min_cores) )
+          advice  = 'Increase paralellization ratio for this level'
+          helpers.warning ('Requested number of cores is smaller than allowed minimum')
+
+        # form blocks each containing grouped 'subblocks' batch jobs
         blocks = helpers.chunks (batches, subblocks)
 
         # split blocks into ensembles (with ensemble sizes being powers of 2)
