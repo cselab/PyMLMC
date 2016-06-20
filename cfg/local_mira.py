@@ -129,7 +129,7 @@ block = '--block ${BLOCKS[%(block)d]}'
 corner = '--corner ${CORNERS[%(corner)d]}'
 
 # shape option
-shape = '--shape %(shape)s}'
+shape_option = '--shape %(shape)s}'
 
 '''
 # boot blocks (3 attempts are recommended)

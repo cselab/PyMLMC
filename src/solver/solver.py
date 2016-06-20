@@ -170,7 +170,7 @@ class Solver (object):
     if shape != None:
       args ['envs'] += ' ' + local.block
       args ['envs'] += ' ' + local.corner
-      args ['envs'] += ' ' + local.shape
+      args ['envs'] += ' ' + local.shape_option
 
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
