@@ -167,10 +167,10 @@ class Solver (object):
     #  args ['shape'] = local.shape (args ['nodes'])
 
     # TODO: this is a dirty fix
-    args ['envs'] += ' ' + local.block
+    args ['envs'] += ' ' + local.block % args
     if shape != None:
-      args ['envs'] += ' ' + local.corner
-      args ['envs'] += ' ' + local.shape_option
+      args ['envs'] += ' ' + local.corner % args
+      args ['envs'] += ' ' + local.shape_option % args
 
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
