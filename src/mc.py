@@ -89,7 +89,7 @@ class MC (object):
         batch = intf (0,                   table=1, empty=1)
         count = intf (len(config.samples), table=1, empty=1)
       args += ( self.parallelization.hours, self.parallelization.minutes, batch, count )
-      if local.ensembles and not self.parallelization.batch:
+      if local.ensembles and self.parallelization.batch:
         merge = intf (self.parallelization.mergemax, table=1)
         format += '  %s  ->'
         args   += (merge, )
