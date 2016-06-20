@@ -116,9 +116,6 @@ runjob \
 : %(cmd)s %(options)s
 '''
 
-# batch job block hook
-#BLOCK_HOOK = '${BLOCKS[%(block)d]}'
-
 # block boot
 boot = 'boot-block --block ${BLOCKS[%(block)d]}'
 

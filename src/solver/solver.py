@@ -135,14 +135,14 @@ class Solver (object):
       if self.recycle:
         dir = '%d' % level
       else:
-        dir = '%d_%d' % (level, type)
-        #dir = '%d%s' % (level, ['f', 'c'] [type])
+        #dir = '%d_%d' % (level, type)
+        dir = '%d%s' % (level, ['f', 'c'] [type])
       if sample != None:
         dir += '_%d' % sample
       return '%s_%s%s' % (self.name, dir, suffix) + ('.%d' % self.iteration if iteration else '')
   
   # assemble job command
-  def job (self, args):
+  def job (self, args, block=0, corner=0, shape=None):
     
     # cluster run
     if local.cluster:
@@ -158,7 +158,14 @@ class Solver (object):
       
       # assemble executable command
       args ['cmd'] = self.cmd % args
-    
+
+    # set default harware topology arguments
+    args ['block']  = block
+    args ['corner'] = corner
+    args ['shape']  = shape
+    if shape == None and local.shape != None:
+      shape = local.shape (args ['nodes'])
+
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
       job = local.simple_job.rstrip() % args
@@ -183,10 +190,6 @@ class Solver (object):
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
-
-    ## process hooks
-    #if hooks:
-    #  job = job.replace ('BLOCK_HOOK', local.BLOCK_HOOK) % {'block' : block}
 
     # add booting and freeing
     if boot:
@@ -264,7 +267,6 @@ class Solver (object):
       
       # if batch mode -> add job to batch
       if parallelization.batch:
-        #self.add (job, sample)
         self.batch.append (args)
       
       # else submit job to job management system under specified label
@@ -444,15 +446,11 @@ class Solver (object):
               jobs = []
               for args in batch:
 
-                # prepare job to be part of an ensemble with batch job id = block
-                args ['block'] = block
+                # determine the shape of a sub-block
+                shape = local.shape (parallelization.nodes)
 
-                # prepare job to run as a sub-block with specified corner and shape
-                args ['corner'] = corner
-                args ['shape']  = local.shape (parallelization.nodes)
-
-                # add job
-                jobs.append ( self.wrap (self.job (args), args ['sample']) )
+                # add batch job of 'shape' to 'corner' within block which is part of an entire ensemble
+                jobs.append ( self.wrap (self.job (args, block, corner, shape), args ['sample']) )
 
               # construct batch job
               batch = '\n'.join (jobs)
