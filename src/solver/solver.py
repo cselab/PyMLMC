@@ -303,8 +303,9 @@ class Solver (object):
 
     if local.boot and local.free:
       boot = local.boot % {'block' : block}
+      wait = 'wait'
       free = local.free % {'block' : block}
-      job = '%s\n\n%s\n%s\n' % (boot, job, free)
+      job = '%s\n\n%s\n%s\n%s\n' % (boot, job, wait, free)
       return job
 
     else:
