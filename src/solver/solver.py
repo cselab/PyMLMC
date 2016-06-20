@@ -163,8 +163,8 @@ class Solver (object):
     args ['block']  = block
     args ['corner'] = corner
     args ['shape']  = shape
-    if shape == None:
-      shape = local.shape (args ['nodes'])
+    if shape == None and local.shape != None:
+      args ['shape'] = local.shape (args ['nodes'])
 
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
