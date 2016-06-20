@@ -168,7 +168,7 @@ class Solver (object):
     args ['envs'] += ' ' + local.block % args
     if shape != None:
       args ['envs'] += ' ' + local.corner % args
-      args ['envs'] += ' ' + local.shape_option % args
+      args ['envs'] += ' ' + local.shape % args
 
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
@@ -458,7 +458,7 @@ class Solver (object):
             subensemble = ''
 
             # determine the shape of a subblock
-            shape = local.shape (parallelization.nodes)
+            shape = local.get_shape (parallelization.nodes)
 
             # add corner initialization
             if shape != None:

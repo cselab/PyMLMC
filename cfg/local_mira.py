@@ -117,7 +117,7 @@ block = '--block ${BLOCKS[%(block)d]}'
 corner = '--corner ${CORNERS[%(corner)d]}'
 
 # shape option
-shape_option = '--shape %(shape)s'
+shape = '--shape %(shape)s'
 
 '''
 # boot blocks (3 attempts are recommended)
@@ -131,7 +131,7 @@ wait
 '''
 
 # get shape from number of nodes
-def shape (nodes):
+def get_shape (nodes):
   if nodes >= 512:
     return None
   shape = [1, 1, 1, 1, 1]
