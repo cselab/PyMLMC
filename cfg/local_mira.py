@@ -35,14 +35,8 @@ def min_walltime (cores): # hours
 def max_walltime (cores): # hours
   if cores == 'default':
     return '12/24'
-  if cores <= 16 * 512:
-    return 1.5
-  if cores == 16 * 1024:
-    return 3
-  if cores == 16 * 2048:
+  if cores < 16 * 8192:
     return 6
-  if cores <= 16 * 4096:
-    return 12
   return 24
 
 # theoretical performance figures per node
