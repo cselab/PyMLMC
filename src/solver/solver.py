@@ -163,7 +163,7 @@ class Solver (object):
     args ['block']  = block
     args ['corner'] = corner
     args ['shape']  = shape
-    if shape == None and local.shape != None:
+    if shape == None:
       shape = local.shape (args ['nodes'])
 
     # assemble job
