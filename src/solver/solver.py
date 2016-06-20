@@ -446,6 +446,9 @@ class Solver (object):
           # submit each block
           for block, batches in enumerate (blocks [submitted : submitted + merge]):
 
+            # initialize subensemble job
+            subensemble = ''
+
             # submit each batch
             for corner, batch in enumerate (batches):
 
@@ -462,12 +465,6 @@ class Solver (object):
               # construct batch job
               batch = '\n'.join (jobs)
 
-              # add corner initialization
-              batch = local.corners % args + '\n' + batch
-
-              # add block booting and block freeing
-              batch = self.boot (batch, block)
-
               # increment 'index' counter
               index += 1
 
@@ -475,14 +472,26 @@ class Solver (object):
               if local.timer:
                 batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile + suffix_format % ('b', index) }
 
-              # fork to background (such that other batch jobs in ensemble could proceed)
+              # fork to background (such that other batch jobs in subensemble could proceed)
               batch = '(\n\n%s\n\n) &\n' % batch
 
-              # header for the ensemble job
-              ensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
+              # add batch job to the subensemble
+              subensemble += batch
 
-              # add batch job to the ensemble
-              ensemble += batch
+              # header for the subensemble job
+              subensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
+
+            # add corner initialization
+            subensemble = local.corners % args + '\n' + subensemble
+
+            # add block booting and block freeing
+            subensemble = self.boot (subensemble, block)
+
+            # fork to background (such that other subensemble jobs in ensemble could proceed)
+            subensemble = '(\n\n%s\n\n) &\n' % subensemble
+
+            # add batch job to the ensemble
+            ensemble += subensemble
 
           # adjust parallelization according to the number of subblocks
           parallelization.nodes *= subblocks
