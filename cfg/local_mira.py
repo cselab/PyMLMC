@@ -85,14 +85,17 @@ simple_job = '''ulimit -c 0
 runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
---block ${BLOCKS[%(block)d]} \
---corner ${CORNERS[%(corner)d]} \
---shape %(shape)s \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
 %(envs)s \
 : %(cmd)s %(options)s
+'''
+
+'''
+--block ${BLOCKS[%(block)d]} \
+--corner ${CORNERS[%(corner)d]} \
+--shape %(shape)s \
 '''
 
 # MPI run command
@@ -100,9 +103,6 @@ mpi_job = '''ulimit -c 0
 runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
---block ${BLOCKS[%(block)d]} \
---corner ${CORNERS[%(corner)d]} \
---shape %(shape)s \
 --cwd $PWD \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
@@ -110,8 +110,26 @@ runjob \
 : %(cmd)s %(options)s
 '''
 
+'''
+--block ${BLOCKS[%(block)d]} \
+--corner ${CORNERS[%(corner)d]} \
+--shape %(shape)s \
+'''
+
 # block boot
 boot = 'boot-block --block ${BLOCKS[%(block)d]}'
+
+# block free
+free = 'boot-block --block ${BLOCKS[%(block)d]} --free'
+
+# block option
+block = '--block ${BLOCKS[%(block)d]}'
+
+# corner option
+corner = '--corner ${CORNERS[%(corner)d]}'
+
+# shape option
+shape = '--shape %(shape)s}'
 
 '''
 # boot blocks (3 attempts are recommended)
@@ -159,15 +177,6 @@ do
 done
 echo
 '''
-
-# block free
-free = 'boot-block --block ${BLOCKS[%(block)d]} --free'
-
-# batch job corner hook
-#CORNER_HOOK = '${CORNERS[%(corner)d]}'
-
-# batch job shape hook
-#SHAPE_HOOK = '%(shape)s'
 
 # submission script template (required for support of batch jobs ensembles)
 script = '''#!/bin/bash

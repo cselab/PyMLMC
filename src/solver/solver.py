@@ -163,8 +163,14 @@ class Solver (object):
     args ['block']  = block
     args ['corner'] = corner
     args ['shape']  = shape
-    if shape == None and local.shape != None:
-      args ['shape'] = local.shape (args ['nodes'])
+    #if shape == None and local.shape != None:
+    #  args ['shape'] = local.shape (args ['nodes'])
+
+    # TODO: this is a dirty fix
+    if shape != None:
+      args ['envs'] += ' ' + local.block
+      args ['envs'] += ' ' + local.corner
+      args ['envs'] += ' ' + local.shape
 
     # assemble job
     if args ['ranks'] == 1 and not local.cluster:
