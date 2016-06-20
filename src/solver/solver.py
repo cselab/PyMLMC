@@ -167,8 +167,8 @@ class Solver (object):
     #  args ['shape'] = local.shape (args ['nodes'])
 
     # TODO: this is a dirty fix
+    args ['envs'] += ' ' + local.block
     if shape != None:
-      args ['envs'] += ' ' + local.block
       args ['envs'] += ' ' + local.corner
       args ['envs'] += ' ' + local.shape_option
 
@@ -471,7 +471,7 @@ class Solver (object):
               # append additional parameters to 'args'
               jobs = []
               for args in batch:
-                
+
                 # determine the shape of a sub-block
                 shape = local.shape (parallelization.nodes)
 
