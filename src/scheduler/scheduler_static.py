@@ -34,29 +34,30 @@ class Static (Scheduler):
 
     for level, type in self.levels_types:
 
+      # process in batch all levels, except the 'self.separate' finest ones
+      self.batch [level] [type] = ( level - type <= self.L - self.separate )
+
+      # merge levels which are processed in batch to ensembles, if ensembles are supported
+      if local.ensembles:
+        self.merge [level] [type] = self.batch [level] [type]
+      else:
+        self.merge [level] [type] = 0
+
       # compute the required number of cores based on pre-computed ratios between resolution levels
       required = self.cores * float (self.ratios [level - type]) / float (self.ratios [self.L])
 
       # round the result
       cores = int ( round ( required ) )
 
-      # respect the minimal amount of cores on the machine
-      #cores = max ( min ( local.min_cores, self.cores ), cores )
+      # respect the minimal amount of cores on the machine, if merging is not supported
+      if not self.merge [level] [type]:
+        cores = max ( min ( local.min_cores, self.cores ), cores )
       
       # walltime is decreased due to level (w.r.t to L) and increased due to fewer cores
       walltime = self.walltime * (float (self.works [level - type]) / self.works [self.L]) * (float (self.cores) / cores)
 
       # walltime is decreased if batching is enabled also on the finest level
       walltime /= self.batchsize
-
-      # process in batch all levels, except the 'self.separate' finest ones
-      self.batch [level] [type] = ( level - type <= self.L - self.separate )
-      
-      # merge levels which are processed in batch to ensembles, if ensembles are supported
-      if local.ensembles:
-        self.merge [level] [type] = self.batch [level] [type]
-      else:
-        self.merge [level] [type] = 0
 
       # construct parallelization according to all computed parameters
       self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], self.limit, self.merge [level] [type], self.email )

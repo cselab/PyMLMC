@@ -144,7 +144,7 @@ def shape (nodes):
 
 # get corners for sub-blocks
 corners = '''
-# get corners of sub-blocks for each batch job in the ensemble
+# get corners of subblocks for each batch job in the ensemble
 CORNERS=`/soft/cobalt/bgq_hardware_mapper/get-corners.py ${BLOCKS[%(block)d]} %(shape)s`
 
 # if 512 or more nodes are needed, return default corner
@@ -153,10 +153,10 @@ then
   CORNERS=$COBALT_CORNER
 fi
 
-# split string of sub-blocks into array elements
+# split string of subblocks into array elements
 read -r -a CORNERS <<< $CORNERS
 
-# print info about all corners of sub-blocks
+# print info about all corners of subblocks
 echo
 echo 'Obtained corners:'
 for CORNER in ${CORNERS[@]}
@@ -208,6 +208,12 @@ do
   echo $BLOCK
 done
 echo
+
+# get default subblock
+CORNERS=$COBALT_CORNER
+
+# split string of subblocks into array elements
+read -r -a CORNERS <<< $CORNERS
 
 %(job)s
 
