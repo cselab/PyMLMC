@@ -22,7 +22,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=16, workunit=None, init=None, indicator=None, distance=None):
+  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=None, init=None, indicator=None, distance=None):
     
     # save configuration
     vars (self) .update ( locals() )
