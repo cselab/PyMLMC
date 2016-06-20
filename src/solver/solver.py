@@ -445,11 +445,20 @@ class Solver (object):
           # submit each block
           for block, batches in enumerate (blocks [submitted : submitted + merge]):
 
+            # header for the subensemble job
+            ensemble += '\n# === BLOCK %d\n' % block
+
             # initialize subensemble job
             subensemble = ''
 
             # submit each batch
             for corner, batch in enumerate (batches):
+
+              # increment 'index' counter
+              index += 1
+
+              # header for the batch job
+              subensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
 
               # append additional parameters to 'args'
               jobs = []
@@ -464,9 +473,6 @@ class Solver (object):
               # construct batch job
               batch = '\n'.join (jobs)
 
-              # increment 'index' counter
-              index += 1
-
               # add timer
               if local.timer:
                 batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile + suffix_format % ('b', index) }
@@ -476,9 +482,6 @@ class Solver (object):
 
               # add batch job to the subensemble
               subensemble += batch
-
-              # header for the subensemble job
-              subensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
 
             # add corner initialization
             subensemble = local.corners % args + '\n' + subensemble
