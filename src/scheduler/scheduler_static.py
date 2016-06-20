@@ -49,7 +49,7 @@ class Static (Scheduler):
       # round the result
       cores = int ( round ( required ) )
 
-      # respect the minimal amount of cores on the machine, if merging is not supported
+      # respect the minimal amount of cores on the machine, if merging is not active for this level
       if not self.merge [level] [type]:
         cores = max ( min ( local.min_cores, self.cores ), cores )
       
