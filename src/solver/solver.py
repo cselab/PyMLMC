@@ -185,7 +185,7 @@ class Solver (object):
     return job
   
   # assemble the submission command
-  def submit (self, job, parallelization, label, directory='.', timer=1, suffix='', boot=1):
+  def submit (self, job, parallelization, label, directory='.', timer=0, suffix='', boot=1):
     
     # check if walltime does not exceed 'local.max_walltime'
     if parallelization.walltime > local.max_walltime (parallelization.cores):
@@ -389,7 +389,7 @@ class Solver (object):
           label = self.label (level, type, suffix=suffix)
 
           # submit
-          self.execute ( self.submit (batch, parallelization, label, directory, suffix=suffix), directory )
+          self.execute ( self.submit (batch, parallelization, label, directory, suffix=suffix, timer=1), directory )
 
         return ''
 
