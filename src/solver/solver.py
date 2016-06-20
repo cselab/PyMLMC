@@ -389,14 +389,17 @@ class Solver (object):
       else:
 
         # check if blocks need to be split into subblocks
-        subblocks = local.min_cores / parallelization.cores
-        if not subblocks >= 1:
-          details = '%s < %s' % ( helpers.intf (parallelization.cores), helpers.intf (local.min_cores) )
-          advice  = 'Increase paralellization ratio for this level'
-          helpers.warning ('Requested number of cores is smaller than allowed minimum')
+        subblocks = max (1, local.min_cores / parallelization.cores)
 
         # form blocks each containing grouped 'subblocks' batch jobs
         blocks = helpers.chunks (batches, subblocks)
+
+        # warn if the first block is not fully used
+        if parallelization.cores * len (blocks [0]) < local.min_cores:
+          message = 'Requested number of cores and samples does not fully use the smallest block'
+          details = '%s * %s < %s' % ( helpers.intf (parallelization.cores), helpers.intf (len (blocks [0])), helpers.intf (local.min_cores) )
+          advice  = 'Increase paralellization ratio for this level'
+          helpers.warning (message, details=details, advice=advice)
 
         # split blocks into ensembles (with ensemble sizes being powers of 2)
         binary = bin ( len (blocks) )
