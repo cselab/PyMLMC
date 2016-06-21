@@ -332,18 +332,17 @@ class Solver (object):
       stdout = None
       stderr = None
     else:
-      stdout = None#open (os.devnull, 'w')
-      stderr = subprocess.STDOUT
+      stdout = subprocess.PIPE#open (os.devnull, 'w')
+      stderr = subprocess.PIPE#subprocess.STDOUT
     
     # execute command
     if not self.params.simulate:
-      #stdout = subprocess.check_output (cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy())
       process = subprocess.Popen (cmd, cwd=directory, stdout=stdout, stderr=stderr, shell=True, env=os.environ.copy())
       output  = process.communicate()
       failed  = process.poll()
       if failed:
         message = 'Submission failed'
-        helpers.warning (message, details=str(output))
+        helpers.warning (message, details=str(process.stdout))
   
   # wrap job inside the batch
   def wrap (self, job, sample):
