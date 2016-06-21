@@ -332,7 +332,7 @@ class Solver (object):
       stdout = None
       stderr = None
     else:
-      stdout = open (os.devnull, 'w')
+      stdout = None#open (os.devnull, 'w')
       stderr = subprocess.STDOUT
     
     # execute command
