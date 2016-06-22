@@ -62,7 +62,10 @@ class MLMC_Config (object):
     self.COARSE = 1
 
     # determine types
-    self.types  = lambda level : [self.FINE, self.COARSE] if level > 0 else [self.FINE]
+    if self.recycle:
+      self.types  = lambda level : [self.FINE]
+    else:
+      self.types  = lambda level : [self.FINE, self.COARSE] if level > 0 else [self.FINE]
 
     # determine levels
     self.levels = range ( len ( self.discretizations ) )

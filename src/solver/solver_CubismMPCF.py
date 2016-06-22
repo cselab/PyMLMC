@@ -55,7 +55,7 @@ class CubismMPCF (Solver):
     self.outputfile_v1    = 'integrals.dat'
 
     # set default quantity of interest
-    self.qoi = 'p_sen1'
+    self.qoi = 'p_sensor1'
 
     # set indicator
     if not self.indicator:

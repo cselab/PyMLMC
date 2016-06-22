@@ -658,7 +658,7 @@ class MLMC (object):
 
       # load both types
       for type in reversed (self.config.types (level)):
-        
+
         mc = self.mcs [ self.config.pick [level] [type] ]
         pending = mc.pending ()
         loaded [type] = mc.load ()
