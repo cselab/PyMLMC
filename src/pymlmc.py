@@ -654,7 +654,7 @@ class MLMC (object):
     # load all levels
     for level in self.config.levels:
 
-      loaded = [None, None]
+      loaded = [[], []]
 
       # load both types
       for type in reversed (self.config.types (level)):
@@ -683,7 +683,10 @@ class MLMC (object):
         else:
           self.config.samples.indices.loaded [level] = []
       else:
-        self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (loaded [self.config.COARSE]) )
+        if self.config.recycle:
+          self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (self.config.samples.indices.loaded [level - 1]) )
+        else:
+          self.config.samples.indices.loaded [level] = list ( set (loaded [self.config.FINE]) & set (loaded [self.config.COARSE]) )
 
       # compute auxiliary counts
       self.config.samples.counts.loaded [level] = len (self.config.samples.indices.loaded [level])
