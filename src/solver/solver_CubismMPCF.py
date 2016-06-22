@@ -62,7 +62,7 @@ class CubismMPCF (Solver):
       #self.indicator = lambda x : numpy.max ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] )
       #self.indicator = lambda x : numpy.nanmean ( numpy.abs (x.data [self.qoi]) )
       #self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
-      self.indicator = lambda x : numpy.mean ( x.data [self.qoi] )
+      self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] ) )
       
     # set distance
     if not self.distance:
