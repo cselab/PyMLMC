@@ -644,18 +644,16 @@ class MLMC (object):
     from helpers import intf
     print
     print ' :: LOADING RESULTS:'
-    print '  :  LEVEL  |'
-    print '  :----------'
-    format = '  :      %d  |'
 
     if self.config.recycle:
-      print '   TYPE   |'
-      print '-----------'
-      format += '  %s  |'
+      print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
+      print '  :-------------------------------------------------------|'
+      format = '  :      %d  |    %s  |   %s  |   %s  |   %s   |'
 
-    print '  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
-    print '---------------------------------------------|'
-    format += '    %s  |   %s  |   %s  |   %s   |'
+    else:
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
+      print '  :------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |'
 
     # candidate for the coarsest level
     self.L0 = None

@@ -37,11 +37,12 @@ class Coefficients (object):
 
     if len (self.levels) == 1:
       return
-    
+
     # === if recycling is enabled, coefficients can be computed explicitly
 
     if self.recycle:
-      self.values [ : -1 ] = indicators.correlation * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [ : -1 ]  [0] )
+      for level in self.levels [ : -1 ]:
+        self.values [level] = indicators.correlation [level] * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [level] [0] )
       return self.values
 
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations

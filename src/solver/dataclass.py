@@ -274,6 +274,12 @@ class Time_Series (object):
         self.data [key] [step] *= a
     return self
 
+  def __lmul__ (self, a):
+    for key in self.data.keys():
+      for step in xrange ( len ( self.data [key] ) ):
+        self.data [key] [step] *= a
+    return self
+
   def __iadd__ (self, a):
     if not self.data:
       self.init (a)
