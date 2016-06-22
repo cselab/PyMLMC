@@ -43,6 +43,8 @@ class Coefficients (object):
     if self.recycle:
       for level in self.levels [ : -1 ]:
         self.values [level] = indicators.correlation [level] * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [level] [0] )
+        if numpy.isnan (self.values [level]):
+          self.values [level] = 1
       return self.values
 
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations
