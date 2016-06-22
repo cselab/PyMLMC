@@ -479,7 +479,6 @@ class MLMC (object):
         # report walltime
         walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
         if walltime_sample != 'unknown':
-          print walltime_sample
           walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
           args += (walltime_sample_str, )
         else:
