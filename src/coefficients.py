@@ -35,14 +35,13 @@ class Coefficients (object):
   # optimization can be performed for required specific sample-scaled indicators if sample numbers on each level are provided
   def optimize (self, indicators, samples=None):
 
-    if len (self.levels) == 0:
-      self.values = numpy.array ( [1.0] )
+    if len (self.levels) == 1:
       return
-
+    
     # === if recycling is enabled, coefficients can be computed explicitly
 
     if self.recycle:
-      self.values [ : -1 ] = indicators.correlation * numpy.sqrt ( indicators.variance [self.L] / indicators.variance [ : -1 ] )
+      self.values [ : -1 ] = indicators.correlation * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [ : -1 ]  [0] )
       return self.values
 
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations

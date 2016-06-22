@@ -235,7 +235,7 @@ def name (qoi, short=False):
     name_ = 'min ' + name_
   if '_max' in qoi:
     name_ = 'max ' + name_
-  if '_sen' in qoi:
+  if '_sensor' in qoi:
     id = qoi.split ('_sen', 1) [1]
     name_ = name_ + ' sensor ' + id
   if '_time' in qoi:
