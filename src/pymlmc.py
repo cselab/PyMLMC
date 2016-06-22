@@ -457,6 +457,10 @@ class MLMC (object):
       # for all MC simulations
       for mc in self.mcs:
 
+        # skip type == 1 in recycle mode
+        if self.config.recycle and mc.config.type == self.config.COARSE:
+          continue
+
         # check how many samples are already finished
         finished = mc.finished()
 
@@ -473,11 +477,9 @@ class MLMC (object):
           self.finished = 0
 
         # report walltime
-        if self.config.recycle:
-          walltime_sample = self.status.list ['walltimes'] [mc.config.level]
-        else:
-          walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+        walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
         if walltime_sample != 'unknown':
+          print walltime_sample
           walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
           args += (walltime_sample_str, )
         else:
@@ -487,10 +489,7 @@ class MLMC (object):
         if finished > 0:
 
           # parallelization
-          if self.config.recycle:
-            parallelization = self.status.list ['parallelization'] [mc.config.level]
-          else:
-            parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
+          parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
 
           # runtimes, walltime usage, budget usage, etc. of individual samples
           runtime_sample = mc.timer ()
@@ -521,10 +520,7 @@ class MLMC (object):
             args += ( '   N/A  ', '   N/A  ' )
 
             # LEGACY: instead, report walltime and budget usage for entire batches
-            if self.config.recycle:
-              batch = self.status.list ['batch'] [mc.config.level]
-            else:
-              batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+            batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
             runtime_batch = mc.timer (batch=1)
             if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
 
@@ -562,10 +558,7 @@ class MLMC (object):
               args += ( '    ', '    ' )
 
           # batch
-          if self.config.recycle:
-            batch = self.status.list ['batch'] [mc.config.level]
-          else:
-            batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
           args += (batch_str, )
 
@@ -596,10 +589,7 @@ class MLMC (object):
         else:
 
           args += ( '        ', '        ', '    ', '    ', '    ', '    ', '    ', '    ' )
-          if self.config.recycle:
-            batch = self.status.list ['batch'] [mc.config.level]
-          else:
-            batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
+          batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
           batch_str = helpers.intf (batch, table=1, empty=1)
           args += ( batch_str, '        ', '        ' )
           print format % args
