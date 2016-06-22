@@ -644,9 +644,18 @@ class MLMC (object):
     from helpers import intf
     print
     print ' :: LOADING RESULTS:'
-    print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
-    print '  :------------------------------------------------------------------|'
-    format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |'
+    print '  :  LEVEL  |'
+    print '  :----------'
+    format = '  :      %d  |'
+
+    if self.config.recycle:
+      print '   TYPE   |'
+      print '-----------'
+      format += '  %s  |'
+
+    print '  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
+    print '---------------------------------------------|'
+    format += '    %s  |   %s  |   %s  |   %s   |'
 
     # candidate for the coarsest level
     self.L0 = None
@@ -673,7 +682,10 @@ class MLMC (object):
         loadedstr  = intf (len (loaded [type]), table=1, empty=1)
         failedstr  = intf (len (mc.config.samples) - len (loaded [type]), table=1, empty=1)
         pendingstr = intf (pending, table=1, empty=1)
-        print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
+        if self.config.recycle:
+          print format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr)
+        else:
+          print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
 
       # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
       if self.L0 == None:
