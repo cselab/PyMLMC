@@ -214,7 +214,7 @@ class CubismMPCF (Solver):
         results .append_v1 ( outputfile_v1, meta_keys, data_keys, meta_formats, data_formats )
     
     # fix for run from MIRA - why this is needed?
-    results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
+    #results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
     
     # correct time dimension
     '''
