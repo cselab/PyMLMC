@@ -68,7 +68,7 @@ class CubismMPCF (Solver):
     if not self.distance:
       #self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else numpy.abs (self.indicator (f))
       #self.distance = lambda f, c : numpy.nanmean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] if c != None else f.data [self.qoi] ) )
-      self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f.data [self.qoi] - c.data [self.qoi]) if not numpy.isnan (entry) ] )] ) ) if c != None else self.indicator (f)
+      self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f.data [self.qoi] - c.data [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
       #self.distance = lambda f, c : numpy.mean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] ) ) if c != None else self.indicator (f)
 
   # return string representing the resolution of a give discretization 'd'
