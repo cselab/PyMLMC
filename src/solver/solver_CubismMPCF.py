@@ -37,7 +37,7 @@ class CubismMPCF (Solver):
     if not path: self.path = self.env ('MPCF_CLUSTER_PATH')
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -tend %(tend)f -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -tend %(tend)f -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d -vp %(vp)d -hdf %(hdf)d'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -148,7 +148,15 @@ class CubismMPCF (Solver):
     args ['seed'] = seed
     
     args ['proceed'] = params.proceed
-    
+
+    # I/O: use HDF only for resolutions up to 1024^3 (~4GB per channel per snapshot)
+    if discretization ['NX'] * discretization ['NY'] * discretization ['NZ'] <= 1024 ** 3:
+      args ['vp']  = 0
+      args ['hdf'] = 1
+    else:
+      args ['vp']  = 1
+      args ['hdf'] = 0
+
     # cluster run
     if local.cluster:
       
