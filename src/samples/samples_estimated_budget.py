@@ -33,8 +33,8 @@ class Estimated_Budget (Samples):
     elif self.finest == 'half': self.finest = ( self.L + 1 ) / 2
 
     # set warmup samples
-    if hasattr (warmup, '__iter__'):
-      counts = numpy.array ( warmup [0 : self.L+1] )
+    if hasattr ( self.warmup, '__iter__' ):
+      counts = numpy.array ( self.warmup [0 : self.L+1] )
     
     # compute warmup samples based on works
     else:
