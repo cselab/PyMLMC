@@ -407,12 +407,15 @@ class Solver (object):
         blocks = helpers.chunks (batches, subblocks)
 
         # warn if the first block is not fully utilized
-        if parallelization.cores * len (blocks [0]) < local.min_cores:
+        utilized = parallelization.cores * len (blocks [0]) >= local.min_cores
+        '''
+        if not utilized:
           message = 'Requested number of cores and samples does not fully utilize the smallest block'
           details = '%s * %s < %s' % ( helpers.intf (parallelization.cores), helpers.intf (len (blocks [0])), helpers.intf (local.min_cores) )
           advice  = 'Increase paralellization ratio for this level'
           helpers.warning (message, details=details, advice=advice)
           # TODO: in such case, should batchsize be reduced (for all under-utilized blocks) to improve the utilization?
+        '''
 
         # split blocks into ensembles (with ensemble sizes being powers of 2)
         binary = bin ( len (blocks) )
@@ -514,7 +517,7 @@ class Solver (object):
         # return information about ensembles
         from helpers import intf
         info = [ '%s (%s N)' % ( intf (subblocks * merge), intf (parallelization.nodes * merge) ) for merge in decomposition ]
-        return ' + '.join (info)
+        return ' + '.join (info) + (' [not fully utilized]' if not utilized else '')
     
     return ''
 
