@@ -52,6 +52,13 @@ scratch = '/projects/CloudPredict/sukysj/pymlmc'
 # ensemble support
 ensembles = 1
 
+# adaptive driver
+def io (work):
+  if work > ??:
+    return 'vp'
+  else:
+    return 'hdf'
+
 # default environment variables
 envs = '''\
 --envs PAMI_DEVICE=B \
