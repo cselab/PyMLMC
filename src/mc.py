@@ -54,9 +54,12 @@ class MC (object):
   
   # return the seed for the specified sample
   def seed (self, sample):
-    
-    return pair ( pair (self.config.level, sample), self.config.id )
-  
+
+    if self.config.id == 0:
+      return pair (self.config.level, sample)
+    else:
+      return pair ( pair (self.config.level, sample), self.config.id )
+
   # return information string describing the MC run and the prescribed parallelization
   def info (self):
     
