@@ -19,9 +19,11 @@ warmup   = 4    # number of warmup samples on the finest level L
 workunit = 0.1  # estimated workunit (in core hours), such that runtime = workunit * solver.work (resolution)
 budget   = 10   # prescribed total budget (in core hours) for all samples on all levels
 
-# === MLMC configuration
+# === modules configuration
 
+# general
 config = MLMC_Config ()
+config.deterministic = 0    # simulation runs directly in 'output' directory and the update phases are skipped
 
 # solver
 from solver_Integral2D import Integral2D
