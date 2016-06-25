@@ -197,7 +197,7 @@ class Solver (object):
       helpers.error ('\'walltime\' exceeds \'max_walltime\' in \'local.py\'', details = '%.2f > %.2f' % (parallelization.walltime, local.max_walltime))
 
     # add booting and freeing
-    if boot:
+    if boot and local.boot:
       job = self.boot (job)
 
     # add timer

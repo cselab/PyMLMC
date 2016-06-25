@@ -50,6 +50,9 @@ scratch = '/scratch/daint/sukysj/pymlmc'
 # ensemble support
 ensembles = 0
 
+# boot
+boot = 0
+
 # default environment variables
 envs = ''
 
