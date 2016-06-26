@@ -47,7 +47,7 @@ class CubismMPCF (Solver):
     self.sharedmem = 1
 
     # default workunit
-    if not workunit: workunit = tend * float (8192 * 16 * 24) / (4096 ** 4)
+    if not workunit: workunit = 2 * tend * float (8192 * 16 * 24) / (4096 ** 4)
     
     # set files
     self.outputfile       = 'statistics.dat'
