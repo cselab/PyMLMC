@@ -166,7 +166,8 @@ class Solver (object):
 
     # TODO: this is a dirty fix
     if local.ensembles:
-      args ['envs'] += ' ' + local.block % args
+      if local.block != None:
+        args ['envs'] += ' ' + local.block % args
       if shape != None:
         args ['envs'] += ' ' + local.corner % args
         args ['envs'] += ' ' + local.shape % args
