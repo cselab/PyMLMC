@@ -254,7 +254,7 @@ class CubismMPCF (Solver):
       
       # compute meta parameters for interpolation
       results.meta ['dt'] = numpy.diff (results.meta ['t'])
-    
+
     return results
 
   def efficiency (self, level=0, type=0, sample=0, file=None):

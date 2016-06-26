@@ -60,7 +60,7 @@ envs = ''
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d -N %(tasks)d -d %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d -N %(tasks)d -c %(threads)d %(cmd)s %(options)s'
 
 # submission script template
 script = '''#!/bin/bash
@@ -76,6 +76,7 @@ script = '''#!/bin/bash
 %(xopts)s
 ulimit -c 0
 %(job)s
+wait
 '''
 
 # submit command

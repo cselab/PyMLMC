@@ -157,7 +157,7 @@ class MLMC (object):
 
       # update the computed number of samples
       self.config.samples.append ()
-
+      '''
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
       self.indicators.report  ()
@@ -173,7 +173,7 @@ class MLMC (object):
       
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.indicators, self.config.works, self.config.samples.counts)
-
+      '''
       # query for progress
       helpers.query ('Continue?')
 
