@@ -66,9 +66,6 @@ mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d -N %(t
 script = '''#!/bin/bash
 #SBATCH --job-name=%(label)s
 #SBATCH --nodes=%(nodes)d
-#SBATCH --ntasks=%(ranks)d
-#SBATCH --ntasks-per-node=%(tasks)d
-#SBATCH --cpus-per-task=%(threads)d
 #SBATCH --time=%(hours).2d:%(minutes).2d:00
 #SBATCH --mem=%(memory)d
 #SBATCH --output=%(reportfile)s
@@ -79,6 +76,11 @@ ulimit -c 0
 wait
 '''
 
+'''
+#SBATCH --ntasks=%(ranks)d
+#SBATCH --ntasks-per-node=%(tasks)d
+#SBATCH --cpus-per-task=%(threads)d
+'''
 # submit command
 submit = 'sbatch %(scriptfile)s'
 
