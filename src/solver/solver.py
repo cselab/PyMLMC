@@ -456,7 +456,8 @@ class Solver (object):
           for block, batches in enumerate (blocks [submitted : submitted + merge]):
 
             # header for the subensemble job
-            ensemble += '\n# === BLOCK %d\n' % block
+            if local.block != None:
+              ensemble += '\n# === BLOCK %d\n' % block
 
             # initialize subensemble job
             subensemble = ''
@@ -475,7 +476,14 @@ class Solver (object):
               index += 1
 
               # header for the batch job
-              subensemble += '\n# === BATCH JOB %d [block %d, corner %d]\n' % (index, block, corner)
+              subensemble += '\n# === BATCH JOB %d' % index
+
+              # additional header information
+              if local.block != None:
+                subensemble += ' [block %d, corner %d]' % (block, corner)
+
+              # end of header for the batch job
+              subensemble += '\n'
 
               # append additional parameters to 'args'
               jobs = []
@@ -501,7 +509,8 @@ class Solver (object):
             subensemble = self.boot (subensemble, block)
 
             # fork to background (such that other subensemble jobs in ensemble could proceed)
-            subensemble = '(\n\n%s\n\n) &\n' % subensemble
+            if subblocks != 1:
+              subensemble = '(\n\n%s\n\n) &\n' % subensemble
 
             # add batch job to the ensemble
             ensemble += subensemble
