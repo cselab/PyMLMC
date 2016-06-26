@@ -56,6 +56,8 @@ free   = None
 block  = None
 corner = None
 shape  = None
+def get_shape (nodes):
+  return None
 
 # default environment variables
 envs = ''
