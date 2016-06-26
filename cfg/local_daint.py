@@ -48,7 +48,7 @@ performance = 1
 scratch = '/scratch/daint/sukysj/pymlmc'
 
 # ensemble support
-ensembles = 0
+ensembles = 1
 
 # ensemble-related options
 boot   = None
@@ -64,7 +64,7 @@ envs = ''
 simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s %(options)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d -ntasks-per-node %(tasks)d -c %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d --ntasks-per-node %(tasks)d -c %(threads)d %(cmd)s %(options)s'
 
 # submission script template
 script = '''#!/bin/bash
