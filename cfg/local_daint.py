@@ -75,7 +75,7 @@ script = '''#!/bin/bash
 #SBATCH --time=%(hours).2d:%(minutes).2d:00
 #SBATCH --mem=%(memory)d
 #SBATCH --output=%(reportfile)s
-#SBATCH --account=s659
+#SBATCH --account=s500
 %(xopts)s
 ulimit -c 0
 %(job)s
