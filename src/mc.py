@@ -152,15 +152,33 @@ class MC (object):
     config = self.config
     return sum ( [ not config.solver.finished ( config.level, config.type, sample ) for sample in config.samples ] )
 
+  # check if some loaded results are invalid
+  def invalid (self):
+
+    invalid = [ (self.config.solver.invalid (result) if result != None else 0) for result in self.results ]
+    indices = [ i for i, status in enumerate (invalid) if status ]
+
+    return indices
+
   # report timer results
-  def timer (self, batch=0):
+  def timer (self, walltime=None, batch=0):
     
     config = self.config
+
     if batch:
       runtimes = config.solver.timer ( config.level, config.type )
     else:
       runtimes = [ config.solver.timer ( config.level, config.type, sample ) for sample in config.samples ]
 
+    # set maximum runtime for runs that went over walltime limit
+    for sample, runtime in enumerate (runtimes):
+      if runtime == -1:
+        if walltime != None:
+          runtimes [sample] = 3600 * walltime
+        else:
+          runtimes [sample] = None
+
+    # filter out invalid entries (pending and failed simulations)
     runtimes = [ runtime for runtime in runtimes if runtime != None ]
 
     if len (runtimes) > 0:

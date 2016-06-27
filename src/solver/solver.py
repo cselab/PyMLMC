@@ -117,7 +117,8 @@ class Solver (object):
     
     else:
       if self.recycle:
-        dir = '%d' % level
+        dir = '%d%s' % (level, ['f', 'c'] [type])
+        #dir = '%d' % level
       else:
         #dir = '%d_%d' % (level, type)
         dir = '%d%s' % (level, ['f', 'c'] [type])
@@ -551,16 +552,11 @@ class Solver (object):
         lines = f.readlines()
         if len (lines) >= 3:
           line = lines [-3]
-          time = line.strip().split(' ') [-1]
-        else:
-          time = None
-    else:
-      time = None
+          if line.strip().split(' ') [0] == 'real':
+            return float ( line.strip().split(' ') [-1] )
+      return -1
 
-    try:
-      return float (time)
-    except:
-      return None
+    return None
 
   # report timer results
   def timer (self, level, type, sample='all'):

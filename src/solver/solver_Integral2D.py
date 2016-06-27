@@ -113,3 +113,11 @@ class Integral2D (Solver):
   def efficiency (self, level=0, type=0, sample=0, file=None):
 
     return None
+
+  # check if the loaded result is invalid
+  def invalid (self, result):
+
+    if numpy.isnan (result.data [self.qoi]) .any() or numpy.isinf (result.data [self.qoi]) .any():
+      return 1
+
+    return 0

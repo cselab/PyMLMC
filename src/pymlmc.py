@@ -157,7 +157,7 @@ class MLMC (object):
 
       # update the computed number of samples
       self.config.samples.append ()
-      '''
+
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
       self.indicators.report  ()
@@ -173,7 +173,7 @@ class MLMC (object):
       
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.indicators, self.config.works, self.config.samples.counts)
-      '''
+
       # query for progress
       helpers.query ('Continue?')
 
@@ -411,10 +411,10 @@ class MLMC (object):
         # if simulation is finished, report runtime
         if pending == 0:
 
-          runtime = mc.timer (self.config.scheduler.batch)
+          walltime = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
+          runtime  = mc.timer (walltime, self.config.scheduler.batch)
           if runtime ['max'] != None:
             runtimestr = time.strftime ( '%H:%M:%S', time.gmtime (runtime ['max']) )
-            walltime   = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
             if walltime != 'unknown':
               walltimestr = time.strftime ( '%H:%M:%S', time.gmtime (walltime * 3600) )
               percent = round ( 100 * (runtime ['max'] / 3600) / walltime )
@@ -491,7 +491,7 @@ class MLMC (object):
           parallelization = self.status.list ['parallelization'] [mc.config.level] [mc.config.type]
 
           # runtimes, walltime usage, budget usage, etc. of individual samples
-          runtime_sample = mc.timer ()
+          runtime_sample = mc.timer (walltime_sample)
           if runtime_sample ['min'] != None and runtime_sample ['max'] != None:
 
             # runtimes
@@ -520,7 +520,7 @@ class MLMC (object):
 
             # LEGACY: instead, report walltime and budget usage for entire batches
             batch = self.status.list ['batch'] [mc.config.level] [mc.config.type]
-            runtime_batch = mc.timer (batch=1)
+            runtime_batch = mc.timer (walltime_sample, batch=1)
             if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
 
               # walltime usage
@@ -646,14 +646,14 @@ class MLMC (object):
     print ' :: LOADING RESULTS:'
 
     if self.config.recycle:
-      print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
-      print '  :-------------------------------------------------------|'
-      format = '  :      %d  |    %s  |   %s  |   %s  |   %s   |'
+      print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
+      print '  :-------------------------------------------------------------------|'
+      format = '  :      %d  |    %s  |   %s  |   %s  |   %s   |   %s'
 
     else:
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |'
-      print '  :------------------------------------------------------------------|'
-      format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |'
+      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
+      print '  :------------------------------------------------------------------------------|'
+      format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |   %s'
 
     # candidate for the coarsest level
     self.L0 = None
@@ -669,6 +669,7 @@ class MLMC (object):
         mc = self.mcs [ self.config.pick [level] [type] ]
         pending = mc.pending ()
         loaded [type] = mc.load ()
+        invalid = mc.invalid ()
 
         # check if at least one sample at some level with type FINE
         if mc.available and mc.config.type == self.config.FINE:
@@ -680,10 +681,15 @@ class MLMC (object):
         loadedstr  = intf (len (loaded [type]), table=1, empty=1)
         failedstr  = intf (len (mc.config.samples) - len (loaded [type]), table=1, empty=1)
         pendingstr = intf (pending, table=1, empty=1)
-        if self.config.recycle:
-          print format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr)
+        invalidstr = intf (len (invalid), table=1, empty=1)
+        if len (invalid) > 0 and len (invalid) <= 16:
+          invalidstr += '   : ' + ' '.join ( ['%d' % index for index in invalid] )
         else:
-          print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr)
+          invalidstr += '   |'
+        if self.config.recycle:
+          print format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+        else:
+          print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
 
       # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
       if self.L0 == None:

@@ -9,6 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import numpy
+import copy
 
 class Time_Series (object):
   
@@ -254,10 +255,21 @@ class Time_Series (object):
     
     if begin == None: begin = self.meta ['t'] [0]
     if end   == None: end   = self.meta ['t'] [-1]
-    
+
+    leftnan  = numpy.abs (begin - self.meta ['t'] [0] ) > 0.05 * numpy.abs (end - begin)
+    rightnan = numpy.abs (end   - self.meta ['t'] [-1]) > 0.05 * numpy.abs (end - begin)
+
     times = numpy.linspace ( begin, end, points )
     for key in self.data.keys():
-      self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=float('nan'), right=float('nan') )
+      if leftnan:
+        left = float ('nan')
+      else:
+        left = self.data [key] [0]
+      if rightnan:
+        right = float ('nan')
+      else:
+        right = self.data [key] [-1]
+      self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=left, right=right )
     
     self.meta ['t']  = times
   
@@ -269,16 +281,18 @@ class Time_Series (object):
         self.data [key] .append ( 0 )
 
   def __rmul__ (self, a):
-    for key in self.data.keys():
-      for step in xrange ( len ( self.data [key] ) ):
-        self.data [key] [step] *= a
-    return self
+    result = copy.deepcopy (self)
+    for key in result.data.keys():
+      for step in xrange ( len ( result.data [key] ) ):
+        result.data [key] [step] *= a
+    return result
 
   def __lmul__ (self, a):
-    for key in self.data.keys():
-      for step in xrange ( len ( self.data [key] ) ):
-        self.data [key] [step] *= a
-    return self
+    result = copy.deepcopy (self)
+    for key in result.data.keys():
+      for step in xrange ( len ( result.data [key] ) ):
+        result.data [key] [step] *= a
+    return result
 
   def __iadd__ (self, a):
     if not self.data:

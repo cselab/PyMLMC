@@ -59,17 +59,17 @@ class CubismMPCF (Solver):
 
     # set indicator
     if not self.indicator:
-      #self.indicator = lambda x : numpy.max ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] )
+      self.indicator = lambda x : numpy.max ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] )
       #self.indicator = lambda x : numpy.nanmean ( numpy.abs (x.data [self.qoi]) )
-      self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
+      #self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
       #self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] ) )
       
     # set distance
     if not self.distance:
-      #self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else numpy.abs (self.indicator (f))
+      self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else numpy.abs (self.indicator (f))
       #self.distance = lambda f, c : numpy.nanmean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] if c != None else f.data [self.qoi] ) )
-      self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f.data [self.qoi] - c.data [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
-      #self.distance = lambda f, c : numpy.mean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] ) ) if c != None else self.indicator (f)
+      #self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f.data [self.qoi] - c.data [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else numpy.abs (self.indicator (f))
+      #self.distance = lambda f, c : numpy.mean ( numpy.abs ( f.data [self.qoi] - c.data [self.qoi] ) ) if c != None else numpy.abs (self.indicator (f))
 
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
@@ -291,3 +291,21 @@ class CubismMPCF (Solver):
       return numpy.mean (efficiencies)
     else:
       return None
+
+  # check if the loaded result is invalid
+  def invalid (self, results):
+
+    if numpy.isnan (results.data [self.qoi]) .any() or numpy.isinf (results.data [self.qoi]) .any():
+      return 1
+    
+    if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
+      return 1
+
+    '''
+    qois = [ 'c_global_max', 'p_global_max' ]
+    for qoi in qois:
+      if numpy.isnan (results.data [qoi]) .any() or numpy.isinf (results.data [qoi]) .any():
+        return 1
+    '''
+
+    return 0
