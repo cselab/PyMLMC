@@ -85,5 +85,5 @@ class Coefficients (object):
     if numpy.isnan (self.values).any() or (self.values <= 0).any() or (self.values > 1).any():
       message = 'Fishy values of optimized coefficients - resetting to ones'
       details = ' '.join ( [ '%d' % value for value in self.values ] )
-      hepers.warning (message, details=details)
+      helpers.warning (message, details=details)
       self.values = numpy.ones (self.L+1)
