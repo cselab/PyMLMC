@@ -1114,8 +1114,8 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     xend = float('nan')
 
     count = 0
-    for sample in mlmc.config.samples.indices.computed [level]:
-
+    for sample in range (mlmc.config.samples.counts.computed [level]):
+      
       if valid and sample in mlmc.config.indices.invalid [level]:
         continue
 
