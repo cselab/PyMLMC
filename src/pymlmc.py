@@ -661,15 +661,16 @@ class MLMC (object):
     # load all levels
     for level in self.config.levels:
 
-      loaded = [[], []]
+      loaded  = [[], []]
+      invalid = [[], []]
 
       # load both types
       for type in reversed (self.config.types (level)):
 
         mc = self.mcs [ self.config.pick [level] [type] ]
         pending = mc.pending ()
-        loaded [type] = mc.load ()
-        invalid = mc.invalid ()
+        loaded  [type] = mc.load ()
+        invalid [type] = mc.invalid ()
 
         # check if at least one sample at some level with type FINE
         if mc.available and mc.config.type == self.config.FINE:
@@ -681,15 +682,18 @@ class MLMC (object):
         loadedstr  = intf (len (loaded [type]), table=1, empty=1)
         failedstr  = intf (len (mc.config.samples) - len (loaded [type]), table=1, empty=1)
         pendingstr = intf (pending, table=1, empty=1)
-        invalidstr = intf (len (invalid), table=1, empty=1)
-        if len (invalid) > 0 and len (invalid) <= 16:
-          invalidstr += '   : ' + ' '.join ( ['%d' % index for index in invalid] )
+        invalidstr = intf (len (invalid [type]), table=1, empty=1)
+        if len (invalid [type]) > 0 and len (invalid [type]) <= 16:
+          invalidstr += '   : ' + ' '.join ( ['%d' % index for index in invalid [type]] )
         else:
           invalidstr += '   |'
         if self.config.recycle:
           print format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
         else:
           print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+
+        # remove invalid samples
+        loaded [type] = list ( set (loaded [type]) - set (invalid [type]) )
 
       # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
       if self.L0 == None:
