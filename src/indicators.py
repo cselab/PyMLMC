@@ -44,7 +44,7 @@ class Indicators (object):
   def compute (self, mcs, indices):
 
     print
-    print ' :: Computing INDICATORS...',
+    print ' :: Computing INDICATORS...'
 
     # set availability
     self.available = 1
