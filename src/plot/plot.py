@@ -1429,7 +1429,7 @@ def plot_correlations (mlmc, exact=None, infolines=False, run=1, frame=False, to
   print ' done.'
 
 # plot coefficients
-def plot_coefficiens (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+def plot_coefficients (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
 
   print ' :: INFO: Plotting coefficients...',
   sys.stdout.flush()
