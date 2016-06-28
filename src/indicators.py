@@ -38,6 +38,7 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
     self.available       = 0
     self.nans            = 0
+    self.extrapolated    = 0
     self.history         = {}
   
   def compute (self, mcs, indices):
@@ -97,7 +98,6 @@ class Indicators (object):
 
     # extrapolate missing indicators
     if self.nans:
-      helpers.warning ('Missing indicator values are extrapolated!')
       self.extrapolate ()
 
     # === optimal control variate coefficients
@@ -265,6 +265,10 @@ class Indicators (object):
     for level in self.levels:
       print helpers.scif (self.variance_diff [level] / (self.normalization) ** 2, table=1),
     print
+
+    # issue a warning if some indicator values were extrapolated
+    if self.extrapolated:
+      helpers.warning ('Missing indicator values are extrapolated!')
   
   def save (self, iteration):
 
@@ -306,8 +310,9 @@ class Indicators (object):
 
   # extrapolate missing indicators from the coarser levels
   def extrapolate (self):
-    
-    self.available = 1
+
+    self.extrapolated = 1
+    self.available    = 1
 
     # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
 
