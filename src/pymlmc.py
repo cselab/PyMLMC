@@ -509,8 +509,8 @@ class MLMC (object):
 
             # budget usage
             budget_sample             = float (self.config.works [mc.config.level - mc.config.type]) / parallelization
-            budget_sample_percent_min = round ( 100 * (runtime_sample ['min'] / 3600) / budget_sample )
-            budget_sample_percent_max = round ( 100 * (runtime_sample ['max'] / 3600) / budget_sample )
+            budget_sample_percent_min = min ( 999, round ( 100 * (runtime_sample ['min'] / 3600) / budget_sample ) )
+            budget_sample_percent_max = min ( 999, round ( 100 * (runtime_sample ['max'] / 3600) / budget_sample ) )
             args += ( '%3d%%' % budget_sample_percent_min, '%3d%%' % budget_sample_percent_max )
 
           # default values if runtime measurements are not available
