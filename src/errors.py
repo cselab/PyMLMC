@@ -91,10 +91,11 @@ class Errors (object):
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
       return
 
+    FINEST       = numpy.max ( [ level for level in self.levels if counts.loaded [level] > 0 ] )
     work_mlmc    = sum ( [ works [level] * counts.loaded [level] for level in self.levels ] )
-    variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels ] )
+    variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST] ] )
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
-    work_mc      = works [self.L] * samples_mc
+    work_mc      = works [FINEST] * samples_mc
     self.speedup = work_mc / work_mlmc
 
     # avoid round-off errors for pure MC runs
@@ -102,7 +103,7 @@ class Errors (object):
       self.speedup = 1.0
     
     print
-    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup
+    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
   
