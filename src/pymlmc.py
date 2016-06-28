@@ -714,10 +714,10 @@ class MLMC (object):
 
     # report how many pairs of fine and course samples were loaded
     print
-    print ' :: LOADED PAIRS (FINE & COARSE):'
-    print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |'
-    print '  :-------------------------------------------|'
-    format = '  :      %d  |    %s  |   %s  |   %s  |'
+    print ' :: LOADED VALID PAIRS (FINE & COARSE):'
+    print '  :  LEVEL  |  SAMPLES  |  INCLUDED  |  EXCLUDED  |'
+    print '  :-----------------------------------------------|'
+    format = '  :      %d  |    %s  |    %s   |    %s   |'
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)

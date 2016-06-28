@@ -120,8 +120,16 @@ class Indicators (object):
     for level in self.levels:
       self.mean_diff     [level] = numpy.mean ( distances [level] )
       #self.mean_diff     [level] = numpy.nanmean ( distances [level] )
-      self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
-      #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float ('nan')
+      if len (distances [level]) > 1:
+        self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+        #self.variance_diff [level] = numpy.nanvar  ( distances [level] )  if len (distances [level]) > 1 else float ('nan')
+      else:
+        self.variance_diff [level] = float ('nan')
+        self.nans = 1
+
+    # extrapolate missing difference indicators
+    if self.nans:
+      self.extrapolate_diffs ()
 
     print ' done.'
     print
@@ -335,14 +343,13 @@ class Indicators (object):
         else:
           self.variance [level] [1] = numpy.nan
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
-
-    '''
+    
     for level in self.levels:
       if numpy.isnan ( self.mean_diff [level] ):
         if level != 0:
-          self.mean_diff     [level] = self.mean_diff [level-1] / 2
+          self.mean_diff [level] = self.mean_diff [level-1] / 2
         else:
-          self.mean_diff     [level] = numpy.nan
+          self.mean_diff [level] = numpy.nan
           helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
 
     for level in self.levels:
@@ -353,7 +360,6 @@ class Indicators (object):
           self.variance_diff [level] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
-    '''
 
     for level in self.levels [1:]:
       if numpy.isnan ( self.correlation [level] ):
@@ -372,3 +378,29 @@ class Indicators (object):
           self.covariance [level] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
+
+    self.nans = 0
+
+  # extrapolate missing difference indicators from the coarser levels
+  def extrapolate_diffs (self):
+
+    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
+
+    for level in self.levels:
+      if numpy.isnan ( self.mean_diff [level] ):
+        if level != 0:
+          self.mean_diff [level] = self.mean_diff [level-1] / 2
+        else:
+          self.mean_diff [level] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
+
+    for level in self.levels:
+      if numpy.isnan ( self.variance_diff [level] ):
+        if level != 0:
+          self.variance_diff [level] = self.variance_diff [level-1] / 2
+        else:
+          self.variance_diff [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
+
+    self.nans = 0
