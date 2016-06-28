@@ -93,7 +93,7 @@ class Errors (object):
 
     FINEST       = numpy.max ( [ level for level in self.levels if counts.loaded [level] > 0 ] )
     work_mlmc    = sum ( [ works [level] * counts.loaded [level] for level in self.levels ] )
-    variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST] ] )
+    variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
     work_mc      = works [FINEST] * samples_mc
     self.speedup = work_mc / work_mlmc
