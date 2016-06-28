@@ -1095,7 +1095,7 @@ def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, 
   print ' done.'
 
 # plot results of all samples (ensemble) of all levels
-def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, save=None):
+def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, valid=False, save=None):
 
   if not qoi: qoi = mlmc.config.solver.qoi
 
@@ -1114,7 +1114,10 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
     xend = float('nan')
 
     count = 0
-    for sample in mlmc.config.samples.indices.loaded [level]:
+    for sample in mlmc.config.samples.indices.computed [level]:
+
+      if valid and sample in mlmc.config.indices.invalid [level]:
+        continue
 
       if count == limit:
         break

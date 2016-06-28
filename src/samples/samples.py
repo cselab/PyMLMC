@@ -22,6 +22,7 @@ class Counts (object):
 
   loaded     = []
   failed     = []
+  invalid    = []
 
   def __init__ (self, levels, tolerate):
 
@@ -66,6 +67,7 @@ class Indices (object):
   
   loaded     = []
   failed     = []
+  invalid    = []
   
   def make (self, counts):
     
@@ -96,11 +98,13 @@ class Samples (object):
 
     self.counts.computed = numpy.zeros ( len (self.levels), dtype=int )
 
-    self.counts.loaded  = [ None for level in self.levels ]
-    self.counts.failed  = [ None for level in self.levels ]
+    self.counts.loaded   = [ None for level in self.levels ]
+    self.counts.failed   = [ None for level in self.levels ]
+    self.counts.invalid  = [ None for level in self.levels ]
 
-    self.indices.loaded = [ None for level in self.levels ]
-    self.indices.failed = [ None for level in self.levels ]
+    self.indices.loaded  = [ None for level in self.levels ]
+    self.indices.failed  = [ None for level in self.levels ]
+    self.indices.invalid = [ None for level in self.levels ]
 
     self.tolerate = 0
   

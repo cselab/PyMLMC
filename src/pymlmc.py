@@ -712,6 +712,10 @@ class MLMC (object):
       self.config.samples.counts.loaded [level] = len (self.config.samples.indices.loaded [level])
       self.config.samples.counts.failed [level] = self.config.samples.counts.combined [level] - self.config.samples.counts.loaded [level]
 
+      # store invalid indices and counts
+      self.config.samples.indices.invalid [level] = list ( set (invalid [self.config.FINE]) | set (invalid [self.config.COARSE]) )
+      self.config.samples.counts.invalid  [level] = len (self.config.samples.indices [level])
+
     # report how many pairs of fine and course samples were loaded
     print
     print ' :: LOADED VALID PAIRS (FINE & COARSE):'
