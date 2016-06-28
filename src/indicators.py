@@ -343,23 +343,6 @@ class Indicators (object):
         else:
           self.variance [level] [1] = numpy.nan
           helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
-    
-    for level in self.levels:
-      if numpy.isnan ( self.mean_diff [level] ):
-        if level != 0:
-          self.mean_diff [level] = self.mean_diff [level-1] / 2
-        else:
-          self.mean_diff [level] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
-
-    for level in self.levels:
-      if numpy.isnan ( self.variance_diff [level] ):
-        if level != 0:
-          self.variance_diff [level] = self.variance_diff [level-1] / 2
-        else:
-          self.variance_diff [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
 
     for level in self.levels [1:]:
       if numpy.isnan ( self.correlation [level] ):
