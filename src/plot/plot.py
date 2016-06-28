@@ -1115,7 +1115,7 @@ def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, 
 
     count = 0
     for sample in range (mlmc.config.samples.counts.computed [level]):
-      
+
       if valid and sample in mlmc.config.indices.invalid [level]:
         continue
 
@@ -1447,9 +1447,9 @@ def plot_coefficients (mlmc, exact=None, infolines=False, run=1, frame=False, to
 
   # plot correlations
 
-  pylab.plot (levels, correlation, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
-  pylab.title  ('Level correlations for Q = %s' % qoi)
-  pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
+  pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
+  pylab.title  ('Level coefficients for Q = %s' % qoi)
+  pylab.ylabel (r'coefficient')
   pylab.xlabel ('mesh level')
   pylab.ylim ([-0.1, 1.1])
   levels_extent (levels)
