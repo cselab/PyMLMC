@@ -171,7 +171,9 @@ class CubismMPCF (Solver):
 
   def progress (self, results):
 
-    return float (results.meta ['t'] [-1]) / self.tend
+    time = numpy.max ( [ results.meta ['t'] [step] for step in results.meta ['t'] if not numpy.isnan (results.data [self.qoi]) ] )
+
+    return float (time) / self.tend
 
   def load (self, level=0, type=0, sample=0, file=None):
     
