@@ -278,9 +278,9 @@ class Time_Series (object):
       for key in self.data.keys():
         if qoi in key:
           if lower != None:
-            self.data [key] = numpy.max ( lower, self.data [key] )
+            self.data [key] = numpy.maximum ( lower, self.data [key] )
           if upper != None:
-            self.data [key] = numpy.min ( upper, self.data [key] )
+            self.data [key] = numpy.minimum ( upper, self.data [key] )
 
   def init (self, a):
     self.meta = a.meta

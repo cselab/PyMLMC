@@ -35,6 +35,8 @@ def min_walltime (cores): # hours
   return 0
 
 def max_walltime (cores): # hours
+  if cores < 8 * 1024:
+    return 2
   return 24
 
 # theoretical performance figures per node
