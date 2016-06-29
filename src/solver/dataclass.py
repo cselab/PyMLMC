@@ -272,7 +272,16 @@ class Time_Series (object):
       self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=left, right=right )
     
     self.meta ['t']  = times
-  
+
+  def clip (self, ranges):
+    for qoi, lower, upper in ranges:
+      for key in self.data.keys():
+        if qoi in key:
+          if lower != None:
+            self.data [key] = numpy.max ( lower, self.data [key] )
+          if upper != None:
+            self.data [key] = numpy.min ( upper, self.data [key] )
+
   def init (self, a):
     self.meta = a.meta
     for key in a.data.keys():

@@ -810,7 +810,20 @@ class MLMC (object):
 
     print '  : DONE'
     print
-  
+
+  # clip MLMC estimates
+  def clip (self, ranges):
+
+    print
+    print ' :: CLIPPING MLMC estimates...'
+
+    # apply prescribed ranges for all stats
+    for name in self.stats.keys():
+      self.stats [name] .clip (ranges)
+
+    print '  : DONE'
+    print
+
   # report computed statistics (mostly used only for debugging)
   def report (self):
     
