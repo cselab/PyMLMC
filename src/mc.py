@@ -194,10 +194,10 @@ class MC (object):
     for sample, result in enumerate (self.results):
       if sample > 8:
         break
-      progress = self.config.solver.progress (result)
+      progress = self.config.solver.progress (result) if result != None else 0
       bar      = int ( math.ceil (progress * 20) )
       percent  = int ( math.ceil (100 * progress) )
-      print '  -> sample %6d: [%s] %d%%' % (sample, '#' * bar + ' ' * (20 - bar), percent)
+      print '  %6d: [%s] %d%%' % (sample, '#' * bar + ' ' * (20 - bar), percent)
 
   # report efficiency
   def efficiency (self, batch=0):

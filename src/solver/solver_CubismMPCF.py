@@ -171,8 +171,7 @@ class CubismMPCF (Solver):
 
   def progress (self, results):
 
-    ts = [ t for step, t in enumerate (results.meta ['t']) if results.data [self.qoi] != None ]
-    return float (max (ts)) / self.tend
+    return float (results.meta ['t'] [-1]) / self.tend
 
   def load (self, level=0, type=0, sample=0, file=None):
     
