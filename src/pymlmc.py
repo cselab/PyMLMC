@@ -742,9 +742,10 @@ class MLMC (object):
       return
 
     print
-    print ' :: PROGRESS: [not yet implemented]'
-
-    # TODO: implement this!
+    print ' :: PROGRESS:'
+    
+    for mc in self.mcs:
+      mc.progress ()
 
   # assemble MC and MLMC estimates
   def assemble (self, stats, qois='all'):
