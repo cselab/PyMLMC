@@ -638,8 +638,8 @@ class MatPlotLib (object):
     ys = numpy.empty ( len (qois), dtype=float )
     vs = numpy.empty ( ( len (ts), len (qois) ), dtype=float )
     for shell, qoi in enumerate (qois):
-      ys [shell]    = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
-      vs [ : shell] = numpy.array ( stat.data [qoi] )
+      ys [shell]       = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
+      vs [ : , shell ] = numpy.array ( stat.data [qoi] )
 
     vmax = extent [1]
 
