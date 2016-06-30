@@ -500,7 +500,7 @@ class MatPlotLib (object):
       pylab.legend (loc = loc)
     if save:
       self.saveall (save, qoi)
-    elif autosave:
+    elif self.autosave:
       self.saveall (figname (suffix), qoi)
     pylab.draw ()
 
@@ -537,15 +537,15 @@ class MatPlotLib (object):
     pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
 
     if '_pos_d' in qoi:
-      if surface == 'N/A':
+      if self.surface == 'N/A':
         print
         print
-        print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
+        print ' :: ERROR: \'plot.surface\' not set.'
         print
         sys.exit()
-      if surface != None:
-        pylab.axhline (y=surface,  color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
-        pylab.axhline (y=-surface, color='maroon', linestyle='--', alpha=alpha(run))
+      if self.surface != None:
+        pylab.axhline (y=self.surface,  color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+        pylab.axhline (y=-self.surface, color='maroon', linestyle='--', alpha=alpha(run))
 
   # adjust axes
   def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None):
@@ -585,16 +585,16 @@ class MatPlotLib (object):
       
       ylim = pylab.ylim() [1]
 
-      if '_pos_d' in qoi and surface != None:
-        pylab.gca().set_ylim (top = 1.05 * surface)
-        #pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
+      if '_pos_d' in qoi and self.surface != None:
+        pylab.gca().set_ylim (top = 1.05 * self.surface)
+        #pylab.gca().set_ylim (top = max (1.05 * self.surface, ylim))
 
-      if '_pos_x' in qoi and extent_x != None:
-        pylab.gca().set_ylim (top = max (extent_x, ylim))
-      if '_pos_y' in qoi and extent_y != None:
-        pylab.gca().set_ylim (top = max (extent_y, ylim))
-      if '_pos_z' in qoi and extent_z != None:
-        pylab.gca().set_ylim (top = max (extent_z, ylim))
+      if '_pos_x' in qoi and self.extent_x != None:
+        pylab.gca().set_ylim (top = max (self.extent_x, ylim))
+      if '_pos_y' in qoi and self.extent_y != None:
+        pylab.gca().set_ylim (top = max (self.extent_y, ylim))
+      if '_pos_z' in qoi and self.extent_z != None:
+        pylab.gca().set_ylim (top = max (self.extent_z, ylim))
 
   # plot histogram
   def histogram (self, qoi, stat, log=0):
@@ -872,7 +872,7 @@ class MatPlotLib (object):
       extent_range = extent [1] - extent [0]
       extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
     elif '_pos_d' in qoi:
-      extent_diff = ( - 1.05 * surface, 1.05 * surface )
+      extent_diff = ( - 1.05 * self.surface, 1.05 * self.surface )
     else:
       extent_diff = None
 
@@ -946,7 +946,7 @@ class MatPlotLib (object):
       extent_range = extent [1] - extent [0]
       extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
     elif '_pos_d' in qoi:
-      extent_diff = ( - 1.05 * surface, 1.05 * surface )
+      extent_diff = ( - 1.05 * self.surface, 1.05 * self.surface )
     else:
       extent_diff = None
 
@@ -1044,16 +1044,16 @@ class MatPlotLib (object):
     if base (qoi) == 'e':
       positions = []
       if '_pos_d_x' in qoi:
-        max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
+        max_d_x = 0.5 * numpy.sqrt (self.extent_y ** 2 + self.extent_z ** 2)
         positions = numpy.argwhere (vs > 0.9 * max_d_x)
       elif '_pos_d_y' in qoi:
-        max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
+        max_d_y = 0.5 * numpy.sqrt (self.extent_x ** 2 + self.extent_z ** 2)
         positions = numpy.argwhere (vs > 0.9 * max_d_y)
       elif '_pos_d_z' in qoi:
-        max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
+        max_d_z = 0.5 * numpy.sqrt (self.extent_x ** 2 + self.extent_y ** 2)
         positions = numpy.argwhere (vs > 0.9 * max_d_z)
       elif '_pos_d' in qoi:
-        max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
+        max_d = 0.5 * numpy.sqrt (self.extent_x ** 2 + self.extent_y ** 2 + self.extent_z ** 2)
         positions = numpy.argwhere (vs > 0.9 * max_d)
       ts = numpy.delete (ts, positions)
       vs = numpy.delete (vs, positions)
