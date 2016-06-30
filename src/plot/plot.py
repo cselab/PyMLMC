@@ -314,6 +314,17 @@ def adjust (infolines, subplots=1):
   right = min ( 0.98, 0.94 + 0.01 * subplots)
   pylab.subplots_adjust (right=right)
 
+# main class for plotting using MatPlotLib
+class MatPlotLib (object):
+
+  def __init__ (self, mlmc):
+
+    self.mlmc = mlmc
+
+    print
+    print ' :: MatPlotLib plotting backend initialized.'
+    print
+
 # compute parameters needed for the generation of the TexTable
 def getTexTableConfig (mlmc):
   
@@ -635,10 +646,10 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     if name == 'histogram':
       plot_histogram (qoi, stats [name])
       break
-    
+
     if 'shell' in qoi:
       qois = [ q for q in stats [name] .data.keys() if qoi in q ]
-      compare = lambda (a, b) : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
+      compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
       qois.sort (compare)
       plot_shells (qois, stat, extent)
       adjust = 0
