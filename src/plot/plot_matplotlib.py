@@ -395,13 +395,9 @@ class MatPlotLib (object):
   # generate TeX code with the table including information about the simulation
   def generateTexTable (self, base):
     
-    # check for valid mlmc simulation
-    if mlmc == None:
-      return
-    
     # get the config
     
-    [keys, captions, opts] = getTexTableConfig (mlmc)
+    [keys, captions, opts] = getTexTableConfig ()
     
     # TeX code generation
     
