@@ -373,12 +373,12 @@ class MatPlotLib (object):
     import time
     
     values               = {}
-    values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in self.mlmc.config.discretizations [mlmc.config.L] .values() ] )
+    values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in self.mlmc.config.discretizations [self.mlmc.config.L] .values() ] )
     values ['cores']     = self.mlmc.status.list ['parallelization']
     values ['cluster']   = self.mlmc.status.list ['cluster']
     
     if self.mlmc.finished:
-      runtime = self.mlmc.mcs[mlmc.config.L].timer (batch=1) ['max']
+      runtime = self.mlmc.mcs [self.mlmc.config.L] .timer (batch=1) ['max']
       values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
     else:
       values ['runtime'] = self.mlmc.status.list ['walltimes'] [-1] [0]
