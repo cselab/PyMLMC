@@ -668,7 +668,7 @@ class MatPlotLib (object):
         break
 
       if 'shell' in qoi:
-        qois = [ q for q in stats [name] .data.keys() if qoi in q ]
+        qois = [ q for q in stats [stat_name] .data.keys() if qoi in q ]
         compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
         qois.sort (compare)
         self.shells (qois, stat, extent)
