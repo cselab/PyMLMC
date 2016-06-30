@@ -256,8 +256,8 @@ class Time_Series (object):
     if begin == None: begin = self.meta ['t'] [0]
     if end   == None: end   = self.meta ['t'] [-1]
 
-    leftnan  = numpy.abs (begin - self.meta ['t'] [0] ) > 0.05 * numpy.abs (end - begin)
-    rightnan = numpy.abs (end   - self.meta ['t'] [-1]) > 0.05 * numpy.abs (end - begin)
+    leftnan  = numpy.abs (begin - self.meta ['t'] [0] ) > 0.1 * numpy.abs (end - begin)
+    rightnan = numpy.abs (end   - self.meta ['t'] [-1]) > 0.1 * numpy.abs (end - begin)
 
     times = numpy.linspace ( begin, end, points )
     for key in self.data.keys():

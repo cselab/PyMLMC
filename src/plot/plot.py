@@ -579,10 +579,10 @@ def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
       pylab.gca().set_ylim (top = max (extent_z, ylim))
 
 # plot histogram
-def plot_histogram (qoi, stat):
+def plot_histogram (qoi, stat, log=0):
 
   ts = numpy.array ( stat.meta ['t'] )
-  ys = numpy.array ( stat.meta ['s'] )
+  ys = numpy.array ( stat.meta ['bins'] )
   vs = numpy.array ( stat.data [qoi] )
 
   vmax = numpy.max (numpy.max (vs))
@@ -595,23 +595,55 @@ def plot_histogram (qoi, stat):
     norm = None
     vmin = 0
 
-  extent = ( min (ts), max (ts), min (ys), max (ys) )
+  # TODO: cmap should be based on 'color(qoi)'
+
+  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+
+# plot shells
+def plot_shells (qois, stat, extent, log=0):
+
+  ts = numpy.array ( stat.meta ['t'] )
+
+  # construct array consisting of all shells
+  vs = numpy.array ( ( len (ts), len (qois) ) , dtype=float )
+  for shell, qoi in enumerate (qois):
+    ys [shell]    = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
+    vs [ : shell] = numpy.array ( stat.data [qoi] )
+
+  vmax = extent [1]
+
+  if log:
+    from matplotlib.colors import LogNorm
+    norm = LogNorm (vmin=0, vmax=vmax)
+    vmin = 1
+  else:
+    norm = None
+    vmin = extent [0]
 
   # TODO: cmap should be based on 'color(qoi)'
 
-  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='nearest', vmin=vmin, vmax=vmax)
+  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
 
 # plot each stat
 def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
   
   percentiles = []
+  adjust = 1
 
   for name, stat in stats.iteritems():
 
     if name == 'histogram':
       plot_histogram (qoi, stats [name])
-      continue
+      break
     
+    if 'shell' in qoi:
+      qois = [ q for q in stats [name] .data.keys() if qoi in q ]
+      compare = lambda (a, b) : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
+      qois.sort (compare)
+      plot_shells (qois, stat, extent)
+      adjust = 0
+      break
+
     ts = numpy.array ( stat.meta ['t'] )
     vs = numpy.array ( stat.data [qoi] )
     
@@ -656,7 +688,8 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
     # hack to show the legend entry
     pylab.plot([], [], color=bright, linewidth=10, label=label)
 
-  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
+  if adjust:
+    adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
   
   pylab.xlabel (xlabel)
   pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
