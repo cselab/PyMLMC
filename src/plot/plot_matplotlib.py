@@ -912,7 +912,7 @@ class MatPlotLib (object):
       self.draw (save, qoi, suffix='stats_diffs')
 
     print ' done.'
-  
+
   # plot computed MC estimators and their differences
   def mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
@@ -1611,7 +1611,10 @@ class MatPlotLib (object):
     rh = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
     return tc, rh
 
-  def rp_integrated (self, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=rp.OptPL2()):
+  def rp_integrated (self, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=None):
+    if model = None:
+      import rp
+      model = rp.OptPL2()
     dr0 = 0
     [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S, model)
     return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
