@@ -723,6 +723,7 @@ class MatPlotLib (object):
       self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
     pylab.xlabel (xlabel)
+    global name
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
     
     self.helper_lines (qoi, run)
