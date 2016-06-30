@@ -578,12 +578,39 @@ def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
     if '_pos_z' in qoi and extent_z != None:
       pylab.gca().set_ylim (top = max (extent_z, ylim))
 
+# plot histogram
+def plot_histogram (qoi, stat):
+
+  ts = numpy.array ( stat.meta ['t'] )
+  ys = numpy.array ( stat.meta ['s'] )
+  vs = numpy.array ( stat.data [qoi] )
+
+  vmax = numpy.max (numpy.max (vs))
+
+  if log:
+    from matplotlib.colors import LogNorm
+    norm = LogNorm (vmin=0, vmax=vmax)
+    vmin = 1
+  else:
+    norm = None
+    vmin = 0
+
+  extent = ( min (ts), max (ts), min (ys), max (ys) )
+
+  # TODO: cmap should be based on 'color(qoi)'
+
+  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='nearest', vmin=vmin, vmax=vmax)
+
 # plot each stat
 def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
   
   percentiles = []
 
-  for stat_name, stat in stats.iteritems():
+  for name, stat in stats.iteritems():
+
+    if name == 'histogram':
+      plot_histogram (qoi, stats [name])
+      continue
     
     ts = numpy.array ( stat.meta ['t'] )
     vs = numpy.array ( stat.data [qoi] )
@@ -594,7 +621,7 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       vs = vs [1:]
 
     # stat-specific plotting: std. deviation
-    if stat_name == 'std. deviation' and 'mean' in stats:
+    if name == 'std. deviation' and 'mean' in stats:
       ms = numpy.array ( stats ['mean'] .data [qoi] )
       bright = brighten(color(qoi), factor=0.7)
       pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
@@ -602,12 +629,12 @@ def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True
       pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
     
     # collect percentiles for later fill
-    elif 'percentile' in stat_name:
+    elif 'percentile' in name:
       percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
     
     # general plotting
     else:
-      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=stat_name)
+      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
   
   # plot percentiles
   if percentiles != []:
@@ -910,10 +937,10 @@ def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorig
     return
 
   if not frame:
-    figure (infolines, subplots=1)
+    figure (infolines)
   
   xlabel = '%s [%s]' % (name('t'), unit('t'))
-  #pylab.title ( 'estimated statistics for %s' % qoi )
+  pylab.title ( 'estimated statistics for %s' % qoi )
   plot_stats (qoi, mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
   if infolines:
