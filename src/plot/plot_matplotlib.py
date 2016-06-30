@@ -324,8 +324,6 @@ def filter (vs, width):
   vs_cnv = numpy.convolve (window, vs_ext, mode='valid')
   return vs_cnv [width / 2 - 1 : len (vs_cnv) - width / 2]
 
-xend_max = None
-
 # main class for plotting using MatPlotLib
 class MatPlotLib (object):
 
@@ -335,6 +333,8 @@ class MatPlotLib (object):
   extent_y = 'N/A'
   extent_z = 'N/A'
   surface  = 'N/A'
+
+  xend_max = None
 
   # initialization
   def __init__ (self, mlmc):
@@ -494,8 +494,7 @@ class MatPlotLib (object):
   def draw (self, save, qoi=None, legend=False, loc='best', suffix='autosave'):
     
     # reset xend_max
-    global xend_max
-    xend_max = None
+    self.xend_max = None
     
     if legend or (qoi != None and '_pos' in qoi):
       pylab.legend (loc = loc)
@@ -559,12 +558,11 @@ class MatPlotLib (object):
       pylab.gca().set_xlim (left = 0)
 
     if xend != None:
-      global xend_max
-      if xend_max == None:
-        xend_max = xend
+      if self.xend_max == None:
+        self.xend_max = xend
       else:
-        xend_max = max (xend, xend_max)
-      pylab.gca().set_xlim (right = xend_max)
+        self.xend_max = max (xend, self.xend_max)
+      pylab.gca().set_xlim (right = self.xend_max)
 
     # if extent is specified, use that
     if extent:
@@ -914,7 +912,7 @@ class MatPlotLib (object):
       self.draw (save, qoi, suffix='stats_diffs')
 
     print ' done.'
-
+  
   # plot computed MC estimators and their differences
   def mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
