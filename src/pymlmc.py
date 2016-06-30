@@ -97,7 +97,6 @@ class MLMC (object):
 
     # query for progress
     helpers.query ('Continue with data analysis?')
-    print
   
   # initial phase
   def init (self):
