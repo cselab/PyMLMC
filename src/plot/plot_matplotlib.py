@@ -1612,7 +1612,7 @@ class MatPlotLib (object):
     return tc, rh
 
   def rp_integrated (self, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=None):
-    if model = None:
+    if model == None:
       import rp
       model = rp.OptPL2()
     dr0 = 0

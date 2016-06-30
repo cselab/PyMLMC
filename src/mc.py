@@ -191,10 +191,19 @@ class MC (object):
 
     print
     print '  : Level %d, type %s:' % (self.config.level, ['FINE', 'COARSE'] [self.config.type])
+
+    # progress status of all samples
+    progresses = []
     for sample, result in enumerate (self.results):
+      progresses.append ( self.config.solver.progress (result) if result != None else 0 )
+
+    # print overall report
+
+
+    # print status of some samples in progress
+    for sample, progress in enumerate (progresses):
       if sample > 8:
         break
-      progress = self.config.solver.progress (result) if result != None else 0
       bar      = int ( math.ceil (progress * 20) )
       percent  = int ( math.ceil (100 * progress) )
       print '  %6d: [%s] %d%%' % (sample, '#' * bar + ' ' * (20 - bar), percent)
