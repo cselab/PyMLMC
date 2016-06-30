@@ -661,10 +661,10 @@ class MatPlotLib (object):
     percentiles = []
     adjust = 1
 
-    for name, stat in stats.iteritems():
+    for stat_name, stat in stats.iteritems():
 
-      if name == 'histogram':
-        self.histogram (qoi, stats [name])
+      if stat_name == 'histogram':
+        self.histogram (qoi, stat)
         break
 
       if 'shell' in qoi:
@@ -684,7 +684,7 @@ class MatPlotLib (object):
         vs = vs [1:]
 
       # stat-specific plotting: std. deviation
-      if name == 'std. deviation' and 'mean' in stats:
+      if stat_name == 'std. deviation' and 'mean' in stats:
         ms = numpy.array ( stats ['mean'] .data [qoi] )
         bright = brighten(color(qoi), factor=0.7)
         pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
@@ -692,7 +692,7 @@ class MatPlotLib (object):
         pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
       
       # collect percentiles for later fill
-      elif 'percentile' in name:
+      elif 'percentile' in stat_name:
         percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
       
       # general plotting
@@ -723,7 +723,6 @@ class MatPlotLib (object):
       self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
     pylab.xlabel (xlabel)
-    global name
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
     
     self.helper_lines (qoi, run)
