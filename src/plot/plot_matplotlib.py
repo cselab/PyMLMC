@@ -489,7 +489,7 @@ class MatPlotLib (object):
     pylab.savefig    (base_name + '.' + 'eps')
     pylab.savefig    (base_name + '.' + 'png')
     pylab.savefig    (base_name + '.' + 'pdf')
-    generateTexTable (base_name)
+    self.generateTexTable (base_name)
 
   def draw (self, save, qoi=None, legend=False, loc='best', suffix='autosave'):
     
