@@ -397,7 +397,7 @@ class MatPlotLib (object):
     
     # get the config
     
-    [keys, captions, opts] = getTexTableConfig ()
+    [keys, captions, opts] = self.getTexTableConfig ()
     
     # TeX code generation
     
