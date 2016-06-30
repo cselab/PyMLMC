@@ -56,17 +56,25 @@ if __name__ == '__main__':
 # check if interactive
 if __name__ == '__main__':
 
-  from plot import *
+  from plot_matplotlib import MatPlotLib
+
+  # initialize plotting backend
+  plot = MatPlotLib (mlmc)
+
+  # setup plotting
+  plot.autosave = 1
+  plot.set_extent  (10.0)
+  plot.set_surface (2.5)
 
   qois = { 'I' : [0, 1], ??? }
 
   # plotting emnsembles
   for qoi, extent in qois.iteritems():
-    plot_ensembles ( mlmc, qoi=qoi, extent=extent, save=figname('ensembles') )
+    plot.ensembles ( qoi=qoi, extent=extent )
 
   # show ensembles
   if not local.cluster:
-    show()
+    plot.show()
 
   # statistics
   from stats_numpy import *
@@ -81,39 +89,49 @@ if __name__ == '__main__':
   # assemble MLMC estimates
   mlmc.assemble (stats, qois.keys())
 
+  # required qoi ranges for MLMC estimates
+  ranges = []
+  ranges.append ( ['I', 0, None] )
+
+  # clip MLMC estimates
+  mlmc.clip (ranges)
+
   for qoi, extent in qois.iteritems():
 
     # plot MC results
-    plot_mcs ( mlmc, qoi=qoi, extent=extent, save=figname('stats_mcs') )
+    plot.mcs ( qoi=qoi, extent=extent )
 
     # plot diffs of MC results
-    plot_diffs ( mlmc, qoi=qoi, extent=extent, save=figname('stats_diffs') )
+    plot.diffs ( qoi=qoi, extent=extent )
 
     # plot MLMC results
-    plot_mlmc ( mlmc, qoi=qoi, extent=extent, save=figname('stats_mlmc') )
+    plot.mlmc ( qoi=qoi, extent=extent )
 
+  # show statistics
   if not local.cluster:
-    show()
+    plot.show()
 
   # plot samples
-  plot_samples ( mlmc, save=figname('samples') )
+  plot.samples ()
 
   # plot budget
-  plot_budget ( mlmc, save=figname('budget') )
+  plot.budget ()
 
   # plot indicators
-  plot_indicators ( mlmc, save=figname('indicators') )
+  plot.indicators ()
 
   # plot correlations
-  plot_correlations ( mlmc, save=figname('correlations') )
+  plot.correlations ()
 
   # plot coefficients
-  plot_coefficients ( mlmc, save=figname('coefficients') )
+  plot.coefficients ()
 
   # plot errors
-  plot_errors ( mlmc, save=figname('errors') )
-  
+  plot.errors ()
+
+  # show indicators
   if not local.cluster:
-    show()
-  
-  query()
+    plot.show()
+
+  # query for further action
+  plot.query()

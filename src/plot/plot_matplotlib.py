@@ -314,202 +314,6 @@ def adjust (infolines, subplots=1):
   right = min ( 0.98, 0.94 + 0.01 * subplots)
   pylab.subplots_adjust (right=right)
 
-# main class for plotting using MatPlotLib
-class MatPlotLib (object):
-
-  def __init__ (self, mlmc):
-
-    self.mlmc = mlmc
-
-    print
-    print ' :: MatPlotLib plotting backend initialized.'
-    print
-
-# compute parameters needed for the generation of the TexTable
-def getTexTableConfig (mlmc):
-  
-  # config
-  
-  keys     =  ['grid_size', 'cores', 'runtime', 'cluster']
-  captions =  ['grid size', 'cores', 'runtime', 'cluster']
-  
-  # aggregation of information
-  
-  import time
-  
-  values               = {}
-  values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in mlmc.config.discretizations [mlmc.config.L] .values() ] )
-  values ['cores']     = mlmc.status.list ['parallelization']
-  values ['cluster']   = mlmc.status.list ['cluster']
-  
-  if mlmc.finished:
-    runtime = mlmc.mcs[mlmc.config.L].timer (batch=1) ['max']
-    values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
-  else:
-    values ['runtime'] = mlmc.status.list ['walltimes'] [-1] [0]
-  
-  # number of levels
-
-  if mlmc.config.L != 0:
-    keys = ['L'] + keys
-    captions = [r'$L$'] + captions
-    values ['L'] = mlmc.config.L
-  
-  return [keys, captions, values]
-
-# generate TeX code with the table including information about the simulation
-def generateTexTable (mlmc, base):
-  
-  # check for valid mlmc simulation
-  if mlmc == None:
-    return
-  
-  # get the config
-  
-  [keys, captions, opts] = getTexTableConfig (mlmc)
-  
-  # TeX code generation
-  
-  columns =  '|' + 'c|' * len(keys)
-  
-  text =  '\n'
-  text += r'\begin{tabular}{%s}' % columns + '\n'
-  
-  text += r'\hline' + '\n'
-  text += (r'%s & ' * len(captions))[0:-2] % tuple(captions) + r'\\' + '\n'
-  text += r'\hline' + '\n'
-  text += (r'%s & ' * len(keys))[0:-2] % tuple([opts[key] for key in keys]) + r'\\' + '\n'
-  text += r'\hline' + '\n'
-  
-  text += r'\end{tabular}' + '\n'
-  
-  # saving
-  f = open (base + '.tex', 'w')
-  f.write (text)
-  f.close ()
-
-# plot infolines with information about the simulation
-def plot_infolines (mlmc):
-  
-  '''
-  # text formatter
-  def format_text (text, subplots):
-    if not subplots and len(text) > 65:
-      cut_pos = len(text)/2
-      cut_pos = text.find(' ', cut_pos)
-      text = text[:cut_pos] + '\n' + ' ' * 9 + text[cut_pos:]
-    return text
-  
-  # CONF
-  text  = prefix + format_text('CONF:' + ???, subplots) + '\n'
-  
-  # OPTS
-  text += prefix + format_text('OPTS: ' + mlmc.options, subplots) + '\n'
-  
-  # INFO
-  [keys, captions, values] = getTexTableConfig (mlmc)
-  
-  string_info  = ' CLUSTER: ' + config ['cluster']
-  string_info += ', cores: ' + str(helpers.intf(int(config ['cores'])))
-  string_info += ', runtime: ' + config ['runtime']
-
-  text += prefix + format_text('INFO:' + string_info, subplots)
-  
-  # SAMPLES
-  samples_available = self.samples and (self.i.L != 0 or self.i.ML != 1 or self.i.READ_NUMBER_OF_SAMPLES_FROM_FILE)
-  if samples_available:
-    text += '\n' + prefix + 'SAMPLES: ' + str(self.samples[::-1])[1:-1]
-  
-  # MESH_LEVEL and TYPE
-  if level != None:
-    text += ' (only the %d-sample MC estimate from MESH_LEVEL=%d and TYPE=%d is displayed)' % (self.samples[level+type], level, type)
-  
-  # default parallelization
-  if self.default_parallelization:
-    if samples_available:
-      text += ' | '
-    else:
-      text += '\n'
-    text += 'PARALLELIZATION:'
-    for level in range(len(self.default_parallelization)):
-      text += ' ' + str(self.default_parallelization[level][3]) + 'x(' + str(self.default_parallelization[level][0])
-      if self.i.NY > 1: text += 'x' + str(self.default_parallelization[level][1])
-      if self.i.NZ > 1: text += 'x' + str(self.default_parallelization[level][2])
-      text += ')'
-  
-  return text
-  '''
-  return None
-
-def saveall (mlmc, save, qoi=None):
-  base_name = save[:-4]
-  if qoi != None:
-    base_name += '_' + qoi
-  # bug workaround
-  if base (qoi) == 'm' or base (qoi) == 'w':
-    base_name += '_'
-  pylab.savefig    (base_name + '.' + save[-3:])
-  pylab.savefig    (base_name + '.' + 'eps')
-  pylab.savefig    (base_name + '.' + 'png')
-  pylab.savefig    (base_name + '.' + 'pdf')
-  generateTexTable (mlmc, base_name)
-
-def draw (mlmc, save, qoi=None, legend=False, loc='best'):
-  
-  # reset xend_max
-  global xend_max
-  xend_max = None
-  
-  if legend or (qoi != None and '_pos' in qoi):
-    pylab.legend (loc = loc)
-  if save:
-    saveall (mlmc, save, qoi)
-  pylab.draw ()
-
-# show plots
-def show (block=1):
-
-  # show all figures
-  pylab.show (block=block)
-
-  # close all figures
-  # REMARK: does not work for some reason
-  if block:
-    print ' :: Closing figures...',
-    sys.stdout.flush()
-    import time
-    time.sleep (1)
-    pylab.close ('all')
-    time.sleep (1)
-    print 'done.'
-
-# query for action
-def query ():
-  raw_input ('Press ENTER to continue... ')
-  pylab.close ('all')
-
-# === domain related constants
-
-extent_x = 'N/A'
-extent_y = 'N/A'
-extent_z = 'N/A'
-surface  = 'N/A'
-xend_max = None
-
-def set_extent (e_x, e_y=None, e_z=None):
-  global extent_x
-  global extent_y
-  global extent_z
-  extent_x = e_x
-  extent_y = e_y if e_y != None else extent_x
-  extent_z = e_z if e_z != None else extent_x
-
-def set_surface (s):
-  global surface
-  surface = s
-
-# === plotting routines
-
 # filter
 def filter (vs, width):
   if width % 2 != 0:
@@ -520,1218 +324,1436 @@ def filter (vs, width):
   vs_cnv = numpy.convolve (window, vs_ext, mode='valid')
   return vs_cnv [width / 2 - 1 : len (vs_cnv) - width / 2]
 
-# plot a line indicating position
-def plot_helper_lines (qoi, run=1):
-  
-  if qoi == None:
-    return
+xend_max = None
 
-  pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+# main class for plotting using MatPlotLib
+class MatPlotLib (object):
 
-  if '_pos_d' in qoi:
-    if surface == 'N/A':
-      print
-      print
-      print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
-      print
-      sys.exit()
-    if surface != None:
-      pylab.axhline (y=surface,  color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
-      pylab.axhline (y=-surface, color='maroon', linestyle='--', alpha=alpha(run))
+  autosave = 0
 
-# adjust axes
-def adjust_axes (qoi, extent, xorigin, yorigin, xend=None, yend=None):
-  
-  # fit all existing data first
-  pylab.gca().axis ('auto')
-  
-  # adjust x-axis
-  if xorigin:
-    pylab.gca().set_xlim (left = 0)
+  extent_x = 'N/A'
+  extent_y = 'N/A'
+  extent_z = 'N/A'
+  surface  = 'N/A'
 
-  if xend != None:
-    global xend_max
-    if xend_max == None:
-      xend_max = xend
+  # initialization
+  def __init__ (self, mlmc):
+
+    self.mlmc = mlmc
+
+    print
+    print ' :: MatPlotLib plotting backend initialized.'
+    print
+
+  # === domain related constants
+
+  # extent of the domain
+  def set_extent (self, extent_x, extent_y=None, extent_z=None):
+
+    self.extent_x = extent_x
+    self.extent_y = extent_y if extent_y != None else self.extent_x
+    self.extent_z = extent_z if extent_z != None else self.extent_x
+
+  # surface of the object
+  def set_surface (self, surface):
+    self.surface = surface
+
+  # === LaTeX generation tools
+
+  # compute parameters needed for the generation of the TexTable
+  def getTexTableConfig (self):
+    
+    # config
+    
+    keys     =  ['grid_size', 'cores', 'runtime', 'cluster']
+    captions =  ['grid size', 'cores', 'runtime', 'cluster']
+    
+    # aggregation of information
+    
+    import time
+    
+    values               = {}
+    values ['grid_size'] = 'x'.join ( [ str(parameter) for parameter in self.mlmc.config.discretizations [mlmc.config.L] .values() ] )
+    values ['cores']     = self.mlmc.status.list ['parallelization']
+    values ['cluster']   = self.mlmc.status.list ['cluster']
+    
+    if self.mlmc.finished:
+      runtime = self.mlmc.mcs[mlmc.config.L].timer (batch=1) ['max']
+      values ['runtime'] = time.strftime ( '%H:%M:%S', time.gmtime (runtime) )
     else:
-      xend_max = max (xend, xend_max)
-    pylab.gca().set_xlim (right = xend_max)
-
-  # if extent is specified, use that
-  if extent:
-    pylab.ylim (*extent)
-
-  # otherwise perform some automatic axes modifications based on parameters
-  else:
+      values ['runtime'] = self.mlmc.status.list ['walltimes'] [-1] [0]
     
-    if yorigin:
-      pylab.gca().set_ylim (bottom = 0)
+    # number of levels
+
+    if self.mlmc.config.L != 0:
+      keys = ['L'] + keys
+      captions = [r'$L$'] + captions
+      values ['L'] = self.mlmc.config.L
     
-    if yend:
-      pylab.gca().set_ylim (top = yend)
+    return [keys, captions, values]
+
+  # generate TeX code with the table including information about the simulation
+  def generateTexTable (self, base):
+    
+    # check for valid mlmc simulation
+    if mlmc == None:
+      return
+    
+    # get the config
+    
+    [keys, captions, opts] = getTexTableConfig (mlmc)
+    
+    # TeX code generation
+    
+    columns =  '|' + 'c|' * len(keys)
+    
+    text =  '\n'
+    text += r'\begin{tabular}{%s}' % columns + '\n'
+    
+    text += r'\hline' + '\n'
+    text += (r'%s & ' * len(captions))[0:-2] % tuple(captions) + r'\\' + '\n'
+    text += r'\hline' + '\n'
+    text += (r'%s & ' * len(keys))[0:-2] % tuple([opts[key] for key in keys]) + r'\\' + '\n'
+    text += r'\hline' + '\n'
+    
+    text += r'\end{tabular}' + '\n'
+    
+    # saving
+    f = open (base + '.tex', 'w')
+    f.write (text)
+    f.close ()
+
+  # === plotting helpers
+
+  # plot infolines with information about the simulation
+  def infolines (self):
+    
+    '''
+    # text formatter
+    def format_text (text, subplots):
+      if not subplots and len(text) > 65:
+        cut_pos = len(text)/2
+        cut_pos = text.find(' ', cut_pos)
+        text = text[:cut_pos] + '\n' + ' ' * 9 + text[cut_pos:]
+      return text
+    
+    # CONF
+    text  = prefix + format_text('CONF:' + ???, subplots) + '\n'
+    
+    # OPTS
+    text += prefix + format_text('OPTS: ' + self.mlmc.options, subplots) + '\n'
+    
+    # INFO
+    [keys, captions, values] = getTexTableConfig (mlmc)
+    
+    string_info  = ' CLUSTER: ' + config ['cluster']
+    string_info += ', cores: ' + str(helpers.intf(int(config ['cores'])))
+    string_info += ', runtime: ' + config ['runtime']
+
+    text += prefix + format_text('INFO:' + string_info, subplots)
+    
+    # SAMPLES
+    samples_available = self.samples and (self.i.L != 0 or self.i.ML != 1 or self.i.READ_NUMBER_OF_SAMPLES_FROM_FILE)
+    if samples_available:
+      text += '\n' + prefix + 'SAMPLES: ' + str(self.samples[::-1])[1:-1]
+    
+    # MESH_LEVEL and TYPE
+    if level != None:
+      text += ' (only the %d-sample MC estimate from MESH_LEVEL=%d and TYPE=%d is displayed)' % (self.samples[level+type], level, type)
+    
+    # default parallelization
+    if self.default_parallelization:
+      if samples_available:
+        text += ' | '
+      else:
+        text += '\n'
+      text += 'PARALLELIZATION:'
+      for level in range(len(self.default_parallelization)):
+        text += ' ' + str(self.default_parallelization[level][3]) + 'x(' + str(self.default_parallelization[level][0])
+        if self.i.NY > 1: text += 'x' + str(self.default_parallelization[level][1])
+        if self.i.NZ > 1: text += 'x' + str(self.default_parallelization[level][2])
+        text += ')'
+    
+    return text
+    '''
+    return None
+
+  def saveall (self, save, qoi=None):
+    base_name = save[:-4]
+    if qoi != None:
+      base_name += '_' + qoi
+    # bug workaround
+    if base (qoi) == 'm' or base (qoi) == 'w':
+      base_name += '_'
+    pylab.savefig    (base_name + '.' + save[-3:])
+    pylab.savefig    (base_name + '.' + 'eps')
+    pylab.savefig    (base_name + '.' + 'png')
+    pylab.savefig    (base_name + '.' + 'pdf')
+    generateTexTable (base_name)
+
+  def draw (self, save, qoi=None, legend=False, loc='best', suffix='autosave'):
+    
+    # reset xend_max
+    global xend_max
+    xend_max = None
+    
+    if legend or (qoi != None and '_pos' in qoi):
+      pylab.legend (loc = loc)
+    if save:
+      self.saveall (save, qoi)
+    elif autosave:
+      self.saveall (figname (suffix), qoi)
+    pylab.draw ()
+
+  # show plots
+  def show (self, block=1):
+
+    # show all figures
+    pylab.show (block=block)
+
+    # close all figures
+    # REMARK: does not work for some reason
+    if block:
+      print ' :: Closing figures...',
+      sys.stdout.flush()
+      import time
+      time.sleep (1)
+      pylab.close ('all')
+      time.sleep (1)
+      print 'done.'
+
+  # query for action
+  def query (self):
+    raw_input ('Press ENTER to continue... ')
+    pylab.close ('all')
+
+  # === plotting routines
+
+  # plot a line indicating position
+  def helper_lines (self, qoi, run=1):
     
     if qoi == None:
       return
-  
-    # this should be perfomed _only_ if data is too close
-    #pylab.gca().set_ylim (top = 1.05 * pylab.ylim() [1])
+
+    pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+
+    if '_pos_d' in qoi:
+      if surface == 'N/A':
+        print
+        print
+        print ' :: ERROR: \'pymlmc.plot.surface\' not set.'
+        print
+        sys.exit()
+      if surface != None:
+        pylab.axhline (y=surface,  color='maroon', linestyle='--', alpha=alpha(run), label='cloud surface')
+        pylab.axhline (y=-surface, color='maroon', linestyle='--', alpha=alpha(run))
+
+  # adjust axes
+  def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None):
     
-    ylim = pylab.ylim() [1]
+    # fit all existing data first
+    pylab.gca().axis ('auto')
+    
+    # adjust x-axis
+    if xorigin:
+      pylab.gca().set_xlim (left = 0)
 
-    if '_pos_d' in qoi and surface != None:
-      pylab.gca().set_ylim (top = 1.05 * surface)
-      #pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
+    if xend != None:
+      global xend_max
+      if xend_max == None:
+        xend_max = xend
+      else:
+        xend_max = max (xend, xend_max)
+      pylab.gca().set_xlim (right = xend_max)
 
-    if '_pos_x' in qoi and extent_x != None:
-      pylab.gca().set_ylim (top = max (extent_x, ylim))
-    if '_pos_y' in qoi and extent_y != None:
-      pylab.gca().set_ylim (top = max (extent_y, ylim))
-    if '_pos_z' in qoi and extent_z != None:
-      pylab.gca().set_ylim (top = max (extent_z, ylim))
+    # if extent is specified, use that
+    if extent:
+      pylab.ylim (*extent)
 
-# plot histogram
-def plot_histogram (qoi, stat, log=0):
+    # otherwise perform some automatic axes modifications based on parameters
+    else:
+      
+      if yorigin:
+        pylab.gca().set_ylim (bottom = 0)
+      
+      if yend:
+        pylab.gca().set_ylim (top = yend)
+      
+      if qoi == None:
+        return
+    
+      # this should be perfomed _only_ if data is too close
+      #pylab.gca().set_ylim (top = 1.05 * pylab.ylim() [1])
+      
+      ylim = pylab.ylim() [1]
 
-  ts = numpy.array ( stat.meta ['t'] )
-  ys = numpy.array ( stat.meta ['bins'] )
-  vs = numpy.array ( stat.data [qoi] )
+      if '_pos_d' in qoi and surface != None:
+        pylab.gca().set_ylim (top = 1.05 * surface)
+        #pylab.gca().set_ylim (top = max (1.05 * surface, ylim))
 
-  vmax = numpy.max (numpy.max (vs))
+      if '_pos_x' in qoi and extent_x != None:
+        pylab.gca().set_ylim (top = max (extent_x, ylim))
+      if '_pos_y' in qoi and extent_y != None:
+        pylab.gca().set_ylim (top = max (extent_y, ylim))
+      if '_pos_z' in qoi and extent_z != None:
+        pylab.gca().set_ylim (top = max (extent_z, ylim))
 
-  if log:
-    from matplotlib.colors import LogNorm
-    norm = LogNorm (vmin=0, vmax=vmax)
-    vmin = 1
-  else:
-    norm = None
-    vmin = 0
-
-  # TODO: cmap should be based on 'color(qoi)'
-
-  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
-
-# plot shells
-def plot_shells (qois, stat, extent, log=0):
-
-  ts = numpy.array ( stat.meta ['t'] )
-
-  # construct array consisting of all shells
-  vs = numpy.array ( ( len (ts), len (qois) ) , dtype=float )
-  for shell, qoi in enumerate (qois):
-    ys [shell]    = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
-    vs [ : shell] = numpy.array ( stat.data [qoi] )
-
-  vmax = extent [1]
-
-  if log:
-    from matplotlib.colors import LogNorm
-    norm = LogNorm (vmin=0, vmax=vmax)
-    vmin = 1
-  else:
-    norm = None
-    vmin = extent [0]
-
-  # TODO: cmap should be based on 'color(qoi)'
-
-  pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
-
-# plot each stat
-def plot_stats (qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
-  
-  percentiles = []
-  adjust = 1
-
-  for name, stat in stats.iteritems():
-
-    if name == 'histogram':
-      plot_histogram (qoi, stats [name])
-      break
-
-    if 'shell' in qoi:
-      qois = [ q for q in stats [name] .data.keys() if qoi in q ]
-      compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
-      qois.sort (compare)
-      plot_shells (qois, stat, extent)
-      adjust = 0
-      break
+  # plot histogram
+  def histogram (self, qoi, stat, log=0):
 
     ts = numpy.array ( stat.meta ['t'] )
+    ys = numpy.array ( stat.meta ['bins'] )
     vs = numpy.array ( stat.data [qoi] )
-    
-    # exclude first data point, if we are dealing with positions
-    if '_pos' in qoi:
-      ts = ts [1:]
-      vs = vs [1:]
 
-    # stat-specific plotting: std. deviation
-    if name == 'std. deviation' and 'mean' in stats:
-      ms = numpy.array ( stats ['mean'] .data [qoi] )
+    vmax = numpy.max (numpy.max (vs))
+
+    if log:
+      from matplotlib.colors import LogNorm
+      norm = LogNorm (vmin=0, vmax=vmax)
+      vmin = 1
+    else:
+      norm = None
+      vmin = 0
+
+    # TODO: cmap should be based on 'color(qoi)'
+
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+
+  # gather all shell qois for assembly
+  def gather_shell_qois (self, shells):
+
+    extra = []
+
+    for shell in shells:
+      for qoi in self.mlmc.mcs [0].results [0] .data.keys():
+        if qoi.find (shell) == 0:
+          extra.append (qoi)
+
+    return extra
+
+  # plot shells
+  def shells (self, qois, stat, extent, log=0):
+
+    ts = numpy.array ( stat.meta ['t'] )
+
+    # construct array consisting of all shells
+    ys = numpy.array ( len (qois) )
+    vs = numpy.array ( ( len (ts), len (qois) ) , dtype=float )
+    for shell, qoi in enumerate (qois):
+      ys [shell]    = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
+      vs [ : shell] = numpy.array ( stat.data [qoi] )
+
+    vmax = extent [1]
+
+    if log:
+      from matplotlib.colors import LogNorm
+      norm = LogNorm (vmin=0, vmax=vmax)
+      vmin = 1
+    else:
+      norm = None
+      vmin = extent [0]
+
+    # TODO: cmap should be based on 'color(qoi)'
+
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+
+  # plot each stat
+  def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
+    
+    percentiles = []
+    adjust = 1
+
+    for name, stat in stats.iteritems():
+
+      if name == 'histogram':
+        self.histogram (qoi, stats [name])
+        break
+
+      if 'shell' in qoi:
+        qois = [ q for q in stats [name] .data.keys() if qoi in q ]
+        compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
+        qois.sort (compare)
+        self.shells (qois, stat, extent)
+        adjust = 0
+        break
+
+      ts = numpy.array ( stat.meta ['t'] )
+      vs = numpy.array ( stat.data [qoi] )
+      
+      # exclude first data point, if we are dealing with positions
+      if '_pos' in qoi:
+        ts = ts [1:]
+        vs = vs [1:]
+
+      # stat-specific plotting: std. deviation
+      if name == 'std. deviation' and 'mean' in stats:
+        ms = numpy.array ( stats ['mean'] .data [qoi] )
+        bright = brighten(color(qoi), factor=0.7)
+        pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
+        # hack to show the legend entry
+        pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
+      
+      # collect percentiles for later fill
+      elif 'percentile' in name:
+        percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
+      
+      # general plotting
+      else:
+        pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
+    
+    # plot percentiles
+    if percentiles != []:
+
+      if len (percentiles) != 2:
+        print
+        print ' :: ERROR: Only two percentiles can be plotted at a time.'
+        print
+        print sys.exit()
+      
+      lower  = percentiles [0] ['vs']
+      upper  = percentiles [1] ['vs']
+      ts     = percentiles [0] ['ts']
+      levels = [ percentile ['level'] for percentile in percentiles ]
+      label  = 'confidence %d%% - %d%%' % ( min (levels), max (levels) )
+
       bright = brighten(color(qoi), factor=0.7)
-      pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
+      pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
       # hack to show the legend entry
-      pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
+      pylab.plot([], [], color=bright, linewidth=10, label=label)
+
+    if adjust:
+      self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
-    # collect percentiles for later fill
-    elif 'percentile' in name:
-      percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
+    pylab.xlabel (xlabel)
+    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
     
-    # general plotting
-    else:
-      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
-  
-  # plot percentiles
-  if percentiles != []:
-
-    if len (percentiles) != 2:
-      print
-      print ' :: ERROR: Only two percentiles can be plotted at a time.'
-      print
-      print sys.exit()
+    self.helper_lines (qoi, run)
     
-    lower  = percentiles [0] ['vs']
-    upper  = percentiles [1] ['vs']
-    ts     = percentiles [0] ['ts']
-    levels = [ percentile ['level'] for percentile in percentiles ]
-    label  = 'confidence %d%% - %d%%' % ( min (levels), max (levels) )
+    if legend:
+      pylab.legend (loc='best')
 
-    bright = brighten(color(qoi), factor=0.7)
-    pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
-    # hack to show the legend entry
-    pylab.plot([], [], color=bright, linewidth=10, label=label)
+  # plot computed MC estimators of statistics
+  def mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
-  if adjust:
-    adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
-  
-  pylab.xlabel (xlabel)
-  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-  
-  plot_helper_lines (qoi, run)
-  
-  if legend:
-    pylab.legend (loc='best')
+    if not qoi: qoi = self.mlmc.config.solver.qoi
 
-# plot computed MC estimators of statistics
-def plot_mcs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+    print ' :: INFO: Plotting MC estimates of \'%s\'...' % qoi,
+    sys.stdout.flush()
 
-  if not qoi: qoi = mlmc.config.solver.qoi
+    levels = len (self.mlmc.config.levels)
 
-  print ' :: INFO: Plotting MC estimates of \'%s\'...' % qoi,
-  sys.stdout.flush()
-
-  levels = len (mlmc.config.levels)
-
-  if not frame:
-    figure (infolines, subplots=levels)
-
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-
-  for mc in mlmc.mcs:
-
-    if mc.config.type != mlmc.config.FINE:
-      continue
-
-    pylab.subplot ( 1, levels, mc.config.level + 1 )
-    pylab.title ( 'level %d' % mc.config.level )
-    if mc.available:
-      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines, subplots=levels)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot computed MC estimators of statistics
-def plot_mc (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
-
-  # some dynamic values
-  if level  == 'finest':   level = mlmc.config.L
-  if level  == 'coarsest': level = 0
-
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting MC estimates of \'%s\' for level %d...' % (qoi, level),
-  sys.stdout.flush()
-
-  levels = len (mlmc.config.levels)
-
-  if not frame:
-    figure (infolines)
-
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-
-  mc = mlmc.mcs [ mlmc.config.pick [level] [type] ]
-  if mc.available:
-    plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot computed MC estimators of statistics for both types
-def plot_mcs_both (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
-  
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting MC estimates (both types) of \'%s\'...' % qoi,
-  sys.stdout.flush()
-  
-  levels = len (mlmc.config.levels)
-  
-  if not frame:
-    if infolines:
-      pylab.figure (figsize=(levels*6, 4+5))
-    else:
-      pylab.figure (figsize=(levels*6, 2*4))
-  
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-  
-  for mc in mlmc.mcs:
-    
-    typestr = ['fine', 'coarse'] [mc.config.type]
-    pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
-    pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
-    if mc.available:
-      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
-  
-  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  pylab.subplot (2, levels, 1 + levels)
-  pylab.legend (handles, labels, loc='center')
-  pylab.axis('off')
-
-  '''
-  pylab.subplots_adjust (top=0.95)
-  pylab.subplots_adjust (right=0.97)
-  pylab.subplots_adjust (left=0.05)
-
-  if infolines:
-  plot_infolines (self)
-  pylab.subplots_adjust (bottom=0.10)
-  else:
-  pylab.subplots_adjust (bottom=0.05)
-  '''
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot computed differences of MC estimators
-def plot_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
-
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
-  sys.stdout.flush()
-
-  if mlmc.config.L == 0:
-    print 'skipped (since L=0).'
-    return
-
-  if not frame:
-    figure (infolines, subplots=mlmc.config.L)
-
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-
-  if extent:
-    extent_range = extent [1] - extent [0]
-    extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
-  elif '_pos_d' in qoi:
-    extent_diff = ( - 1.05 * surface, 1.05 * surface )
-  else:
-    extent_diff = None
-
-  for level, diff in enumerate (mlmc.diffs):
-
-    if level == 0: continue
-    pylab.subplot ( 1, mlmc.config.L, level)
-    pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    if mlmc.config.samples.counts.loaded [level]:
-      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
-
-  '''
-  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  pylab.subplot (2, levels, 1 + levels)
-  pylab.legend (handles, labels, loc='center')
-  pylab.axis('off')
-  '''
-
-  '''
-  pylab.subplots_adjust (top=0.95)
-  pylab.subplots_adjust (right=0.97)
-  pylab.subplots_adjust (left=0.05)
-
-  if infolines:
-    plot_infolines (self)
-    pylab.subplots_adjust (bottom=0.10)
-  else:
-    pylab.subplots_adjust (bottom=0.05)
-  '''
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines, subplots=mlmc.config.L)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot computed MC estimators and their differences
-def plot_mc_and_diffs (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
-
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting MC estimates AND differences of \'%s\'...' % qoi,
-  sys.stdout.flush()
-
-  levels = len (mlmc.config.levels)
-
-  if not frame:
-    if infolines:
-      pylab.figure (figsize=(levels*6, 4+5))
-    else:
-      pylab.figure (figsize=(levels*6, 2*4))
-
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-
-  # MC estimates for each level (only type = 0)
-  for mc in mlmc.mcs:
-
-    if mc.config.type != 0:
-      continue
-
-    pylab.subplot ( 2, levels, mc.config.level + 1 )
-    pylab.title ( 'level %d' % mc.config.level )
-    if mc.available:
-      plot_stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
-
-  if extent:
-    extent_range = extent [1] - extent [0]
-    extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
-  elif '_pos_d' in qoi:
-    extent_diff = ( - 1.05 * surface, 1.05 * surface )
-  else:
-    extent_diff = None
-
-  # differences of MC estimates
-  for level, diff in enumerate (mlmc.diffs):
-
-    if level == 0:
-      continue
-
-    pylab.subplot ( 2, levels, level + 1 + levels )
-    pylab.title ( 'level %d - level %d' % (level, level - 1) )
-    if mlmc.config.samples.loaded:
-      plot_stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
-
-  handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-  pylab.subplot (2, levels, 1 + levels)
-  pylab.legend (handles, labels, loc='center')
-  pylab.axis('off')
-
-  '''
-  pylab.subplots_adjust (top=0.95)
-  pylab.subplots_adjust (right=0.97)
-  pylab.subplots_adjust (left=0.05)
-
-  if infolines:
-    plot_infolines (self)
-    pylab.subplots_adjust (bottom=0.10)
-  else:
-    pylab.subplots_adjust (bottom=0.05)
-  '''
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot computed MLMC statistics
-def plot_mlmc (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
-  
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
-  sys.stdout.flush()
-  
-  if not mlmc.available:
-    print ' NOT available.'
-    return
-
-  if not frame:
-    figure (infolines)
-  
-  xlabel = '%s [%s]' % (name('t'), unit('t'))
-  pylab.title ( 'estimated statistics for %s' % qoi )
-  plot_stats (qoi, mlmc.stats, extent, xorigin, yorigin, xlabel, run)
-
-  if infolines:
-    plot_infolines (self)
-
-  adjust (infolines)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot results of one sample of the specified level and type
-def plot_sample (mlmc, level, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
-  
-  # some dynamic values
-  if level  == 'finest':   level = mlmc.config.L
-  if level  == 'coarsest': level = 0
-  
-  if not qoi: qoi = mlmc.config.solver.qoi
-
-  print ' :: INFO: Plotting sample of \'%s\' for level %d and type %d...' % (qoi, level, type),
-  sys.stdout.flush()
-
-  if trendline == None:
-    if '_pos' in qoi:
-      trendline = 1
-    else:
-      trendline = 0
-
-  results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
-  
-  ts = numpy.array ( results.meta ['t'] )
-  vs = numpy.array ( results.data [qoi] )
-  
-  # energy filter
-  if base (qoi) == 'e':
-    positions = []
-    if '_pos_d_x' in qoi:
-      max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
-      positions = numpy.argwhere (vs > 0.9 * max_d_x)
-    elif '_pos_d_y' in qoi:
-      max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
-      positions = numpy.argwhere (vs > 0.9 * max_d_y)
-    elif '_pos_d_z' in qoi:
-      max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
-      positions = numpy.argwhere (vs > 0.9 * max_d_z)
-    elif '_pos_d' in qoi:
-      max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
-      positions = numpy.argwhere (vs > 0.9 * max_d)
-    ts = numpy.delete (ts, positions)
-    vs = numpy.delete (vs, positions)
-  
-  # exclude first data point, if we are dealing with positions or vorticities
-  if '_pos' in qoi or base (qoi) == 'W':
-    ts = ts [1:]
-    vs = vs [1:]
-
-  # exclude more first data points for positions of densities
-  if '_pos' in qoi and base (qoi) == 'r':
-    ts = ts [3:]
-    vs = vs [3:]
-  
-  if not frame:
-    figure (infolines, subplots=1)
-
-  if label == None:
-    if '_pos' in qoi:
-      label = 'distance'
-    elif not frame:
-      label = None
-    elif not label:
-      label = name (qoi)
-
-  if not (trendline and frame):
-    pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=label)
-
-  # add trendline (if specified or if dealing with positions)
-  if trendline:
-    ls = filter (vs, width=smoothen)
     if not frame:
-      label = 'trendline'
-    if len (ls) == len (ts):
-      pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), alpha=alpha(run), label=label)
-    else:
-      print
-      print ' :: WARNING: computing trendline failed (NaN\'s present? Too short?)'
+      figure (infolines, subplots=levels)
 
-  if not mlmc.config.deterministic:
-    pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
 
-  pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
-  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-  
-  plot_helper_lines (qoi, run)
-  
-  adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
-  
-  if infolines:
-    plot_infolines (self)
-  
-  adjust (infolines)
-  
-  if not frame:
-    draw (mlmc, save, qoi)
+    for mc in self.mlmc.mcs:
 
-# plot the first sample of the finest level and type 0
-# used mainly for deterministic runs
-def plot (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
-  
-  level  = 'finest'
-  type   = 0
-  sample = 0
-  
-  plot_sample (mlmc, level, type, sample, qoi, infolines, extent, xorigin, yorigin, run, trendline, smoothen, label, frame, save)
-  
-  print ' done.'
+      if mc.config.type != self.mlmc.config.FINE:
+        continue
 
-# plot results of all samples (ensemble) of the specified level and type 
-def plot_ensemble (mlmc, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=1024, save=None):
-  
-  # some dynamic values
-  if level  == 'finest':   level  = mlmc.config.L
-  if level  == 'coarsest': level  = 0
-  
-  if not qoi: qoi = mlmc.config.solver.qoi
+      pylab.subplot ( 1, levels, mc.config.level + 1 )
+      pylab.title ( 'level %d' % mc.config.level )
+      if mc.available:
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
-  print ' :: INFO: Plotting ensemble of \'%s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
-  sys.stdout.flush()
+    if infolines:
+      self.infolines ()
 
-  xend = float('nan')
+    adjust (infolines, subplots=levels)
 
-  figure (infolines, subplots=1)
+    if not frame:
+      self.draw (save, qoi, suffix='stats_mcs')
 
-  count = 0
-  for sample in mlmc.config.samples.indices.loaded [level]:
+    print ' done.'
 
-    if count == limit:
-      break
+  # plot computed MC estimators of statistics
+  def mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+    # some dynamic values
+    if level  == 'finest':   level = self.mlmc.config.L
+    if level  == 'coarsest': level = 0
+
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting MC estimates of \'%s\' for level %d...' % (qoi, level),
+    sys.stdout.flush()
+
+    levels = len (self.mlmc.config.levels)
+
+    if not frame:
+      figure (infolines)
+
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+    mc = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ]
+    if mc.available:
+      self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
+
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines)
+
+    if not frame:
+      self.draw (save, qoi, suffix='stats_mc')
+
+    print ' done.'
+
+  # plot computed MC estimators of statistics for both types
+  def mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
     
-    results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
+    if not qoi: qoi = self.mlmc.config.solver.qoi
 
-    if results == None:
-      continue
+    print ' :: INFO: Plotting MC estimates (both types) of \'%s\'...' % qoi,
+    sys.stdout.flush()
+    
+    levels = len (self.mlmc.config.levels)
+    
+    if not frame:
+      if infolines:
+        pylab.figure (figsize=(levels*6, 4+5))
+      else:
+        pylab.figure (figsize=(levels*6, 2*4))
+    
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
+    
+    for mc in self.mlmc.mcs:
+      
+      typestr = ['fine', 'coarse'] [mc.config.type]
+      pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
+      pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
+      if mc.available:
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+    
+    handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+    pylab.subplot (2, levels, 1 + levels)
+    pylab.legend (handles, labels, loc='center')
+    pylab.axis('off')
+
+    '''
+    pylab.subplots_adjust (top=0.95)
+    pylab.subplots_adjust (right=0.97)
+    pylab.subplots_adjust (left=0.05)
+
+    if infolines:
+    self.infolines ()
+    pylab.subplots_adjust (bottom=0.10)
     else:
-      count += 1
+    pylab.subplots_adjust (bottom=0.05)
+    '''
 
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines)
+
+    if not frame:
+      self.draw (save, qoi, suffix='stats_mcs_both')
+
+    print ' done.'
+
+  # plot computed differences of MC estimators
+  def diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
+
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting differences of MC estimates of \'%s\'...' % qoi,
+    sys.stdout.flush()
+
+    if self.mlmc.config.L == 0:
+      print 'skipped (since L=0).'
+      return
+
+    if not frame:
+      figure (infolines, subplots=self.mlmc.config.L)
+
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+    if extent:
+      extent_range = extent [1] - extent [0]
+      extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
+    elif '_pos_d' in qoi:
+      extent_diff = ( - 1.05 * surface, 1.05 * surface )
+    else:
+      extent_diff = None
+
+    for level, diff in enumerate (self.mlmc.diffs):
+
+      if level == 0: continue
+      pylab.subplot ( 1, self.mlmc.config.L, level)
+      pylab.title ( 'level %d - level %d' % (level, level - 1) )
+      if self.mlmc.config.samples.counts.loaded [level]:
+        self.stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+
+    '''
+    handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+    pylab.subplot (2, levels, 1 + levels)
+    pylab.legend (handles, labels, loc='center')
+    pylab.axis('off')
+    '''
+
+    '''
+    pylab.subplots_adjust (top=0.95)
+    pylab.subplots_adjust (right=0.97)
+    pylab.subplots_adjust (left=0.05)
+
+    if infolines:
+      self.infolines ()
+      pylab.subplots_adjust (bottom=0.10)
+    else:
+      pylab.subplots_adjust (bottom=0.05)
+    '''
+
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines, subplots=self.mlmc.config.L)
+
+    if not frame:
+      self.draw (save, qoi, suffix='stats_diffs')
+
+    print ' done.'
+
+  # plot computed MC estimators and their differences
+  def mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting MC estimates AND differences of \'%s\'...' % qoi,
+    sys.stdout.flush()
+
+    levels = len (self.mlmc.config.levels)
+
+    if not frame:
+      if infolines:
+        pylab.figure (figsize=(levels*6, 4+5))
+      else:
+        pylab.figure (figsize=(levels*6, 2*4))
+
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
+
+    # MC estimates for each level (only type = 0)
+    for mc in self.mlmc.mcs:
+
+      if mc.config.type != 0:
+        continue
+
+      pylab.subplot ( 2, levels, mc.config.level + 1 )
+      pylab.title ( 'level %d' % mc.config.level )
+      if mc.available:
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+
+    if extent:
+      extent_range = extent [1] - extent [0]
+      extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
+    elif '_pos_d' in qoi:
+      extent_diff = ( - 1.05 * surface, 1.05 * surface )
+    else:
+      extent_diff = None
+
+    # differences of MC estimates
+    for level, diff in enumerate (self.mlmc.diffs):
+
+      if level == 0:
+        continue
+
+      pylab.subplot ( 2, levels, level + 1 + levels )
+      pylab.title ( 'level %d - level %d' % (level, level - 1) )
+      if self.mlmc.config.samples.loaded:
+        self.stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+
+    handles, labels = pylab.gcf().gca().get_legend_handles_labels()
+    pylab.subplot (2, levels, 1 + levels)
+    pylab.legend (handles, labels, loc='center')
+    pylab.axis('off')
+
+    '''
+    pylab.subplots_adjust (top=0.95)
+    pylab.subplots_adjust (right=0.97)
+    pylab.subplots_adjust (left=0.05)
+
+    if infolines:
+      self.infolines ()
+      pylab.subplots_adjust (bottom=0.10)
+    else:
+      pylab.subplots_adjust (bottom=0.05)
+    '''
+
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines)
+
+    if not frame:
+      self.draw (save, qoi, suffix='stats_mcs_and_diffs')
+
+    print ' done.'
+
+  # plot computed MLMC statistics
+  def mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+    
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting MLMC estimates of \'%s\'...' % qoi,
+    sys.stdout.flush()
+    
+    if not self.mlmc.available:
+      print ' NOT available.'
+      return
+
+    if not frame:
+      figure (infolines)
+    
+    xlabel = '%s [%s]' % (name('t'), unit('t'))
+    pylab.title ( 'estimated statistics for %s' % qoi )
+    self.stats (qoi, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
+
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines)
+
+    if not frame:
+      self.draw (save, qoi, suffix='stats_mlmc')
+
+    print ' done.'
+
+  # plot results of one sample of the specified level and type
+  def sample (self, level, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
+    
+    # some dynamic values
+    if level  == 'finest':   level = self.mlmc.config.L
+    if level  == 'coarsest': level = 0
+    
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting sample of \'%s\' for level %d and type %d...' % (qoi, level, type),
+    sys.stdout.flush()
+
+    if trendline == None:
+      if '_pos' in qoi:
+        trendline = 1
+      else:
+        trendline = 0
+
+    results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
+    
     ts = numpy.array ( results.meta ['t'] )
     vs = numpy.array ( results.data [qoi] )
-
-    xend = max (xend, numpy.max(ts))
     
-    # exclude first data point, if we are dealing with positions
-    if '_pos' in qoi:
+    # energy filter
+    if base (qoi) == 'e':
+      positions = []
+      if '_pos_d_x' in qoi:
+        max_d_x = 0.5 * numpy.sqrt (extent_y ** 2 + extent_z ** 2)
+        positions = numpy.argwhere (vs > 0.9 * max_d_x)
+      elif '_pos_d_y' in qoi:
+        max_d_y = 0.5 * numpy.sqrt (extent_x ** 2 + extent_z ** 2)
+        positions = numpy.argwhere (vs > 0.9 * max_d_y)
+      elif '_pos_d_z' in qoi:
+        max_d_z = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2)
+        positions = numpy.argwhere (vs > 0.9 * max_d_z)
+      elif '_pos_d' in qoi:
+        max_d = 0.5 * numpy.sqrt (extent_x ** 2 + extent_y ** 2 + extent_z ** 2)
+        positions = numpy.argwhere (vs > 0.9 * max_d)
+      ts = numpy.delete (ts, positions)
+      vs = numpy.delete (vs, positions)
+    
+    # exclude first data point, if we are dealing with positions or vorticities
+    if '_pos' in qoi or base (qoi) == 'W':
       ts = ts [1:]
       vs = vs [1:]
+
+    # exclude more first data points for positions of densities
+    if '_pos' in qoi and base (qoi) == 'r':
+      ts = ts [3:]
+      vs = vs [3:]
     
-    pylab.plot  (ts, vs, label=str(sample), linewidth=1)
-  
-  pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
-  
-  pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
-  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-  
-  plot_helper_lines (qoi)
-  
-  adjust_axes (qoi, extent, xorigin, yorigin) #, xend=xend) # xend does not work when failed jobs are present
-  
-  if min (limit, mlmc.config.samples.counts.loaded [level]) <= legend:
-    pylab.legend (loc='best')
-  
-  if infolines:
-    plot_infolines (self)
-  
-  adjust (infolines)
-  
-  draw (mlmc, save, qoi)
-  
-  print ' done.'
+    if not frame:
+      figure (infolines, subplots=1)
 
-# plot results of all samples (ensemble) of all levels
-def plot_ensembles (mlmc, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, valid=False, save=None):
+    if label == None:
+      if '_pos' in qoi:
+        label = 'distance'
+      elif not frame:
+        label = None
+      elif not label:
+        label = name (qoi)
 
-  if not qoi: qoi = mlmc.config.solver.qoi
+    if not (trendline and frame):
+      pylab.plot  (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=label)
 
-  print ' :: INFO: Plotting ensembles of \'%-20s\' for all levels (limit set to %d)...' % (qoi, limit),
-  sys.stdout.flush()
+    # add trendline (if specified or if dealing with positions)
+    if trendline:
+      ls = filter (vs, width=smoothen)
+      if not frame:
+        label = 'trendline'
+      if len (ls) == len (ts):
+        pylab.plot  (ts, ls, color=color('trendline'), linestyle=style(run), alpha=alpha(run), label=label)
+      else:
+        print
+        print ' :: WARNING: computing trendline failed (NaN\'s present? Too short?)'
 
-  levels = len (mlmc.config.levels)
+    if not self.mlmc.config.deterministic:
+      pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
 
-  figure (infolines, subplots=levels)
+    pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
+    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+    
+    self.helper_lines (qoi, run)
+    
+    self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
+    
+    if infolines:
+      self.infolines ()
+    
+    adjust (infolines)
+    
+    if not frame:
+      self.draw (save, qoi, suffix='sample_%d_%d_%d' (level, type, sample))
 
-  for level in mlmc.config.levels:
+  # plot the first sample of the finest level and type 0
+  # used mainly for deterministic runs
+  def plot (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, trendline=None, smoothen=41, label=None, frame=False, save=None):
+    
+    level  = 'finest'
+    type   = 0
+    sample = 0
+    
+    self.sample (level, type, sample, qoi, infolines, extent, xorigin, yorigin, run, trendline, smoothen, label, frame, save)
+    
+    print ' done.'
 
-    pylab.subplot ( 1, levels, level + 1 )
-    pylab.title ( 'samples of level %d' % level )
+  # plot results of all samples (ensemble) of the specified level and type 
+  def ensemble (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, legend=4, limit=1024, save=None):
+    
+    # some dynamic values
+    if level  == 'finest':   level  = self.mlmc.config.L
+    if level  == 'coarsest': level  = 0
+    
+    if not qoi: qoi = self.mlmc.config.solver.qoi
+
+    print ' :: INFO: Plotting ensemble of \'%s\' for level %d and type %d (limit set to %d)...' % (qoi, level, type, limit),
+    sys.stdout.flush()
 
     xend = float('nan')
 
-    count = 0
-    for sample in range (mlmc.config.samples.counts.computed [level]):
+    figure (infolines, subplots=1)
 
-      if valid and sample in mlmc.config.indices.invalid [level]:
-        continue
+    count = 0
+    for sample in self.mlmc.config.samples.indices.loaded [level]:
 
       if count == limit:
         break
+      
+      results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
 
-      for type in mlmc.config.types (level):
+      if results == None:
+        continue
+      else:
+        count += 1
 
-        results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
+      ts = numpy.array ( results.meta ['t'] )
+      vs = numpy.array ( results.data [qoi] )
 
-        if results == None:
-          continue
-        else:
-          count += 1
-
-        ts = numpy.array ( results.meta ['t'] )
-        vs = numpy.array ( results.data [qoi]  )
-
-        xend = max (xend, numpy.max(ts))
-
-        # exclude first data point, if we are dealing with positions
-        if '_pos' in qoi:
-          ts = ts [1:]
-          vs = vs [1:]
-        
-        if type == mlmc.config.FINE:
-          line, = pylab.plot  (ts, vs, linewidth=1, alpha=1.0 )
-        else:
-          pylab.plot  (ts, vs, linewidth=1, alpha=0.3, color=line.get_color() )
+      xend = max (xend, numpy.max(ts))
+      
+      # exclude first data point, if we are dealing with positions
+      if '_pos' in qoi:
+        ts = ts [1:]
+        vs = vs [1:]
+      
+      pylab.plot  (ts, vs, label=str(sample), linewidth=1)
+    
+    pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
     
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-    pylab.title ( '%s at level %d' % (name(qoi), level) )
+    
+    self.helper_lines (qoi)
+    
+    self.adjust_axes (qoi, extent, xorigin, yorigin) #, xend=xend) # xend does not work when failed jobs are present
+    
+    if min (limit, self.mlmc.config.samples.counts.loaded [level]) <= legend:
+      pylab.legend (loc='best')
+    
+    if infolines:
+      self.infolines ()
+    
+    adjust (infolines)
+    
+    self.draw (save, qoi, suffix='ensemble_%d_%d' % (level, type))
+    
+    print ' done.'
 
-    plot_helper_lines (qoi)
+  # plot results of all samples (ensemble) of all levels
+  def ensembles (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, valid=False, save=None):
 
-    adjust_axes (qoi, extent, xorigin, yorigin)#, xend=xend) # xend does not work when failed jobs are present
+    if not qoi: qoi = self.mlmc.config.solver.qoi
 
-  if infolines:
-    plot_infolines (self)
+    print ' :: INFO: Plotting ensembles of \'%-20s\' for all levels (limit set to %d)...' % (qoi, limit),
+    sys.stdout.flush()
 
-  adjust (infolines, subplots=levels)
+    levels = len (self.mlmc.config.levels)
 
-  draw (mlmc, save, qoi)
+    figure (infolines, subplots=levels)
 
-  print ' done.'
+    for level in self.mlmc.config.levels:
 
-def plot_diagram (solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
-  
-  if not qoi: qoi = solver.qoi
+      pylab.subplot ( 1, levels, level + 1 )
+      pylab.title ( 'samples of level %d' % level )
 
-  print ' :: INFO: Plotting diagram of \'%-20s\'...' % qoi,
-  sys.stdout.flush()
-  
-  vs = []
-  for outputfilename in outputfilenames:
-    results = solver.load (file=outputfilename)
-    if '_time' in qoi:
-      vs.append ( results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ] )
+      xend = float('nan')
+
+      count = 0
+      for sample in range (self.mlmc.config.samples.counts.computed [level]):
+
+        if valid and sample in self.mlmc.config.indices.invalid [level]:
+          continue
+
+        if count == limit:
+          break
+
+        for type in self.mlmc.config.types (level):
+
+          results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
+
+          if results == None:
+            continue
+          else:
+            count += 1
+
+          ts = numpy.array ( results.meta ['t'] )
+          vs = numpy.array ( results.data [qoi]  )
+
+          xend = max (xend, numpy.max(ts))
+
+          # exclude first data point, if we are dealing with positions
+          if '_pos' in qoi:
+            ts = ts [1:]
+            vs = vs [1:]
+          
+          if type == self.mlmc.config.FINE:
+            line, = pylab.plot  (ts, vs, linewidth=1, alpha=1.0 )
+          else:
+            pylab.plot  (ts, vs, linewidth=1, alpha=0.3, color=line.get_color() )
+      
+      pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
+      pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+      pylab.title ( '%s at level %d' % (name(qoi), level) )
+
+      self.helper_lines (qoi)
+
+      self.adjust_axes (qoi, extent, xorigin, yorigin)#, xend=xend) # xend does not work when failed jobs are present
+
+    if infolines:
+      self.infolines ()
+
+    adjust (infolines, subplots=levels)
+
+    self.draw (save, qoi, suffix='ensembles')
+
+    print ' done.'
+
+  def diagram (self, solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
+    
+    if not qoi: qoi = solver.qoi
+
+    print ' :: INFO: Plotting diagram of \'%-20s\'...' % qoi,
+    sys.stdout.flush()
+    
+    vs = []
+    for outputfilename in outputfilenames:
+      results = solver.load (file=outputfilename)
+      if '_time' in qoi:
+        vs.append ( results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ] )
+      else:
+        vs.append ( numpy.max ( results.data [qoi] ) )
+
+    if not frame:
+      figure (infolines, subplots=1)
+    
+    if label == None:
+      label = name (qoi)
+    
+    if logx:
+      pylab.semilogx (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
     else:
-      vs.append ( numpy.max ( results.data [qoi] ) )
+      pylab.plot (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
+    
+    if ref_file:
+      results = solver.load (file=ref_file)
+      if '_time' in qoi:
+        v_ref = results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ]
+      else:
+        v_ref = numpy.max ( results.data [qoi] )
+      pylab.axhline (y=v_ref, xmin=params[0], xmax=params[-1], color=color(qoi), linestyle=style(run), alpha=0.5, label=ref_label)
+    
+    pylab.xlabel ('%s [%s]' % (param_name, param_unit))
+    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+    
+    self.helper_lines (qoi, run)
+    
+    yend = 1.05 * numpy.max (vs)
+    self.adjust_axes (qoi, extent, xorigin, yorigin, yend=yend)
+    
+    if infolines:
+      self.infolines ()
+    
+    adjust (infolines)
+    
+    if not frame:
+      self.draw (None, save, qoi, legend=True, suffix='diagram')
 
-  if not frame:
-    figure (infolines, subplots=1)
-  
-  if label == None:
-    label = name (qoi)
-  
-  if logx:
-    pylab.semilogx (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
-  else:
-    pylab.plot (params, vs, color=color(qoi), linestyle=style(run), marker='o', markerfacecolor='w', markeredgecolor=color(qoi), alpha=alpha(run), label=label)
-  
-  if ref_file:
-    results = solver.load (file=ref_file)
-    if '_time' in qoi:
-      v_ref = results.meta ['t'] [ numpy.argmax (results.data [qoi[:-5]]) ]
-    else:
-      v_ref = numpy.max ( results.data [qoi] )
-    pylab.axhline (y=v_ref, xmin=params[0], xmax=params[-1], color=color(qoi), linestyle=style(run), alpha=0.5, label=ref_label)
-  
-  pylab.xlabel ('%s [%s]' % (param_name, param_unit))
-  pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-  
-  plot_helper_lines (qoi, run)
-  
-  yend = 1.05 * numpy.max (vs)
-  adjust_axes (qoi, extent, xorigin, yorigin, yend=yend)
-  
-  if infolines:
-    plot_infolines (self)
-  
-  adjust (infolines)
-  
-  if not frame:
-    draw (None, save, qoi, legend=True)
+  # plot samples
+  def samples (self, infolines=False, warmup=True, optimal=True, run=1, frame=False, fill=1, save=None):
 
-# plot samples
-def plot_samples (mlmc, infolines=False, warmup=True, optimal=True, run=1, frame=False, fill=1, save=None):
+    print ' :: INFO: Plotting samples...',
+    sys.stdout.flush()
 
-  print ' :: INFO: Plotting samples...',
-  sys.stdout.flush()
+    # === load all required data
 
-  # === load all required data
+    levels           = self.mlmc.config.levels
+    qoi              = self.mlmc.config.solver.qoi
 
-  levels           = mlmc.config.levels
-  qoi              = mlmc.config.solver.qoi
+    # === plot
 
-  # === plot
+    if not frame:
+      figure (infolines, subplots=1)
 
-  if not frame:
-    figure (infolines, subplots=1)
+    # plot number of samples
 
-  # plot number of samples
-
-  basevalue = 0.3
-  baseline  = [basevalue for level in levels]
-  pylab.semilogy (levels, mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
-  if fill:
-    pylab.fill_between (levels, baseline, mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
-  #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
-  if mlmc.config.iteration > 0:
-    pylab.semilogy (levels, mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+    basevalue = 0.3
+    baseline  = [basevalue for level in levels]
+    pylab.semilogy (levels, self.mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
     if fill:
-      pylab.fill_between (levels, mlmc.config.samples.history ['combined'] [0], mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5, linewidth=0.0)
-  #if optimal:
-  #  pylab.semilogy (levels, mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
-  pylab.title  ('Number of samples')
-  pylab.ylabel ('number of samples')
-  pylab.xlabel ('mesh level')
-  levels_extent (levels)
-  pylab.ylim   (ymin=basevalue)
-  pylab.axhline (y=1, color='black', linestyle='-', linewidth=1, alpha=0.7)
-  pylab.axhline (y=2, color='black', linestyle='-', linewidth=1, alpha=0.5)
-  pylab.axhline (y=3, color='black', linestyle='-', linewidth=1, alpha=0.3)
-  pylab.axhline (y=4, color='black', linestyle='-', linewidth=1, alpha=0.1)
+      pylab.fill_between (levels, baseline, self.mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
+    #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
+    if self.mlmc.config.iteration > 0:
+      pylab.semilogy (levels, self.mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+      if fill:
+        pylab.fill_between (levels, self.mlmc.config.samples.history ['combined'] [0], self.mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5, linewidth=0.0)
+    #if optimal:
+    #  pylab.semilogy (levels, self.mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/self.mlmc.config.samples.optimal_fraction)))
+    pylab.title  ('Number of samples')
+    pylab.ylabel ('number of samples')
+    pylab.xlabel ('mesh level')
+    levels_extent (levels)
+    pylab.ylim   (ymin=basevalue)
+    pylab.axhline (y=1, color='black', linestyle='-', linewidth=1, alpha=0.7)
+    pylab.axhline (y=2, color='black', linestyle='-', linewidth=1, alpha=0.5)
+    pylab.axhline (y=3, color='black', linestyle='-', linewidth=1, alpha=0.3)
+    pylab.axhline (y=4, color='black', linestyle='-', linewidth=1, alpha=0.1)
 
-  if not frame:
-    pylab.legend (loc='upper right')
+    if not frame:
+      pylab.legend (loc='upper right')
 
-  adjust (infolines)
+    adjust (infolines)
 
-  if infolines:
-    show_info(self)
+    if infolines:
+      show_info(self)
 
-  if not frame:
-    draw (mlmc, save, qoi)
+    if not frame:
+      self.draw (save, qoi, suffix='samples')
 
-  print ' done.'
-
-# plot budget
-def plot_budget (mlmc, infolines=False, warmup=1, optimal=1, run=1, frame=False, total=1, fill=1, normalization=1e6, unit='million', save=None):
-
-  print ' :: INFO: Plotting budget...',
-  sys.stdout.flush()
-
-  # === load all required data
-
-  levels           = mlmc.config.levels
-  qoi              = mlmc.config.solver.qoi
-  
-  budget_warmup      = [ mlmc.config.samples.history ['combined'] [0] [level] * mlmc.config.samples.works [level] / normalization for level in levels ]
-  budget_final       = [ mlmc.config.samples.counts.combined          [level] * mlmc.config.samples.works [level] / normalization for level in levels ]
-  #budget_optimal     = [ mlmc.config.samples.counts_optimal           [level] * mlmc.config.samples.works [level] / normalization for level in levels ]
-  budget_total       = sum (budget_final)
-
-  # === plot
-
-  if not frame:
-    figure (infolines, subplots=1)
+    print ' done.'
 
   # plot budget
+  def budget (self, infolines=False, warmup=1, optimal=1, run=1, frame=False, total=1, fill=1, normalization=1e6, unit='million', save=None):
 
-  basevalue = 0
-  baseline  = [basevalue for level in levels]
-  if warmup:
-    pylab.plot (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
-    if fill:
-      pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
-  if mlmc.config.iteration > 0:
-    pylab.plot (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
-    if fill:
-      pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5, linewidth=0.0)
-  if total:
-    pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
-  #if optimal:
-  #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/mlmc.config.samples.optimal_fraction)))
-  pylab.title  ('Computational budget')
-  pylab.ylabel ('computational budget [%s core hours]' % unit)
-  pylab.xlabel ('mesh level')
-  levels_extent (levels)
-  pylab.ylim   (ymin=basevalue)
+    print ' :: INFO: Plotting budget...',
+    sys.stdout.flush()
 
-  if not frame:
-    pylab.legend (loc='upper right')
+    # === load all required data
 
-  adjust (infolines)
-
-  if infolines:
-    show_info(self)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot indicators
-def plot_indicators (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
-  
-  print ' :: INFO: Plotting indicators...',
-  sys.stdout.flush()
-  
-  # === load all required data
-  
-  EPSILON       = mlmc.indicators.mean_diff
-  SIGMA         = mlmc.indicators.variance_diff
-  #TOL           = mlmc.config.samples.tol
-  NORMALIZATION = mlmc.errors.normalization
-  levels        = mlmc.config.levels
-  qoi           = mlmc.config.solver.qoi
-  
-  # === compute error using the exact solution mean_exact
-  
-  if exact:
+    levels           = self.mlmc.config.levels
+    qoi              = self.mlmc.config.solver.qoi
     
-    # TODO: this needs to be reviewed
-    error = numpy.abs ( exact - mlmc.stats [ qoi ] ) / NORMALIZATION
-  
-  # === plot
-  
-  if not frame:
-    figure (infolines, subplots=2)
-  
-  # plot EPSILON
-  
-  pylab.subplot(121)
-  means = [e / NORMALIZATION for e in EPSILON]
-  pylab.semilogy (levels, means, color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
-  if run == 1:
+    budget_warmup      = [ self.mlmc.config.samples.history ['combined'] [0] [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
+    budget_final       = [ self.mlmc.config.samples.counts.combined          [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
+    #budget_optimal     = [ self.mlmc.config.samples.counts_optimal           [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
+    budget_total       = sum (budget_final)
+
+    # === plot
+
+    if not frame:
+      figure (infolines, subplots=1)
+
+    # plot budget
+
+    basevalue = 0
+    baseline  = [basevalue for level in levels]
+    if warmup:
+      pylab.plot (levels, budget_warmup, color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
+      if fill:
+        pylab.fill_between (levels, baseline, budget_warmup, facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
+    if self.mlmc.config.iteration > 0:
+      pylab.plot (levels, budget_final, color=color_params('budget'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+      if fill:
+        pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5, linewidth=0.0)
+    if total:
+      pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
+    #if optimal:
+    #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/self.mlmc.config.samples.optimal_fraction)))
+    pylab.title  ('Computational budget')
+    pylab.ylabel ('computational budget [%s core hours]' % unit)
+    pylab.xlabel ('mesh level')
+    levels_extent (levels)
+    pylab.ylim   (ymin=basevalue)
+
+    if not frame:
+      pylab.legend (loc='upper right')
+
+    adjust (infolines)
+
+    if infolines:
+      show_info(self)
+
+    if not frame:
+      self.draw (save, qoi, suffix='budget')
+
+    print ' done.'
+
+  # plot indicators
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+    
+    print ' :: INFO: Plotting indicators...',
+    sys.stdout.flush()
+    
+    # === load all required data
+    
+    EPSILON       = self.mlmc.indicators.mean_diff
+    SIGMA         = self.mlmc.indicators.variance_diff
+    #TOL           = self.mlmc.config.samples.tol
+    NORMALIZATION = self.mlmc.errors.normalization
+    levels        = self.mlmc.config.levels
+    qoi           = self.mlmc.config.solver.qoi
+    
+    # === compute error using the exact solution mean_exact
+    
     if exact:
-      pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
-    #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Rel. level means for Q = %s' % qoi)
-  pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
-  pylab.xlabel ('mesh level')
-  adjust_extent (means, factor=1.5)
-  levels_extent (levels)
-  if exact:
-    pylab.legend (loc='upper right')
-  
-  # plot SIGMA
-  
-  pylab.subplot(122)
-  deviations = numpy.sqrt(SIGMA) / NORMALIZATION
-  pylab.semilogy (levels, deviations, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
-  #if run == 1:
-  #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-  pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
-  pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
-  pylab.xlabel ('mesh level')
-  adjust_extent (deviations, factor=1.5)
-  levels_extent (levels)
-  #pylab.legend (loc='best')
-  
-  adjust (infolines, subplots=2)
-  
-  if infolines:
-    show_info(self)
-  
-  if not frame:
-    draw (mlmc, save, qoi)
+      
+      # TODO: this needs to be reviewed
+      error = numpy.abs ( exact - self.mlmc.stats [ qoi ] ) / NORMALIZATION
+    
+    # === plot
+    
+    if not frame:
+      figure (infolines, subplots=2)
+    
+    # plot EPSILON
+    
+    pylab.subplot(121)
+    means = [e / NORMALIZATION for e in EPSILON]
+    pylab.semilogy (levels, means, color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
+    if run == 1:
+      if exact:
+        pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+      #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.title  ('Rel. level means for Q = %s' % qoi)
+    pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
+    pylab.xlabel ('mesh level')
+    adjust_extent (means, factor=1.5)
+    levels_extent (levels)
+    if exact:
+      pylab.legend (loc='upper right')
+    
+    # plot SIGMA
+    
+    pylab.subplot(122)
+    deviations = numpy.sqrt(SIGMA) / NORMALIZATION
+    pylab.semilogy (levels, deviations, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
+    #if run == 1:
+    #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
+    pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
+    pylab.xlabel ('mesh level')
+    adjust_extent (deviations, factor=1.5)
+    levels_extent (levels)
+    #pylab.legend (loc='best')
+    
+    adjust (infolines, subplots=2)
+    
+    if infolines:
+      show_info(self)
+    
+    if not frame:
+      self.draw (save, qoi, suffix='indicators')
 
-  print ' done.'
-
-# plot correlations
-def plot_correlations (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
-
-  print ' :: INFO: Plotting correlations...',
-  sys.stdout.flush()
-
-  # === load all required data
-
-  correlation = mlmc.indicators.correlation
-  levels      = mlmc.config.levels
-  qoi         = mlmc.config.solver.qoi
-
-  # === plot
-
-  if not frame:
-    figure (infolines, subplots=1)
-
-  # plot correlations
-
-  pylab.plot (levels, correlation, color=color_params('correlation'), linestyle=style(run), alpha=alpha(run), marker='x', label='level correlations')
-  pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
-  pylab.title  ('Level correlations for Q = %s' % qoi)
-  pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
-  pylab.xlabel ('mesh level')
-  pylab.ylim ([-0.1, 1.1])
-  levels_extent (levels)
-  #pylab.legend (loc='upper right')
-
-  adjust (infolines, subplots=1)
-
-  if infolines:
-    show_info(self)
-
-  if not frame:
-    draw (mlmc, save, qoi)
-
-  print ' done.'
-
-# plot coefficients
-def plot_coefficients (mlmc, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
-
-  print ' :: INFO: Plotting coefficients...',
-  sys.stdout.flush()
-
-  # === load all required data
-
-  coefficients = mlmc.indicators.coefficients.values
-  levels       = mlmc.config.levels
-  qoi          = mlmc.config.solver.qoi
-
-  # === plot
-
-  if not frame:
-    figure (infolines, subplots=1)
+    print ' done.'
 
   # plot correlations
+  def correlations (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
 
-  pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
-  pylab.title  ('Level coefficients for Q = %s' % qoi)
-  pylab.ylabel (r'coefficient')
-  pylab.xlabel ('mesh level')
-  pylab.ylim ([-0.1, 1.1])
-  levels_extent (levels)
-  #pylab.legend (loc='upper right')
+    print ' :: INFO: Plotting correlations...',
+    sys.stdout.flush()
 
-  adjust (infolines, subplots=1)
+    # === load all required data
 
-  if infolines:
-    show_info(self)
+    correlation = self.mlmc.indicators.correlation
+    levels      = self.mlmc.config.levels
+    qoi         = self.mlmc.config.solver.qoi
 
-  if not frame:
-    draw (mlmc, save, qoi)
-  
-  print ' done.'
+    # === plot
 
-# plot errors
-def plot_errors (mlmc, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
-  
-  print ' :: INFO: Plotting errors...',
-  sys.stdout.flush()
+    if not frame:
+      figure (infolines, subplots=1)
 
-  if not mlmc.errors.available:
-    print ' NOT available.'
-    return
+    # plot correlations
 
-  # === load all required data
+    pylab.plot (levels, correlation, color=color_params('correlation'), linestyle=style(run), alpha=alpha(run), marker='x', label='level correlations')
+    pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
+    pylab.title  ('Level correlations for Q = %s' % qoi)
+    pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
+    pylab.xlabel ('mesh level')
+    pylab.ylim ([-0.1, 1.1])
+    levels_extent (levels)
+    #pylab.legend (loc='upper right')
 
-  #TOL              = mlmc.config.samples.tol
-  levels           = mlmc.config.levels
-  qoi              = mlmc.config.solver.qoi
-  
-  # === plot
-  
-  if not frame:
-    figure (infolines, subplots=1)
-  
-  # plot relative sampling error
-  if warmup:
-    pylab.semilogy (levels, mlmc.errors.history ['relative_error'] [0], color=color_params('warmup'), linestyle=style(run), alpha=alpha(run), marker='+', label='warmup')
-  if mlmc.config.iteration > 0:
-    pylab.semilogy (levels, mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
-    if fill:
-      pylab.fill_between (levels, mlmc.errors.relative_error, mlmc.errors.history ['relative_error'] [0], facecolor=color_params('errors'), alpha=0.5, linewidth=0.0)
-  if total:
-    pylab.axhline (y=mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % mlmc.errors.total_relative_error)
-  #if run == 1:
-  #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
-  pylab.plot([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % mlmc.errors.speedup)
-  pylab.title  ('Relative sampling errors for Q = %s' % qoi)
-  pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
-  pylab.xlabel ('mesh level')
-  levels_extent (levels)
-  #pylab.ylim   (ymax=1.5*TOL)
-  pylab.legend (loc='lower left')
-  
-  adjust (infolines)
-  
-  if infolines:
-    show_info(self)
-  
-  if not frame:
-    draw (mlmc, save, qoi)
+    adjust (infolines, subplots=1)
 
-  print ' done.'
+    if infolines:
+      show_info(self)
 
-import rp
+    if not frame:
+      self.draw (save, qoi, suffix='correlations')
 
-def rp_approximated (r, p0_l=100, p0_g=0.0234, rho_l=1000):
-  tc = 0.914681 * r * numpy.sqrt ( rho_l / (p0_l - p0_g) )
-  rh = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
-  return tc, rh
+    print ' done.'
 
-def rp_integrated (r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=rp.OptPL2()):
-  dr0 = 0
-  [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S, model)
-  return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
+  # plot coefficients
+  def coefficients (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
 
-# plot Rayleigh Plesset
-def plot_rp (mlmc, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, color=None, approximation=False, model='OptPL2', run=1, frame=False, save=None):
-  
-  if r == None:
-    r = numpy.array ( mlmc.mcs [ mlmc.config.pick [mlmc.config.L] [0] ] .results [0] .data ['Req'] ) [0]
-    if count != 1:
-      r /= count ** (1.0/3.0)
-  
-  if not frame:
-    figure (infolines=False, subplots=1)
-  
-  if approximation:
-    tc, rh = rp_approximated (r, p0_l, p0_g, rho_l)
-    ts = numpy.linspace (0, tc, 10000)
-    rs = rp(ts)
-    label = 'Rayleigh-Plesset (approx.)'
-    if color == None:
-      color = color_params('rp_approximated')
-  else:
-    results = mlmc.mcs [ mlmc.config.pick [mlmc.config.L] [0] ] .results [0]
-    tend = numpy.array ( results.meta ['t'] ) [-1]
-    model_class = getattr (rp, model)
-    ts, rs, ps, drs, model_name = rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
-    label = model_name
-    if mu:
-      label += ' + dissipation'
-    if color == None:
-      color = color_params('rp_integrated')
+    print ' :: INFO: Plotting coefficients...',
+    sys.stdout.flush()
 
-  # report approximate collapse time
-  print
-  if count != 1:
-    print ' :: Approximated (Rayleigh-Plesset) collapse time (for count = %d): %f' % (count, rp.approximate_collapse_time (r, p0_l, p0_g, rho_l) )
-  else:
-    print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
+    # === load all required data
 
-  # report maximum pressure
-  if not approximation:
+    coefficients = self.mlmc.indicators.coefficients.values
+    levels       = self.mlmc.config.levels
+    qoi          = self.mlmc.config.solver.qoi
+
+    # === plot
+
+    if not frame:
+      figure (infolines, subplots=1)
+
+    # plot correlations
+
+    pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
+    pylab.title  ('Level coefficients for Q = %s' % qoi)
+    pylab.ylabel (r'coefficient')
+    pylab.xlabel ('mesh level')
+    pylab.ylim ([-0.1, 1.1])
+    levels_extent (levels)
+    #pylab.legend (loc='upper right')
+
+    adjust (infolines, subplots=1)
+
+    if infolines:
+      show_info(self)
+
+    if not frame:
+      self.draw (save, qoi, suffix='coefficients')
+    
+    print ' done.'
+
+  # plot errors
+  def errors (self, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
+    
+    print ' :: INFO: Plotting errors...',
+    sys.stdout.flush()
+
+    if not self.mlmc.errors.available:
+      print ' NOT available.'
+      return
+
+    # === load all required data
+
+    #TOL              = self.mlmc.config.samples.tol
+    levels           = self.mlmc.config.levels
+    qoi              = self.mlmc.config.solver.qoi
+    
+    # === plot
+    
+    if not frame:
+      figure (infolines, subplots=1)
+    
+    # plot relative sampling error
+    if warmup:
+      pylab.semilogy (levels, self.mlmc.errors.history ['relative_error'] [0], color=color_params('warmup'), linestyle=style(run), alpha=alpha(run), marker='+', label='warmup')
+    if self.mlmc.config.iteration > 0:
+      pylab.semilogy (levels, self.mlmc.errors.relative_error, color=color_params('errors'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
+      if fill:
+        pylab.fill_between (levels, self.mlmc.errors.relative_error, self.mlmc.errors.history ['relative_error'] [0], facecolor=color_params('errors'), alpha=0.5, linewidth=0.0)
+    if total:
+      pylab.axhline (y=self.mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % self.mlmc.errors.total_relative_error)
+    #if run == 1:
+    #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
+    pylab.plot([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup)
+    pylab.title  ('Relative sampling errors for Q = %s' % qoi)
+    pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
+    pylab.xlabel ('mesh level')
+    levels_extent (levels)
+    #pylab.ylim   (ymax=1.5*TOL)
+    pylab.legend (loc='lower left')
+    
+    adjust (infolines)
+    
+    if infolines:
+      show_info(self)
+    
+    if not frame:
+      self.draw (save, qoi, suffix='errors')
+
+    print ' done.'
+
+  def rp_approximated (self, r, p0_l=100, p0_g=0.0234, rho_l=1000):
+    tc = 0.914681 * r * numpy.sqrt ( rho_l / (p0_l - p0_g) )
+    rh = lambda t : r * numpy.power (tc ** 2 - t ** 2, 2.0/5.0) / numpy.power (tc ** 2, 2.0/5.0)
+    return tc, rh
+
+  def rp_integrated (self, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, tend=None, mu=0, S=0, model=rp.OptPL2()):
+    dr0 = 0
+    [ts, rs, ps, drs, name] = rp.integrate (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, dr0, mu, S, model)
+    return numpy.array(ts), numpy.array(rs), numpy.array(ps), numpy.array(drs), name
+
+  # plot Rayleigh Plesset
+  def rp (self, r, p0_l=100, p0_g=0.0234, rho_l=1000, rho0_g=1, gamma=1.4, mu=0, S=0, count=1, color=None, approximation=False, model='OptPL2', run=1, frame=False, save=None):
+
+    import rp
+
+    if r == None:
+      r = numpy.array ( self.mlmc.mcs [ self.mlmc.config.pick [self.mlmc.config.L] [0] ] .results [0] .data ['Req'] ) [0]
+      if count != 1:
+        r /= count ** (1.0/3.0)
+    
+    if not frame:
+      figure (infolines=False, subplots=1)
+    
+    if approximation:
+      tc, rh = self.rp_approximated (r, p0_l, p0_g, rho_l)
+      ts = numpy.linspace (0, tc, 10000)
+      rs = rp(ts)
+      label = 'Rayleigh-Plesset (approx.)'
+      if color == None:
+        color = color_params('rp_approximated')
+    else:
+      results = self.mlmc.mcs [ self.mlmc.config.pick [self.mlmc.config.L] [0] ] .results [0]
+      tend = numpy.array ( results.meta ['t'] ) [-1]
+      model_class = getattr (rp, model)
+      ts, rs, ps, drs, model_name = self.rp_integrated (r, p0_l, p0_g, rho_l, rho0_g, gamma, tend, mu, S, model_class() )
+      label = model_name
+      if mu:
+        label += ' + dissipation'
+      if color == None:
+        color = color_params('rp_integrated')
+
+    # report approximate collapse time
     print
     if count != 1:
-      print ' :: Approximated (%s) maximum pressure (for count = %d): %f' % ( model, count, numpy.max(ps) )
+      print ' :: Approximated (Rayleigh-Plesset) collapse time (for count = %d): %f' % (count, rp.approximate_collapse_time (r, p0_l, p0_g, rho_l) )
     else:
-      print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
-    print '  : -> Amplification factor \'p_max / p0_l\' is: %.1f' % (numpy.max(ps) / p0_l)
-  
-  # compute equivalent radius of simultaneously collapsing multiple bubbles
-  if count != 1:
-    label += ' (%d)' % count
-    rs *= count ** (1.0 / 3.0)
+      print ' :: Approximated (Rayleigh-Plesset) collapse time: %f' % rp.approximate_collapse_time (r, p0_l, p0_g, rho_l)
 
-  pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=alpha(run), label=label)
-  
-  pylab.xlabel ('%s [%s]' % (name('t'),   unit('t')))
-  pylab.ylabel ('%s [%s]' % (name('Req'), unit('Req')))
-  
-  if not frame:
-    pylab.label (loc='best')
-    draw (mlmc, save, legend=True, loc='best')
+    # report maximum pressure
+    if not approximation:
+      print
+      if count != 1:
+        print ' :: Approximated (%s) maximum pressure (for count = %d): %f' % ( model, count, numpy.max(ps) )
+      else:
+        print ' :: Approximated (%s) maximum pressure: %f' % ( model, numpy.max(ps) )
+      print '  : -> Amplification factor \'p_max / p0_l\' is: %.1f' % (numpy.max(ps) / p0_l)
+    
+    # compute equivalent radius of simultaneously collapsing multiple bubbles
+    if count != 1:
+      label += ' (%d)' % count
+      rs *= count ** (1.0 / 3.0)
 
-# plot hinton diagram
-# source: http://matplotlib.org/examples/specialty_plots/hinton_demo.html
-def plot_hinton (matrix, scale=0.95):
-  
-  ax = pylab.gca ()
-  
-  ax.patch.set_facecolor ('gray')
-  ax.set_aspect ('equal', 'box')
-  ax.xaxis.set_major_locator (pylab.NullLocator())
-  ax.yaxis.set_major_locator (pylab.NullLocator())
-  
-  for (x, y), w in numpy.ndenumerate (matrix):
-    color = 'white' if w > 0 else 'black'
-    if x == y:
-      color = 'gray'
-    size = scale * numpy.sqrt (numpy.abs(w))
-    #size = scale * numpy.abs(w)
-    rect = pylab.Rectangle ([x - size / 2, y - size / 2], size, size, facecolor=color, edgecolor=color)
-    ax.add_patch (rect)
-  
-  ax.autoscale_view ()
-  ax.invert_yaxis ()
+    pylab.plot (ts, rs, color=color, linestyle=style(run), alpha=alpha(run), label=label)
+    
+    pylab.xlabel ('%s [%s]' % (name('t'),   unit('t')))
+    pylab.ylabel ('%s [%s]' % (name('Req'), unit('Req')))
+    
+    if not frame:
+      pylab.label (loc='best')
+      self.draw (save, legend=True, loc='best', suffix='rp')
 
-'''
-# plot correlations between different qois
-def plot_correlations (mlmc, qois=None, hinton=True, infolines=False, save=None):
-  
-  if qois == None: qois = [ mlmc.config.solver.qoi ]
-  
-  level  = 'finest'
-  type   = 0
-  sample = 0
-  
-  results = mlmc.mcs [ mlmc.config.pick [level] [type] ] .results [sample]
-  
-  data = numpy.zeros ( (len (qois), len (results.meta ['t']) - 1) )
-  for i, qoi in enumerate (qois):
-    # exclude first data point, because some channels needs to
-    data [i, :] = numpy.array ( results.data [qoi] ) [1:]
-  
-  # mask unavailable data
-  data = numpy.ma.masked_array ( data, numpy.isnan (data) )
-  
-  # compute correlation matrix
-  R = numpy.ma.corrcoef (data)
-  
-  pylab.figure ( figsize = (8, 8) )
-  
-  # plot Hinton diagram
-  if hinton:
-    plot_hinton (R)
-    pylab.minorticks_off()
-    pylab.gca().tick_params ( labelleft='on', labelright='off', labelbottom='off',labeltop='on' )
-    pylab.gca().set_xticks ( numpy.arange ( len (qois) ) )
-    pylab.gca().set_yticks ( numpy.arange ( len (qois) ) )
-    pylab.gca().set_xticklabels ( [' ' + name (qoi, short=True) for qoi in qois], rotation='vertical')
-    pylab.gca().set_yticklabels ( [name (qoi, short=True) + ' ' for qoi in qois] )
+  # plot hinton diagram
+  # source: http://matplotlib.org/examples/specialty_plots/hinton_demo.html
+  def hinton (self, matrix, scale=0.95):
+    
+    ax = pylab.gca ()
+    
+    ax.patch.set_facecolor ('gray')
+    ax.set_aspect ('equal', 'box')
+    ax.xaxis.set_major_locator (pylab.NullLocator())
+    ax.yaxis.set_major_locator (pylab.NullLocator())
+    
+    for (x, y), w in numpy.ndenumerate (matrix):
+      color = 'white' if w > 0 else 'black'
+      if x == y:
+        color = 'gray'
+      size = scale * numpy.sqrt (numpy.abs(w))
+      #size = scale * numpy.abs(w)
+      rect = pylab.Rectangle ([x - size / 2, y - size / 2], size, size, facecolor=color, edgecolor=color)
+      ax.add_patch (rect)
+    
+    ax.autoscale_view ()
+    ax.invert_yaxis ()
 
-  # plot conventional correlation matrix
-  else:
-    pylab.pcolor (R)
-    pylab.axis ('equal')
-    pylab.xlim ( [0, len (qois)] )
-    pylab.ylim ( [0, len (qois)] )
-    pylab.xticks ( 0.5 + numpy.arange ( len (qois) ), qois )
-    pylab.yticks ( 0.5 + numpy.arange ( len (qois) ), qois )
-    pylab.colorbar ()
-  
-  if infolines:
-    plot_infolines (self)
+  '''
+  # plot correlations between different qois
+  def correlations (self, qois=None, hinton=True, infolines=False, save=None):
+    
+    if qois == None: qois = [ self.mlmc.config.solver.qoi ]
+    
+    level  = 'finest'
+    type   = 0
+    sample = 0
+    
+    results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
+    
+    data = numpy.zeros ( (len (qois), len (results.meta ['t']) - 1) )
+    for i, qoi in enumerate (qois):
+      # exclude first data point, because some channels needs to
+      data [i, :] = numpy.array ( results.data [qoi] ) [1:]
+    
+    # mask unavailable data
+    data = numpy.ma.masked_array ( data, numpy.isnan (data) )
+    
+    # compute correlation matrix
+    R = numpy.ma.corrcoef (data)
+    
+    pylab.figure ( figsize = (8, 8) )
+    
+    # plot Hinton diagram
+    if hinton:
+      plot_hinton (R)
+      pylab.minorticks_off()
+      pylab.gca().tick_params ( labelleft='on', labelright='off', labelbottom='off',labeltop='on' )
+      pylab.gca().set_xticks ( numpy.arange ( len (qois) ) )
+      pylab.gca().set_yticks ( numpy.arange ( len (qois) ) )
+      pylab.gca().set_xticklabels ( [' ' + name (qoi, short=True) for qoi in qois], rotation='vertical')
+      pylab.gca().set_yticklabels ( [name (qoi, short=True) + ' ' for qoi in qois] )
 
-  pylab.subplots_adjust (bottom=0.05)
-  pylab.subplots_adjust (right=0.95)
-  pylab.subplots_adjust (left=0.20)
-  pylab.subplots_adjust (top=0.80)
-  
-  draw (mlmc, save)
-'''
+    # plot conventional correlation matrix
+    else:
+      pylab.pcolor (R)
+      pylab.axis ('equal')
+      pylab.xlim ( [0, len (qois)] )
+      pylab.ylim ( [0, len (qois)] )
+      pylab.xticks ( 0.5 + numpy.arange ( len (qois) ), qois )
+      pylab.yticks ( 0.5 + numpy.arange ( len (qois) ), qois )
+      pylab.colorbar ()
+    
+    if infolines:
+      self.infolines ()
+
+    pylab.subplots_adjust (bottom=0.05)
+    pylab.subplots_adjust (right=0.95)
+    pylab.subplots_adjust (left=0.20)
+    pylab.subplots_adjust (top=0.80)
+    
+    self.draw (save, suffix='correlations')
+  '''

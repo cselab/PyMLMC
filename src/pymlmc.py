@@ -810,7 +810,6 @@ class MLMC (object):
     # TODO: issue at least a warning if some levels are missing in the _middle_ of level hierarchy (additional bias in introduced!)
 
     print '  : DONE'
-    print
 
   # clip MLMC estimates
   def clip (self, ranges):
@@ -823,7 +822,6 @@ class MLMC (object):
       self.stats [name] .clip (ranges)
 
     print '  : DONE'
-    print
 
   # report computed statistics (mostly used only for debugging)
   def report (self):
