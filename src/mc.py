@@ -198,9 +198,9 @@ class MC (object):
       progresses.append ( self.config.solver.progress (result) if result != None else 0 )
 
     # print overall report
-    print '  : Jobs at 100%%: %6d' % sum (progresses == 1)
-    print '  : Jobs at   0%%: %6d' % sum (progresses == 0)
-    print '  : Running jobs : %6d' % ( len (progresses) - sum (progresses == 1) - sum (progresses == 0) )
+    print '  : Jobs at 100%%: %6d' % progresses.count (1)
+    print '  : Jobs at   0%%: %6d' % progresses.count (0)
+    print '  : Running jobs : %6d' % ( len (progresses) - progresses.count (1) - progresses.count (0) )
 
     # print status of some samples in progress
     reported = 0

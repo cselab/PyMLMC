@@ -638,6 +638,11 @@ class MatPlotLib (object):
     ys = numpy.array ( len (qois) )
     vs = numpy.array ( ( len (ts), len (qois) ) , dtype=float )
     for shell, qoi in enumerate (qois):
+      # IndexError: too many indices for array
+      print shell
+      print qoi
+      print qoi.find ('_shell_avg')
+      print qoi [ qoi.find ('_shell_avg') + 10 : ]
       ys [shell]    = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
       vs [ : shell] = numpy.array ( stat.data [qoi] )
 
