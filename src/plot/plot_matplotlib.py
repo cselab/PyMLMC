@@ -635,8 +635,9 @@ class MatPlotLib (object):
     ts = numpy.array ( stat.meta ['t'] )
 
     # construct array consisting of all shells
-    ys = numpy.array ( len (qois) )
-    vs = numpy.array ( ( len (ts), len (qois) ) , dtype=float )
+    ys = numpy.array ( len (qois), dtype=float )
+    print ys
+    vs = numpy.array ( ( len (ts), len (qois) ), dtype=float )
     for shell, qoi in enumerate (qois):
       # IndexError: too many indices for array
       print shell
