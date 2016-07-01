@@ -692,7 +692,7 @@ class MatPlotLib (object):
 
     # centered data - center extent as well
     if centered:
-      extent = self.center_extent (self, qoi, extent)
+      extent = self.center_extent (qoi, extent)
 
     for stat_name, stat in stats.iteritems():
 
