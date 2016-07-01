@@ -734,7 +734,7 @@ class MatPlotLib (object):
       # hack to show the legend entry
       pylab.plot([], [], color=bright, linewidth=10, label=label)
 
-    if not shells:
+    if not ydistance:
       self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
     pylab.xlabel (xlabel)
