@@ -557,7 +557,7 @@ class MatPlotLib (object):
         pylab.axhline (y=-self.surface, color='maroon', linestyle='--', alpha=alpha(run))
 
   # adjust axes
-  def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None):
+  def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None, ydistance=False):
     
     # fit all existing data first
     pylab.gca().axis ('auto')
@@ -574,7 +574,7 @@ class MatPlotLib (object):
       pylab.gca().set_xlim (right = self.xend_max)
 
     # if extent is specified, use that
-    if extent:
+    if extent and not ydistance:
       pylab.ylim (*extent)
 
     # otherwise perform some automatic axes modifications based on parameters
@@ -626,7 +626,7 @@ class MatPlotLib (object):
 
     # TODO: cmap should be based on 'color(qoi)'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='nearest', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='none', vmin=vmin, vmax=vmax)
 
   # gather all shell qois for assembly
   def gather_shell_qois (self, shells):
@@ -651,6 +651,7 @@ class MatPlotLib (object):
     vs = numpy.empty ( ( len (ts), len (qois) ), dtype=float )
     for shell, qoi in enumerate (qois):
       ys [shell]       = float (shell + 0.5) * self.shell_extent / len (qois)
+      # TODO: reduce number of time steps here a bit?
       vs [ : , shell ] = numpy.array ( stat.data [qoi] )
 
     image_extent = ( ts [0], ts [-1], 0, self.shell_extent )
@@ -667,7 +668,7 @@ class MatPlotLib (object):
 
     # TODO: cmap should be based on 'color(qoi)'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', extent=image_extent, norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', extent=image_extent, norm=norm, interpolation='hermite', vmin=vmin, vmax=vmax)
     pylab.colorbar ()
 
   # plot each stat
@@ -733,14 +734,13 @@ class MatPlotLib (object):
       pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
       # hack to show the legend entry
       pylab.plot([], [], color=bright, linewidth=10, label=label)
-
-    if not ydistance:
-      self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
     pylab.xlabel (xlabel)
     pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
 
     self.helper_lines (qoi, run, ydistance=ydistance)
+
+    self.adjust_axes (qoi, extent, xorigin, yorigin, ydistance=ydistance)
     
     if legend:
       pylab.legend (loc='best')
