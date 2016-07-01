@@ -891,6 +891,9 @@ class MatPlotLib (object):
     else:
       extent_diff = None
 
+    if 'shell' in qoi:
+      extent_diff = extent
+
     for level, diff in enumerate (self.mlmc.diffs):
 
       if level == 0: continue
