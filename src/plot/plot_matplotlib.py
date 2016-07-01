@@ -573,7 +573,8 @@ class MatPlotLib (object):
   def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None, ydistance=False):
     
     # fit all existing data first
-    pylab.gca().axis ('auto')
+    if not ydistance:
+      pylab.gca().axis ('auto')
     
     # adjust x-axis
     if xorigin:
@@ -619,7 +620,7 @@ class MatPlotLib (object):
         pylab.gca().set_ylim (top = max (self.extent_z, ylim))
 
   # plot histogram
-  def histogram (self, qoi, stat, log=0):
+  def histogram (self, qoi, stat, centered, log=0):
 
     ts = numpy.array ( stat.meta ['t'] )
     ys = numpy.array ( stat.meta ['bins'] )
@@ -638,8 +639,12 @@ class MatPlotLib (object):
       vmin = 0
 
     # TODO: cmap should be based on 'color(qoi)'
+    if centered:
+      cmap = 'RdBu'
+    else:
+      cmap = 'binary'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='none', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='hermite', vmin=vmin, vmax=vmax)
 
   # gather all shell qois for assembly
   def gather_shell_qois (self, shells):
@@ -654,7 +659,7 @@ class MatPlotLib (object):
     return extra
 
   # plot shells
-  def shells (self, qois, stat, extent, log=0):
+  def shells (self, qois, stat, extent, centered, log=0):
 
     ts = numpy.array ( stat.meta ['t'] )
 
@@ -680,8 +685,12 @@ class MatPlotLib (object):
       vmin = extent [0]
 
     # TODO: cmap should be based on 'color(qoi)'
+    if centered:
+      cmap = 'RdBu'
+    else:
+      cmap = 'binary'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', extent=image_extent, norm=norm, interpolation='hermite', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect='auto', extent=image_extent, norm=norm, interpolation='hermite', vmin=vmin, vmax=vmax)
     pylab.colorbar ()
 
   # plot each stat
@@ -704,7 +713,7 @@ class MatPlotLib (object):
         qois = [ q for q in stats [stat_name] .data.keys() if q.find (qoi) == 0 ]
         compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
         qois.sort (compare)
-        self.shells (qois, stat, extent)
+        self.shells (qois, stat, extent, centered)
         ydistance = 1
         break
 
