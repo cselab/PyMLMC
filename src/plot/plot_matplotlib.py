@@ -266,7 +266,7 @@ def name (qoi, short=False, ydistance=False):
       name_ = 'z-dist. of ' + name_
 
   if ydistance:
-    name_ = 'dist. of' + name_
+    name_ = 'dist. of ' + name_
 
   return name_
 
