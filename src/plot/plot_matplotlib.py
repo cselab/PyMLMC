@@ -222,7 +222,7 @@ names ['V2']  = 'gas volume'
 names ['Req'] = 'equivalent radius'
 names ['Vc']  = 'cloud volume'
 
-def name (qoi, short=False):
+def name (qoi, short=False, ydistance=False):
   
   base_qoi = base (qoi)
   
@@ -237,6 +237,7 @@ def name (qoi, short=False):
     name_ = 'min ' + name_
   if '_max' in qoi:
     name_ = 'max ' + name_
+
   if '_sensor' in qoi:
     id = qoi.split ('_sensor', 1) [1]
     name_ = name_ + ' sensor ' + id
@@ -244,6 +245,7 @@ def name (qoi, short=False):
     name_ = 'shell ' + name_
   if '_time' in qoi:
     name_ = 'time of ' + name_
+
   if short and '_pos' in qoi:
     name_ = name_ + ' pos'
   else:
@@ -262,6 +264,9 @@ def name (qoi, short=False):
       name_ = 'y-dist. of ' + name_
     if '_pos_d_z' in qoi:
       name_ = 'z-dist. of ' + name_
+
+  if ydistance:
+    name_ = 'dist. of' + name_
 
   return name_
 
@@ -361,6 +366,10 @@ class MatPlotLib (object):
   # surface of the object
   def set_surface (self, surface):
     self.surface = surface
+
+  # shell extent
+  def set_shell_extent (self, extent):
+    self.shell_extent = extent
 
   # === LaTeX generation tools
 
@@ -529,14 +538,14 @@ class MatPlotLib (object):
   # === plotting routines
 
   # plot a line indicating position
-  def helper_lines (self, qoi, run=1):
+  def helper_lines (self, qoi, run=1, ydistance=False):
     
     if qoi == None:
       return
 
     pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
 
-    if '_pos_d' in qoi:
+    if '_pos_d' in qoi or ydistance:
       if self.surface == 'N/A':
         print
         print
@@ -641,10 +650,10 @@ class MatPlotLib (object):
 
     vs = numpy.empty ( ( len (ts), len (qois) ), dtype=float )
     for shell, qoi in enumerate (qois):
-      ys [shell]       = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
+      ys [shell]       = float (shell + 0.5) * self.shell_extent / len (qois)
       vs [ : , shell ] = numpy.array ( stat.data [qoi] )
 
-    image_extent = ( ts [0], ts [-1], ys [0], ys [-1] )
+    image_extent = ( ts [0], ts [-1], 0, self.shell_extent )
 
     vmax = extent [1]
 
@@ -665,7 +674,7 @@ class MatPlotLib (object):
   def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
     
     percentiles = []
-    adjust = 1
+    ydistance   = 0
 
     for stat_name, stat in stats.iteritems():
 
@@ -678,7 +687,7 @@ class MatPlotLib (object):
         compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
         qois.sort (compare)
         self.shells (qois, stat, extent)
-        adjust = 0
+        ydistance = 1
         break
 
       ts = numpy.array ( stat.meta ['t'] )
@@ -725,13 +734,13 @@ class MatPlotLib (object):
       # hack to show the legend entry
       pylab.plot([], [], color=bright, linewidth=10, label=label)
 
-    if adjust:
+    if not shells:
       self.adjust_axes (qoi, extent, xorigin, yorigin, xend=numpy.max(ts))
     
     pylab.xlabel (xlabel)
-    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-    
-    self.helper_lines (qoi, run)
+    pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
+
+    self.helper_lines (qoi, run, ydistance=ydistance)
     
     if legend:
       pylab.legend (loc='best')
@@ -1010,7 +1019,7 @@ class MatPlotLib (object):
       figure (infolines)
     
     xlabel = '%s [%s]' % (name('t'), unit('t'))
-    pylab.title ( 'estimated statistics for %s' % qoi )
+    pylab.title ( 'estimated statistics for %s' % name (qoi) )
     self.stats (qoi, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
     if infolines:
@@ -1100,7 +1109,7 @@ class MatPlotLib (object):
         print ' :: WARNING: computing trendline failed (NaN\'s present? Too short?)'
 
     if not self.mlmc.config.deterministic:
-      pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, qoi, level, type) )
+      pylab.title ( 'sample %d of %s at level %d of type %d' % (sample, name (qoi), level, type) )
 
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
@@ -1170,7 +1179,7 @@ class MatPlotLib (object):
       
       pylab.plot  (ts, vs, label=str(sample), linewidth=1)
     
-    pylab.title ( 'samples of %s at level %d of type %d' % (qoi, level, type) )
+    pylab.title ( 'samples of %s at level %d of type %d' % (name (qoi), level, type) )
     
     pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
     pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
@@ -1245,7 +1254,7 @@ class MatPlotLib (object):
       
       pylab.xlabel ('%s [%s]' % (name('t'), unit('t')))
       pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
-      pylab.title ( '%s at level %d' % (name(qoi), level) )
+      pylab.title ( '%s at level %d' % (name(qoi), level))
 
       self.helper_lines (qoi)
 
@@ -1294,8 +1303,9 @@ class MatPlotLib (object):
         v_ref = numpy.max ( results.data [qoi] )
       pylab.axhline (y=v_ref, xmin=params[0], xmax=params[-1], color=color(qoi), linestyle=style(run), alpha=0.5, label=ref_label)
     
-    pylab.xlabel ('%s [%s]' % (param_name, param_unit))
-    pylab.ylabel ('%s [%s]' % (name(qoi), unit(qoi)))
+    pylab.xlabel ('%s [%s]' % ( param_name, param_unit) )
+    pylab.ylabel ('%s [%s]' % ( name (qoi), unit (qoi) ))
+    pylab.title  ('Diagram of %s' % name (qoi))
     
     self.helper_lines (qoi, run)
     
@@ -1455,7 +1465,7 @@ class MatPlotLib (object):
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
       #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-    pylab.title  ('Rel. level means for Q = %s' % qoi)
+    pylab.title  ('Rel. level means for Q = %s' % name (qoi))
     pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
     adjust_extent (means, factor=1.5)
@@ -1470,7 +1480,7 @@ class MatPlotLib (object):
     pylab.semilogy (levels, deviations, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-    pylab.title  ('Rel. level standard deviations for Q = %s' % qoi)
+    pylab.title  ('Rel. level standard deviations for Q = %s' % name (qoi))
     pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
     adjust_extent (deviations, factor=1.5)
@@ -1508,7 +1518,7 @@ class MatPlotLib (object):
 
     pylab.plot (levels, correlation, color=color_params('correlation'), linestyle=style(run), alpha=alpha(run), marker='x', label='level correlations')
     pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
-    pylab.title  ('Level correlations for Q = %s' % qoi)
+    pylab.title  ('Level correlations for Q = %s' % name (qoi))
     pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
     pylab.ylim ([-0.1, 1.1])
@@ -1545,7 +1555,7 @@ class MatPlotLib (object):
     # plot correlations
 
     pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
-    pylab.title  ('Level coefficients for Q = %s' % qoi)
+    pylab.title  ('Level coefficients for Q = %s' % name (qoi))
     pylab.ylabel (r'coefficient')
     pylab.xlabel ('mesh level')
     pylab.ylim ([-0.1, 1.1])
@@ -1595,7 +1605,7 @@ class MatPlotLib (object):
     #if run == 1:
     #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
     pylab.plot([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup)
-    pylab.title  ('Relative sampling errors for Q = %s' % qoi)
+    pylab.title  ('Relative sampling errors for Q = %s' % name (qoi))
     pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
     pylab.xlabel ('mesh level')
     levels_extent (levels)
