@@ -546,6 +546,9 @@ class MatPlotLib (object):
     else:
       extent_centered = None
 
+    if 'shell' in qoi and extent_centered != None:
+      extent_centered = [ 2 * extent_centered [0], 2 * extent_centered [1] ]
+
     return extent_centered
 
   # === plotting routines
@@ -571,10 +574,9 @@ class MatPlotLib (object):
 
   # adjust axes
   def adjust_axes (self, qoi, extent, xorigin, yorigin, xend=None, yend=None, ydistance=False):
-    
+
     # fit all existing data first
-    if not ydistance:
-      pylab.gca().axis ('auto')
+    pylab.gca().axis ('auto')
     
     # adjust x-axis
     if xorigin:
@@ -594,7 +596,7 @@ class MatPlotLib (object):
     # otherwise perform some automatic axes modifications based on parameters
     else:
       
-      if yorigin:
+      if yorigin or ydistance:
         pylab.gca().set_ylim (bottom = 0)
       
       if yend:
