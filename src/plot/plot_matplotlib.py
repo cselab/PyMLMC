@@ -535,6 +535,19 @@ class MatPlotLib (object):
     raw_input ('Press ENTER to continue... ')
     pylab.close ('all')
 
+  # center extent
+  def center_extent (self, qoi, extent):
+
+    if extent:
+      extent_range    = extent [1] - extent [0]
+      extent_centered = ( - 0.5 * extent_range, 0.5 * extent_range )
+    elif '_pos_d' in qoi:
+      extent_centered = ( - 1.05 * self.surface, 1.05 * self.surface )
+    else:
+      extent_centered = None
+
+    return extent_centered
+
   # === plotting routines
 
   # plot a line indicating position
@@ -672,10 +685,14 @@ class MatPlotLib (object):
     pylab.colorbar ()
 
   # plot each stat
-  def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
+  def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True, centered=False):
     
     percentiles = []
     ydistance   = 0
+
+    # centered data - center extent as well
+    if centered:
+      extent = self.center_extent (self, qoi, extent)
 
     for stat_name, stat in stats.iteritems():
 
@@ -844,18 +861,6 @@ class MatPlotLib (object):
     pylab.legend (handles, labels, loc='center')
     pylab.axis('off')
 
-    '''
-    pylab.subplots_adjust (top=0.95)
-    pylab.subplots_adjust (right=0.97)
-    pylab.subplots_adjust (left=0.05)
-
-    if infolines:
-    self.infolines ()
-    pylab.subplots_adjust (bottom=0.10)
-    else:
-    pylab.subplots_adjust (bottom=0.05)
-    '''
-
     if infolines:
       self.infolines ()
 
@@ -883,43 +888,13 @@ class MatPlotLib (object):
 
     xlabel = '%s [%s]' % (name('t'), unit('t'))
 
-    if extent:
-      extent_range = extent [1] - extent [0]
-      extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
-    elif '_pos_d' in qoi:
-      extent_diff = ( - 1.05 * self.surface, 1.05 * self.surface )
-    else:
-      extent_diff = None
-
-    if 'shell' in qoi:
-      extent_diff = extent
-
     for level, diff in enumerate (self.mlmc.diffs):
 
       if level == 0: continue
       pylab.subplot ( 1, self.mlmc.config.L, level)
       pylab.title ( 'level %d - level %d' % (level, level - 1) )
       if self.mlmc.config.samples.counts.loaded [level]:
-        self.stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
-
-    '''
-    handles, labels = pylab.gcf().gca().get_legend_handles_labels()
-    pylab.subplot (2, levels, 1 + levels)
-    pylab.legend (handles, labels, loc='center')
-    pylab.axis('off')
-    '''
-
-    '''
-    pylab.subplots_adjust (top=0.95)
-    pylab.subplots_adjust (right=0.97)
-    pylab.subplots_adjust (left=0.05)
-
-    if infolines:
-      self.infolines ()
-      pylab.subplots_adjust (bottom=0.10)
-    else:
-      pylab.subplots_adjust (bottom=0.05)
-    '''
+        self.stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
 
     if infolines:
       self.infolines ()
@@ -960,14 +935,6 @@ class MatPlotLib (object):
       if mc.available:
         self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
 
-    if extent:
-      extent_range = extent [1] - extent [0]
-      extent_diff = ( - 0.5 * extent_range, 0.5 * extent_range )
-    elif '_pos_d' in qoi:
-      extent_diff = ( - 1.05 * self.surface, 1.05 * self.surface )
-    else:
-      extent_diff = None
-
     # differences of MC estimates
     for level, diff in enumerate (self.mlmc.diffs):
 
@@ -977,24 +944,12 @@ class MatPlotLib (object):
       pylab.subplot ( 2, levels, level + 1 + levels )
       pylab.title ( 'level %d - level %d' % (level, level - 1) )
       if self.mlmc.config.samples.loaded:
-        self.stats ( qoi, diff, extent_diff, xorigin, yorigin, xlabel, run )
+        self.stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
 
     handles, labels = pylab.gcf().gca().get_legend_handles_labels()
     pylab.subplot (2, levels, 1 + levels)
     pylab.legend (handles, labels, loc='center')
     pylab.axis('off')
-
-    '''
-    pylab.subplots_adjust (top=0.95)
-    pylab.subplots_adjust (right=0.97)
-    pylab.subplots_adjust (left=0.05)
-
-    if infolines:
-      self.infolines ()
-      pylab.subplots_adjust (bottom=0.10)
-    else:
-      pylab.subplots_adjust (bottom=0.05)
-    '''
 
     if infolines:
       self.infolines ()
