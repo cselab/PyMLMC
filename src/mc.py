@@ -261,7 +261,7 @@ class MC (object):
     self.stats_all = {}
     for stat in stats:
       if self.available:
-        self.stats_all [ stat.name ] = stat.compute_all ( self.results, qois=qois, check=1 )
+        self.stats_all [ stat.name ] = stat.steps ( self.results, qois=qois, check=1 )
       else:
         self.stats_all [ stat.name ] = None
     '''
@@ -270,4 +270,4 @@ class MC (object):
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     self.stats = {}
     for stat in stats:
-      self.stats [ stat.name ] = stat.compute_all ( self.results, indices=indices, qois=qois )
+      self.stats [ stat.name ] = stat.steps ( self.results, indices=indices, qois=qois )

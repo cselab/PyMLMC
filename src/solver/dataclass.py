@@ -285,38 +285,34 @@ class Time_Series (object):
   def init (self, a):
     self.meta = a.meta
     for key in a.data.keys():
-      self.data [key] = []
-      for step in xrange ( len ( a.data [key] ) ):
-        self.data [key] .append ( 0 )
+      self.data [key] = numpy.zeros ( len ( a.data [key] ) )
+
+  def resize (self, size):
+    for key in self.data.keys():
+      shape = (len (self.data [key]), size) if size > 1 else len (self.data [key])
+      self.data [key] = numpy.empty (shape)
 
   def __rmul__ (self, a):
     result = copy.deepcopy (self)
     for key in result.data.keys():
-      for step in xrange ( len ( result.data [key] ) ):
-        result.data [key] [step] *= a
+      result.data [key] *= a
     return result
 
   def __lmul__ (self, a):
-    result = copy.deepcopy (self)
-    for key in result.data.keys():
-      for step in xrange ( len ( result.data [key] ) ):
-        result.data [key] [step] *= a
-    return result
-
+    return self * a
+    
   def __iadd__ (self, a):
     if not self.data:
       self.init (a)
     for key in self.data.keys():
-      for step in xrange ( len ( self.data [key] ) ):
-        self.data [key] [step] += a.data [key] [step]
+      self.data [key] += a.data [key]
     return self
   
   def __isub__ (self, a):
     if not self.data:
       self.init (a)
     for key in self.data.keys():
-      for step in xrange ( len ( self.data [key] ) ):
-        self.data [key] [step] -= a.data [key] [step]
+      self.data [key] -= a.data [key]
     return self
   
   def __str__ (self):

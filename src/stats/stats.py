@@ -15,7 +15,7 @@ from helpers import Progress
 class Stat (object):
   
   # TODO: implement serialize() method for DataClass and generalize this
-  def compute_all (self, samples, indices=None, check=0, qois='all'):
+  def steps (self, samples, indices=None, check=0, qois='all'):
 
     # check if sufficiently many samples are provided
     if len (samples) == 0 or (indices and len (indices) == 0):
@@ -26,8 +26,9 @@ class Stat (object):
     for sample in samples:
       if sample != None:
         stats = copy.deepcopy (sample)
+        stats.resize (self.size)
         break
-
+    
     # check if at least one sample is available
     if stats == None:
       print '       %-30s[%s]' % (self.name, 'unavailable')
@@ -64,15 +65,12 @@ class Stat (object):
             ensemble = [ sample.data [key] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [key] [step]) ]
           else:
             ensemble = [ sample.data [key] [step] for sample in samples if not numpy.isnan (sample.data [key] [step]) ]
-
-        # remove NaN's
-        #ensemble = [ element for element in ensemble if not numpy.isnan (element) ]
-
+        
         # compute statistic
         if len (ensemble) > 0:
           stats.data [key] [step] = self.compute (ensemble)
         else:
-          stats.data [key] [step] = float ('nan')
+          stats.data [key] [step] = self.empty ()
       
       # update progress
       progress.update (i + 1)

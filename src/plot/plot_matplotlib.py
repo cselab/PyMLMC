@@ -165,26 +165,26 @@ def alpha (run):
 
 units = {}
 
-units ['t']   = r'$\mu s$'
-units ['pos'] = r'$mm$'
+units ['t']    = r'$\mu s$'
+units ['pos']  = r'$mm$'
 
-units ['a2']  = r'$-$'
-units ['r']   = r'$kg/m^3$'
-units ['r2']  = r'$kg/m^3$'
-units ['u']   = r'$mm/\mu s$'
-units ['v']   = r'$mm/\mu s$'
-units ['w']   = r'$mm/\mu s$'
-units ['m']   = r'$mm/\mu s$'
-units ['ke']  = r'$J$' # check
-units ['W']   = r'$\mu s^{-1}$'
-units ['e']   = r'$J$' # check
-units ['p']   = r'$bar$'
-units ['pw']  = r'$bar$'
-units ['c']   = r'$mm/\mu s$'
-units ['M']   = r'$-$'
-units ['V2']  = r'$mm^3$'
-units ['Req'] = r'$mm$'
-units ['Vc']  = r'$mm^3$'
+units ['a2']   = r'$-$'
+units ['r']    = r'$kg/m^3$'
+units ['r2']   = r'$kg/m^3$'
+units ['u']    = r'$mm/\mu s$'
+units ['v']    = r'$mm/\mu s$'
+units ['w']    = r'$mm/\mu s$'
+units ['m']    = r'$mm/\mu s$'
+units ['ke']   = r'$J$' # check
+units ['W']    = r'$\mu s^{-1}$'
+units ['e']    = r'$J$' # check
+units ['p']    = r'$MPa$'
+units ['pw']   = r'$MPa$'
+units ['c']    = r'$mm/\mu s$'
+units ['M']    = r'$-$'
+units ['V2']   = r'$mm^3$'
+units ['Req']  = r'$mm$'
+units ['Vc']   = r'$mm^3$'
 
 def unit (qoi):
   if '_pos' in qoi:
@@ -559,7 +559,7 @@ class MatPlotLib (object):
     if qoi == None:
       return
 
-    pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+    #pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
 
     if '_pos_d' in qoi or ydistance:
       if self.surface == 'N/A':
@@ -622,15 +622,13 @@ class MatPlotLib (object):
         pylab.gca().set_ylim (top = max (self.extent_z, ylim))
 
   # plot histogram
-  def histogram (self, qoi, stat, centered, log=0):
+  def histogram (self, qoi, stat, extent, centered, log=0):
 
-    ts = numpy.array ( stat.meta ['t'] )
-    ys = numpy.array ( stat.meta ['bins'] )
-    vs = numpy.array ( stat.data [qoi] )
+    vs = stat.data [qoi]
 
-    extent = ( ts [0], ts [-1], ys [0], ys [-1] )
+    extent = ( stat.meta ['t'] [0], stat.meta ['t'] [-1], extent [0], extent [1] )
 
-    vmax = numpy.max (numpy.max (vs))
+    vmax = 1.0
 
     if log:
       from matplotlib.colors import LogNorm
@@ -647,6 +645,7 @@ class MatPlotLib (object):
       cmap = 'binary'
 
     pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='hermite', vmin=vmin, vmax=vmax)
+    pylab.colorbar ()
 
   # gather all shell qois for assembly
   def gather_shell_qois (self, shells):
@@ -701,15 +700,15 @@ class MatPlotLib (object):
     percentiles = []
     ydistance   = 0
 
-    # centered data - center extent as well
-    if centered:
-      extent = self.center_extent (qoi, extent)
-
     for stat_name, stat in stats.iteritems():
 
       if stat_name == 'histogram':
-        self.histogram (qoi, stat)
+        self.histogram (qoi, stat, extent, centered)
         break
+      
+      # centered data - center extent as well
+      if centered:
+        extent = self.center_extent (qoi, extent)
 
       if 'shell' in qoi:
         qois = [ q for q in stats [stat_name] .data.keys() if q.find (qoi) == 0 ]
@@ -988,7 +987,7 @@ class MatPlotLib (object):
       figure (infolines)
     
     xlabel = '%s [%s]' % (name('t'), unit('t'))
-    pylab.title ( 'estimated statistics for %s' % name (qoi) )
+    #pylab.title ( 'statistics for %s' % name (qoi) )
     self.stats (qoi, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
     if infolines:
