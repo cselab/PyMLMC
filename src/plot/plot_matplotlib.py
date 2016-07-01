@@ -189,6 +189,8 @@ units ['Vc']  = r'$mm^3$'
 def unit (qoi):
   if '_pos' in qoi:
     return units ['pos']
+  if '_shell' in qoi:
+    return units ['pos']
   if '_time' in qoi:
     return units ['t']
   base_qoi = base (qoi)
@@ -238,6 +240,8 @@ def name (qoi, short=False):
   if '_sensor' in qoi:
     id = qoi.split ('_sensor', 1) [1]
     name_ = name_ + ' sensor ' + id
+  if '_shell' in qoi:
+    name_ = 'shell ' + name_
   if '_time' in qoi:
     name_ = 'time of ' + name_
   if short and '_pos' in qoi:
@@ -599,6 +603,8 @@ class MatPlotLib (object):
     ys = numpy.array ( stat.meta ['bins'] )
     vs = numpy.array ( stat.data [qoi] )
 
+    extent = ( ts [0], ts [-1], ys [0], ys [-1] )
+
     vmax = numpy.max (numpy.max (vs))
 
     if log:
@@ -611,7 +617,7 @@ class MatPlotLib (object):
 
     # TODO: cmap should be based on 'color(qoi)'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='nearest', vmin=vmin, vmax=vmax)
 
   # gather all shell qois for assembly
   def gather_shell_qois (self, shells):
@@ -632,10 +638,13 @@ class MatPlotLib (object):
 
     # construct array consisting of all shells
     ys = numpy.empty ( len (qois), dtype=float )
+
     vs = numpy.empty ( ( len (ts), len (qois) ), dtype=float )
     for shell, qoi in enumerate (qois):
       ys [shell]       = int (qoi [ qoi.find ('_shell_avg') + 10 : ])
       vs [ : , shell ] = numpy.array ( stat.data [qoi] )
+
+    image_extent = ( ts [0], ts [-1], ys [0], ys [-1] )
 
     vmax = extent [1]
 
@@ -649,7 +658,8 @@ class MatPlotLib (object):
 
     # TODO: cmap should be based on 'color(qoi)'
 
-    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+    pylab.imshow (numpy.transpose (vs), cmap='binary', origin='lower', aspect='auto', extent=image_extent, norm=norm, interpolation='nearest', vmin=vmin, vmax=vmax)
+    pylab.colorbar ()
 
   # plot each stat
   def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True):
@@ -664,7 +674,7 @@ class MatPlotLib (object):
         break
 
       if 'shell' in qoi:
-        qois = [ q for q in stats [stat_name] .data.keys() if qoi in q ]
+        qois = [ q for q in stats [stat_name] .data.keys() if q.find (qoi) == 0 ]
         compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
         qois.sort (compare)
         self.shells (qois, stat, extent)
@@ -727,7 +737,7 @@ class MatPlotLib (object):
       pylab.legend (loc='best')
 
   # plot computed MC estimators of statistics
-  def mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -762,7 +772,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators of statistics
-  def mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
     # some dynamic values
     if level  == 'finest':   level = self.mlmc.config.L
@@ -795,7 +805,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators of statistics for both types
-  def mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -848,7 +858,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed differences of MC estimators
-  def diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
+  def stats_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -910,7 +920,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators and their differences
-  def mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -985,7 +995,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MLMC statistics
-  def mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 

@@ -99,13 +99,13 @@ if __name__ == '__main__':
   for qoi, extent in qois.iteritems():
 
     # plot MC results
-    plot.mcs ( qoi=qoi, extent=extent )
+    plot.stats_mcs ( qoi=qoi, extent=extent )
 
     # plot diffs of MC results
-    plot.diffs ( qoi=qoi, extent=extent )
+    plot.stats_diffs ( qoi=qoi, extent=extent )
 
     # plot MLMC results
-    plot.mlmc ( qoi=qoi, extent=extent )
+    plot.stats_mlmc ( qoi=qoi, extent=extent )
 
   # show statistics
   if not local.cluster:
