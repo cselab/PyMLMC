@@ -559,7 +559,7 @@ class MatPlotLib (object):
     if qoi == None:
       return
 
-    #pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+    pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
 
     if '_pos_d' in qoi or ydistance:
       if self.surface == 'N/A':
