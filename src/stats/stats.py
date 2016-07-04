@@ -10,7 +10,7 @@
 
 import copy
 import numpy
-from helpers import Progress
+import helpers
 
 class Stat (object):
   
@@ -44,14 +44,22 @@ class Stat (object):
       names   = stats.data.keys()
       extents = [ None for name in names ]
     else:
-      names, extents = qois.iteritems()
+      names   = qois.keys()
+      extents = qois.values()
 
     # use progress indicator, report current statistic each time
     prefix = '       %-30s' % self.name
-    progress = Progress (prefix=prefix, steps=len(keys), length=20)
-
-    # compute sample statistics
+    progress = helpers.Progress (prefix=prefix, steps=len(names), length=20)
+    
+    # compute sample statistics for each qoi
     for i, (name, extent) in enumerate (zip (names, extents)):
+
+      # check if qoi is available
+      if name not in sample.data:
+        helpers.warning ('QoI \'%s\' not found in assembled data.' % name)
+        continue
+      
+      # compute sample statistics for each step
       for step in xrange ( len ( stats.data [name] ) ):
 
         # check for unavailable samples

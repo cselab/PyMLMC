@@ -70,46 +70,52 @@ if __name__ == '__main__':
 
   # plotting emnsembles
   for qoi, extent in qois.iteritems():
-    plot.ensembles ( qoi=qoi, extent=extent )
+    plot.ensembles ( qoi=qoi, extent=extent, both=0 )
+    plot.ensembles ( qoi=qoi, extent=extent, both=1 )
 
   # show ensembles
   if not local.cluster:
     plot.show()
-
-  # statistics
-  from stats_numpy import *
-  stats = []
-  stats.append ( NumPy_Stat ('mean') )
-  stats.append ( NumPy_Stat ('percentile', '0.05 percentile',  5) )
-  stats.append ( NumPy_Stat ('percentile', '0.95 percentile', 95) )
-
-  # TOOD: add histograms as image plots?
-  #stats.append ( NumPy_Stat ('histogram') )
-
-  # assemble MLMC estimates
-  mlmc.assemble (stats, qois.keys())
-
+  
   # required qoi ranges for MLMC estimates
   ranges = []
   ranges.append ( ['I', 0, None] )
 
-  # clip MLMC estimates
-  mlmc.clip (ranges)
+  # statistics
+  from stats_numpy import *
+  from stats_confidence import *
+  from stats_histogram import *
+  figures = {}
+  figures ['mean-confidence'] = [ NumPy_Stat ('mean'), Confidence (lower=5, upper=95), Confidence (lower=25, upper=75) ]
+  figures ['histogram']       = [ Histogram () ]
 
-  for qoi, extent in qois.iteritems():
+  # assemble and plot all statistics
+  for suffix, stats in figures.iteritems():
 
-    # plot MC results
-    plot.stats_mcs ( qoi=qoi, extent=extent )
+    # assemble MLMC estimates
+    mlmc.assemble ( stats, qois )
+    
+    # add shells to qois
+    qois.update (shells) 
+    
+    # clip MLMC estimates
+    mlmc.clip (ranges)
+    
+    # plot all qois
+    for qoi, extent in qois.iteritems():
 
-    # plot diffs of MC results
-    plot.stats_diffs ( qoi=qoi, extent=extent )
+      # plot MC results
+      plot.stats_mcs ( qoi=qoi, extent=extent, suffix=suffix )
 
-    # plot MLMC results
-    plot.stats_mlmc ( qoi=qoi, extent=extent )
+      # plot diffs of MC results
+      plot.stats_diffs ( qoi=qoi, extent=extent, suffix=suffix )
 
-  # show statistics
-  if not local.cluster:
-    plot.show()
+      # plot MLMC results
+      plot.stats_mlmc ( qoi=qoi, extent=extent, suffix=suffix )
+  
+    # show statistics
+    if not local.cluster:
+      plot.show()
 
   # plot samples
   plot.samples ()

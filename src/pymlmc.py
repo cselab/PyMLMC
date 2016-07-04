@@ -758,11 +758,12 @@ class MLMC (object):
 
     # report quantities of interest to be assembled
     if qois != None:
-      print '  :',
+
+      print '  : Specified qois:'
       for qoi in qois.keys():
         print qoi,
       print
-
+    
     import copy
     
     # assemble MC estimates on all levels and types for each statistic

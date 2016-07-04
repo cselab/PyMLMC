@@ -628,22 +628,22 @@ class MatPlotLib (object):
 
     extent = ( stat.meta ['t'] [0], stat.meta ['t'] [-1], extent [0], extent [1] )
 
-    vmax = 1.0
+    # TODO: cmap should be based on 'color(qoi)'
+    if centered:
+      vmax = 0.5
+      vmin = -0.5
+      cmap = 'RdBu'
+    else:
+      vmax = 1.0
+      vmin = 0.0
+      cmap = 'binary'
 
     if log:
       from matplotlib.colors import LogNorm
       norm = LogNorm (vmin=0, vmax=vmax)
-      vmin = 1
     else:
       norm = None
-      vmin = 0
-
-    # TODO: cmap should be based on 'color(qoi)'
-    if centered:
-      cmap = 'RdBu'
-    else:
-      cmap = 'binary'
-
+    
     pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect='auto', norm=norm, extent=extent, interpolation='hermite', vmin=vmin, vmax=vmax)
     pylab.colorbar ()
 
@@ -695,60 +695,67 @@ class MatPlotLib (object):
     pylab.colorbar ()
 
   # plot each stat
-  def stats (self, qoi, names, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True, centered=False):
-    
+  def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True, centered=False):
+
     ydistance   = 0
-
-    # filter statistics based on names
-    if names:
-      selected = { name: self.mlmc.stats [name] for name in names }
-    else:
-      selected = self.stats
     
-    for stat_name, stat in selected.iteritems():
+    for stat_name, stat in stats.iteritems():
 
-      if stat_name == 'histogram':
-        self.histogram (qoi, stat, extent, centered)
-        break
+      # if the specified qoi was not assembled, continue
+      if qoi not in stat.data:
+        continue
       
-      # centered data - center extent as well
-      if centered:
-        extent = self.center_extent (qoi, extent)
+      # get size (dimensions) of the statistic
+      shape = stat.data [qoi] .shape
+      size  = shape [1] if len (shape) > 1 else 1
+      
+      # load data
+      ts = numpy.array ( stat.meta ['t'] )
+      vs = numpy.array ( stat.data [qoi] )
 
+      # centered data - center extent as well
+      if centered and size <= 2:
+        extent = self.center_extent (qoi, extent)
+      
+      # special plotting for shells
       if 'shell' in qoi:
+
+        # only size 1 statistic can be plotted as an image
+        if size != 1:
+          continue
+        
+        # gather all required sheels and plot them in a single plot
         qois = [ q for q in stats [stat_name] .data.keys() if q.find (qoi) == 0 ]
         compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
         qois.sort (compare)
         self.shells (qois, stat, extent, centered)
         ydistance = 1
         break
-
-      ts = numpy.array ( stat.meta ['t'] )
-      vs = numpy.array ( stat.data [qoi] )
       
-      # exclude first data point, if we are dealing with positions
-      if '_pos' in qoi:
-        ts = ts [1:]
-        vs = vs [1:]
+      # special plotting for multi-dimensional statistics such as histograms and correlations
+      if size > 2:
+        if stat_name == 'histogram':
+          self.histogram (qoi, stat, extent, centered)
+        break
+      
+      # plot size 2 statistics such as confidence intervals
+      if size == 2:
+        lower  = vs [:, 0]
+        upper  = vs [:, 1]
+        bright = brighten (color(qoi), factor=0.7)
+        pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3, label=name)
+        # hack to show the legend entry
+        #pylab.plot([], [], color=bright, linewidth=10, label=name)
+        continue
 
       # stat-specific plotting: std. deviation
-      if stat_name == 'std. deviation' and 'mean' in stats:
+      if 'std. deviation' in stat_name and 'mean' in stats:
         ms = numpy.array ( stats ['mean'] .data [qoi] )
         bright = brighten(color(qoi), factor=0.7)
         pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
         # hack to show the legend entry
         pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
-        break
-      
-      # plot confidence intervals
-      if 'confidence' in stat_name:
-        lower  = vs [0, :]
-        upper  = vs [1, :]
-        bright = brighten (color(qoi), factor=0.7)
-        pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3, label=name)
-        # hack to show the legend entry
-        #pylab.plot([], [], color=bright, linewidth=10, label=name)
-        break
+        continue
         
       # general plotting
       pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
@@ -764,7 +771,7 @@ class MatPlotLib (object):
       pylab.legend (loc='best')
 
   # plot computed MC estimators of statistics
-  def stats_mcs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -786,7 +793,7 @@ class MatPlotLib (object):
       pylab.subplot ( 1, levels, mc.config.level + 1 )
       pylab.title ( 'level %d' % mc.config.level )
       if mc.available:
-        self.stats ( qoi, names, mc.stats, extent, xorigin, yorigin, xlabel, run )
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
     if infolines:
       self.infolines ()
@@ -799,7 +806,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators of statistics
-  def stats_mc (self, level, type=0, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', title=False, save=None):
+  def stats_mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', title=False, save=None):
 
     # some dynamic values
     if level  == 'finest':   level = self.mlmc.config.L
@@ -822,7 +829,7 @@ class MatPlotLib (object):
 
     mc = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ]
     if mc.available:
-      self.stats ( qoi, names, mc.stats, extent, xorigin, yorigin, xlabel, run )
+      self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run )
 
     if infolines:
       self.infolines ()
@@ -835,7 +842,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators of statistics for both types in separate sub-plots
-  def stats_mcs_both (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -858,7 +865,7 @@ class MatPlotLib (object):
       pylab.subplot ( 2, levels, mc.config.level + 1 + (mc.config.type == 1) * levels )
       pylab.title ( 'level %d %s' % (mc.config.level, typestr) )
       if mc.available:
-        self.stats ( qoi, names, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
     
     handles, labels = pylab.gcf().gca().get_legend_handles_labels()
     pylab.subplot (2, levels, 1 + levels)
@@ -876,7 +883,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed differences of MC estimators
-  def stats_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, suffix='', save=None):
+  def stats_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -898,7 +905,7 @@ class MatPlotLib (object):
       pylab.subplot ( 1, self.mlmc.config.L, level)
       pylab.title ( 'level %d - level %d' % (level, level - 1) )
       if self.mlmc.config.samples.counts.loaded [level]:
-        self.stats ( qoi, names, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
+        self.stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
 
     if infolines:
       self.infolines ()
@@ -911,7 +918,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators and their differences
-  def stats_mc_and_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -937,7 +944,7 @@ class MatPlotLib (object):
       pylab.subplot ( 2, levels, mc.config.level + 1 )
       pylab.title ( 'level %d' % mc.config.level )
       if mc.available:
-        self.stats ( qoi, names, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
+        self.stats ( qoi, mc.stats, extent, xorigin, yorigin, xlabel, run, legend=False )
 
     # differences of MC estimates
     for level, diff in enumerate (self.mlmc.diffs):
@@ -948,7 +955,7 @@ class MatPlotLib (object):
       pylab.subplot ( 2, levels, level + 1 + levels )
       pylab.title ( 'level %d - level %d' % (level, level - 1) )
       if self.mlmc.config.samples.loaded:
-        self.stats ( qoi, names, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
+        self.stats ( qoi, diff, extent, xorigin, yorigin, xlabel, run, centered=True )
 
     handles, labels = pylab.gcf().gca().get_legend_handles_labels()
     pylab.subplot (2, levels, 1 + levels)
@@ -966,7 +973,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MLMC statistics
-  def stats_mlmc (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, title=False, suffix='', save=None):
+  def stats_mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, title=False, suffix='', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -985,7 +992,7 @@ class MatPlotLib (object):
     if title:
       pylab.title ( 'MLMC statistics for %s' % name (qoi) )
     
-    self.stats (qoi, names, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
+    self.stats (qoi, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
     if infolines:
       self.infolines ()

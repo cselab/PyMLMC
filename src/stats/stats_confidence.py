@@ -16,7 +16,10 @@ class Confidence (Stat):
   
   def __init__ (self, name=None, lower=5, upper=95):
     
-    self.size = 2
+    self.size  = 2
+    self.lower = lower
+    self.upper = upper
+
     if name == None:
       self.name = 'confidence %d%% - %d%%' % (lower, upper)
     
@@ -27,7 +30,7 @@ class Confidence (Stat):
     
     interval = numpy.empty (2)
 
-    interval [0] = self.percentile (samples, lower)
-    interval [1] = self.percentile (samples, upper)
+    interval [0] = numpy.percentile (samples, self.lower)
+    interval [1] = numpy.percentile (samples, self.upper)
     
     return interval

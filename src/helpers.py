@@ -92,6 +92,12 @@ def grids_3d_t (N, NS):
 def chunks (list, size):
   return [ list [i : i+size] for i in range (0, len (list), size) ]
 
+# merge two dictionaries
+def mergedict (a, b):
+  c = a.copy ()
+  c.update (b)
+  return c
+
 # integer format with multipliers K, M, etc.
 def intf (number, table=0, empty=0, bar=0, plain=0):
   if bar:
