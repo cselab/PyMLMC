@@ -28,7 +28,7 @@ class NumPy_Stat (Stat):
     self.params = params
   
   # compute statistic 'self.stat' of given samples
-  def compute (self, samples, range=None):
+  def compute (self, samples, extent):
 
     warnings.simplefilter ('ignore')
     
@@ -36,8 +36,3 @@ class NumPy_Stat (Stat):
       return self.stat (samples, self.params)
     else:
       return self.stat (samples)
-
-  # return empty result in case no samples are available
-  def empty (self):
-
-    return float ('nan')

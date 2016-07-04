@@ -650,12 +650,12 @@ class MatPlotLib (object):
   # gather all shell qois for assembly
   def gather_shell_qois (self, shells):
 
-    extra = []
+    extra = {}
 
-    for shell in shells:
+    for shell, extent in shells.iteritems():
       for qoi in self.mlmc.mcs [0].results [0] .data.keys():
         if qoi.find (shell) == 0:
-          extra.append (qoi)
+          extra [qoi] = extent
 
     return extra
 
@@ -697,17 +697,15 @@ class MatPlotLib (object):
   # plot each stat
   def stats (self, qoi, names, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True, centered=False):
     
-    percentiles = []
     ydistance   = 0
 
     # filter statistics based on names
-    # TODO: this overwrites stats that is later used in shells!
-    ''''
     if names:
-      stats = { name: self.mlmc.stats [name] for name in names }
-    ''''
-
-    for stat_name, stat in stats.iteritems():
+      selected = { name: self.mlmc.stats [name] for name in names }
+    else:
+      selected = self.stats
+    
+    for stat_name, stat in selected.iteritems():
 
       if stat_name == 'histogram':
         self.histogram (qoi, stat, extent, centered)
@@ -740,34 +738,20 @@ class MatPlotLib (object):
         pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
         # hack to show the legend entry
         pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
+        break
       
-      # collect percentiles for later fill
-      elif 'percentile' in stat_name:
-        percentiles.append ( { 'ts' : ts, 'vs' : vs, 'level' : int ( 100 * float ( stat_name.split(' ') [0] ) ) } )
-      
+      # plot confidence intervals
+      if 'confidence' in stat_name:
+        lower  = vs [0, :]
+        upper  = vs [1, :]
+        bright = brighten (color(qoi), factor=0.7)
+        pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3, label=name)
+        # hack to show the legend entry
+        #pylab.plot([], [], color=bright, linewidth=10, label=name)
+        break
+        
       # general plotting
-      else:
-        pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
-    
-    # plot percentiles
-    if percentiles != []:
-
-      if len (percentiles) != 2:
-        print
-        print ' :: ERROR: Only two percentiles can be plotted at a time.'
-        print
-        print sys.exit()
-      
-      lower  = percentiles [0] ['vs']
-      upper  = percentiles [1] ['vs']
-      ts     = percentiles [0] ['ts']
-      levels = [ percentile ['level'] for percentile in percentiles ]
-      label  = 'confidence %d%% - %d%%' % ( min (levels), max (levels) )
-
-      bright = brighten(color(qoi), factor=0.7)
-      pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
-      # hack to show the legend entry
-      pylab.plot([], [], color=bright, linewidth=10, label=label)
+      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
     
     pylab.xlabel (xlabel)
     pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
@@ -780,7 +764,7 @@ class MatPlotLib (object):
       pylab.legend (loc='best')
 
   # plot computed MC estimators of statistics
-  def stats_mcs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mcs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -810,12 +794,12 @@ class MatPlotLib (object):
     adjust (infolines, subplots=levels)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs')
+      self.draw (save, qoi, suffix='stats_mcs' + suffix)
 
     print ' done.'
 
   # plot computed MC estimators of statistics
-  def stats_mc (self, level, type=0, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mc (self, level, type=0, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', title=False, save=None):
 
     # some dynamic values
     if level  == 'finest':   level = self.mlmc.config.L
@@ -833,6 +817,9 @@ class MatPlotLib (object):
 
     xlabel = '%s [%s]' % (name('t'), unit('t'))
 
+    if title:
+      pylab.title ( 'MC statistics for %s' % name (qoi) )
+
     mc = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ]
     if mc.available:
       self.stats ( qoi, names, mc.stats, extent, xorigin, yorigin, xlabel, run )
@@ -843,12 +830,12 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mc')
+      self.draw (save, qoi, suffix='stats_mc' + suffix)
 
     print ' done.'
 
-  # plot computed MC estimators of statistics for both types
-  def stats_mcs_both (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  # plot computed MC estimators of statistics for both types in separate sub-plots
+  def stats_mcs_both (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -884,12 +871,12 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs_both')
+      self.draw (save, qoi, suffix='stats_mcs_both' + suffix)
 
     print ' done.'
 
   # plot computed differences of MC estimators
-  def stats_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, save=None):
+  def stats_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -919,12 +906,12 @@ class MatPlotLib (object):
     adjust (infolines, subplots=self.mlmc.config.L)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_diffs')
+      self.draw (save, qoi, suffix='stats_diffs' + suffix)
 
     print ' done.'
 
   # plot computed MC estimators and their differences
-  def stats_mc_and_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mc_and_diffs (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -974,12 +961,12 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs_and_diffs')
+      self.draw (save, qoi, suffix='stats_mcs_and_diffs' + suffix)
 
     print ' done.'
 
   # plot computed MLMC statistics
-  def stats_mlmc (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, save=None):
+  def stats_mlmc (self, qoi=None, names=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, title=False, suffix='', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -994,7 +981,10 @@ class MatPlotLib (object):
       figure (infolines)
     
     xlabel = '%s [%s]' % (name('t'), unit('t'))
-    #pylab.title ( 'statistics for %s' % name (qoi) )
+    
+    if title:
+      pylab.title ( 'MLMC statistics for %s' % name (qoi) )
+    
     self.stats (qoi, names, self.mlmc.stats, extent, xorigin, yorigin, xlabel, run)
 
     if infolines:
@@ -1003,7 +993,7 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mlmc')
+      self.draw (save, qoi, suffix='stats_mlmc' + suffix)
 
     print ' done.'
   
@@ -1176,7 +1166,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot results of all samples (ensemble) of all levels
-  def ensembles (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, valid=False, save=None):
+  def ensembles (self, qoi=None, both=True, infolines=False, extent=None, xorigin=True, yorigin=True, limit=1024, valid=False, save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -1204,6 +1194,9 @@ class MatPlotLib (object):
           break
 
         for type in self.mlmc.config.types (level):
+
+          if type == self.mlmc.config.COARSE and not both:
+            continue
 
           results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
 
@@ -1240,7 +1233,7 @@ class MatPlotLib (object):
 
     adjust (infolines, subplots=levels)
 
-    self.draw (save, qoi, suffix='ensembles')
+    self.draw (save, qoi, suffix='ensembles' + ('_both' if both else ''))
 
     print ' done.'
 

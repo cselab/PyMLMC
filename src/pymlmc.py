@@ -747,7 +747,7 @@ class MLMC (object):
       mc.progress ()
 
   # assemble MC and MLMC estimates
-  def assemble (self, stats, qois='all'):
+  def assemble (self, stats, qois=None):
 
     # check if statistics can be assembled (at least one sample at some level with type 0)
     if not self.available:
@@ -757,10 +757,11 @@ class MLMC (object):
     print ' :: ASSEMBLING:'
 
     # report quantities of interest to be assembled
-    print '  :',
-    for qoi in qois:
-      print qoi,
-    print
+    if qois != None:
+      print '  :',
+      for qoi in qois.keys():
+        print qoi,
+      print
 
     import copy
     

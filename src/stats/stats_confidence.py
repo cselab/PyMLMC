@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Statistics class for histograms using NumPy
+# Statistics class for confidence intervals using NumPy
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -12,18 +12,22 @@ from stats import Stat
 import numpy
 import warnings
 
-class Histogram (Stat):
+class Confidence (Stat):
   
-  def __init__ (self, name='histogram', bins=100):
+  def __init__ (self, name=None, lower=5, upper=95):
     
-    self.size = bins
-    self.name = name
-  
-  # compute histogram using NumPy
+    self.size = 2
+    if name == None:
+      self.name = 'confidence %d%% - %d%%' % (lower, upper)
+    
+  # compute statistic 'self.stat' of given samples
   def compute (self, samples, extent):
 
     warnings.simplefilter ('ignore')
     
-    histogram, intervals = numpy.histogram (samples, bins=self.size, range=extent)
+    interval = numpy.empty (2)
 
-    return histogram / float ( len (samples) )
+    interval [0] = self.percentile (samples, lower)
+    interval [1] = self.percentile (samples, upper)
+    
+    return interval
