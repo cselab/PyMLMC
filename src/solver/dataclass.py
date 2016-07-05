@@ -250,15 +250,15 @@ class Time_Series (object):
     # sort data
     for key in self.data.keys():
       self.data [key] = self.data [key] [order]
-
+  
   def interpolate (self, points, begin=None, end=None):
     
     if begin == None: begin = self.meta ['t'] [0]
     if end   == None: end   = self.meta ['t'] [-1]
-
+    
     leftnan  = numpy.abs (begin - self.meta ['t'] [0] ) > 0.1 * numpy.abs (end - begin)
     rightnan = numpy.abs (end   - self.meta ['t'] [-1]) > 0.1 * numpy.abs (end - begin)
-
+    
     times = numpy.linspace ( begin, end, points )
     for key in self.data.keys():
       if leftnan:
@@ -272,7 +272,7 @@ class Time_Series (object):
       self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=left, right=right )
     
     self.meta ['t']  = times
-
+  
   def clip (self, ranges):
     for qoi, lower, upper in ranges:
       for key in self.data.keys():

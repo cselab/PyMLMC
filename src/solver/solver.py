@@ -515,11 +515,14 @@ class Solver (object):
 
             # add batch job to the ensemble
             ensemble += subensemble
+          
+          # add sinchronization
+          ensemble += '\n' + 'wait'
 
           # adjust parallelization according to the number of subblocks
           parallelization.nodes *= subblocks
           parallelization.cores *= subblocks
-
+          
           # submit
           self.execute ( self.submit (ensemble, parallelization, label, directory, suffix=suffix, boot=0, timer=0), directory )
 

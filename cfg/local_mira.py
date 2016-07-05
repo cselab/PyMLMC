@@ -195,8 +195,6 @@ done
 echo
 
 %(job)s
-
-wait
 '''
 
 # submit command

@@ -810,10 +810,19 @@ class MLMC (object):
     print
     print ' :: CLIPPING MLMC estimates...'
 
-    # apply prescribed ranges for all stats with size <= 2
+    # apply prescribed ranges for all stats
     for stat in self.stats:
-      if stat.size <= 2:
-        stat.estimate.clip (ranges)
+
+      # only if clipping is required
+      if stat.clip:
+
+        # if global clipping is specified, clip all qois accordingly
+        if isinstance ( stat.clip, (list, tuple) ):
+          stat.estimate.clip ( [ '', stat.clip [0], stat.clip [1] ] )
+        
+        # otherwise clip according to the specified ranges
+        else:
+          stat.estimate.clip (ranges)
 
     print '  : DONE'
 

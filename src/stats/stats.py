@@ -17,6 +17,9 @@ class Stat (object):
   # containers for results
   estimate = None
 
+  # special clipping
+  clip = 1
+
   # return empty result in case no samples are available
   def empty (self):
 

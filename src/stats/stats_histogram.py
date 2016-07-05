@@ -18,6 +18,7 @@ class Histogram (Stat):
     
     self.size = bins
     self.name = name
+    self.clip = [0.0, 1.0]
   
   # compute histogram using NumPy
   def compute (self, samples, extent):

@@ -704,7 +704,8 @@ class MatPlotLib (object):
 
     ydistance = 0
     
-    for stat in stats:
+    # reversed plotting of stats (to avoid stats hindering each other)
+    for stat in reversed (stats):
 
       # centered data - center extent as well
       if centered and stat.size <= 2:
@@ -755,12 +756,14 @@ class MatPlotLib (object):
     pylab.xlabel (xlabel)
     pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
 
-    self.helper_lines (qoi, run, size=size, ydistance=ydistance)
+    self.helper_lines (qoi, run, size=stat.size, ydistance=ydistance)
 
     self.adjust_axes (qoi, extent, xorigin, yorigin, ydistance=ydistance)
     
     if legend:
-      pylab.legend (loc='best')
+      # plot legend with reversed ordering
+      handles, labels = pylab.gca().get_legend_handles_labels ()
+      pylab.legend (handles[::-1], labels[::-1], loc='best')
   
   # plot computed MC estimators of statistics
   def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', save=None):

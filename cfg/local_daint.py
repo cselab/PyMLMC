@@ -79,7 +79,6 @@ script = '''#!/bin/bash
 %(xopts)s
 ulimit -c 0
 %(job)s
-wait
 '''
 
 '''

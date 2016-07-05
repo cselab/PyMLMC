@@ -22,6 +22,8 @@ class Deviations (Stat):
     
     if name == None:
       self.name = 'mean +/- %d std. dev.' % self.factor
+
+    self.clip = 0
     
   # compute mean and standard deviation
   def compute (self, samples, extent):
