@@ -625,6 +625,20 @@ class MatPlotLib (object):
   def histogram (self, qoi, stat, extent, centered, log=0):
 
     vs = stat.estimate.data [qoi]
+    
+    # downsample time dimension
+    '''
+    samples = 100
+    steps   = len (stat.estimate.meta ['t'])
+    if steps > samples:
+      stride = steps / samples
+      if steps % samples != 0:
+        padding = stride - steps % samples
+      padded = numpy.append ( vs, numpy.full (padding, float('nan')) )
+      downsampled = numpy.nanmean (padded.reshape ((-1, stride)), axis=1)
+    else:
+      downsampled = vs
+    '''
 
     extent = ( stat.estimate.meta ['t'] [0], stat.estimate.meta ['t'] [-1], extent [0], extent [1] )
 
@@ -710,6 +724,8 @@ class MatPlotLib (object):
       # centered data - center extent as well
       if centered and stat.size <= 2:
         stat_extent = self.center_extent (qoi, extent)
+      else:
+        stat_extent = extent
       
       # if the specified qoi was not assembled, continue
       if qoi not in stat.estimate.data or stat.estimate.data [qoi] == None:
