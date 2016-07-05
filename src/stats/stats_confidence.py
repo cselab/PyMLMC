@@ -17,11 +17,14 @@ class Confidence (Stat):
   def __init__ (self, name=None, level=5, lower=None, upper=None):
     
     self.size  = 2
+    self.level = level
+    self.lower = lower
+    self.upper = upper
     if lower == None or upper == None:
       self.lower = level
       self.upper = 1.0 - level
     if level == None:
-      self.level = min ( 0.5, max (lower, 1.0 - upper) )
+      self.level = min ( 0.5, max (self.lower, 1.0 - self.upper) )
     self.alpha = 1.0 - self.level
 
     if name == None:

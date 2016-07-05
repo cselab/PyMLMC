@@ -352,7 +352,6 @@ class MatPlotLib (object):
 
     print
     print ' :: MatPlotLib plotting backend initialized.'
-    print
 
   # === domain related constants
 
@@ -554,13 +553,14 @@ class MatPlotLib (object):
   # === plotting routines
 
   # plot a line indicating position
-  def helper_lines (self, qoi, run=1, ydistance=False):
+  def helper_lines (self, qoi, run=1, size=1, ydistance=False):
     
     if qoi == None:
       return
-
-    pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
-
+    
+    if size <= 2:
+      pylab.axhline (y=0, color='black', linestyle='-', linewidth=2, alpha=0.3)
+    
     if '_pos_d' in qoi or ydistance:
       if self.surface == 'N/A':
         print
@@ -742,7 +742,7 @@ class MatPlotLib (object):
       if stat.size == 2:
         lower  = vs [:, 0]
         upper  = vs [:, 1]
-        factor = 0.6 * stat.alpha
+        factor = 0.8 * stat.alpha
         bright = brighten (color(qoi), factor=factor)
         pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
         # hack to show the legend entry
@@ -755,7 +755,7 @@ class MatPlotLib (object):
     pylab.xlabel (xlabel)
     pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
 
-    self.helper_lines (qoi, run, ydistance=ydistance)
+    self.helper_lines (qoi, run, size=size, ydistance=ydistance)
 
     self.adjust_axes (qoi, extent, xorigin, yorigin, ydistance=ydistance)
     
