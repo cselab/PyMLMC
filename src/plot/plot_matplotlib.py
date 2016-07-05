@@ -742,7 +742,7 @@ class MatPlotLib (object):
       if stat.size == 2:
         lower  = vs [:, 0]
         upper  = vs [:, 1]
-        factor = 0.4 + 0.6 * stat.alpha
+        factor = 0.6 * stat.alpha
         bright = brighten (color(qoi), factor=factor)
         pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
         # hack to show the legend entry

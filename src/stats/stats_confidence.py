@@ -19,7 +19,7 @@ class Confidence (Stat):
     self.size  = 2
     self.lower = lower
     self.upper = upper
-    self.alpha = max ( 50, max (lower, 100 - upper) ) / float (50)
+    self.alpha = min ( 50, max (100 - lower, upper) ) / float (50)
 
     if name == None:
       self.name = 'confidence %d%% - %d%%' % (lower, upper)
