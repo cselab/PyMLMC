@@ -28,7 +28,7 @@ class Confidence (Stat):
     self.alpha = 1.0 - self.level
 
     if name == None:
-      self.name = 'confidence %.2f - %.2f' % (lower, upper)
+      self.name = 'confidence %.2f - %.2f' % (self.lower, self.upper)
     
   # compute percentiles to form a confidence interval
   def compute (self, samples, extent):
