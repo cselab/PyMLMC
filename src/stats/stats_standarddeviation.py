@@ -12,15 +12,16 @@ from stats import Stat
 import numpy
 import warnings
 
-class Standard_Deviation_Interval (Stat):
+class Deviations (Stat):
   
-  def __init__ (self, name=None):
+  def __init__ (self, name=None, factor=1):
     
-    self.size  = 2
-    self.alpha = 0.5
-
+    self.size   = 2
+    self.factor = factor
+    self.alpha  = min (1.0, 0.3 * factor)
+    
     if name == None:
-      self.name = 'mean +/- std. dev.'
+      self.name = 'mean +/- %d std. dev.' % self.factor
     
   # compute mean and standard deviation
   def compute (self, samples, extent):
@@ -30,8 +31,9 @@ class Standard_Deviation_Interval (Stat):
     result = numpy.empty (2)
 
     mean = numpy.mean (samples)
+    std  = numpy.std (samples, ddof=1)
 
-    result [0] = mean - numpy.std (samples, ddof=1)
-    result [1] = mean + numpy.std (samples, ddof=1)
+    result [0] = mean - self.factor * std
+    result [1] = mean + self.factor * std
     
     return result
