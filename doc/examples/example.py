@@ -86,7 +86,7 @@ if __name__ == '__main__':
   from stats_confidence import *
   from stats_histogram import *
   figures = {}
-  figures ['mean-confidence'] = [ NumPy_Stat ('mean'), Confidence (lower=5, upper=95), Confidence (lower=25, upper=75) ]
+  figures ['mean-confidence'] = [ NumPy_Stat ('mean'), Confidence (lower=25, upper=75), Confidence (lower=5, upper=95) ]
   figures ['histogram']       = [ Histogram () ]
 
   # assemble and plot all statistics
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
       # plot MLMC results
       plot.stats_mlmc ( qoi=qoi, extent=extent, suffix=suffix )
-  
+    
     # show statistics
     if not local.cluster:
       plot.show()

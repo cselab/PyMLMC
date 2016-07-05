@@ -14,6 +14,7 @@
 import os
 import sys
 import math
+import copy
 
 # === local imports
 
@@ -255,19 +256,9 @@ class MC (object):
 
     print '  : -> level %d, type %d' % (self.config.level, self.config.type)
 
-    '''
-    # assemble MC estimates from all available samples
-    print '    -> all samples:'
-    self.stats_all = {}
-    for stat in stats:
-      if self.available:
-        self.stats_all [ stat.name ] = stat.steps ( self.results, qois=qois, check=1 )
-      else:
-        self.stats_all [ stat.name ] = None
-    '''
+    self.stats = copy.deepcopy (stats)
     
     # assemble MC estimates using only specified subset of all samples
     print '    -> valid pairs of samples (both fine and coarse samples loaded):'
-    self.stats = {}
-    for stat in stats:
-      self.stats [ stat.name ] = stat.steps ( self.results, indices=indices, qois=qois )
+    for stat in self.stats:
+      stat.steps ( self.results, indices=indices, qois=qois )

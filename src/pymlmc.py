@@ -14,6 +14,7 @@
 import os
 import sys
 import time
+import copy
 
 # === local imports
 
@@ -764,8 +765,6 @@ class MLMC (object):
         print qoi,
       print
     
-    import copy
-    
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
     for mc in self.mcs:
@@ -773,40 +772,33 @@ class MLMC (object):
 
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
-    self.diffs = [ {} for level in self.config.levels ]
-    for name in [stat.name for stat in stats]:
+    self.diffs = [ copy.deepcopy (stats) for level in self.config.levels ]
 
-      # mark all levels as unavailable until the valid coarsest level L0
-      for level in self.config.levels [0 : self.L0]:
-        self.diffs [level] [name] = None
-
-      # coarsest level difference is just a plain MC estimate
-      self.diffs [self.L0] [name] = self.indicators.coefficients.values [self.L0] * copy.deepcopy (self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [name])
-
-      # assemble differences of the remaining levels
-      for level in self.config.levels [self.L0 + 1 : ]:
+    # coarsest level difference is just a plain MC estimate
+    for index, stat in enumerate (self.diffs [self.L0]):
+      stat.estimate = self.indicators.coefficients.values [self.L0] * self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [index] .estimate
+    
+    # assemble differences of the remaining levels
+    for level in self.config.levels [self.L0 + 1 : ]:
+      for index, stat in enumerate (self.diffs [level]):
         
         # if at least one sample from that level is available
         if self.config.samples.counts.loaded [level] != 0:
-          self.diffs [level] [name]  = self.indicators.coefficients.values [level]     * copy.deepcopy (self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [name])
-          self.diffs [level] [name] -= self.indicators.coefficients.values [level - 1] *                self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [name]
-
-        # else mark level as unavailable
-        else:
-          self.diffs [level] [name] = None
+          stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
+          stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
     
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
-    self.stats = {}
-    for name in [stat.name for stat in stats]:
+    self.stats = copy.deepcopy (stats)
+    for index, stat in enumerate (self.stats):
 
       # copy coarsest difference
-      self.stats [name] = copy.deepcopy (self.diffs [self.L0] [name])
+      stat.estimate = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
 
       # add remaining differences
       for diff in self.diffs [self.L0 + 1 : ]:
-        if diff [name] != None:
-          self.stats [name] += diff [name]
+        if diff [index] .estimate != None:
+          stat.estimate += diff [index] .estimate
 
     # TODO: issue at least a warning if some levels are missing in the _middle_ of level hierarchy (additional bias in introduced!)
 
@@ -818,9 +810,10 @@ class MLMC (object):
     print
     print ' :: CLIPPING MLMC estimates...'
 
-    # apply prescribed ranges for all stats
-    for name in self.stats.keys():
-      self.stats [name] .clip (ranges)
+    # apply prescribed ranges for all stats with size <= 2
+    for stat in self.stats:
+      if stat.size <= 2:
+        stat.estimate.clip (ranges)
 
     print '  : DONE'
 
@@ -829,5 +822,5 @@ class MLMC (object):
     
     for stat in self.stats:
       print
-      print ' :: STATISTIC: %s' % stat
-      print self.stats [stat]
+      print ' :: STATISTIC: %s' % stat.name
+      print stat.estimate

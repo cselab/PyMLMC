@@ -14,28 +14,30 @@ import helpers
 
 class Stat (object):
   
+  # containers for results
+  estimate = None
+
   # return empty result in case no samples are available
   def empty (self):
 
     return numpy.full ( self.size, float ('nan') )
 
   # TODO: implement serialize() method for DataClass and generalize this
-  def steps (self, samples, indices=None, check=0, qois=None):
+  def steps (self, samples, indices=None, qois=None):
 
     # check if sufficiently many samples are provided
     if len (samples) == 0 or (indices and len (indices) == 0):
       return None
 
     # copy data class from the first valid sample
-    stats = None
     for sample in samples:
       if sample != None:
-        stats = copy.deepcopy (sample)
-        stats.resize (self.size)
+        self.estimate = copy.deepcopy (sample)
+        self.estimate.resize (self.size)
         break
     
     # check if at least one sample is available
-    if stats == None:
+    if self.estimate == None:
       print '       %-30s[%s]' % (self.name, 'unavailable')
       return None
 
@@ -60,36 +62,22 @@ class Stat (object):
         continue
       
       # compute sample statistics for each step
-      for step in xrange ( len ( stats.data [name] ) ):
+      for step in xrange ( len ( self.estimate.data [name] ) ):
 
-        # check for unavailable samples
-        if check:
-
-          # if spedific indices are required, take this into account
-          if indices != None:
-            ensemble = [ sample.data [name] [step] for index, sample in enumerate (samples) if sample != None and index in indices and not numpy.isnan (sample.data [name] [step]) ]
-          else:
-            ensemble = [ sample.data [name] [step] for sample in samples if sample != None and not numpy.isnan (sample.data [name] [step]) ]
-
-        # assume all samples are available
+        # if spedific indices are required, take this into account
+        if indices != None:
+          ensemble = [ sample.data [name] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [name] [step]) ]
         else:
-
-          # if spedific indices are required, take this into account
-          if indices != None:
-            ensemble = [ sample.data [name] [step] for index, sample in enumerate (samples) if index in indices and not numpy.isnan (sample.data [name] [step]) ]
-          else:
-            ensemble = [ sample.data [name] [step] for sample in samples if not numpy.isnan (sample.data [name] [step]) ]
+          ensemble = [ sample.data [name] [step] for sample in samples if not numpy.isnan (sample.data [name] [step]) ]
         
         # compute statistic
         if len (ensemble) > 0:
-          stats.data [name] [step] = self.compute (ensemble, extent)
+          self.estimate.data [name] [step] = self.compute (ensemble, extent)
         else:
-          stats.data [name] [step] = self.empty ()
+          self.estimate.data [name] [step] = self.empty ()
       
       # update progress
       progress.update (i + 1)
       
     # finalize progress indicator
     progress.finalize()
-
-    return stats

@@ -624,9 +624,9 @@ class MatPlotLib (object):
   # plot histogram
   def histogram (self, qoi, stat, extent, centered, log=0):
 
-    vs = stat.data [qoi]
+    vs = stat.estimate.data [qoi]
 
-    extent = ( stat.meta ['t'] [0], stat.meta ['t'] [-1], extent [0], extent [1] )
+    extent = ( stat.estimate.meta ['t'] [0], stat.estimate.meta ['t'] [-1], extent [0], extent [1] )
 
     # TODO: cmap should be based on 'color(qoi)'
     if centered:
@@ -660,9 +660,14 @@ class MatPlotLib (object):
     return extra
 
   # plot shells
-  def shells (self, qois, stat, extent, centered, log=0):
+  def shells (self, qoi, stat, extent, centered, log=0):
 
-    ts = numpy.array ( stat.meta ['t'] )
+    # gather all required sheels
+    qois = [ q for q in stat.estimate.data.keys() if q.find (qoi) == 0 ]
+    compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
+    qois.sort (compare)
+
+    ts = numpy.array ( stat.estimate.meta ['t'] )
 
     # construct array consisting of all shells
     ys = numpy.empty ( len (qois), dtype=float )
@@ -671,7 +676,7 @@ class MatPlotLib (object):
     for shell, qoi in enumerate (qois):
       ys [shell]       = float (shell + 0.5) * self.shell_extent / len (qois)
       # TODO: reduce number of time steps here a bit?
-      vs [ : , shell ] = numpy.array ( stat.data [qoi] )
+      vs [ : , shell ] = numpy.array ( stat.estimate.data [qoi] )
 
     image_extent = ( ts [0], ts [-1], 0, self.shell_extent )
 
@@ -697,68 +702,55 @@ class MatPlotLib (object):
   # plot each stat
   def stats (self, qoi, stats, extent, xorigin, yorigin, xlabel, run=1, legend=True, centered=False):
 
-    ydistance   = 0
+    ydistance = 0
     
-    for stat_name, stat in stats.iteritems():
-
-      # if the specified qoi was not assembled, continue
-      if qoi not in stat.data:
-        continue
-      
-      # get size (dimensions) of the statistic
-      shape = stat.data [qoi] .shape
-      size  = shape [1] if len (shape) > 1 else 1
-      
-      # load data
-      ts = numpy.array ( stat.meta ['t'] )
-      vs = numpy.array ( stat.data [qoi] )
+    for stat in stats:
 
       # centered data - center extent as well
-      if centered and size <= 2:
+      if centered and stat.size <= 2:
         extent = self.center_extent (qoi, extent)
       
-      # special plotting for shells
-      if 'shell' in qoi:
+      # if the specified qoi was not assembled, continue
+      if qoi not in stat.estimate.data or stat.estimate.data [qoi] == None:
 
-        # only size 1 statistic can be plotted as an image
-        if size != 1:
-          continue
-        
-        # gather all required sheels and plot them in a single plot
-        qois = [ q for q in stats [stat_name] .data.keys() if q.find (qoi) == 0 ]
-        compare = lambda a, b : int (a [ a.find ('_shell_avg') + 10 : ]) - int (b [ b.find ('_shell_avg') + 10 : ])
-        qois.sort (compare)
-        self.shells (qois, stat, extent, centered)
-        ydistance = 1
-        break
+        # special plotting for shells
+        if 'shell' in qoi:
+
+          # only size 1 statistic can be plotted as an image
+          if stat.size != 1:
+            continue
+          
+          # plot all shells in a single plot
+          self.shells (qoi, stat, extent, centered)
+          ydistance = 1
+          break
+
+        # if no special plotting is appropriate, continue
+        continue
       
+      # load data
+      ts = numpy.array ( stat.estimate.meta ['t'] )
+      vs = numpy.array ( stat.estimate.data [qoi] )
+
       # special plotting for multi-dimensional statistics such as histograms and correlations
-      if size > 2:
-        if stat_name == 'histogram':
+      if stat.size > 2:
+        if stat.name == 'histogram':
           self.histogram (qoi, stat, extent, centered)
         break
       
       # plot size 2 statistics such as confidence intervals
-      if size == 2:
+      if stat.size == 2:
         lower  = vs [:, 0]
         upper  = vs [:, 1]
-        bright = brighten (color(qoi), factor=0.7)
-        pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3, label=name)
+        factor = 0.4 + 0.6 * stat.alpha
+        bright = brighten (color(qoi), factor=factor)
+        pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
         # hack to show the legend entry
-        #pylab.plot([], [], color=bright, linewidth=10, label=name)
-        continue
-
-      # stat-specific plotting: std. deviation
-      if 'std. deviation' in stat_name and 'mean' in stats:
-        ms = numpy.array ( stats ['mean'] .data [qoi] )
-        bright = brighten(color(qoi), factor=0.7)
-        pylab.fill_between (ts, ms - vs, ms + vs, facecolor=bright, edgecolor=bright, linewidth=3)
-        # hack to show the legend entry
-        pylab.plot([], [], color=bright, linewidth=10, label='mean +/- std. dev.')
+        pylab.plot ([], [], color=bright, linewidth=10, label=stat.name)
         continue
         
-      # general plotting
-      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=name)
+      # general plotting for statistic of size 1
+      pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=stat.name)
     
     pylab.xlabel (xlabel)
     pylab.ylabel ('%s [%s]' % (name (qoi, ydistance=ydistance), unit (qoi)))
@@ -769,9 +761,9 @@ class MatPlotLib (object):
     
     if legend:
       pylab.legend (loc='best')
-
+  
   # plot computed MC estimators of statistics
-  def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -801,12 +793,12 @@ class MatPlotLib (object):
     adjust (infolines, subplots=levels)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs' + suffix)
+      self.draw (save, qoi, suffix='stats_mcs_' + suffix)
 
     print ' done.'
 
   # plot computed MC estimators of statistics
-  def stats_mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', title=False, save=None):
+  def stats_mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', title=False, save=None):
 
     # some dynamic values
     if level  == 'finest':   level = self.mlmc.config.L
@@ -842,7 +834,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot computed MC estimators of statistics for both types in separate sub-plots
-  def stats_mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -878,12 +870,12 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs_both' + suffix)
+      self.draw (save, qoi, suffix='stats_mcs_both_' + suffix)
 
     print ' done.'
 
   # plot computed differences of MC estimators
-  def stats_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, suffix='', save=None):
+  def stats_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, run=1, frame=False, suffix='main', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -913,12 +905,12 @@ class MatPlotLib (object):
     adjust (infolines, subplots=self.mlmc.config.L)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_diffs' + suffix)
+      self.draw (save, qoi, suffix='stats_diffs_' + suffix)
 
     print ' done.'
 
   # plot computed MC estimators and their differences
-  def stats_mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='', save=None):
+  def stats_mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', save=None):
 
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -968,12 +960,12 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mcs_and_diffs' + suffix)
+      self.draw (save, qoi, suffix='stats_mcs_and_diffs_' + suffix)
 
     print ' done.'
 
   # plot computed MLMC statistics
-  def stats_mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, title=False, suffix='', save=None):
+  def stats_mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, title=False, suffix='main', save=None):
     
     if not qoi: qoi = self.mlmc.config.solver.qoi
 
@@ -1000,7 +992,7 @@ class MatPlotLib (object):
     adjust (infolines)
 
     if not frame:
-      self.draw (save, qoi, suffix='stats_mlmc' + suffix)
+      self.draw (save, qoi, suffix='stats_mlmc_' + suffix)
 
     print ' done.'
   

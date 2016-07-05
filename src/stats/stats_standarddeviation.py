@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Statistics class for confidence intervals using NumPy
+# Statistics class for standard deviations using NumPy
 # TODO: add paper, description and link           #
 #                                                 #
 # Jonas Sukys                                     #
@@ -12,26 +12,26 @@ from stats import Stat
 import numpy
 import warnings
 
-class Confidence (Stat):
+class Standard_Deviation_Interval (Stat):
   
-  def __init__ (self, name=None, lower=5, upper=95):
+  def __init__ (self, name=None):
     
     self.size  = 2
-    self.lower = lower
-    self.upper = upper
-    self.alpha = max ( 50, max (lower, 100 - upper) ) / float (50)
+    self.alpha = 0.5
 
     if name == None:
-      self.name = 'confidence %d%% - %d%%' % (lower, upper)
+      self.name = 'mean +/- std. dev.'
     
-  # compute percentiles to form a confidence interval
+  # compute mean and standard deviation
   def compute (self, samples, extent):
 
     warnings.simplefilter ('ignore')
     
-    interval = numpy.empty (2)
+    result = numpy.empty (2)
 
-    interval [0] = numpy.percentile (samples, self.lower)
-    interval [1] = numpy.percentile (samples, self.upper)
+    mean = numpy.mean (samples)
+
+    result [0] = mean - numpy.std (samples, ddof=1)
+    result [1] = mean + numpy.std (samples, ddof=1)
     
-    return interval
+    return result
