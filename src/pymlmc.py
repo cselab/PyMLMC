@@ -818,7 +818,7 @@ class MLMC (object):
 
         # if global clipping is specified, clip all qois accordingly
         if isinstance ( stat.clip, (list, tuple) ):
-          stat.estimate.clip ( [ '', stat.clip [0], stat.clip [1] ] )
+          stat.estimate.clip ( [ [ '', stat.clip [0], stat.clip [1] ] ] )
         
         # otherwise clip according to the specified ranges
         else:

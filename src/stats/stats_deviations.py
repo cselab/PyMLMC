@@ -18,7 +18,7 @@ class Deviations (Stat):
     
     self.size   = 2
     self.factor = factor
-    self.alpha  = min (1.0, 0.3 * factor)
+    self.alpha  = min (1.0, 0.2 + 0.3 * factor)
     
     if name == None:
       self.name = 'mean +/- %d std. dev.' % self.factor
