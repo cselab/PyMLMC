@@ -630,8 +630,8 @@ class MatPlotLib (object):
 
     # TODO: cmap should be based on 'color(qoi)'
     if centered:
-      vmax = 0.5
-      vmin = -0.5
+      vmax =   1.0
+      vmin = - 1.0
       cmap = 'RdBu'
     else:
       vmax = 1.0
@@ -709,7 +709,7 @@ class MatPlotLib (object):
 
       # centered data - center extent as well
       if centered and stat.size <= 2:
-        extent = self.center_extent (qoi, extent)
+        stat_extent = self.center_extent (qoi, extent)
       
       # if the specified qoi was not assembled, continue
       if qoi not in stat.estimate.data or stat.estimate.data [qoi] == None:
@@ -722,7 +722,7 @@ class MatPlotLib (object):
             continue
           
           # plot all shells in a single plot
-          self.shells (qoi, stat, extent, centered)
+          self.shells (qoi, stat, stat_extent, centered)
           ydistance = 1
           break
 
@@ -736,7 +736,7 @@ class MatPlotLib (object):
       # special plotting for multi-dimensional statistics such as histograms and correlations
       if stat.size > 2:
         if stat.name == 'histogram':
-          self.histogram (qoi, stat, extent, centered)
+          self.histogram (qoi, stat, stat_extent, centered)
         break
       
       # plot size 2 statistics such as confidence intervals
@@ -758,12 +758,13 @@ class MatPlotLib (object):
 
     self.helper_lines (qoi, run, size=stat.size, ydistance=ydistance)
 
-    self.adjust_axes (qoi, extent, xorigin, yorigin, ydistance=ydistance)
+    self.adjust_axes (qoi, stat_extent, xorigin, yorigin, ydistance=ydistance)
     
     if legend:
       # plot legend with reversed ordering
       handles, labels = pylab.gca().get_legend_handles_labels ()
-      pylab.legend (handles[::-1], labels[::-1], loc='best')
+      if handles != [] and labels != []:
+        pylab.legend (handles[::-1], labels[::-1], loc='best')
   
   # plot computed MC estimators of statistics
   def stats_mcs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, run=1, frame=False, suffix='main', save=None):
