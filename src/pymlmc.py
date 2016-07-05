@@ -806,7 +806,7 @@ class MLMC (object):
 
   # clip MLMC estimates
   def clip (self, ranges):
-
+    
     print
     print ' :: CLIPPING MLMC estimates...'
 

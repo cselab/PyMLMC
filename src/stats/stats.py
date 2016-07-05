@@ -58,7 +58,7 @@ class Stat (object):
 
       # check if qoi is available
       if name not in sample.data:
-        helpers.warning ('QoI \'%s\' not found in assembled data.' % name)
+        helpers.warning ('QoI \'%s\' not found in loaded data.' % name)
         continue
       
       # compute sample statistics for each step
