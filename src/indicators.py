@@ -134,7 +134,7 @@ class Indicators (object):
     if self.nans:
       self.extrapolate_diffs ()
 
-    print ' done.'
+    print 'done.'
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
   def values (self, mcs, indices=None):
