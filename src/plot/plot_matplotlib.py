@@ -346,9 +346,14 @@ class MatPlotLib (object):
   xend_max = None
 
   # initialization
-  def __init__ (self, mlmc):
+  def __init__ (self, mlmc, auto=False):
 
     self.mlmc = mlmc
+    self.auto = auto
+
+    # non-blocking pylab.show ()
+    if self.auto:
+      pylab.ion ()
 
     print
     print ' :: MatPlotLib plotting backend initialized.'
@@ -513,21 +518,14 @@ class MatPlotLib (object):
     pylab.draw ()
 
   # show plots
-  def show (self, block=1):
+  def show (self):
 
     # show all figures
-    pylab.show (block=block)
+    pylab.show ()
 
-    # close all figures
-    # REMARK: does not work for some reason
-    if block:
-      print ' :: Closing figures...',
-      sys.stdout.flush()
-      import time
-      time.sleep (1)
-      pylab.close ('all')
-      time.sleep (1)
-      print 'done.'
+    # query for action
+    if self.auto:
+      self.query ()
 
   # query for action
   def query (self):
