@@ -106,7 +106,7 @@ class Errors (object):
       self.speedup = 1.0
     
     print
-    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+    print ' :: SPEEDUP (MLMC vs. MC): %.2f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
 
@@ -115,7 +115,7 @@ class Errors (object):
     self.ocv_speedup = (total_error_plain ** 2) / (self.total_error ** 2)
 
     print
-    print ' :: SPEEDUP (OCV vs. PLAIN): %.1f' % self.ocv_speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+    print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.ocv_speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
 
   def save (self, iteration):
 

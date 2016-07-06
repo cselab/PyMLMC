@@ -131,6 +131,9 @@ class Indicators (object):
     # compute optimal control variate coefficients
     self.coefficients.optimize (self)
 
+    # re-evaluate distances between indicators for every two consecute levels of each sample for the specified indices
+    distances = self.distances (mcs, indices)
+
     # === EPSILON_DIFF and SIGMA_DIFF level distance indicators
     # (WITH optimal control variate coefficients computed above)
 
