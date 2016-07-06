@@ -49,6 +49,11 @@ class Indicators (object):
     # set availability
     self.available = 1
 
+    # === control variate COEFFICIENTS
+
+    # initialize coefficients
+    self.coefficients = Coefficients (self.levels, self.recycle)
+
     # === VALUES and DISTANCES
 
     # evaluates indicators for each level, type and sample for the specified indices
@@ -56,10 +61,6 @@ class Indicators (object):
 
     # evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
-
-    # === control variate COEFFICIENTS
-
-    self.coefficients = Coefficients (self.levels, self.recycle)
 
     # === EPSILON (mean) & SIGMA (variance) indicators
 
