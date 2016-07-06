@@ -43,6 +43,7 @@ class Errors (object):
 
     # compute relative sampling errors (if only one sample is loaded, use indicator value)
     # REMARK: this is not accurate since variance_diff are not easy to extrapolate correctly (see a commented alternative [not yet properly tested])
+    # TODO: add conditional branch, based on whether the indicators were extrapolated or not
     self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
     '''
     self.relative_error = numpy.zeros ( len (self.levels) )
@@ -86,7 +87,7 @@ class Errors (object):
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0
 
-  # compute and report speedup (MLMC vs MC)
+  # compute and report speedup (MLMC vs MC and OCV vs PLAIN)
   def speedup (self, indicators, works, counts):
 
     if not self.available or self.total_error == 0:
@@ -108,7 +109,14 @@ class Errors (object):
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
-  
+
+    # TODO: compute OCV speedup in terms of budget
+    total_error_plain = numpy.sqrt ( numpy.sum ( indicators.variance_diff_plain / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) )
+    self.ocv_speedup = (total_error_plain ** 2) / (self.total_error ** 2)
+
+    print
+    print ' :: SPEEDUP (OCV vs. PLAIN): %.1f' % self.ocv_speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+
   def save (self, iteration):
 
     # init history

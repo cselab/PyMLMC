@@ -107,19 +107,35 @@ class Indicators (object):
     if self.nans:
       self.extrapolate ()
 
+    # === EPSILON_DIFF_PLAIN and SIGMA_DIFF_PLAIN level distance indicators
+    # (WITHOUT optimal control variate coefficients computed above)
+
+    self.mean_diff_plain     = numpy.zeros ( self.L + 1, dtype=float)
+    self.variance_diff_plain = numpy.zeros ( self.L + 1, dtype=float)
+
+    # compute level distances
+    for level in self.levels:
+      self.mean_diff_plain     [level] = numpy.mean ( distances [level] )
+      if len (distances [level]) > 1:
+        self.variance_diff_plain [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+      else:
+        self.variance_diff_plain [level] = float ('nan')
+        self.nans = 1
+    
+    # extrapolate missing difference indicators
+    if self.nans:
+      self.extrapolate_diffs ()
+
     # === OPTIMAL control variate COEFFICIENTS
 
     # compute optimal control variate coefficients
     self.coefficients.optimize (self)
 
     # === EPSILON_DIFF and SIGMA_DIFF level distance indicators
-    # (with optimal control variate coefficients computed above)
+    # (WITH optimal control variate coefficients computed above)
 
     self.mean_diff     = numpy.zeros ( self.L + 1, dtype=float)
     self.variance_diff = numpy.zeros ( self.L + 1, dtype=float)
-
-    # evaluate distances between indicators for every two consecute levels of each sample for the specified indices
-    distances = self.distances (mcs, indices)
 
     # compute level distances
     for level in self.levels:
@@ -132,7 +148,7 @@ class Indicators (object):
 
     # extrapolate missing difference indicators
     if self.nans:
-      self.extrapolate_diffs ()
+      self.extrapolate_diffs_plain ()
 
     print 'done.'
 
@@ -231,6 +247,18 @@ class Indicators (object):
     print '    ---',
     for level in self.levels [1:]:
       print helpers.scif (self.variance [level] [1] / (self.normalization ** 2), table=1),
+    print
+
+    # report mean_diff_plain
+    print '  : EPSILON DIFF:',
+    for level in self.levels:
+      print helpers.scif (self.mean_diff_plain [level] / self.normalization, table=1),
+    print
+
+    # report variance_diff_plain
+    print '  : SIGMA   DIFF:',
+    for level in self.levels:
+      print helpers.scif (self.variance_diff_plain [level] / (self.normalization ** 2), table=1),
     print
 
     # report covariance
@@ -390,6 +418,30 @@ class Indicators (object):
           self.variance_diff [level] = self.variance_diff [level-1] / 2
         else:
           self.variance_diff [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
+
+    self.nans = 0
+
+  # extrapolate missing plain difference indicators from the coarser levels
+  def extrapolate_diffs_plain (self):
+
+    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
+
+    for level in self.levels:
+      if numpy.isnan ( self.mean_diff_plain [level] ):
+        if level != 0:
+          self.mean_diff_plain [level] = self.mean_diff_plain [level-1] / 2
+        else:
+          self.mean_diff_plain [level] = numpy.nan
+          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
+
+    for level in self.levels:
+      if numpy.isnan ( self.variance_diff_plain [level] ):
+        if level != 0:
+          self.variance_diff_plain [level] = self.variance_diff_plain [level-1] / 2
+        else:
+          self.variance_diff_plain [level] = numpy.nan
           self.available = 0
           helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
 
