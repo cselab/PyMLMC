@@ -259,6 +259,5 @@ class MC (object):
     self.stats = copy.deepcopy (stats)
     
     # assemble MC estimates using only specified subset of all samples
-    print '    -> valid pairs of samples (both fine and coarse samples loaded):'
     for stat in self.stats:
       stat.steps ( self.results, indices=indices, qois=qois )
