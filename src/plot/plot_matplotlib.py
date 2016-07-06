@@ -520,6 +520,10 @@ class MatPlotLib (object):
   # show plots
   def show (self):
 
+    # report success
+    print
+    print ' :: Done! Go watch some nice pictures :)'
+
     # show all figures
     pylab.show ()
 
@@ -529,6 +533,8 @@ class MatPlotLib (object):
 
   # query for action
   def query (self):
+    
+    print
     raw_input ('Press ENTER to continue... ')
     pylab.close ('all')
 
