@@ -12,6 +12,7 @@
 # === global imports
 
 import os
+import sys
 import numpy
 from itertools import izip
 
@@ -44,7 +45,8 @@ class Indicators (object):
   def compute (self, mcs, indices):
 
     print
-    print ' :: Computing INDICATORS...'
+    print ' :: Computing INDICATORS...',
+    sys.stdout.flush ()
 
     # set availability
     self.available = 1
@@ -133,7 +135,6 @@ class Indicators (object):
       self.extrapolate_diffs ()
 
     print ' done.'
-    print
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
   def values (self, mcs, indices=None):
