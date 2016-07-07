@@ -352,7 +352,7 @@ class Indicators (object):
   def fit (self, indicator, name, critical):
     
     # check if sufficiently of measurements is available for inference
-    if numpy.isnan (indicator) .all():
+    if numpy.isnan (indicator) .all ():
       if critical:
         self.available = 0
       helpers.warning ('Extrapolation of indicators \'%s\' not possible!' % name)
@@ -368,6 +368,43 @@ class Indicators (object):
 
     # update indicator values to the maximum likelihood estimations
     indicator = numpy.exp ( numpy.polyval (line, self.levels) )
+  
+  # infer indicator values using available level values as measurement data
+  def infer (self):
+
+    self.infered   = 1
+    self.available = 1
+
+    self.fit (self.mean     [:, 0], 'EPSILON [FINE]',   critical = False)
+    self.fit (self.mean     [:, 1], 'EPSILON [COARSE]', critical = False)
+    self.fit (self.variance [:, 0], 'SIGMA [FINE]',     critical = True )
+    self.fit (self.variance [:, 1], 'SIGMA [COARSE]',   critical = True )
+
+    # TODO: this is derived from already infered indicators!
+    self.fit (self.variance [:, 1], 'CORRELATION',      critical = True )
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.correlation [level] ):
+        if level != 0:
+          self.correlation [level] = self.correlation [level-1] + 0.5 * (1.0 - self.correlation [level-1])
+        else:
+          self.correlation [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'CORRELATION\' not possible!')
+    
+    # TODO: this is derived from already infered indicators!
+    self.fit (self.variance [:, 1], 'COVARIANCE',      critical = True )
+
+    for level in self.levels [1:]:
+      if numpy.isnan ( self.covariance [level] ):
+        if level != 0 and not numpy.isnan ( self.correlation [level] ):
+          self.covariance [level] = self.correlation [level] * numpy.sqrt (self.variance [level] [0] * self.variance [level-1] [0])
+        else:
+          self.covariance [level] = numpy.nan
+          self.available = 0
+          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
+
+    self.nans = 0
 
   # extrapolate missing indicators from the coarser levels
   def extrapolate (self):

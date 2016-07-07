@@ -282,7 +282,7 @@ def brighten (color, factor=0.7):
 
 # set levels extent
 def levels_extent (levels):
-  pylab.xlim ( [ -0.2, levels[-1]+0.2 ] )
+  pylab.xlim ( [ -0.2 + levels [0], levels [-1] + 0.2 ] )
   pylab.xticks (levels)
 
 def adjust_extent (data, factor=1.5, offset=0):
@@ -1420,15 +1420,19 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot indicators
-  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+  def indicators (self, plain=False, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
     
     print ' :: INFO: Plotting indicators...',
     sys.stdout.flush()
     
     # === load all required data
     
-    EPSILON       = self.mlmc.indicators.mean_diff
-    SIGMA         = self.mlmc.indicators.variance_diff
+    if plain:
+      EPSILON     = self.mlmc.indicators.mean_diff_plain
+      SIGMA       = self.mlmc.indicators.variance_diff_plain
+    else:
+      EPSILON     = self.mlmc.indicators.mean_diff
+      SIGMA       = self.mlmc.indicators.variance_diff
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
     levels        = self.mlmc.config.levels
@@ -1436,7 +1440,7 @@ class MatPlotLib (object):
 
     # === filter data
 
-    if not coarsest and len (levels) > 1:
+    if plain and not coarsest and len (levels) > 1:
       EPSILON = EPSILON [ 1 : ]
       SIGMA   = SIGMA   [ 1 : ]
       levels  = levels  [ 1 : ]
@@ -1490,7 +1494,7 @@ class MatPlotLib (object):
       show_info(self)
     
     if not frame:
-      self.draw (save, qoi, suffix='indicators')
+      self.draw (save, qoi, suffix='indicators' + ('_plain' if plain else ''))
 
     print ' done.'
 
@@ -1518,7 +1522,7 @@ class MatPlotLib (object):
     pylab.title  ('Level correlations for Q = %s' % name (qoi))
     pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    pylab.ylim ([-0.1, 1.1])
+    pylab.ylim ( [ -0.1, 1.1 * max (1.0, max (correlation)) ] )
     levels_extent (levels)
     #pylab.legend (loc='upper right')
 
@@ -1556,7 +1560,7 @@ class MatPlotLib (object):
     pylab.title  ('Level coefficients for Q = %s' % name (qoi))
     pylab.ylabel ('coefficient')
     pylab.xlabel ('mesh level')
-    pylab.ylim ([-0.1, 1.1])
+    pylab.ylim ( [ -0.1, 1.1 * max (1.0, max (coefficients)) ] )
     levels_extent (levels)
     pylab.legend (loc='lower right')
 
