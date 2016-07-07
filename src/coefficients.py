@@ -90,6 +90,8 @@ class Coefficients (object):
         b [-1] = indicators.covariance [self.L] / samples [self.L]
 
       # solve linear system
+      print A
+      print b
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # if the result is 'fishy', revert to default values

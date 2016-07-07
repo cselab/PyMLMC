@@ -260,7 +260,7 @@ def info (message, details=None, advice=None):
     print '  : -> %s' % advice
 
 # query
-def query (message, hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1, format=None):
+def query (message='Continue?', hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1, format=None):
 
   print
   if warning != None:
@@ -332,8 +332,3 @@ def warning (message, details=None, advice=None):
     print '  : %s' % details
   if advice != None:
     print '  : -> %s' % advice
-
-# query for action
-def query (self):
-  print
-  raw_input ('Press ENTER to continue... ')
