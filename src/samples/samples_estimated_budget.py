@@ -12,6 +12,7 @@ from samples import *
 import helpers
 import local
 import numpy
+import math
 
 # surpresses invalid division errors and simply returns 'nan' in such cases
 numpy.seterr ( divide='ignore', invalid='ignore' )
@@ -154,7 +155,7 @@ class Estimated_Budget (Samples):
           continue
         
         # compute new sample number
-        updated [level] = floor ( sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * budget / variance_work_sum )
+        updated [level] = math.floor ( sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * budget / variance_work_sum )
 
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem

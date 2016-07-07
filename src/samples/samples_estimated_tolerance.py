@@ -163,7 +163,7 @@ class Estimated_Tolerance (Samples):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * variance_work_sum )
+        updated [level] = math.ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * variance_work_sum )
         
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
