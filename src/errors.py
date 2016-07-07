@@ -133,7 +133,7 @@ class Errors (object):
     
     # report
     print
-    if forecast: print ' :: FORECASTED ESTIMATES'
+    if forecast: print ' :: FORECAST'
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup_mlmc + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
@@ -143,7 +143,7 @@ class Errors (object):
     
     # report
     print
-    if forecast: print ' :: FORECASTED ESTIMATES'
+    if forecast: print ' :: FORECAST'
     print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.speedup_ocv + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : ->   OCV MLMC error: %1.2e' % (error / self.normalization)
     print '  : -> PLAIN MLMC error: %1.2e' % (plain / self.normalization)
