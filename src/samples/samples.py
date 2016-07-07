@@ -15,6 +15,7 @@ import numpy
 
 class Counts (object):
 
+  optimal    = []
   computed   = []
   additional = []
   combined   = []
@@ -38,22 +39,28 @@ class Counts (object):
   def report (self):
 
     print '  :'
-    print '  :   LEVEL   : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :-------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
-
-    print '  : Computed  :',
+    print '  :   LEVEL    : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :--------------' + '-'.join ( [ helpers.intf (None, table=1, bar=1) for level in self.levels ] )
+    
+    print '  : Computed   :',
     for level in self.levels:
       print helpers.intf (self.available() [level], table=1),
     print
+    
+    if self.optimal != []:
+      print '  : Optimal    :',
+      for level in self.levels:
+        print helpers.intf (self.optimal [level], table=1),
+      print
 
     if self.additional != []:
 
-      print '  : Required  :',
+      print '  : Updated    :',
       for level in self.levels:
         print helpers.intf (self.available() [level] + self.additional [level], table=1),
       print
 
-      print '  : Pending   :',
+      print '  : Additional :',
       for level in self.levels:
         print helpers.intf (self.additional [level], table=1),
       print
