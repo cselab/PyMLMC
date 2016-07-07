@@ -24,8 +24,6 @@ class Counts (object):
   failed     = []
   invalid    = []
 
-  updated    = 0
-
   def __init__ (self, levels, tolerate):
 
     self.levels   = levels
