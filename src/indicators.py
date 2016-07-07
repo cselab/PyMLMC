@@ -360,7 +360,7 @@ class Indicators (object):
     
     # if only one measurement is available, assume constant values
     if  numpy.sum ( ~ numpy.isnan (indicator) ) == 1:
-      indicator = indicator [  ]
+      indicator = indicator
 
     # fit a linear polynomial using linear least squares
     line = numpy.polyfit (self.levels, numpy.log (indicator), 1)
