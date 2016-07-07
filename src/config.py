@@ -105,7 +105,7 @@ class MLMC_Config (object):
       print '                 ->   %-30s' % 'WORK RATIOS'                      + '    ' + '%s' % ' '.join ( [ helpers.intf (ratio) for ratio in self.work_ratios ] )
       print '                 ->   %-30s' % 'CORE RATIOS'                      + '    ' + '%s' % ' '.join ( [ helpers.intf (ratio) for ratio in self.core_ratios ] )
     print   '  : SAMPLES      :    %-30s' % self.samples   .__class__.__name__
-    if self.deterministic:
+    if not self.deterministic:
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
     print   '  : ROOT         :    %-30s' % self.root
     print   '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
