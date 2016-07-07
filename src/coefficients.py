@@ -47,7 +47,7 @@ class Coefficients (object):
     costs [ 1 : ]  =     self.values [ 1 :    ] ** 2                   * indicators.variance [ 1 :   , 0 ]
     costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [ 1 :   , 1 ]
     costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance [ 1 : ]
-    
+
     costs *= ( indicators.pairworks / ndicators.pairworks [0] ) ** 2
     
     return numpy.sum (costs)
@@ -101,7 +101,7 @@ class Coefficients (object):
         for level in range (self.L):
           if level != 0:
             A [level] [level - 1] = - indicators.covariance [level] / samples [level]
-          A [level] [level] = indicators.variance [level] [0] / samples [level] + indicators.variance [level] [0] / samples [level + 1]
+          A [level] [level] = indicators.variance [level] [0] / samples [level] + indicators.variance [level + 1] [1] / samples [level + 1]
           if level != self.L - 1:
             A [level] [level + 1] = - indicators.covariance [level + 1] / samples [level + 1]
 
