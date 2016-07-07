@@ -211,6 +211,9 @@ class MLMC (object):
 
           helpers.warning ('indicators or errors not available - samples can not be updated')
           break
+        
+        # report forecasted speedup (MLMC vs MC)
+        self.errors.speedup (self.indicators, self.config.samples.counts, forecast=True)
 
         # for interactive sessions
         if self.params.query:

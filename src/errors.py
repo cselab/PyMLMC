@@ -105,7 +105,7 @@ class Errors (object):
       self.available = 0
 
   # compute and report speedup (MLMC vs MC and OCV vs PLAIN)
-  def speedup (self, indicators, counts, forecast=0):
+  def speedup (self, indicators, counts, forecast=False):
     
     if not self.available or self.total_error == 0:
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
@@ -120,21 +120,21 @@ class Errors (object):
     plain  = self.total ( self.errors (indicators.variance_diff_plain, counts) )
 
     # compute MLMC vs. MC speedup
-    FINEST       = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
-    work_mlmc    = sum ( [ indicators.pairworks [level] * counts [level] for level in self.levels ] )
-    variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
-    samples_mc   = numpy.ceil ( variance_mc / error ** 2 )
-    work_mc      = indicators.works [FINEST] * samples_mc
-    self.speedup = work_mc / work_mlmc
+    FINEST      = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
+    work_mlmc   = sum ( [ indicators.pairworks [level] * counts [level] for level in self.levels ] )
+    variance_mc = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
+    samples_mc  = numpy.ceil ( variance_mc / error ** 2 )
+    work_mc     = indicators.works [FINEST] * samples_mc
+    self.speedup_mlmc = work_mc / work_mlmc
     
     # avoid round-off errors for pure MC runs
     if len (self.levels) == 1:
-      self.speedup = 1.0
+      self.speedup_mlmc = 1.0
     
     # report
     print
     if forecast: print ' :: FORECASTED ESTIMATES'
-    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+    print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup_mlmc + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
     
