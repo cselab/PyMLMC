@@ -119,8 +119,8 @@ class Errors (object):
     # report
     print
     print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.ocv_speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
-    print '  : ->   OCV MLMC error: %1.2e' % self.total_error / self.normalization
-    print '  : -> PLAIN MLMC error: %1.2e' % total_error_plain / self.normalization
+    print '  : ->   OCV MLMC error: %1.2e' % (self.total_error  / self.normalization)
+    print '  : -> PLAIN MLMC error: %1.2e' % (total_error_plain / self.normalization)
 
   def save (self, iteration):
 
