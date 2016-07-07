@@ -83,16 +83,17 @@ class Coefficients (object):
       if samples == None:
 
         # assemble matrix from indicators
+        pairworks = indicators.pairworks / indicators.pairworks [0]
         for level in range (self.L):
           if level != 0:
-            A [level] [level - 1] = - indicators.pairworks [level] ** 2 * indicators.covariance [level]
-          A [level] [level]  = indicators.pairworks [level    ] ** 2 * indicators.variance [level    ] [0]
-          A [level] [level] += indicators.pairworks [level + 1] ** 2 * indicators.variance [level + 1] [1]
+            A [level] [level - 1] = - pairworks [level] ** 2 * indicators.covariance [level]
+          A [level] [level]  = pairworks [level    ] ** 2 * indicators.variance [level    ] [0]
+          A [level] [level] += pairworks [level + 1] ** 2 * indicators.variance [level + 1] [1]
           if level != self.L - 1:
-            A [level] [level + 1] = - indicators.pairworks [level + 1] ** 2 * indicators.covariance [level + 1]
+            A [level] [level + 1] = - pairworks [level + 1] ** 2 * indicators.covariance [level + 1]
         
         # assemble right hand side
-        b [-1] = indicators.pairworks [self.L] ** 2 * indicators.covariance [self.L]
+        b [-1] = pairworks [self.L] ** 2 * indicators.covariance [self.L]
       
       # sample-weighted optimization
       else:
@@ -114,7 +115,7 @@ class Coefficients (object):
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # if the result is 'fishy', revert to default values
-    if numpy.isnan (self.values).any() or (self.values <= 0).any() or (self.values > 1).any():
+    if numpy.isnan (self.values).any():# or (self.values <= 0).any() or (self.values > 1).any():
       message = 'Fishy values of optimized coefficients - resetting all to 1.0'
       details = ' '.join ( [ helpers.scif (value) for value in self.values ] )
       helpers.warning (message, details=details)
