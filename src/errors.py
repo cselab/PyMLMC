@@ -82,7 +82,7 @@ class Errors (object):
     print
 
     print '  :'
-    print '  : Total sampling error : %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
+    print '  : Total sampling error: %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
 
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0

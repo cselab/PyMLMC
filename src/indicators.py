@@ -304,7 +304,7 @@ class Indicators (object):
 
     # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
     print '  :'
-    print '  : SPEEDUP OCV : %.2f' % self.coefficients.speedup
+    print '  : OPTIMIZATION: %.2f' % self.coefficients.optimization
 
     # issue a warning if some indicator values were extrapolated
     if self.extrapolated:

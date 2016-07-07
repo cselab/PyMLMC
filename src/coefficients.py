@@ -36,7 +36,7 @@ class Coefficients (object):
     
     self.L       = len (self.levels) - 1
     self.values  = numpy.ones (self.L+1)
-    self.speedup = None
+    self.speedup = optimization
   
   # compute cost functional
   def cost (self, indicators):
@@ -122,5 +122,5 @@ class Coefficients (object):
     # cost of OCV estimator
     cost_ocv = self.cost (indicators)
 
-    # compute speedup
-    self.speedup = cost_plain / cost_ocv
+    # compute optimization factor
+    self.optimization = cost_plain / cost_ocv
