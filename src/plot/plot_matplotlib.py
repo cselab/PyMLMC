@@ -522,7 +522,7 @@ class MatPlotLib (object):
 
     # report success
     print
-    print ' :: Done! Go watch some nice pictures :)'
+    print ' :: Done! Go watch some nice (hopefully) pictures :)'
 
     # show all figures
     pylab.show ()
