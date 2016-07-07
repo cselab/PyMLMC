@@ -154,7 +154,7 @@ class Estimated_Budget (Samples):
           continue
         
         # compute optimal number of samples for specified level
-        updated [level] = math.floor ( budget * fractions [level] / sum ( fraction * available ) )
+        updated [level] = math.floor ( budget * fractions [level] / sum ( fractions * available ) )
         
         # if the optimal number of samples is smaller than the already computed number of samples,
         # remove this level from the optimization problem (mark unavailable)
