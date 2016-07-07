@@ -42,10 +42,13 @@ class Coefficients (object):
   def cost (self, indicators):
     
     costs = numpy.zeros (self.L + 1)
-    costs [ 0   ]  =     self.values [ 0      ] ** 2                   * indicators.pairworks [ 0   ] ** indicators.variance [ 0     , 0 ]
-    costs [ 1 : ]  =     self.values [ 1 :    ] ** 2                   * indicators.pairworks [ 1 : ] ** indicators.variance [ 1 :   , 0 ]
-    costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.pairworks [ 1 : ] ** indicators.variance [ 1 :   , 1 ]
-    costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.pairworks [ 1 : ] ** 2 * indicators.covariance [ 1 : ]
+
+    costs [ 0   ]  =     self.values [ 0      ] ** 2                   * indicators.variance [ 0     , 0 ]
+    costs [ 1 : ]  =     self.values [ 1 :    ] ** 2                   * indicators.variance [ 1 :   , 0 ]
+    costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [ 1 :   , 1 ]
+    costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance [ 1 : ]
+    
+    costs *= ( indicators.pairworks / ndicators.pairworks [0] ) ** 2
     
     return numpy.sum (costs)
 
