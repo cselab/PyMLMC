@@ -112,7 +112,7 @@ class Errors (object):
       return
     
     if forecast:
-      counts = counts.combined
+      counts = counts.updated
     else:
       counts = counts.loaded
     

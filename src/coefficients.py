@@ -114,7 +114,7 @@ class Coefficients (object):
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # if the result is 'fishy', revert to default values
-    if numpy.isnan (self.values).any():
+    if numpy.isnan (self.values).any()or 1:
       message = 'Invalid values of optimized coefficients - resetting all to 1.0'
       details = ' '.join ( [ helpers.scif (value) for value in self.values ] )
       helpers.warning (message, details=details)
