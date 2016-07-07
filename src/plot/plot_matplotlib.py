@@ -1398,7 +1398,7 @@ class MatPlotLib (object):
         pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5, linewidth=0.0)
     if total:
       pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
-    if optimal:
+    if optimal and self.mlmc.config.iteration > 0:
       pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
     pylab.title  ('Computational budget')
     pylab.ylabel ('computational budget [%s core hours]' % unit)

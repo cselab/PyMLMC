@@ -30,7 +30,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle, lsqfit=True):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle, infer=True, lsqfit=True):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -360,8 +360,9 @@ class Indicators (object):
     
     # if only one measurement is available, assume constant values
     if  numpy.sum ( ~ numpy.isnan (indicator) ) == 1:
-      indicator = indicator
-
+      indicator = indicator [ numpy.where ( ~ numpy.isnan (indicator) ) ]
+      return
+    
     # fit a linear polynomial using linear least squares
     line = numpy.polyfit (self.levels, numpy.log (indicator), 1)
 
