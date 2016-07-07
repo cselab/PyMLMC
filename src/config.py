@@ -18,6 +18,7 @@ import sys
 
 import helpers
 import local
+import numpy
 
 # === additional Python paths
 
@@ -85,10 +86,10 @@ class MLMC_Config (object):
       self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
 
     # works
-    self.works = [ self.solver.workunit * float ( self.solver.work (discretization) ) / local.performance for discretization in self.discretizations ]
-    
+    self.works = numpy.array ( [ self.solver.workunit * float ( self.solver.work (discretization) ) / local.performance for discretization in self.discretizations ] )
+
     # work ratios
-    self.work_ratios = [ self.works [level] / self.works [0] for level in self.levels ]
+    self.work_ratios = numpy.array ( [ self.works [level] / self.works [0] for level in self.levels ] )
 
     # default core ratios
     self.core_ratios = [ self.solver.ratio (discretization, self.discretizations [0]) for discretization in self.discretizations ]
