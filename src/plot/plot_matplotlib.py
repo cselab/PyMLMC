@@ -1375,9 +1375,9 @@ class MatPlotLib (object):
     levels           = self.mlmc.config.levels
     qoi              = self.mlmc.config.solver.qoi
     
-    budget_warmup      = [ self.mlmc.config.samples.history ['combined'] [0] [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
-    budget_final       = [ self.mlmc.config.samples.counts.combined          [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
-    #budget_optimal     = [ self.mlmc.config.samples.counts_optimal           [level] * self.mlmc.config.samples.works [level] / normalization for level in levels ]
+    budget_warmup      = [ self.mlmc.config.samples.history ['combined'] [0] [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
+    budget_final       = [ self.mlmc.config.samples.counts.combined          [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
+    #budget_optimal     = [ self.mlmc.config.samples.counts_optimal           [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
     budget_total       = sum (budget_final)
 
     # === plot
