@@ -27,6 +27,20 @@ class Errors (object):
     self.errors_file = 'errors.dat'
     self.available   = 0
     self.history     = {}
+  
+  # compute errors for each level from variance_diff and sample counts
+  def errors (self, variance_diff, counts):
+
+    return numpy.sqrt ( variance_diff / numpy.maximum ( counts, numpy.ones (len(self.levels)) ) )
+  
+  # compute total error
+  def total (self, errors):
+
+    return numpy.sqrt ( numpy.sum (errors ** 2) )
+
+  def relative (self, errors):
+    
+    return errors / self.normalization
 
   # compute errors
   def compute (self, indicators, counts):
@@ -41,10 +55,10 @@ class Errors (object):
       self.available = 0
       return
 
-    # compute relative sampling errors (if only one sample is loaded, use indicator value)
+    # compute sampling errors (if only one sample is loaded, use indicator value)
     # REMARK: this is not accurate since variance_diff are not easy to extrapolate correctly (see a commented alternative [not yet properly tested])
     # TODO: add conditional branch, based on whether the indicators were extrapolated or not
-    self.relative_error = numpy.sqrt ( indicators.variance_diff / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) / self.normalization
+    self.error = self.errors (indicators.variance_diff, counts.loaded)
     '''
     self.relative_error = numpy.zeros ( len (self.levels) )
     self.relative_error [0] = indicators.coefficients.values [0] ** 2 * indicators.variance [0] [0] / max (counts.loaded [0], 1)
@@ -56,13 +70,16 @@ class Errors (object):
       self.relative_error [level]  = max ( self.relative_error [level], 0 )
     self.relative_error = numpy.sqrt (self.relative_error) / self.normalization
     '''
-
-    # compute the cumulative relative sampling error
-    self.total_relative_error = numpy.sqrt ( numpy.sum ( self.relative_error ** 2 ) )
+    
+    # compute relative sampling errors
+    self.relative_error = self.relative (self.error)
     
     # compute the cumulative sampling error
-    self.total_error = self.total_relative_error * self.normalization
-  
+    self.total_error = self.total (self.error)
+
+    # compute the cumulative relative sampling error
+    self.total_relative_error = self.relative (self.total_error)
+
   # report relative sampling errors
   def report (self):
 
@@ -88,17 +105,25 @@ class Errors (object):
       self.available = 0
 
   # compute and report speedup (MLMC vs MC and OCV vs PLAIN)
-  def speedup (self, indicators, counts):
+  def speedup (self, indicators, counts, forecast=0):
     
     if not self.available or self.total_error == 0:
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
       return
     
+    if forecast:
+      counts = counts.combined
+    else:
+      counts = counts.loaded
+    
+    error  = self.total ( self.errors (indicators.variance_diff,       counts) )
+    plain  = self.total ( self.errors (indicators.variance_diff_plain, counts) )
+
     # compute MLMC vs. MC speedup
-    FINEST       = numpy.max ( [ level for level in self.levels if counts.loaded [level] > 0 ] )
-    work_mlmc    = sum ( [ indicators.pairworks [level] * counts.loaded [level] for level in self.levels ] )
+    FINEST       = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
+    work_mlmc    = sum ( [ indicators.pairworks [level] * counts [level] for level in self.levels ] )
     variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
-    samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
+    samples_mc   = numpy.ceil ( variance_mc / error ** 2 )
     work_mc      = indicators.works [FINEST] * samples_mc
     self.speedup = work_mc / work_mlmc
     
@@ -108,19 +133,20 @@ class Errors (object):
     
     # report
     print
+    if forecast: print ' :: FORECASTED ESTIMATES'
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
     print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
     
     # compute OCV MLMC vs. PLAIN MLMC speedup
-    total_error_plain = numpy.sqrt ( numpy.sum ( indicators.variance_diff_plain / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) )
-    self.speedup_ocv = (total_error_plain ** 2) / (self.total_error ** 2)
+    self.speedup_ocv = plain ** 2 / error ** 2
     
     # report
     print
+    if forecast: print ' :: FORECASTED ESTIMATES'
     print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.speedup_ocv + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
-    print '  : ->   OCV MLMC error: %1.2e' % (self.total_error  / self.normalization)
-    print '  : -> PLAIN MLMC error: %1.2e' % (total_error_plain / self.normalization)
+    print '  : ->   OCV MLMC error: %1.2e' % (error / self.normalization)
+    print '  : -> PLAIN MLMC error: %1.2e' % (plain / self.normalization)
 
   def save (self, iteration):
 

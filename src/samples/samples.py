@@ -141,17 +141,6 @@ class Samples (object):
     for i in range (iteration + 1):
       for entry in self.history:
         helpers.dump (self.history [entry] [i], '%d', entry, self.samples_file, i)
-
-    '''
-    # remove old samples file to avoid trashing
-    if iteration == 0:
-      helpers.delete (self.samples_file)
-
-    # dump samples counts
-    helpers.dump (self.counts.computed,   '%d', 'computed',   self.samples_file, iteration)
-    helpers.dump (self.counts.additional, '%d', 'additional', self.samples_file, iteration)
-    helpers.dump (self.counts.combined,   '%d', 'combined',   self.samples_file, iteration)
-    '''
   
   def make (self):
 
