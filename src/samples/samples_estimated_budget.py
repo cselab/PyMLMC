@@ -94,7 +94,8 @@ class Estimated_Budget (Samples):
 
     budget_used = float (sum ( [ self.pairworks [level] * self.counts.available() [level] for level in self.levels ] ))
     budget_left = float (self.budget - budget_used)
-    budget_reqd = float (sum ( [ self.pairworks [level] * self.counts.additional  [level] for level in self.levels ] ))
+    if self.available:
+      budget_reqd = float (sum ( [ self.pairworks [level] * self.counts.additional  [level] for level in self.levels ] ))
 
     print '  : -> Specified budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(self.budget), table=1), helpers.intf (numpy.ceil(self.budget/local.cores), table=1))
     print '  : -> Consumed  budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_used), table=1), helpers.intf (numpy.ceil(budget_used/local.cores), table=1))
