@@ -34,8 +34,20 @@ class Coefficients (object):
     # store configuration 
     vars (self) .update ( locals() )
     
-    self.L      = len (self.levels) - 1
-    self.values = numpy.ones (self.L+1)
+    self.L       = len (self.levels) - 1
+    self.values  = numpy.ones (self.L+1)
+    self.speedup = None
+  
+  # compute cost functional
+  def cost (self, indicators):
+    
+    costs = numpy.zeros (self.L + 1)
+    costs [0]      = self.values [0] ** 2 * indicators.pairworks [0]     ** 2 * indicators.variance [0]     [0]
+    costs [ 1 : ]  = self.values [ 1 :    ] ** 2 * indicators.pairworks [ 1 : ] ** 2 * indicators.variance [ 1 :    ] [0]
+    costs [ 1 : ] += self.values [   : -1 ] ** 2 * indicators.pairworks [ 1 : ] ** 2 * indicators.variance [   : -1 ] [0]
+    costs [ 1 : ] -= 2 * self.values [ 1 : ] * self.values [ : -1 ] * indicators.pairworks [ 1 : ] ** 2 * indicators.covariance [ 1 : ]
+    
+    return numpy.sum (costs)
 
   # optimize coefficients of control variates given indicators
   # optimization can be performed for required specific sample-scaled indicators if sample numbers on each level are provided
@@ -44,6 +56,9 @@ class Coefficients (object):
     # no optimization if only one level is present
     if len (self.levels) == 1:
       return
+
+    # cost of plain (non-optimized) estimator
+    cost_plain = self.cost (indicators)
 
     # === if recycling is enabled, coefficients can be computed explicitly
 
@@ -67,13 +82,13 @@ class Coefficients (object):
         # assemble matrix from indicators
         for level in range (self.L):
           if level != 0:
-            A [level] [level - 1] = - indicators.works [level] ** 2 * indicators.covariance [level]
-          A [level] [level] = ( indicators.works [level] ** 2 + indicators.works [level + 1] ** 2 ) * indicators.variance [level] [0]
+            A [level] [level - 1] = - indicators.pairworks [level] ** 2 * indicators.covariance [level]
+          A [level] [level] = ( indicators.pairworks [level] ** 2 + indicators.pairworks [level + 1] ** 2 ) * indicators.variance [level] [0]
           if level != self.L - 1:
-            A [level] [level + 1] = - indicators.works [level + 1] ** 2 * indicators.covariance [level + 1]
+            A [level] [level + 1] = - indicators.pairworks [level + 1] ** 2 * indicators.covariance [level + 1]
         
         # assemble right hand side
-        b [-1] = indicators.works [self.L] ** 2 * indicators.covariance [self.L]
+        b [-1] = indicators.pairworks [self.L] ** 2 * indicators.covariance [self.L]
       
       # sample-weighted optimization
       else:
@@ -88,7 +103,7 @@ class Coefficients (object):
 
         # assemble right hand side
         b [-1] = indicators.covariance [self.L] / samples [self.L]
-
+      
       # solve linear system
       print A
       print b
@@ -100,3 +115,9 @@ class Coefficients (object):
       details = ' '.join ( [ helpers.scif (value) for value in self.values ] )
       helpers.warning (message, details=details)
       self.values = numpy.ones (self.L+1)
+    
+    # cost of OCV estimator
+    cost_ocv = self.cost (indicators)
+
+    # compute speedup
+    self.speedup = cost_plain / cost_ocv

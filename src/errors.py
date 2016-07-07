@@ -88,7 +88,7 @@ class Errors (object):
       self.available = 0
 
   # compute and report speedup (MLMC vs MC and OCV vs PLAIN)
-  def speedup (self, indicators, works, counts):
+  def speedup (self, indicators, counts):
     
     if not self.available or self.total_error == 0:
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
@@ -96,10 +96,10 @@ class Errors (object):
     
     # compute MLMC vs. MC speedup
     FINEST       = numpy.max ( [ level for level in self.levels if counts.loaded [level] > 0 ] )
-    work_mlmc    = sum ( [ works [level] * counts.loaded [level] for level in self.levels ] )
+    work_mlmc    = sum ( [ indicators.pairworks [level] * counts.loaded [level] for level in self.levels ] )
     variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
     samples_mc   = numpy.ceil ( variance_mc / (self.total_error ** 2) )
-    work_mc      = works [FINEST] * samples_mc
+    work_mc      = indicators.works [FINEST] * samples_mc
     self.speedup = work_mc / work_mlmc
     
     # avoid round-off errors for pure MC runs

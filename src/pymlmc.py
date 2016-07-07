@@ -55,7 +55,7 @@ class MLMC (object):
     self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate, self.config.recycle )
 
     # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick, self.config.samples.works, self.config.recycle )
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick, self.config.works, self.config.samples.pairworks, self.config.recycle )
     
     # errors
     self.errors = Errors (self.config.levels, self.config.recycle)
@@ -172,7 +172,7 @@ class MLMC (object):
       self.errors.save    (self.config.iteration)
       
       # report speedup (MLMC vs MC)
-      self.errors.speedup (self.indicators, self.config.works, self.config.samples.counts)
+      self.errors.speedup (self.indicators, self.config.samples.counts)
 
       # query for progress
       helpers.query ('Continue?')

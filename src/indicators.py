@@ -30,7 +30,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, works, recycle):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -299,6 +299,10 @@ class Indicators (object):
       print helpers.scif (self.variance_diff [level] / (self.normalization ** 2), table=1),
     print
 
+    # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+    print '  :'
+    print '  : SPEEDUP OCV : vs. PLAIN): %.2f' % self.coefficients.speedup
+    
     # issue a warning if some indicator values were extrapolated
     if self.extrapolated:
       helpers.warning ('Missing indicator values are extrapolated!')

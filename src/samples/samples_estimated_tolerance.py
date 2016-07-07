@@ -31,9 +31,15 @@ class Estimated_Tolerance (Samples):
     if   self.warmup_finest_level == 'last': self.warmup_finest_level = self.L
     elif self.warmup_finest_level == 'half': self.warmup_finest_level = ( self.L + 1 ) / 2
 
-    # compute warmup samples based on works
-    counts = numpy.array ( [ self.warmup * numpy.ceil ( float (self.works [self.L] / self.works [level]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
-
+    # set warmup samples
+    if hasattr ( self.warmup, '__iter__' ):
+      counts = numpy.array ( self.warmup [0 : self.L+1] )
+    
+    # compute warmup samples based on works ensuring that total work does not exceed 2 * warmup * works [self.L]
+    else:
+      works = self.works if self.recycle else self.pairworks
+      counts = numpy.array ( [ self.warmup * numpy.ceil ( float (works [self.L] / works [level]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
+    
     # adjust warmup samples w.r.t. set range for multiple warmup samples
     counts [0 : self.warmup_finest_level+1] = counts [self.L - self.warmup_finest_level : self.L+1]
     counts [self.warmup_finest_level : ]    = counts [self.L]
@@ -93,7 +99,7 @@ class Estimated_Tolerance (Samples):
         self.counts.additional [level] = 1;
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts_optimal * self.works )
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
@@ -138,7 +144,7 @@ class Estimated_Tolerance (Samples):
     updated = numpy.array ( computed, dtype=int, copy=True )
     
     # compute the work-weighted sum of all variances
-    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
+    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.pairworks [level] for level in self.levels ] ) )
     
     # perform iterative optimization until valid number of samples is obtained
     optimize = 1
@@ -157,7 +163,7 @@ class Estimated_Tolerance (Samples):
           continue
         
         # compute new sample number
-        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.works [level] ) * variance_work_sum )
+        updated [level] = ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * variance_work_sum )
         
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
@@ -174,7 +180,7 @@ class Estimated_Tolerance (Samples):
           optimize = 1
           
           # update variance_work_sum
-          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.works [level] )
+          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.pairworks [level] )
           
           # update required sampling error
           required_error = sqrt ( (required_error ** 2) - indicators.variance_diff [level] / computed [level] )

@@ -36,10 +36,11 @@ class Estimated_Budget (Samples):
     if hasattr ( self.warmup, '__iter__' ):
       counts = numpy.array ( self.warmup [0 : self.L+1] )
     
-    # compute warmup samples based on works
+    # compute warmup samples based on works ensuring that total work does not exceed 2 * warmup * works [self.L]
     else:
-      counts = numpy.array ( [ self.warmup * numpy.ceil ( float (self.works [self.L] / self.works [level]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
-
+      works = self.works if self.recycle else self.pairworks
+      counts = numpy.array ( [ self.warmup * numpy.ceil ( float (works [self.L] / works [level]) / (2 ** (self.L - level)) ) for level in self.levels ], dtype=int )
+    
     # adjust warmup samples w.r.t. set range for multiple warmup samples
     counts [0 : self.finest+1] = counts [self.L - self.finest : self.L+1]
     counts [self.finest : ]    = counts [self.L]
@@ -48,7 +49,7 @@ class Estimated_Budget (Samples):
 
   def finished (self, errors):
 
-    work = numpy.sum ( numpy.array(self.works) * numpy.array(self.counts.computed) )
+    work = numpy.sum ( numpy.array(self.pairworks) * numpy.array(self.counts.computed) )
     return work >= 0.9 * self.budget
 
   def update (self, errors, indicators):
@@ -68,7 +69,7 @@ class Estimated_Budget (Samples):
         self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.works ) / numpy.sum ( self.counts_optimal * self.works )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts_optimal * self.pairworks )
 
     # compute optimal control variate coefficients
     if self.optimal:
@@ -88,10 +89,10 @@ class Estimated_Budget (Samples):
     print
     print ' :: BUDGET:'
 
-    budget_used = float (sum ( [ self.works [level] * self.counts.available() [level] for level in self.levels ] ))
+    budget_used = float (sum ( [ self.pairworks [level] * self.counts.available() [level] for level in self.levels ] ))
     budget_left = float (self.budget - budget_used)
     if self.counts.additional != []:
-      budget_reqd = float (sum ( [ self.works [level] * self.counts.additional [level] for level in self.levels ] ))
+      budget_reqd = float (sum ( [ self.pairworks [level] * self.counts.additional [level] for level in self.levels ] ))
 
     print '  : -> Specified budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(self.budget), table=1), helpers.intf (numpy.ceil(self.budget/local.cores), table=1))
     print '  : -> Consumed  budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_used), table=1), helpers.intf (numpy.ceil(budget_used/local.cores), table=1))
@@ -133,8 +134,8 @@ class Estimated_Budget (Samples):
     updated = numpy.array ( computed, dtype=int, copy=True )
     
     # compute the work-weighted sum of all variances
-    #variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.works [level] for level in self.levels ] ) )
-    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] / self.works [level] for level in self.levels ] ) )
+    #variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.pairworks [level] for level in self.levels ] ) )
+    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] / self.pairworks [level] for level in self.levels ] ) )
 
     # perform iterative optimization until valid number of samples is obtained
     optimize = 1
@@ -153,7 +154,7 @@ class Estimated_Budget (Samples):
           continue
         
         # compute new sample number
-        updated [level] = floor ( sqrt ( indicators.variance_diff [level] / self.works [level] ) * budget / variance_work_sum )
+        updated [level] = floor ( sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * budget / variance_work_sum )
 
         # if the new sample number is smaller than the already computed sample number,
         # then remove this level from the optimization problem
@@ -169,9 +170,9 @@ class Estimated_Budget (Samples):
           optimize = 1
           
           # update variance_work_sum
-          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.works [level] )
+          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.pairworks [level] )
 
           # update budget
-          budget -= self.works [level] * updated [level]
+          budget -= self.pairworks [level] * updated [level]
     
     return updated
