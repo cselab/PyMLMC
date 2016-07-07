@@ -226,6 +226,16 @@ class Indicators (object):
     print '  :    LEVEL    : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
+    # report correlation
+    print '  : CORRELATION :',
+    print '    ---',
+    for level in self.levels [1:]:
+      print helpers.scif (self.correlation [level], table=1),
+    print
+
+    # splitter
+    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
     # report mean (fine)
     print '  : EPSILON [FI]:',
     for level in self.levels:
@@ -271,13 +281,6 @@ class Indicators (object):
       print helpers.scif (self.covariance [level] / (self.normalization ** 2), table=1),
     print
 
-    # report correlation
-    print '  : CORRELATION :',
-    print '    ---',
-    for level in self.levels [1:]:
-      print helpers.scif (self.correlation [level], table=1),
-    print
-
     # splitter
     print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
@@ -286,7 +289,7 @@ class Indicators (object):
     for level in self.levels:
       print helpers.scif (self.coefficients.values [level], table=1),
     print
-
+    
     # report mean_diff
     print '  : EPSILON DIFF:',
     for level in self.levels:
@@ -302,7 +305,7 @@ class Indicators (object):
     # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
     print '  :'
     print '  : SPEEDUP OCV : vs. PLAIN): %.2f' % self.coefficients.speedup
-    
+
     # issue a warning if some indicator values were extrapolated
     if self.extrapolated:
       helpers.warning ('Missing indicator values are extrapolated!')
