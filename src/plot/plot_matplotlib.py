@@ -1550,15 +1550,16 @@ class MatPlotLib (object):
     if not frame:
       figure (infolines, subplots=1)
 
-    # plot correlations
+    # plot coefficients
 
     pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
+    pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % self.mlmc.errors.speedup_ocv)
     pylab.title  ('Level coefficients for Q = %s' % name (qoi))
-    pylab.ylabel (r'coefficient')
+    pylab.ylabel ('coefficient')
     pylab.xlabel ('mesh level')
     pylab.ylim ([-0.1, 1.1])
     levels_extent (levels)
-    #pylab.legend (loc='upper right')
+    pylab.legend (loc='lower right')
 
     adjust (infolines, subplots=1)
 
@@ -1602,7 +1603,7 @@ class MatPlotLib (object):
       pylab.axhline (y=self.mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % self.mlmc.errors.total_relative_error)
     #if run == 1:
     #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
-    pylab.plot([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup)
+    pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup)
     pylab.title  ('Relative sampling errors for Q = %s' % name (qoi))
     pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
     pylab.xlabel ('mesh level')
