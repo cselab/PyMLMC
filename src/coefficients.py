@@ -34,9 +34,10 @@ class Coefficients (object):
     # store configuration 
     vars (self) .update ( locals() )
     
-    self.L       = len (self.levels) - 1
-    self.values  = numpy.ones (self.L+1)
-    self.speedup = optimization
+    self.L      = len (self.levels) - 1
+    self.values = numpy.ones (self.L+1)
+    
+    self.optimization = None
   
   # compute cost functional
   def cost (self, indicators):
