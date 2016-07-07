@@ -70,7 +70,7 @@ class Coefficients (object):
       # each coefficient can be computed independently
       for level in self.levels [ : -1 ]:
         self.values [level] = indicators.correlation [level] * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [level] [0] )
-
+    
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations
 
     else:
@@ -79,7 +79,7 @@ class Coefficients (object):
       A = numpy.zeros ( [self.L, self.L] )
       b = numpy.zeros (self.L)
 
-      # work-weighted optimization
+      # a-priori (work-weighted) optimization
       if samples == None:
 
         # assemble matrix from indicators
@@ -95,7 +95,7 @@ class Coefficients (object):
         # assemble right hand side
         b [-1] = pairworks [self.L] ** 2 * indicators.covariance [self.L]
       
-      # sample-weighted optimization
+      # a-posteriori (sample-weighted) optimization
       else:
 
         # assemble matrix from indicators
@@ -110,13 +110,11 @@ class Coefficients (object):
         b [-1] = indicators.covariance [self.L] / samples [self.L]
       
       # solve linear system
-      print A
-      print b
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # if the result is 'fishy', revert to default values
-    if numpy.isnan (self.values).any():# or (self.values <= 0).any() or (self.values > 1).any():
-      message = 'Fishy values of optimized coefficients - resetting all to 1.0'
+    if numpy.isnan (self.values).any():
+      message = 'Invalid values of optimized coefficients - resetting all to 1.0'
       details = ' '.join ( [ helpers.scif (value) for value in self.values ] )
       helpers.warning (message, details=details)
       self.values = numpy.ones (self.L+1)

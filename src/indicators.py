@@ -234,7 +234,7 @@ class Indicators (object):
     print
 
     # splitter
-    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report mean (fine)
     print '  : EPSILON [FI]:',
@@ -282,14 +282,14 @@ class Indicators (object):
     print
 
     # splitter
-    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report coefficients
     print '  : COEFFICIENT :',
     for level in self.levels:
       print helpers.scif (self.coefficients.values [level], table=1),
     print
-    
+
     # report mean_diff
     print '  : EPSILON DIFF:',
     for level in self.levels:
