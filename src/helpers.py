@@ -332,3 +332,8 @@ def warning (message, details=None, advice=None):
     print '  : %s' % details
   if advice != None:
     print '  : -> %s' % advice
+
+# query for action
+def query (self):
+  print
+  raw_input ('Press ENTER to continue... ')

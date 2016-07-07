@@ -85,7 +85,7 @@ class MLMC_Config (object):
       self.pick = [ [0, None] ] + [ [2 * level, 2 * level - 1] for level in self.levels [1:] ]
 
     # works
-    self.works = [ self.solver.workunit * self.solver.work (discretization) / float (local.performance) for discretization in self.discretizations ]
+    self.works = [ self.solver.workunit * float ( self.solver.work (discretization) ) / local.performance for discretization in self.discretizations ]
 
     # work ratios
     self.work_ratios = [ self.works [level] / self.works [0] for level in self.levels ]

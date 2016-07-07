@@ -2,8 +2,14 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Class for optimal coefficients for control variates
 # TODO: add paper, description and link
-# Recycling  enabled: Peterstorfer, Willcox, Gunzburger, "Optimal model management for multifidelity Monte Carlo estimation", 2015.
-# Recycling disabled: TODO
+# 
+# Recycling disabled (default):
+# Sukys, Rasthofer, Werelinger, Hadjidiukas, Rosinelli, Koumoutsakos
+# "Uncertainty quantification in multi-phase cloud cavitation collapse flows using optimal control variate multi-level Monte Carlo sampling and petascale direct numerical simulations"
+#
+# Recycling  enabled:
+# Peterstorfer, Willcox, Gunzburger
+# "Optimal model management for multifidelity Monte Carlo estimation", 2015.
 #
 # Jonas Sukys
 # CSE Lab, ETH Zurich, Switzerland
@@ -51,44 +57,37 @@ class Coefficients (object):
 
     else:
       
-      # assemble matrix from indicators
+      # optimization problem as a linear system
       A = numpy.zeros ( [self.L, self.L] )
-      for level in range (self.L):
-        if level != 0:
-          A [level] [level - 1] = - indicators.works [level] * indicators.covariance [level]
-        A [level] [level] = ( indicators.works [level] + indicators.works [level + 1] ) * indicators.variance [level] [0]
-        if level != self.L - 1:
-          A [level] [level + 1] = - indicators.works [level + 1] * indicators.covariance [level + 1]
-      
-      # assemble right hand side
       b = numpy.zeros (self.L)
-      b [-1] = indicators.works [self.L] * indicators.covariance [self.L]
-      
-      # TODO: use this non-work-weighted but sample-weighted version if samples != None
-      '''
-      # assemble matrix from indicators
-      A = numpy.zeros ( [self.L, self.L] )
-      for level in range (self.L):
-        if level != 0:
-          A [level] [level - 1] = - indicators.covariance [level]
-          if samples != None:
-            A [level] [level - 1] /= samples [level]
-        A [level] [level] = indicators.variance [level] [0]
-        if samples != None:
-          A [level] [level] *= ( 1.0 / samples [level] + 1.0 / samples [level + 1] )
-        else:
-          A [level] [level] *= 2
-        if level != self.L - 1:
-          A [level] [level + 1] = - indicators.covariance [level + 1]
-          if samples != None:
-            A [level] [level + 1] /= samples [level + 1]
 
-      # assemble right hand side
-      b = numpy.zeros (self.L)
-      b [-1] = indicators.covariance [self.L]
-      if samples != None:
-        b [-1] /= samples [self.L]
-      '''
+      # work-weighted optimization
+      if samples == None:
+
+        # assemble matrix from indicators
+        for level in range (self.L):
+          if level != 0:
+            A [level] [level - 1] = - indicators.works [level] ** 2 * indicators.covariance [level]
+          A [level] [level] = ( indicators.works [level] ** 2 + indicators.works [level + 1] ** 2 ) * indicators.variance [level] [0]
+          if level != self.L - 1:
+            A [level] [level + 1] = - indicators.works [level + 1] ** 2 * indicators.covariance [level + 1]
+        
+        # assemble right hand side
+        b [-1] = indicators.works [self.L] ** 2 * indicators.covariance [self.L]
+      
+      # sample-weighted optimization
+      else:
+
+        # assemble matrix from indicators
+        for level in range (self.L):
+          if level != 0:
+            A [level] [level - 1] = - indicators.covariance [level] / samples [level]
+          A [level] [level] = indicators.variance [level] [0] / samples [level] + indicators.variance [level] [0] / samples [level + 1]
+          if level != self.L - 1:
+            A [level] [level + 1] = - indicators.covariance [level + 1] / samples [level + 1]
+
+        # assemble right hand side
+        b [-1] = indicators.covariance [self.L] / samples [self.L]
 
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
