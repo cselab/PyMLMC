@@ -96,7 +96,7 @@ class MLMC_Config (object):
 
   # report configuration
   def report (self):
-
+    
     print
     print   ' :: CONFIGURATION:    '
     print   '  : MACHINE      :    %-30s' % local.name                         + '    ' + '[TYPE: %s]' % ('cluster'       if local.cluster      else 'standalone')

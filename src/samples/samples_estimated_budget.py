@@ -73,6 +73,7 @@ class Estimated_Budget (Samples):
     self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts_optimal * self.pairworks )
 
     # compute optimal control variate coefficients
+    # TODO: check this
     if self.optimal:
       indicators.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
 
@@ -119,10 +120,10 @@ class Estimated_Budget (Samples):
   # query for budget
   def query (self):
 
-    message = 'specify the required computational budget'
-    hint    = 'press ENTER to leave %s CPU hours' % helpers.intf (self.budget)
-    default = self.budget
-    budget = helpers.query (message, hint=hint, type=float, default=default, format='intf', exit=0)
+    message  = 'specify the required computational budget'
+    hint     = 'press ENTER to leave %s CPU hours' % helpers.intf (self.budget)
+    default  = self.budget
+    budget   = helpers.query (message, hint=hint, type=float, default=default, format='intf', exit=0)
     modified = budget != self.budget
     self.budget = budget
     return modified
@@ -154,7 +155,7 @@ class Estimated_Budget (Samples):
           continue
         
         # compute optimal number of samples for specified level
-        updated [level] = math.floor ( budget * fractions [level] / sum ( fractions * available ) )
+        updated [level] = math.floor ( fractions [level] * budget / sum ( fractions * self.pairworks * available ) )
         
         # if the optimal number of samples is smaller than the already computed number of samples,
         # remove this level from the optimization problem (mark unavailable)
@@ -170,7 +171,7 @@ class Estimated_Budget (Samples):
           optimize = 1
 
           # update budget
-          budget -= self.pairworks [level] * updated [level]
+          budget -= updated [level] * self.pairworks [level]
 
           # restart the optimization for all levels
           break
