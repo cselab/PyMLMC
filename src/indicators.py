@@ -30,7 +30,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle, lsqfit=True):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -347,14 +347,32 @@ class Indicators (object):
     if config.iteration > 0:
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
+  
+  # least squares fit to indicator, where available level values are considered as measurement data
+  def fit (self, indicator, name, critical):
+    
+    # check if sufficiently of measurements is available for inference
+    if numpy.isnan (indicator) .all():
+      if critical:
+        self.available = 0
+      helpers.warning ('Extrapolation of indicators \'%s\' not possible!' % name)
+      return
+    
+    # if only one measurement is available, assume constant values
+    if  numpy.sum ( ~ numpy.isnan (indicator) ) == 1:
+      indicator = indicator [  ]
+
+    # fit a linear polynomial using linear least squares
+    line = numpy.polyfit (self.levels, numpy.log (indicator), 1)
+
+    # update indicator values to the maximum likelihood estimations
+    indicator = numpy.exp ( numpy.polyval (line, self.levels) )
 
   # extrapolate missing indicators from the coarser levels
   def extrapolate (self):
 
     self.extrapolated = 1
     self.available    = 1
-
-    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
 
     for level in self.levels:
       if numpy.isnan ( self.mean [level] [0] ):

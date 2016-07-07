@@ -1338,8 +1338,8 @@ class MatPlotLib (object):
       pylab.semilogy (levels, self.mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
       if fill:
         pylab.fill_between (levels, self.mlmc.config.samples.history ['combined'] [0], self.mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5, linewidth=0.0)
-    if optimal:
-      pylab.semilogy (levels, self.mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
+    if optimal and self.mlmc.config.iteration > 0:
+      pylab.semilogy (levels, self.mlmc.config.samples.counts.optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
     pylab.title  ('Number of samples')
     pylab.ylabel ('number of samples')
     pylab.xlabel ('mesh level')
