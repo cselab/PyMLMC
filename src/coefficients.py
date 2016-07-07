@@ -47,14 +47,25 @@ class Coefficients (object):
       for level in self.levels [ : -1 ]:
         self.values [level] = indicators.correlation [level] * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [level] [0] )
 
-      # if the result is 'fishy', revert to default values
-      if numpy.isnan (self.values).any() or (self.values <= 0).any():
-        self.values = numpy.ones (self.L+1)
-
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations
 
     else:
-
+      
+      # assemble matrix from indicators
+      A = numpy.zeros ( [self.L, self.L] )
+      for level in range (self.L):
+        if level != 0:
+          A [level] [level - 1] = - indicators.works [level] * indicators.covariance [level]
+        A [level] [level] = ( indicators.works [level] + indicators.works [level + 1] ) * indicators.variance [level] [0]
+        if level != self.L - 1:
+          A [level] [level + 1] = - indicators.works [level + 1] * indicators.covariance [level + 1]
+      
+      # assemble right hand side
+      b = numpy.zeros (self.L)
+      b [-1] = indicators.works [self.L] * indicators.covariance [self.L]
+      
+      # TODO: use this non-work-weighted but sample-weighted version if samples != None
+      '''
       # assemble matrix from indicators
       A = numpy.zeros ( [self.L, self.L] )
       for level in range (self.L):
@@ -77,6 +88,7 @@ class Coefficients (object):
       b [-1] = indicators.covariance [self.L]
       if samples != None:
         b [-1] /= samples [self.L]
+      '''
 
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)

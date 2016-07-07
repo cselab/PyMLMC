@@ -533,7 +533,7 @@ class MatPlotLib (object):
 
   # query for action
   def query (self):
-    
+
     print
     raw_input ('Press ENTER to continue... ')
     pylab.close ('all')
@@ -1421,7 +1421,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot indicators
-  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
     
     print ' :: INFO: Plotting indicators...',
     sys.stdout.flush()
@@ -1434,6 +1434,13 @@ class MatPlotLib (object):
     NORMALIZATION = self.mlmc.errors.normalization
     levels        = self.mlmc.config.levels
     qoi           = self.mlmc.config.solver.qoi
+
+    # === filter data
+
+    if not coarsest and len (levels) > 1:
+      EPSILON = EPSILON [ 1 : ]
+      SIGMA   = SIGMA   [ 1 : ]
+      levels  = levels  [ 1 : ]
     
     # === compute error using the exact solution mean_exact
     

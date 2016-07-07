@@ -30,7 +30,7 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, recycle):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, works, recycle):
     
     # store configuration 
     vars (self) .update ( locals() )

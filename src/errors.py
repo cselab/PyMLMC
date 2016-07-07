@@ -94,6 +94,7 @@ class Errors (object):
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
       return
 
+    # compute MLMC vs. MC speedup
     FINEST       = numpy.max ( [ level for level in self.levels if counts.loaded [level] > 0 ] )
     work_mlmc    = sum ( [ works [level] * counts.loaded [level] for level in self.levels ] )
     variance_mc  = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
@@ -105,17 +106,21 @@ class Errors (object):
     if len (self.levels) == 1:
       self.speedup = 1.0
     
+    # report
     print
     print ' :: SPEEDUP (MLMC vs. MC): %.2f' % self.speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
-    print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mlmc) )
-    print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil(work_mc) )
+    print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
+    print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
 
-    # TODO: compute OCV speedup in terms of budget
+    # compute OCV MLMC vs. PLAIN MLMC speedup
     total_error_plain = numpy.sqrt ( numpy.sum ( indicators.variance_diff_plain / numpy.maximum ( counts.loaded, numpy.ones (len(self.levels)) ) ) )
     self.ocv_speedup = (total_error_plain ** 2) / (self.total_error ** 2)
 
+    # report
     print
     print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.ocv_speedup + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+    print '  : ->   OCV MLMC error: %1.2e' % self.total_error / self.normalization
+    print '  : -> PLAIN MLMC error: %1.2e' % total_error_plain / self.normalization
 
   def save (self, iteration):
 
