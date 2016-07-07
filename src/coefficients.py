@@ -106,7 +106,7 @@ class Coefficients (object):
           A [level] [level] = indicators.variance [level] [0] / samples [level] + indicators.variance [level + 1] [1] / samples [level + 1]
           if level != self.L - 1:
             A [level] [level + 1] = - indicators.covariance [level + 1] / samples [level + 1]
-
+        
         # assemble right hand side
         b [-1] = indicators.covariance [self.L] / samples [self.L]
       

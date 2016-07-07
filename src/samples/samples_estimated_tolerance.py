@@ -86,8 +86,8 @@ class Estimated_Tolerance (Samples):
       if self.counts.available() [level] == 1 and self.counts.additional [level] > 1:
         self.counts.additional [level] = 1
     
-    # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.works )
+    # compute overhead
+    self.overhead = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.works ) - 1.0
     
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()

@@ -65,8 +65,8 @@ class Estimated_Budget (Samples):
     # compute additional number of samples from updated
     self.counts.additional = numpy.maximum ( 0, updated - self.counts.available() )
     
-    # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.pairworks )
+    # compute overhead
+    self.overhead = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.pairworks ) - 1.0
 
     # compute optimal control variate coefficients
     # TODO: check this
@@ -105,7 +105,7 @@ class Estimated_Budget (Samples):
 
     # report computed and additional number of samples
     self.counts.report (self.available)
-    
+
     # report budget status
     self.report_budget ()
 

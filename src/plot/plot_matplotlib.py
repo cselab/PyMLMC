@@ -1334,13 +1334,12 @@ class MatPlotLib (object):
     pylab.semilogy (levels, self.mlmc.config.samples.history ['combined'] [0], color=color_params('warmup'), linestyle=style(run), marker='+', label='warmup')
     if fill:
       pylab.fill_between (levels, baseline, self.mlmc.config.samples.history ['combined'] [0], facecolor=color_params('warmup'), alpha=0.5, linewidth=0.0)
-    #pylab.semilogy (levels, samples, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='estimated for TOL=%1.1e' % TOL)
     if self.mlmc.config.iteration > 0:
       pylab.semilogy (levels, self.mlmc.config.samples.counts.combined, color=color_params('samples'), linestyle=style(run), alpha=alpha(run), marker='x', label='final')
       if fill:
         pylab.fill_between (levels, self.mlmc.config.samples.history ['combined'] [0], self.mlmc.config.samples.counts.combined, facecolor=color_params('samples'), alpha=0.5, linewidth=0.0)
-    #if optimal:
-    #  pylab.semilogy (levels, self.mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/self.mlmc.config.samples.optimal_fraction)))
+    if optimal:
+      pylab.semilogy (levels, self.mlmc.config.samples.counts_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
     pylab.title  ('Number of samples')
     pylab.ylabel ('number of samples')
     pylab.xlabel ('mesh level')
@@ -1377,7 +1376,7 @@ class MatPlotLib (object):
     
     budget_warmup      = [ self.mlmc.config.samples.history ['combined'] [0] [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
     budget_final       = [ self.mlmc.config.samples.counts.combined          [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
-    #budget_optimal     = [ self.mlmc.config.samples.counts_optimal           [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
+    budget_optimal     = [ self.mlmc.config.samples.counts.optimal           [level] * self.mlmc.config.samples.pairworks [level] / normalization for level in levels ]
     budget_total       = sum (budget_final)
 
     # === plot
@@ -1399,8 +1398,8 @@ class MatPlotLib (object):
         pylab.fill_between (levels, budget_warmup, budget_final, facecolor=color_params('budget'), alpha=0.5, linewidth=0.0)
     if total:
       pylab.axhline (y=budget_total, color=color_params('total'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1f %s' % (budget_total, unit))
-    #if optimal:
-    #  pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * (1 - 1/self.mlmc.config.samples.optimal_fraction)))
+    if optimal:
+      pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
     pylab.title  ('Computational budget')
     pylab.ylabel ('computational budget [%s core hours]' % unit)
     pylab.xlabel ('mesh level')
