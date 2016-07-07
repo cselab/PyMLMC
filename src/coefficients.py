@@ -36,7 +36,7 @@ class Coefficients (object):
     
     self.L      = len (self.levels) - 1
     self.values = numpy.ones (self.L+1)
-    
+
     self.optimization = None
   
   # compute cost functional
@@ -55,7 +55,7 @@ class Coefficients (object):
 
   # optimize coefficients of control variates given indicators
   # optimization can be performed for required specific sample-scaled indicators if sample numbers on each level are provided
-  def optimize (self, indicators, samples=None):
+  def optimize (self, indicators, samples=[]):
 
     # no optimization if only one level is present
     if len (self.levels) == 1:
@@ -81,7 +81,7 @@ class Coefficients (object):
       b = numpy.zeros (self.L)
 
       # a-priori (work-weighted) optimization
-      if samples == None:
+      if samples == []:
 
         # assemble matrix from indicators
         pairworks = indicators.pairworks / indicators.pairworks [0]
