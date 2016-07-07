@@ -48,7 +48,7 @@ class Coefficients (object):
     costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [ 1 :   , 1 ]
     costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance [ 1 : ]
 
-    costs *= ( indicators.pairworks / ndicators.pairworks [0] ) ** 2
+    costs *= ( indicators.pairworks / indicators.pairworks [0] ) ** 2
     
     return numpy.sum (costs)
 
