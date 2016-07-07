@@ -64,11 +64,6 @@ class Estimated_Budget (Samples):
     
     # compute additional number of samples from updated
     self.counts.additional = numpy.maximum ( 0, updated - self.counts.available() )
-    '''
-    for level in self.levels:
-      if updated [level] > self.counts.available() [level]:
-        self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
-    '''
     
     # compute optimal_work_fraction
     self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.pairworks )
@@ -108,13 +103,9 @@ class Estimated_Budget (Samples):
     print
     print ' :: SAMPLES: (estimated for the specified budget)'
 
-    # report coefficients
-    # TODO: indicators is not a member of Samples
-    #indicators.coefficients.report()
-
     # report computed and additional number of samples
     self.counts.report (self.available)
-
+    
     # report budget status
     self.report_budget ()
 

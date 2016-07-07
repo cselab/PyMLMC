@@ -19,11 +19,10 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated_Tolerance (Samples):
   
-  def __init__ (self, tol=1e-1, warmup=1, aggressive=0, warmup_finest_level='last', evaluation_fraction=0.9, min_evaluation_fraction=0.1, aggression=0.1):
+  def __init__ (self, tol=1e-1, warmup=1, warmup_finest_level='last', aggression=0.9, proximity=1.1):
     
     # save configuration
     vars (self) .update ( locals() )
-    self.counts_updated = None
   
   def init (self):
     
@@ -64,11 +63,12 @@ class Estimated_Tolerance (Samples):
     if not numpy.isnan (indicators) .any() : return
 
     # compute the required cumulative sampling error
-    if self.aggressive:
-      self.required_error = self.tol * errors.normalization * max (0.5, 1.0 - self.aggression)
-    else:
-      self.required_error = self.tol * errors.normalization
-
+    self.required_error = self.tol * errors.normalization
+    
+    # take into account desired aggression
+    if self.aggression > 1.0 or errors.total_relative_error / self.tol > self.proximity
+      self.required_error *= self.aggression
+    
     # compute optimal number of samples
     # assuming that no samples were computed so far
     self.counts.optimal = self.optimal ( numpy.ones(len(self.levels)), self.required_error, indicators )
@@ -78,18 +78,7 @@ class Estimated_Tolerance (Samples):
     updated = self.optimal ( self.counts.available(), self.required_error, indicators)
     
     # compute additional number of samples from updated
-    for level in self.levels:
-     if updated [level] > self.counts.available() [level]:
-       
-       # assign all required additional number of samples
-       if self.aggressive:
-         self.counts.additional [level] = updated [level] - self.counts.available() [level]
-       
-       # compute required additional number of samples according to (min_)evaluation_fraction
-       else:
-         self.counts.additional [level] = numpy.round ( self.evaluation_fraction * (updated [level] - self.counts.available() [level] ) )
-         if self.counts.additional [level] < self.min_evaluation_fraction * self.counts_updated [level]:
-           self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
+    self.counts.additional = numpy.maximum ( 0, updated - self.counts.available() )
     
     # update counts [level] = 1 to counts [level] = 2 first, and only afterwards allow counts [level] > 2
     # this prevents assigning wrong number of samples based on _extrapolated_ indicators
@@ -113,17 +102,9 @@ class Estimated_Tolerance (Samples):
     
     print
     print ' :: SAMPLES: (estimated for the specified tolerance tol=%s)' % helpers.scif (self.tol)
-
-    #if self.tol:
-    #  print '(= %.1f%% of tol=%.1e)' % ( round ( 1000 * self.total_relative_error / tol ) / 10, tol )
-
+    
     # report computed and additional number of samples
     self.counts.report (self.available)
-
-    # report additional specific information
-    if self.available:
-      fractions = ( numpy.round(100 * self.evaluation_fraction), numpy.round(100 * self.min_evaluation_fraction) )
-      print ' (%d%% of required, at least %d%% of all)' % fractions
   
   # query for tolerance
   def query (self):
