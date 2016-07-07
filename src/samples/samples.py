@@ -24,6 +24,8 @@ class Counts (object):
   failed     = []
   invalid    = []
 
+  updated    = 0
+
   def __init__ (self, levels, tolerate):
 
     self.levels   = levels
@@ -36,7 +38,7 @@ class Counts (object):
     else:
       return self.computed
 
-  def report (self):
+  def report (self, available):
 
     print '  :'
     print '  :   LEVEL    : ' + ' '.join ( [ helpers.intf (level, table=1)       for level in self.levels ] )
@@ -46,14 +48,13 @@ class Counts (object):
     for level in self.levels:
       print helpers.intf (self.available() [level], table=1),
     print
-    
-    if self.optimal != []:
+
+    if available:
+
       print '  : Optimal    :',
       for level in self.levels:
         print helpers.intf (self.optimal [level], table=1),
       print
-
-    if self.additional != []:
 
       print '  : Updated    :',
       for level in self.levels:
@@ -102,11 +103,13 @@ class Samples (object):
     
     self.L = len(levels) - 1
 
-    self.counts.computed = numpy.zeros ( len (self.levels), dtype=int )
+    self.counts.computed   = numpy.zeros (self.L + 1, dtype=int)
+    self.counts.optimal    = numpy.zeros (self.L + 1, dtype=int)
+    self.counts.additional = numpy.zeros (self.L + 1, dtype=int)
 
-    self.counts.loaded   = [ None for level in self.levels ]
-    self.counts.failed   = [ None for level in self.levels ]
-    self.counts.invalid  = [ None for level in self.levels ]
+    self.counts.loaded   = numpy.zeros (self.L + 1, dtype=int)
+    self.counts.failed   = numpy.zeros (self.L + 1, dtype=int)
+    self.counts.invalid  = numpy.zeros (self.L + 1, dtype=int)
 
     self.indices.loaded  = [ None for level in self.levels ]
     self.indices.failed  = [ None for level in self.levels ]

@@ -25,7 +25,6 @@ class Estimated_Budget (Samples):
     
     # save configuration
     vars (self) .update ( locals() )
-    self.counts_updated = []
   
   def init (self):
 
@@ -46,37 +45,39 @@ class Estimated_Budget (Samples):
     counts [0 : self.finest+1] = counts [self.L - self.finest : self.L+1]
     counts [self.finest : ]    = counts [self.L]
 
-    self.counts.additional = numpy.array ( counts, copy=True )
+    self.counts.additional = counts
 
   def finished (self, errors):
 
-    work = numpy.sum ( numpy.array(self.pairworks) * numpy.array(self.counts.computed) )
+    work = numpy.sum ( self.pairworks * self.counts.computed )
     return work >= 0.9 * self.budget
 
   def update (self, errors, indicators):
 
     # compute optimal number of samples
     # assuming that no samples were computed so far
-    self.counts_optimal = self.optimal ( numpy.ones(len(self.levels)), self.budget, indicators )
+    self.counts.optimal = self.optimal ( numpy.ones(len(self.levels)), self.budget, indicators )
     
     # compute optimal number of samples
     # assuming that self.counts.available() samples are already available on each level
-    self.counts_updated = self.optimal ( self.counts.available(), self.budget, indicators)
+    updated = self.optimal ( self.counts.available(), self.budget, indicators)
     
-    # compute additional number of samples from counts_updated
-    self.counts.additional = numpy.zeros ( len(self.levels), dtype=int )
+    # compute additional number of samples from updated
+    self.counts.additional = numpy.maximum ( 0, updated - self.counts.available() )
+    '''
     for level in self.levels:
-      if self.counts_updated [level] > self.counts.available() [level]:
+      if updated [level] > self.counts.available() [level]:
         self.counts.additional [level] = self.counts_updated [level] - self.counts.available() [level]
+    '''
     
     # compute optimal_work_fraction
-    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts_optimal * self.pairworks )
+    self.optimal_work_fraction = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.pairworks )
 
     # compute optimal control variate coefficients
     # TODO: check this
     if self.optimal:
       indicators.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
-
+    
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
     
@@ -93,13 +94,12 @@ class Estimated_Budget (Samples):
 
     budget_used = float (sum ( [ self.pairworks [level] * self.counts.available() [level] for level in self.levels ] ))
     budget_left = float (self.budget - budget_used)
-    if self.counts.additional != []:
-      budget_reqd = float (sum ( [ self.pairworks [level] * self.counts.additional [level] for level in self.levels ] ))
+    budget_reqd = float (sum ( [ self.pairworks [level] * self.counts.additional  [level] for level in self.levels ] ))
 
     print '  : -> Specified budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(self.budget), table=1), helpers.intf (numpy.ceil(self.budget/local.cores), table=1))
     print '  : -> Consumed  budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_used), table=1), helpers.intf (numpy.ceil(budget_used/local.cores), table=1))
     print '  : -> Remaining budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_left), table=1), helpers.intf (numpy.ceil(budget_left/local.cores), table=1))
-    if self.counts.additional != []:
+    if self.available:
       print '  : -> Requested budget: %s CPU hours [%s NODE hours]' % (helpers.intf (numpy.ceil(budget_reqd), table=1), helpers.intf (numpy.ceil(budget_reqd/local.cores), table=1))
 
   def report (self):
@@ -112,10 +112,10 @@ class Estimated_Budget (Samples):
     #indicators.coefficients.report()
 
     # report computed and additional number of samples
-    self.counts.report ()
+    self.counts.report (self.available)
 
     # report budget status
-    self.report_budget()
+    self.report_budget ()
 
   # query for budget
   def query (self):
