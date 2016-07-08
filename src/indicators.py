@@ -47,7 +47,7 @@ class Indicator (object):
   def __setitem__(self, key, item):
     setattr (self, key, item) 
   
-  def report (self, key, normalization):
+  def report (self, key, normalization=1.0):
 
     print '  : %-18s:' % self.name,
     #for level in self.levels [ : self.start ]:
@@ -107,7 +107,7 @@ class Indicators (object):
       self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
     
     # set the normalization
-    if numpy.isnan (self.mean [self.COARSE] ['measured'] [0]):
+    if numpy.isnan (self.mean [self.FINE] ['measured'] [0]):
       self.normalization = 1
       helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
@@ -283,7 +283,7 @@ class Indicators (object):
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation .report ('measured')
+    self.correlation .report ('measured', self.normalization)
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
