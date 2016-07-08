@@ -63,7 +63,7 @@ class Indicator (object):
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference=True, lsqfit=True):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = True, lsqfit = True, degree = 2):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -249,7 +249,7 @@ class Indicators (object):
     return distances
   
   # least squares inference of indicator level values based on the measured level values
-  def infer (self, indicator, critical, degree=2):
+  def infer (self, indicator, critical):
 
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
@@ -267,7 +267,7 @@ class Indicators (object):
       return
     
     # fit a linear polynomial using linear least squares, weighted by data undertainties
-    line = numpy.polyfit (self.levels [indicator.start:], numpy.log (indicator ['measured'] [indicator.start:]), degree, w = indicator ['weights'] [indicator.start:])
+    line = numpy.polyfit (self.levels [indicator.start:], numpy.log (indicator ['measured'] [indicator.start:]), self.degree, w = indicator ['weights'] [indicator.start:])
 
     # update indicator values to the maximum likelihood estimations
     indicator ['infered'] [indicator.start:] = numpy.exp ( numpy.polyval (line, self.levels [indicator.start:]) )

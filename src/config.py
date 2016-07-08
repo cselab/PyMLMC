@@ -49,6 +49,7 @@ class MLMC_Config (object):
   root            = '.'
   deterministic   = 0
   recycle         = 0
+  degree          = 2
   iteration       = None
   
   def __init__ (self, id=0):
@@ -96,7 +97,7 @@ class MLMC_Config (object):
 
   # report configuration
   def report (self):
-    
+
     print
     print   ' :: CONFIGURATION:    '
     print   '  : MACHINE      :    %-30s' % local.name                         + '    ' + '[TYPE: %s]' % ('cluster'       if local.cluster      else 'standalone')
