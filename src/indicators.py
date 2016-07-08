@@ -374,30 +374,37 @@ class Indicators (object):
   
   def save (self, iteration):
 
+    origins = ['measured', 'infered']
+
     # initialize history
     if len (self.history) == 0:
-      self.history ['epsilon_fi']    = {}
-      self.history ['epsilon_co']    = {}
-      self.history ['sigma_fi']      = {}
-      self.history ['sigma_co']      = {}
-      self.history ['covariance']    = {}
-      self.history ['correlation']   = {}
-      self.history ['coefficients']  = {}
-      self.history ['epsilon_diff']  = {}
-      self.history ['variance_diff'] = {}
+      for origin in origins:
+        self.history ['mean_fine_'         + origin] = {}
+        self.history ['mean_coarse_'       + origin] = {}
+        self.history ['variance_fine_'     + origin] = {}
+        self.history ['variance_coarse_'   + origin] = {}
+        self.history ['covariance_'        + origin] = {}
+        self.history ['correlation_'       + origin] = {}
+        self.history ['coefficients_'      + origin] = {}
+        self.history ['mean_diff_'         + origin] = {}
+        self.history ['variance_diff_'     + origin] = {}
+        self.history ['mean_diff_opt_'     + origin] = {}
+        self.history ['variance_diff_opt_' + origin] = {}
 
     # append history
-    self.history ['epsilon_fi']    [iteration] = [ self.mean [level] [0] for level in self.levels ]
-    self.history ['epsilon_co']    [iteration] = [ self.mean [level] [1] for level in self.levels ]
-    self.history ['sigma_fi']      [iteration] = [ self.variance [level] [0] for level in self.levels ]
-    self.history ['sigma_co']      [iteration] = [ self.variance [level] [1] for level in self.levels ]
-    self.history ['covariance']    [iteration] = self.covariance
-    self.history ['correlation']   [iteration] = self.correlation
-    if 'coefficients' in self.history:
-      self.history ['coefficients']  [iteration] = self.coefficients.values
-    self.history ['epsilon_diff']  [iteration] = self.mean_diff
-    self.history ['variance_diff'] [iteration] = self.variance_diff
-
+    for origin in origins:
+      self.history ['mean_fine_'         + origin] [iteration] = self.mean     [self.FINE]   [origin]
+      self.history ['mean_coarse_'       + origin] [iteration] = self.mean     [self.COARSE] [origin]
+      self.history ['variance_fine_'     + origin] [iteration] = self.variance [self.FINE]   [origin]
+      self.history ['variance_coarse_'   + origin] [iteration] = self.variance [self.COARSE] [origin]
+      self.history ['covariance_'        + origin] [iteration] = self.covariance             [origin]
+      self.history ['correlation_'       + origin] [iteration] = self.correlation            [origin]
+      self.history ['coefficients_'      + origin] [iteration] = self.coefficients.values
+      self.history ['mean_diff_'         + origin] [iteration] = self.mean_diff              [origin]
+      self.history ['variance_diff_'     + origin] [iteration] = self.variance_diff          [origin]
+      self.history ['mean_diff_opt_'     + origin] [iteration] = self.mean_diff_opt          [origin]
+      self.history ['variance_diff_opt_' + origin] [iteration] = self.variance_diff_opt      [origin]
+    
     # dump history
     helpers.delete (self.indicators_file)
     for variable in self.history:
