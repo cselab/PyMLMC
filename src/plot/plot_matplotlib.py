@@ -142,8 +142,7 @@ def color (qoi):
 
 # === styles (specified by the run)
 
-#styles = ['-', '--', ':', '-.']
-styles = ['-', '-', '-', '-']
+styles = ['-', '--', ':', '-.']
 
 def style (run):
   if (run - 1) < len (styles):
@@ -1467,7 +1466,7 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means for Q = %s' % name (qoi))
     pylab.ylabel (r'mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    adjust_extent (mean_diff_measured, factor=1.5)
+    #adjust_extent (mean_diff_measured, factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
@@ -1482,7 +1481,7 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    adjust_extent (variance_diff_measured, factor=1.5)
+    #adjust_extent (variance_diff_measured, factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
@@ -1518,7 +1517,8 @@ class MatPlotLib (object):
 
     pylab.plot (levels, correlation_measured, color=color_params('correlation'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
     pylab.plot (levels, correlation_infered,  color=color_params('correlation'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
-    pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
+    if run == 1:
+      pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle='-', linewidth=2, alpha=0.6, label='correlation = 1/2')
     pylab.title  ('Level correlations for Q = %s' % name (qoi))
     pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
@@ -1557,6 +1557,9 @@ class MatPlotLib (object):
 
     pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
     pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % self.mlmc.errors.speedup_ocv)
+    if run == 1:
+      pylab.axhline (y=0.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
+      pylab.axhline (y=1.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
     pylab.title  ('Level coefficients for Q = %s' % name (qoi))
     pylab.ylabel ('coefficient')
     pylab.xlabel ('mesh level')
