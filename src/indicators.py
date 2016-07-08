@@ -96,8 +96,8 @@ class Indicators (object):
 
     # === MEAN & VARIANCE indicators
 
-    self.mean     = [ Indicator ('MEAN     COARSE', self.levels), Indicator ('MEAN     COARSE', self.levels, start = 1) ]
-    self.variance = [ Indicator ('VARIANCE FINE',   self.levels), Indicator ('VARIANCE FINE',   self.levels, start = 1) ]
+    self.mean     = [ Indicator ('MEAN     FINE', self.levels), Indicator ('MEAN     COARSE', self.levels, start = 1) ]
+    self.variance = [ Indicator ('VARIANCE FINE', self.levels), Indicator ('VARIANCE COARSE',   self.levels, start = 1) ]
 
     # compute mean and variance for all levels and types
     for level, type in self.levels_types:
