@@ -1556,7 +1556,8 @@ class MatPlotLib (object):
     # plot coefficients
 
     pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
-    pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % self.mlmc.errors.speedup_ocv)
+    if self.mlmc.errors.speedup_ocv != None:
+      pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % self.mlmc.errors.speedup_ocv)
     if run == 1:
       pylab.axhline (y=0.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
       pylab.axhline (y=1.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
@@ -1609,7 +1610,8 @@ class MatPlotLib (object):
       pylab.axhline (y=self.mlmc.errors.total_relative_error, color=color_params('error'), linestyle=style(run), alpha=alpha(run)/2, label='total: %.1e' % self.mlmc.errors.total_relative_error)
     #if run == 1:
     #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
-    pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup_mlmc)
+    if self.mlmc.errors.speedup_mlmc != None:
+      pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup_mlmc)
     pylab.title  ('Relative sampling errors for Q = %s' % name (qoi))
     pylab.ylabel (r'$\sqrt{\operatorname{Var} ( \alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1} ) / M_\ell}$')
     pylab.xlabel ('mesh level')
