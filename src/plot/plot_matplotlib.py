@@ -1482,7 +1482,7 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1}Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    adjust_extent (deviations, factor=1.5)
+    adjust_extent (variance_diff_measured, factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
