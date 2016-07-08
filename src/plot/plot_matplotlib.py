@@ -1522,7 +1522,7 @@ class MatPlotLib (object):
     pylab.title  ('Level correlations for Q = %s' % name (qoi))
     pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    pylab.ylim ( [ -0.1, 1.1 * max (1.0, max (correlation)) ] )
+    pylab.ylim ( [ -0.1, 1.1 * max (1.0, max (correlation_measured)) ] )
     levels_extent (levels)
     pylab.legend (loc='lower right')
 
