@@ -1420,30 +1420,27 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot indicators
-  def indicators (self, plain=False, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
     
     print ' :: INFO: Plotting indicators...',
     sys.stdout.flush()
     
     # === load all required data
+
+    # use only levels with true differences 
+    levels = self.mlmc.config.levels
+    if not coarsest and len (levels) > 1:
+      levels = levels  [ 1 : ]
     
-    if plain:
-      EPSILON     = self.mlmc.indicators.mean_diff_plain
-      SIGMA       = self.mlmc.indicators.variance_diff_plain
-    else:
-      EPSILON     = self.mlmc.indicators.mean_diff
-      SIGMA       = self.mlmc.indicators.variance_diff
+    mean_diff_measured         = self.mlmc.indicators.mean_diff         ['measured'] [levels]
+    variance_diff_measured     = self.mlmc.indicators.variance_diff     ['measured'] [levels]
+    mean_diff_infered          = self.mlmc.indicators.mean_diff         ['infered']  [levels]
+    variance_diff_infered      = self.mlmc.indicators.variance_diff     ['infered']  [levels]
+    mean_diff_opt_infered      = self.mlmc.indicators.mean_diff_opt     ['infered']  [levels]
+    variance_diff_opt_infered  = self.mlmc.indicators.variance_diff_opt ['infered']  [levels]
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
-    levels        = self.mlmc.config.levels
     qoi           = self.mlmc.config.solver.qoi
-
-    # === filter data
-
-    if plain and not coarsest and len (levels) > 1:
-      EPSILON = EPSILON [ 1 : ]
-      SIGMA   = SIGMA   [ 1 : ]
-      levels  = levels  [ 1 : ]
     
     # === compute error using the exact solution mean_exact
     
@@ -1457,36 +1454,37 @@ class MatPlotLib (object):
     if not frame:
       figure (infolines, subplots=2)
     
-    # plot EPSILON
+    # plot mean diffs (measured, infered and optimized)
     
     pylab.subplot(121)
-    means = [e / NORMALIZATION for e in EPSILON]
-    pylab.semilogy (levels, means, color=color_params('epsilon'), linestyle=style(run), alpha=alpha(run), marker='x', label='relative level means')
+    pylab.semilogy (levels, mean_diff_measured    / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_diff_infered     / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    pylab.semilogy (levels, mean_diff_opt_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
       #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. level means for Q = %s' % name (qoi))
-    pylab.ylabel (r'mean of relative $Q_\ell - Q_{\ell-1}$')
+    pylab.ylabel (r'mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1}Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    adjust_extent (means, factor=1.5)
+    adjust_extent (mean_diff_measured, factor=1.5)
     levels_extent (levels)
-    if exact:
-      pylab.legend (loc='upper right')
+    pylab.legend (loc='upper right')
     
-    # plot SIGMA
+    # plot variance diffs (measured, infered and optimized)
     
     pylab.subplot(122)
-    deviations = numpy.sqrt(SIGMA) / NORMALIZATION
-    pylab.semilogy (levels, deviations, color=color_params('sigma'), linestyle=style(run), alpha=alpha(run), marker='x', label='rel. level standard deviations')
+    pylab.semilogy (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-    pylab.title  ('Rel. level standard deviations for Q = %s' % name (qoi))
-    pylab.ylabel (r'standard deviation of rel. $Q_\ell - Q_{\ell-1}$')
+    pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
+    pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1}Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
     adjust_extent (deviations, factor=1.5)
     levels_extent (levels)
-    #pylab.legend (loc='best')
+    pylab.legend (loc='upper right')
     
     adjust (infolines, subplots=2)
     
@@ -1494,7 +1492,7 @@ class MatPlotLib (object):
       show_info(self)
     
     if not frame:
-      self.draw (save, qoi, suffix='indicators' + ('_plain' if plain else ''))
+      self.draw (save, qoi, suffix='indicators')
 
     print ' done.'
 
@@ -1506,9 +1504,10 @@ class MatPlotLib (object):
 
     # === load all required data
 
-    correlation = self.mlmc.indicators.correlation
-    levels      = self.mlmc.config.levels
-    qoi         = self.mlmc.config.solver.qoi
+    correlation_measured = self.mlmc.indicators.correlation ['measured']
+    correlation_infered  = self.mlmc.indicators.correlation ['infered']
+    levels = self.mlmc.config.levels
+    qoi    = self.mlmc.config.solver.qoi
 
     # === plot
 
@@ -1517,14 +1516,15 @@ class MatPlotLib (object):
 
     # plot correlations
 
-    pylab.plot (levels, correlation, color=color_params('correlation'), linestyle=style(run), alpha=alpha(run), marker='x', label='level correlations')
+    pylab.plot (levels, correlation_measured, color=color_params('correlation'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.plot (levels, correlation_infered,  color=color_params('correlation'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
     pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='correlation = 1/2')
     pylab.title  ('Level correlations for Q = %s' % name (qoi))
     pylab.ylabel (r'correlation of $Q_\ell$ and $Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
     pylab.ylim ( [ -0.1, 1.1 * max (1.0, max (correlation)) ] )
     levels_extent (levels)
-    #pylab.legend (loc='upper right')
+    pylab.legend (loc='lower right')
 
     adjust (infolines, subplots=1)
 
@@ -1608,7 +1608,7 @@ class MatPlotLib (object):
     #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
     pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup_mlmc)
     pylab.title  ('Relative sampling errors for Q = %s' % name (qoi))
-    pylab.ylabel (r'relative error $\sqrt{\operatorname{Var} ( Q_\ell - Q_{\ell-1} ) / M_\ell}$')
+    pylab.ylabel (r'$\sqrt{\operatorname{Var} ( \alpha_\ellQ_\ell - \alpha_{\ell-1}Q_{\ell-1} ) / M_\ell}$')
     pylab.xlabel ('mesh level')
     levels_extent (levels)
     #pylab.ylim   (ymax=1.5*TOL)

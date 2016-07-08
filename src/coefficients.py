@@ -44,10 +44,10 @@ class Coefficients (object):
     
     costs = numpy.zeros (self.L + 1)
 
-    costs [ 0   ]  =     self.values [ 0      ] ** 2                   * indicators.variance [ 0     , 0 ]
-    costs [ 1 : ]  =     self.values [ 1 :    ] ** 2                   * indicators.variance [ 1 :   , 0 ]
-    costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [ 1 :   , 1 ]
-    costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance [ 1 : ]
+    costs [ 0   ]  =     self.values [ 0      ] ** 2                   * indicators.variance [0] ['infered'] [0]
+    costs [ 1 : ]  =     self.values [ 1 :    ] ** 2                   * indicators.variance [0] ['infered'] [ 1 : ]
+    costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
+    costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
 
     costs *= ( indicators.pairworks / indicators.pairworks [0] ) ** 2
     
@@ -70,7 +70,7 @@ class Coefficients (object):
 
       # each coefficient can be computed independently
       for level in self.levels [ : -1 ]:
-        self.values [level] = indicators.correlation [level] * numpy.sqrt ( indicators.variance [self.L] [0] / indicators.variance [level] [0] )
+        self.values [level] = indicators.correlation ['infered'] [level] * numpy.sqrt ( indicators.variance [0] ['infered'] [self.L] / indicators.variance [0] ['infered'] [level] )
     
     # === if recycling is disabled, coefficients are obtained by solving a linear system of equations
 
@@ -87,14 +87,14 @@ class Coefficients (object):
         pairworks = indicators.pairworks / indicators.pairworks [0]
         for level in range (self.L):
           if level != 0:
-            A [level] [level - 1] = - pairworks [level] ** 2 * indicators.covariance [level]
-          A [level] [level]  = pairworks [level    ] ** 2 * indicators.variance [level    ] [0]
-          A [level] [level] += pairworks [level + 1] ** 2 * indicators.variance [level + 1] [1]
+            A [level] [level - 1] = - pairworks [level] ** 2 * indicators.covariance ['infered'] [level]
+          A [level] [level]  = pairworks [level    ] ** 2 * indicators.variance [0]  ['infered'] [level    ]
+          A [level] [level] += pairworks [level + 1] ** 2 * indicators.variance [1]  ['infered'] [level + 1]
           if level != self.L - 1:
-            A [level] [level + 1] = - pairworks [level + 1] ** 2 * indicators.covariance [level + 1]
+            A [level] [level + 1] = - pairworks [level + 1] ** 2 * indicators.covariance ['infered'] [level + 1]
         
         # assemble right hand side
-        b [-1] = pairworks [self.L] ** 2 * indicators.covariance [self.L]
+        b [-1] = pairworks [self.L] ** 2 * indicators.covariance ['infered'] [self.L]
       
       # a-posteriori (sample-weighted) optimization
       else:
@@ -102,13 +102,14 @@ class Coefficients (object):
         # assemble matrix from indicators
         for level in range (self.L):
           if level != 0:
-            A [level] [level - 1] = - indicators.covariance [level] / samples [level]
-          A [level] [level] = indicators.variance [level] [0] / samples [level] + indicators.variance [level + 1] [1] / samples [level + 1]
+            A [level] [level - 1] = - indicators.covariance  ['infered'] [level] / samples [level]
+          A [level] [level]  = indicators.variance [0] ['infered'] [level    ] / samples [level    ]
+          A [level] [level] += indicators.variance [1] ['infered'] [level + 1] / samples [level + 1]
           if level != self.L - 1:
-            A [level] [level + 1] = - indicators.covariance [level + 1] / samples [level + 1]
+            A [level] [level + 1] = - indicators.covariance  ['infered'] [level + 1] / samples [level + 1]
         
         # assemble right hand side
-        b [-1] = indicators.covariance [self.L] / samples [self.L]
+        b [-1] = indicators.covariance  ['infered'] [self.L] / samples [self.L]
       
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)

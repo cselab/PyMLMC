@@ -28,9 +28,42 @@ warnings.filterwarnings ("ignore", message="Degrees of freedom <= 0 for slice")
 
 # === classes
 
+# class for a single indicator with measured and infered valuess
+class Indicator (object):
+
+  def __init__ (self, name, levels, start=0):
+    
+    self.name  = name
+    self.start = start
+
+    self.weights   = numpy.full ( len (levels), float ('nan') )
+    self.measured  = numpy.full ( len (levels), float ('nan') )
+    self.infered   = numpy.full ( len (levels), float ('nan') )
+    
+    def report (self, key):
+
+      print '  : %-20s:' % self.name,
+      print '    ---',
+      #for level in self.levels [ : start ]:
+      #  print '    ---',
+      #for level in self.levels [ start : ]:
+      for level in self.levels:
+        if numpy.isnan (self [key]):
+          print '    N/A',
+        else:
+          print helpers.scif (self [key] [level], table=1),
+      print
+
+    def __getitem__ (self, key):
+      return getattr (self, key)
+
+    def __setitem__(self, key, item):
+      getattr (self, key) = item
+
+# class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, works, pairworks, recycle, infer=True, lsqfit=True):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, infer=True, lsqfit=True):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -38,8 +71,6 @@ class Indicators (object):
     self.L               = len (self.levels) - 1
     self.indicators_file = 'indicators.dat'
     self.available       = 0
-    self.nans            = 0
-    self.extrapolated    = 0
     self.history         = {}
   
   def compute (self, mcs, indices):
@@ -48,10 +79,9 @@ class Indicators (object):
     print ' :: Computing INDICATORS...',
     sys.stdout.flush ()
 
-    # set availability
     self.available = 1
 
-    # === control variate COEFFICIENTS
+    # === initialize control variate COEFFICIENTS
 
     # initialize coefficients
     self.coefficients = Coefficients (self.levels, self.recycle)
@@ -64,95 +94,95 @@ class Indicators (object):
     # evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
 
-    # === EPSILON (mean) & SIGMA (variance) indicators
+    # === MEAN & VARIANCE indicators
 
-    self.mean     = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
-    self.variance = numpy.zeros ( [ self.L + 1, 2 ], dtype=float )
+    self.mean     = [ Indicator ('MEAN     [FI]', self.levels), Indicator ('MEAN     [CO]', self.levels, start = 1) ]
+    self.variance = [ Indicator ('VARIANCE [FI]', self.levels), Indicator ('VARIANCE [CO]', self.levels, start = 1) ]
 
     # compute mean and variance for all levels and types
     for level, type in self.levels_types:
-      self.mean     [level] [type] = numpy.mean ( values [level] [type] )
-      self.variance [level] [type] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
-    self.mean     [0] [1] = float ('nan')
-    self.variance [0] [1] = float ('nan')
-
+      self.mean     [type] ['weights']  [level] = numpy.sqrt (values [level] [type] .size)
+      self.variance [type] ['weights']  [level] = values [level] [type] .size
+      self.mean     [type] ['measured'] [level] = numpy.mean ( values [level] [type] )
+      self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
+    
     # set the normalization
-    if numpy.isnan (self.mean [0] [0]):
+    if numpy.isnan (self.mean [self.COARSE] ['measured'] [0]):
       self.normalization = 1
       helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
-      self.normalization = numpy.abs (self.mean [0] [0])
+      self.normalization = numpy.abs (self.mean [self.COARSE] ['measured'] [0])
+    
+    # least squares inference of indicator level values based on the measured level values
+    self.infer (self.mean     [self.FINE  ], critical = False)
+    self.infer (self.mean     [self.COARSE], critical = False)
+    self.infer (self.variance [self.FINE  ], critical = True )
+    self.infer (self.variance [self.COARSE], critical = True )
+
+    # === MEAN DIFF and VARIANCE DIFF level distance indicators
+    # (WITHOUT optimal control variate coefficients computed below)
+
+    self.mean_diff     = Indicator ('MEAN     DIFF', self.levels, start = 1)
+    self.variance_diff = Indicator ('VARIANCE DIFF', self.levels, start = 1)
+    
+    # compute level distances
+    for level in self.levels:
+      self.mean_diff     ['weights']  [level] = numpy.sqrt (distances [level] .size)
+      self.variance_diff ['weights']  [level] = distances [level] .size
+      self.mean_diff     ['measured'] [level] = numpy.mean ( distances [level] )
+      self.variance_diff ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+    
+    # least squares inference of indicator level values based on the measured level values
+    self.infer (self.mean_diff,     critical = False)
+    self.infer (self.variance_diff, critical = True )
 
     # === COVARIANCES and CORRELATIONS
-
-    self.covariance  = numpy.zeros ( self.L + 1, dtype=float)
-    self.correlation = numpy.zeros ( self.L + 1, dtype=float)
-
-    # compute covariance and correlation
-
-    self.covariance  [0] = float ('nan')
-    self.correlation [0] = float ('nan')
-
-    # remark: computing covariances and correlations from 'values' leads to inconsistent estimations and should be avoided
-    for level in self.levels [1:] :
-      if len (indices [level]) > 1:
-        self.covariance  [level] = 0.5 * ( self.variance [level] [0] + self.variance [level] [1] - numpy.var ( distances [level] ) )
-        self.correlation [level] = self.covariance [level] / numpy.sqrt (self.variance [level] [0] * self.variance [level] [1])
-      else:
-        self.covariance  [level] = float ('nan')
-        self.correlation [level] = float ('nan')
-        self.nans = 1
-
-    # extrapolate missing indicators
-    if self.nans:
-      self.extrapolate ()
-
-    # === EPSILON_DIFF_PLAIN and SIGMA_DIFF_PLAIN level distance indicators
-    # (WITHOUT optimal control variate coefficients computed above)
-
-    self.mean_diff_plain     = numpy.zeros ( self.L + 1, dtype=float)
-    self.variance_diff_plain = numpy.zeros ( self.L + 1, dtype=float)
-
-    # compute level distances
-    for level in self.levels:
-      self.mean_diff_plain     [level] = numpy.mean ( distances [level] )
-      if len (distances [level]) > 1:
-        self.variance_diff_plain [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
-      else:
-        self.variance_diff_plain [level] = float ('nan')
-        self.nans = 1
     
-    # extrapolate missing difference indicators
-    if self.nans:
-      self.extrapolate_diffs ()
-
+    self.covariance  = Indicator ('COVARIANCE',  self.levels)
+    self.correlation = Indicator ('CORRELATION', self.levels)
+    
+    # compute covariance and correlation, both measured and infered
+    # remark: computing covariances and correlations from 'values' leads to inconsistent estimations and should be avoided
+    for level in self.levels [ 1 : ]:
+      self.covariance  ['weights']  [level] = distances [level] .size
+      self.covariance  ['measured'] [level] = 0.5 * ( self.variance [self.FINE] ['measured'] [level] + self.variance [self.COARSE] ['measured'] [level] - self.variance_diff ['measured'] [level] )
+      self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered']  [level] + self.variance [self.COARSE] ['infered']  [level] - self.variance_diff ['infered']  [level] )
+      self.covariance  ['weights']  [level] = distances [level] .size
+      self.correlation ['measured'] [level] = self.covariance ['measured'] [level] / numpy.sqrt (self.variance [self.FINE] ['measured'] [level] * self.variance [self.COARSE] ['measured'] [level] )
+      self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt (self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
+    
     # === OPTIMAL control variate COEFFICIENTS
-
+    
     # compute optimal control variate coefficients
     self.coefficients.optimize (self)
-
+    
     # re-evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
-
-    # === EPSILON_DIFF and SIGMA_DIFF level distance indicators
+    
+    # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITH optimal control variate coefficients computed above)
+    
+    self.mean_diff_opt     = Indicator ('MEAN     DIFF OPT', self.levels)
+    self.variance_diff_opt = Indicator ('VARIANCE DIFF OPT', self.levels)
 
-    self.mean_diff     = numpy.zeros ( self.L + 1, dtype=float)
-    self.variance_diff = numpy.zeros ( self.L + 1, dtype=float)
-
-    # compute level distances
+    # compute optimized level distances (measured values)
     for level in self.levels:
-      self.mean_diff     [level] = numpy.mean ( distances [level] )
-      if len (distances [level]) > 1:
-        self.variance_diff [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
-      else:
-        self.variance_diff [level] = float ('nan')
-        self.nans = 1
-
-    # extrapolate missing difference indicators
-    if self.nans:
-      self.extrapolate_diffs_plain ()
-
+      self.mean_diff_opt     ['weights']  [level] = numpy.sqrt (distances [level] .size)
+      self.variance_diff_opt ['weights']  [level] = distances [level] .size
+      self.mean_diff_opt     ['measured'] [level] = numpy.mean ( distances [level] )
+      self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+    
+    # compute optimized level distances (infered values)
+    # remark: infering optimized differences from measured optimized differences could lead to inconsistencies with other infered indicators
+    self.mean_diff_opt     ['infered'] [0] = self.coefficients.values [0] * self.mean [0] [self.FINE]
+    self.variance_diff_opt ['infered'] [0] = self.coefficients.values [0] ** 2 * self.variance [0] [self.FINE]
+    for level in self.levels [ 1 : ]:
+      self.mean_diff_opt     ['infered'] [level]  = self.coefficients.values [level    ]      * self.mean     [level] [self.FINE]
+      self.mean_diff_opt     ['infered'] [level] -= self.coefficients.values [level - 1]      * self.mean     [level] [self.COARSE]
+      self.variance_diff_opt ['infered'] [level]  = self.coefficients.values [level    ] ** 2 * self.variance [level] [self.FINE]
+      self.variance_diff_opt ['infered'] [level] += self.coefficients.values [level - 1] ** 2 * self.variance [level] [self.COARSE]
+      self.variance_diff_opt ['infered'] [level] -= 2 * self.coefficients.values [level] * self.coefficients.values [level - 1] * self.covariance [level]
+    
     print 'done.'
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
@@ -217,98 +247,130 @@ class Indicators (object):
         self.nans = 1
 
     return distances
+  
+  # least squares inference of indicator level values based on the measured level values
+  def infer (self, indicator, critical, degree=2):
 
+    # simply copy all values before 'start'
+    indicator ['infered'] [:start] = indicator ['measured'] [:start]
+
+    # check if sufficiently of measurements is available for inference
+    if numpy.isnan (indicator.measured [start:]) .all ():
+      if critical:
+        self.available = 0
+      helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
+      return
+    
+    # if only one measurement is available, assume constant values
+    if  numpy.sum ( ~ numpy.isnan (indicator [start:]) ) == 1:
+      indicator.infered [start:] = indicator [ start + numpy.where ( ~ numpy.isnan (indicator [start:]) ) ]
+      return
+    
+    # fit a linear polynomial using linear least squares, weighted by data undertainties
+    line = numpy.polyfit (levels [start:], numpy.log (indicator ['measured'] [start:]), degree, w = indicator ['weights'] [start:])
+
+    # update indicator values to the maximum likelihood estimations
+    indicator ['infered'] [start:] = numpy.exp ( numpy.polyval (line, levels [start:]) )
+  
   def report (self):
 
+    # === report measured values
+
     print
-    print ' :: INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
+    print ' :: MEASURED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
     print '  :'
-    print '  :    LEVEL    : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :---------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :        LEVEL        : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
-    # report correlation
-    print '  : CORRELATION :',
-    print '    ---',
-    for level in self.levels [1:]:
-      print helpers.scif (self.correlation [level], table=1),
-    print
+    # report 'correlation'
+    self.correlation ['measured'] .report ()
 
     # splitter
-    print '  :---------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
-    # report mean (fine)
-    print '  : EPSILON [FI]:',
-    for level in self.levels:
-      print helpers.scif (self.mean [level] [0] / self.normalization, table=1),
-    print
+    # report 'mean (fine)'
+    self.mean [self.FINE] ['measured'] .report ()
     
-    # report mean (coarse)
-    print '  : EPSILON [CO]:',
-    print '    ---',
-    for level in self.levels [1:]:
-      print helpers.scif (self.mean [level] [1] / self.normalization, table=1),
-    print
+    # report 'mean (coarse)'
+    self.mean [self.COARSE] ['measured'] .report ()
     
-    # report variance (fine)
-    print '  : SIGMA   [FI]:',
-    for level in self.levels:
-      print helpers.scif (self.variance [level] [0] / (self.normalization ** 2), table=1),
-    print
+    # report 'variance (fine)'
+    self.variance [self.FINE] ['measured'] .report ()
     
-    # report variance (coarse)
-    print '  : SIGMA   [CO]:',
-    print '    ---',
-    for level in self.levels [1:]:
-      print helpers.scif (self.variance [level] [1] / (self.normalization ** 2), table=1),
-    print
+    # report 'variance (coarse)'
+    self.variance [self.COARSE] ['measured'] .report ()
 
-    # report mean_diff_plain
-    print '  : EPSILON DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.mean_diff_plain [level] / self.normalization, table=1),
-    print
+    # report 'mean diff'
+    self.mean_diff ['measured'] .report ()
 
-    # report variance_diff_plain
-    print '  : SIGMA   DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.variance_diff_plain [level] / (self.normalization ** 2), table=1),
-    print
-
-    # report covariance
-    print '  : COVARIANCE  :',
-    print '    ---',
-    for level in self.levels [1:]:
-      print helpers.scif (self.covariance [level] / (self.normalization ** 2), table=1),
-    print
+    # report 'variance diff'
+    self.variance_diff ['measured'] .report ()
+    
+    # report 'covariance'
+    self.covariance ['measured'] .report ()
 
     # splitter
-    print '  :---------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
-    # report coefficients
-    print '  : COEFFICIENT :',
+    # report 'mean diff opt'
+    self.mean_diff_opt ['measured'] .report ()
+
+    # report 'variance diff opt'
+    self.variance_diff_opt ['measured'] .report ()
+
+    # === report infered values
+
+    print
+    print ' :: INFERED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
+    print '  :'
+    print '  :        LEVEL        : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report 'correlation'
+    self.correlation ['infered'] .report ()
+
+    # report 'coefficients'
+    print '  : %-20s:' % 'COEFFICIENT',
     for level in self.levels:
       print helpers.scif (self.coefficients.values [level], table=1),
-    print
-
-    # report mean_diff
-    print '  : EPSILON DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.mean_diff [level] / self.normalization, table=1),
-    print
-
-    # report variance_diff
-    print '  : SIGMA   DIFF:',
-    for level in self.levels:
-      print helpers.scif (self.variance_diff [level] / (self.normalization ** 2), table=1),
     print
 
     # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
     print '  :'
     print '  : OPTIMIZATION: %.2f' % self.coefficients.optimization
 
-    # issue a warning if some indicator values were extrapolated
-    if self.extrapolated:
-      helpers.warning ('Missing indicator values are extrapolated!')
+    # splitter
+    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report 'mean (fine)'
+    self.mean [self.FINE] ['infered'] .report ()
+    
+    # report 'mean (coarse)'
+    self.mean [self.COARSE] ['infered'] .report ()
+    
+    # report 'variance (fine)'
+    self.variance [self.FINE] ['infered'] .report ()
+    
+    # report 'variance (coarse)'
+    self.variance [self.COARSE] ['infered'] .report ()
+
+    # report 'mean diff'
+    self.mean_diff ['infered'] .report ()
+
+    # report 'variance diff'
+    self.variance_diff ['infered'] .report ()
+    
+    # report 'covariance'
+    self.covariance ['infered'] .report ()
+
+    # splitter
+    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report 'mean diff opt'
+    self.mean_diff_opt ['infered'] .report ()
+
+    # report 'variance diff opt'
+    self.variance_diff_opt ['infered'] .report ()
   
   def save (self, iteration):
 
@@ -348,64 +410,7 @@ class Indicators (object):
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
   
-  # least squares fit to indicator, where available level values are considered as measurement data
-  def fit (self, indicator, name, critical):
-    
-    # check if sufficiently of measurements is available for inference
-    if numpy.isnan (indicator) .all ():
-      if critical:
-        self.available = 0
-      helpers.warning ('Extrapolation of indicators \'%s\' not possible!' % name)
-      return
-    
-    # if only one measurement is available, assume constant values
-    if  numpy.sum ( ~ numpy.isnan (indicator) ) == 1:
-      indicator = indicator [ numpy.where ( ~ numpy.isnan (indicator) ) ]
-      return
-    
-    # fit a linear polynomial using linear least squares
-    line = numpy.polyfit (self.levels, numpy.log (indicator), 1)
-
-    # update indicator values to the maximum likelihood estimations
-    indicator = numpy.exp ( numpy.polyval (line, self.levels) )
-  
-  # infer indicator values using available level values as measurement data
-  def infer (self):
-
-    self.infered   = 1
-    self.available = 1
-
-    self.fit (self.mean     [:, 0], 'EPSILON [FINE]',   critical = False)
-    self.fit (self.mean     [:, 1], 'EPSILON [COARSE]', critical = False)
-    self.fit (self.variance [:, 0], 'SIGMA [FINE]',     critical = True )
-    self.fit (self.variance [:, 1], 'SIGMA [COARSE]',   critical = True )
-
-    # TODO: this is derived from already infered indicators!
-    self.fit (self.variance [:, 1], 'CORRELATION',      critical = True )
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.correlation [level] ):
-        if level != 0:
-          self.correlation [level] = self.correlation [level-1] + 0.5 * (1.0 - self.correlation [level-1])
-        else:
-          self.correlation [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'CORRELATION\' not possible!')
-    
-    # TODO: this is derived from already infered indicators!
-    self.fit (self.variance [:, 1], 'COVARIANCE',      critical = True )
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.covariance [level] ):
-        if level != 0 and not numpy.isnan ( self.correlation [level] ):
-          self.covariance [level] = self.correlation [level] * numpy.sqrt (self.variance [level] [0] * self.variance [level-1] [0])
-        else:
-          self.covariance [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
-
-    self.nans = 0
-
+  '''
   # extrapolate missing indicators from the coarser levels
   def extrapolate (self):
 
@@ -512,3 +517,4 @@ class Indicators (object):
           helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
 
     self.nans = 0
+  '''

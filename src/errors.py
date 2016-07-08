@@ -58,7 +58,7 @@ class Errors (object):
     # compute sampling errors (if only one sample is loaded, use indicator value)
     # REMARK: this is not accurate since variance_diff are not easy to extrapolate correctly (see a commented alternative [not yet properly tested])
     # TODO: add conditional branch, based on whether the indicators were extrapolated or not
-    self.error = self.errors (indicators.variance_diff, counts.loaded)
+    self.error = self.errors (indicators.variance_diff_opt ['infered'], counts.loaded)
     '''
     self.relative_error = numpy.zeros ( len (self.levels) )
     self.relative_error [0] = indicators.coefficients.values [0] ** 2 * indicators.variance [0] [0] / max (counts.loaded [0], 1)
@@ -116,13 +116,13 @@ class Errors (object):
     else:
       counts = counts.loaded
     
-    error  = self.total ( self.errors (indicators.variance_diff,       counts) )
-    plain  = self.total ( self.errors (indicators.variance_diff_plain, counts) )
+    error  = self.total ( self.errors (indicators.variance_diff_opt ['infered'], counts) )
+    plain  = self.total ( self.errors (indicators.variance_diff     ['infered'], counts) )
 
     # compute MLMC vs. MC speedup
     FINEST      = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
     work_mlmc   = sum ( [ indicators.pairworks [level] * counts [level] for level in self.levels ] )
-    variance_mc = numpy.max ( [ indicators.variance [level] [0] for level in self.levels [0 : FINEST + 1] ] )
+    variance_mc = numpy.max ( [ indicators.variance [0] ['infered'] [level] for level in self.levels [0 : FINEST + 1] ] )
     samples_mc  = numpy.ceil ( variance_mc / error ** 2 )
     work_mc     = indicators.works [FINEST] * samples_mc
     self.speedup_mlmc = work_mc / work_mlmc
