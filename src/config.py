@@ -49,7 +49,7 @@ class MLMC_Config (object):
   root            = '.'
   deterministic   = 0
   recycle         = 0
-  degree          = 2
+  degree          = 1
   iteration       = None
   
   def __init__ (self, id=0):
