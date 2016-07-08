@@ -33,8 +33,9 @@ class Indicator (object):
 
   def __init__ (self, name, levels, start=0):
     
-    self.name  = name
-    self.start = start
+    self.name   = name
+    self.levels = levels
+    self.start  = start
 
     self.weights   = numpy.full ( len (levels), float ('nan') )
     self.measured  = numpy.full ( len (levels), float ('nan') )
@@ -174,14 +175,14 @@ class Indicators (object):
     
     # compute optimized level distances (infered values)
     # remark: infering optimized differences from measured optimized differences could lead to inconsistencies with other infered indicators
-    self.mean_diff_opt     ['infered'] [0] = self.coefficients.values [0] * self.mean [0] [self.FINE]
-    self.variance_diff_opt ['infered'] [0] = self.coefficients.values [0] ** 2 * self.variance [0] [self.FINE]
+    self.mean_diff_opt     ['infered'] [0] = self.coefficients.values [0]      * self.mean     [self.FINE] ['infered'] [0]
+    self.variance_diff_opt ['infered'] [0] = self.coefficients.values [0] ** 2 * self.variance [self.FINE] ['infered'] [0]
     for level in self.levels [ 1 : ]:
-      self.mean_diff_opt     ['infered'] [level]  = self.coefficients.values [level    ]      * self.mean     [level] [self.FINE]
-      self.mean_diff_opt     ['infered'] [level] -= self.coefficients.values [level - 1]      * self.mean     [level] [self.COARSE]
-      self.variance_diff_opt ['infered'] [level]  = self.coefficients.values [level    ] ** 2 * self.variance [level] [self.FINE]
-      self.variance_diff_opt ['infered'] [level] += self.coefficients.values [level - 1] ** 2 * self.variance [level] [self.COARSE]
-      self.variance_diff_opt ['infered'] [level] -= 2 * self.coefficients.values [level] * self.coefficients.values [level - 1] * self.covariance [level]
+      self.mean_diff_opt     ['infered'] [level]  = self.coefficients.values [level    ]      * self.mean     [self.FINE]   ['infered'] [level]
+      self.mean_diff_opt     ['infered'] [level] -= self.coefficients.values [level - 1]      * self.mean     [self.COARSE] ['infered'] [level]
+      self.variance_diff_opt ['infered'] [level]  = self.coefficients.values [level    ] ** 2 * self.variance [self.FINE]   ['infered'] [level]
+      self.variance_diff_opt ['infered'] [level] += self.coefficients.values [level - 1] ** 2 * self.variance [self.COARSE] ['infered'] [level]
+      self.variance_diff_opt ['infered'] [level] -= 2 * self.coefficients.values [level] * self.coefficients.values [level - 1] * self.covariance ['infered'] [level]
     
     print 'done.'
 
@@ -283,40 +284,40 @@ class Indicators (object):
     print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation ['measured'] .report ()
+    self.correlation .report ('measured')
 
     # splitter
     print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean (fine)'
-    self.mean [self.FINE] ['measured'] .report ()
+    self.mean [self.FINE] .report ('measured')
     
     # report 'mean (coarse)'
-    self.mean [self.COARSE] ['measured'] .report ()
+    self.mean [self.COARSE] .report ('measured')
     
     # report 'variance (fine)'
-    self.variance [self.FINE] ['measured'] .report ()
+    self.variance [self.FINE] .report ('measured')
     
     # report 'variance (coarse)'
-    self.variance [self.COARSE] ['measured'] .report ()
+    self.variance [self.COARSE] .report ('measured')
 
     # report 'mean diff'
-    self.mean_diff ['measured'] .report ()
+    self.mean_diff .report ('measured')
 
     # report 'variance diff'
-    self.variance_diff ['measured'] .report ()
+    self.variance_diff .report ('measured')
     
     # report 'covariance'
-    self.covariance ['measured'] .report ()
+    self.covariance .report ('measured')
 
     # splitter
     print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean diff opt'
-    self.mean_diff_opt ['measured'] .report ()
+    self.mean_diff_opt .report ('measured')
 
     # report 'variance diff opt'
-    self.variance_diff_opt ['measured'] .report ()
+    self.variance_diff_opt .report ('measured')
 
     # === report infered values
 
@@ -327,7 +328,7 @@ class Indicators (object):
     print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation ['infered'] .report ()
+    self.correlation.report ('infered')
 
     # report 'coefficients'
     print '  : %-20s:' % 'COEFFICIENT',
@@ -343,34 +344,34 @@ class Indicators (object):
     print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean (fine)'
-    self.mean [self.FINE] ['infered'] .report ()
+    self.mean [self.FINE] .report ('infered')
     
     # report 'mean (coarse)'
-    self.mean [self.COARSE] ['infered'] .report ()
+    self.mean [self.COARSE] .report ('infered')
     
     # report 'variance (fine)'
-    self.variance [self.FINE] ['infered'] .report ()
+    self.variance [self.FINE] .report ('infered')
     
     # report 'variance (coarse)'
-    self.variance [self.COARSE] ['infered'] .report ()
+    self.variance [self.COARSE] .report ('infered')
 
     # report 'mean diff'
-    self.mean_diff ['infered'] .report ()
+    self.mean_diff.report ('infered')
 
     # report 'variance diff'
-    self.variance_diff ['infered'] .report ()
+    self.variance_diff.report ('infered')
     
     # report 'covariance'
-    self.covariance ['infered'] .report ()
+    self.covariance.report ('infered')
 
     # splitter
     print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean diff opt'
-    self.mean_diff_opt ['infered'] .report ()
+    self.mean_diff_opt.report ('infered')
 
     # report 'variance diff opt'
-    self.variance_diff_opt ['infered'] .report ()
+    self.variance_diff_opt.report ('infered')
   
   def save (self, iteration):
 
