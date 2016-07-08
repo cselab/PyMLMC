@@ -55,7 +55,7 @@ class Indicator (object):
     #  print '    ---',
     #for level in self.levels [ self.start : ]:
     for level in self.levels:
-      if numpy.isnan (self [key]):
+      if numpy.isnan (self [key] [level]):
         print '    N/A',
       else:
         print helpers.scif (self [key] [level], table=1),
