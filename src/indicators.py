@@ -47,9 +47,9 @@ class Indicator (object):
   def __setitem__(self, key, item):
     setattr (self, key, item) 
   
-  def report (self, key):
+  def report (self, key, normalization):
 
-    print '  : %-20s:' % self.name,
+    print '  : %-18s:' % self.name,
     #for level in self.levels [ : self.start ]:
     #  print '    ---',
     #for level in self.levels [ self.start : ]:
@@ -57,7 +57,7 @@ class Indicator (object):
       if numpy.isnan (self [key] [level]):
         print '    N/A',
       else:
-        print helpers.scif (self [key] [level], table=1),
+        print helpers.scif (self [key] [level] / normalization, table=1),
     print
 
 # class for computation, inference and reporting of all indicators
@@ -96,8 +96,8 @@ class Indicators (object):
 
     # === MEAN & VARIANCE indicators
 
-    self.mean     = [ Indicator ('MEAN     [FI]', self.levels), Indicator ('MEAN     [CO]', self.levels, start = 1) ]
-    self.variance = [ Indicator ('VARIANCE [FI]', self.levels), Indicator ('VARIANCE [CO]', self.levels, start = 1) ]
+    self.mean     = [ Indicator ('MEAN     COARSE', self.levels), Indicator ('MEAN     COARSE', self.levels, start = 1) ]
+    self.variance = [ Indicator ('VARIANCE FINE',   self.levels), Indicator ('VARIANCE FINE',   self.levels, start = 1) ]
 
     # compute mean and variance for all levels and types
     for level, type in self.levels_types:
@@ -279,58 +279,58 @@ class Indicators (object):
     print
     print ' :: MEASURED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
     print '  :'
-    print '  :        LEVEL        : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
     self.correlation .report ('measured')
 
     # splitter
-    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean (fine)'
-    self.mean [self.FINE] .report ('measured')
+    self.mean [self.FINE] .report ('measured', self.normalization)
     
     # report 'mean (coarse)'
-    self.mean [self.COARSE] .report ('measured')
+    self.mean [self.COARSE] .report ('measured', self.normalization)
     
     # report 'variance (fine)'
-    self.variance [self.FINE] .report ('measured')
+    self.variance [self.FINE] .report ('measured', self.normalization ** 2)
     
     # report 'variance (coarse)'
-    self.variance [self.COARSE] .report ('measured')
+    self.variance [self.COARSE] .report ('measured', self.normalization ** 2)
 
     # report 'mean diff'
-    self.mean_diff .report ('measured')
+    self.mean_diff .report ('measured', self.normalization)
 
     # report 'variance diff'
-    self.variance_diff .report ('measured')
+    self.variance_diff .report ('measured', self.normalization ** 2)
     
     # report 'covariance'
-    self.covariance .report ('measured')
+    self.covariance .report ('measured', self.normalization ** 2)
 
     # splitter
-    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean diff opt'
-    self.mean_diff_opt .report ('measured')
+    self.mean_diff_opt .report ('measured', self.normalization)
 
     # report 'variance diff opt'
-    self.variance_diff_opt .report ('measured')
+    self.variance_diff_opt .report ('measured', self.normalization ** 2)
 
     # === report infered values
 
     print
     print ' :: INFERED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
     print '  :'
-    print '  :        LEVEL        : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
-    print '  :-----------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation.report ('infered')
+    self.correlation.report ('infered', self.normalization)
 
     # report 'coefficients'
-    print '  : %-20s:' % 'COEFFICIENT',
+    print '  : %-18s:' % 'COEFFICIENT',
     for level in self.levels:
       print helpers.scif (self.coefficients.values [level], table=1),
     print
@@ -340,37 +340,37 @@ class Indicators (object):
     print '  : OPTIMIZATION: %.2f' % self.coefficients.optimization
 
     # splitter
-    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean (fine)'
-    self.mean [self.FINE] .report ('infered')
+    self.mean [self.FINE] .report ('infered', self.normalization)
     
     # report 'mean (coarse)'
-    self.mean [self.COARSE] .report ('infered')
+    self.mean [self.COARSE] .report ('infered', self.normalization)
     
     # report 'variance (fine)'
-    self.variance [self.FINE] .report ('infered')
+    self.variance [self.FINE] .report ('infered', self.normalization ** 2)
     
     # report 'variance (coarse)'
-    self.variance [self.COARSE] .report ('infered')
+    self.variance [self.COARSE] .report ('infered', self.normalization ** 2)
 
     # report 'mean diff'
-    self.mean_diff.report ('infered')
+    self.mean_diff.report ('infered', self.normalization)
 
     # report 'variance diff'
-    self.variance_diff.report ('infered')
+    self.variance_diff.report ('infered', self.normalization ** 2)
     
     # report 'covariance'
-    self.covariance.report ('infered')
+    self.covariance.report ('infered', self.normalization ** 2)
 
     # splitter
-    print '  :-----------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean diff opt'
-    self.mean_diff_opt.report ('infered')
+    self.mean_diff_opt.report ('infered', self.normalization)
 
     # report 'variance diff opt'
-    self.variance_diff_opt.report ('infered')
+    self.variance_diff_opt.report ('infered', self.normalization ** 2)
   
   def save (self, iteration):
 
