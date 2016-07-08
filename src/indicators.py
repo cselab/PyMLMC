@@ -255,22 +255,22 @@ class Indicators (object):
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
 
     # check if sufficiently of measurements is available for inference
-    if numpy.isnan (indicator.measured [indicator.start:]) .all ():
+    if numpy.isnan (indicator ['measured'] [indicator.start:]) .all ():
       if critical:
         self.available = 0
       helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
       return
     
-    # if only one measurement is available, assume constant values
-    if  numpy.sum ( ~ numpy.isnan (indicator [indicator.start:]) ) == 1:
-      indicator.infered [indicator.start:] = indicator [ indicator.start + numpy.where ( ~ numpy.isnan (indicator [indicator.start:]) ) ]
+    # if only one measurement is available, assign it to all infered level values
+    if  numpy.sum ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) == 1:
+      indicator ['infered'] [indicator.start:] = indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) ]
       return
     
     # fit a linear polynomial using linear least squares, weighted by data undertainties
-    line = numpy.polyfit (levels [indicator.start:], numpy.log (indicator ['measured'] [indicator.start:]), degree, w = indicator ['weights'] [indicator.start:])
+    line = numpy.polyfit (self.levels [indicator.start:], numpy.log (indicator ['measured'] [indicator.start:]), degree, w = indicator ['weights'] [indicator.start:])
 
     # update indicator values to the maximum likelihood estimations
-    indicator ['infered'] [indicator.start:] = numpy.exp ( numpy.polyval (line, levels [indicator.start:]) )
+    indicator ['infered'] [indicator.start:] = numpy.exp ( numpy.polyval (line, self.levels [indicator.start:]) )
   
   def report (self):
 
