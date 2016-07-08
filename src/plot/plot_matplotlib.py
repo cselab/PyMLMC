@@ -1466,7 +1466,9 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means for Q = %s' % name (qoi))
     pylab.ylabel (r'mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    #adjust_extent (mean_diff_measured, factor=1.5)
+    ymin = numpy.max ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] )
+    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] )
+    adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
@@ -1481,7 +1483,9 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    #adjust_extent (variance_diff_measured, factor=1.5)
+    ymin = numpy.max ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] )
+    ymax = numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] )
+    adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
