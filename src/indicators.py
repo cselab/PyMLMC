@@ -283,7 +283,7 @@ class Indicators (object):
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation .report ('measured', self.normalization)
+    self.correlation .report ('measured')
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
@@ -327,7 +327,7 @@ class Indicators (object):
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation.report ('infered', self.normalization)
+    self.correlation.report ('infered')
 
     # report 'coefficients'
     print '  : %-18s:' % 'COEFFICIENT',
