@@ -58,7 +58,7 @@ class Indicator (object):
       return getattr (self, key)
 
     def __setitem__(self, key, item):
-      getattr (self, key) = item
+      setattr (self, key, item) 
 
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
