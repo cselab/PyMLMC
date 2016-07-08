@@ -109,6 +109,8 @@ class Errors (object):
     
     if not self.available or self.total_error == 0:
       helpers.warning ('Speedup can not be estimated since total sampling error is not available')
+      self.speedup     = None
+      self.speedup_ocv = None
       return
     
     if forecast:
