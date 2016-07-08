@@ -50,7 +50,6 @@ class Indicator (object):
   def report (self, key):
 
     print '  : %-20s:' % self.name,
-    print '    ---',
     #for level in self.levels [ : self.start ]:
     #  print '    ---',
     #for level in self.levels [ self.start : ]:
