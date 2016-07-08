@@ -50,9 +50,9 @@ class Indicator (object):
 
     print '  : %-20s:' % self.name,
     print '    ---',
-    #for level in self.levels [ : start ]:
+    #for level in self.levels [ : self.start ]:
     #  print '    ---',
-    #for level in self.levels [ start : ]:
+    #for level in self.levels [ self.start : ]:
     for level in self.levels:
       if numpy.isnan (self [key]):
         print '    N/A',
@@ -252,25 +252,25 @@ class Indicators (object):
   def infer (self, indicator, critical, degree=2):
 
     # simply copy all values before 'start'
-    indicator ['infered'] [:start] = indicator ['measured'] [:start]
+    indicator ['infered'] [:self.start] = indicator ['measured'] [:self.start]
 
     # check if sufficiently of measurements is available for inference
-    if numpy.isnan (indicator.measured [start:]) .all ():
+    if numpy.isnan (indicator.measured [self.start:]) .all ():
       if critical:
         self.available = 0
       helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
       return
     
     # if only one measurement is available, assume constant values
-    if  numpy.sum ( ~ numpy.isnan (indicator [start:]) ) == 1:
-      indicator.infered [start:] = indicator [ start + numpy.where ( ~ numpy.isnan (indicator [start:]) ) ]
+    if  numpy.sum ( ~ numpy.isnan (indicator [self.start:]) ) == 1:
+      indicator.infered [self.start:] = indicator [ self.start + numpy.where ( ~ numpy.isnan (indicator [self.start:]) ) ]
       return
     
     # fit a linear polynomial using linear least squares, weighted by data undertainties
-    line = numpy.polyfit (levels [start:], numpy.log (indicator ['measured'] [start:]), degree, w = indicator ['weights'] [start:])
+    line = numpy.polyfit (levels [self.start:], numpy.log (indicator ['measured'] [self.start:]), degree, w = indicator ['weights'] [self.start:])
 
     # update indicator values to the maximum likelihood estimations
-    indicator ['infered'] [start:] = numpy.exp ( numpy.polyval (line, levels [start:]) )
+    indicator ['infered'] [self.start:] = numpy.exp ( numpy.polyval (line, levels [self.start:]) )
   
   def report (self):
 
