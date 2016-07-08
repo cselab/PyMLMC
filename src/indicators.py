@@ -111,7 +111,7 @@ class Indicators (object):
       self.normalization = 1
       helpers.warning ('Defaulting \'normalization\' to 1.0 for indicators')
     else:
-      self.normalization = numpy.abs (self.mean [self.COARSE] ['measured'] [0])
+      self.normalization = numpy.abs (self.mean [self.FINE] ['measured'] [0])
     
     # least squares inference of indicator level values based on the measured level values
     self.infer (self.mean     [self.FINE  ], critical = False)
