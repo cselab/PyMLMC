@@ -31,7 +31,7 @@ class Estimated_Budget (Samples):
     # set range for multiple warmup samples
     if   self.finest == 'last': self.finest = self.L
     elif self.finest == 'half': self.finest = ( self.L + 1 ) / 2
-
+    
     # set warmup samples
     if hasattr ( self.warmup, '__iter__' ):
       counts = numpy.array ( self.warmup [0 : self.L+1] )
@@ -128,7 +128,7 @@ class Estimated_Budget (Samples):
     updated = numpy.array ( computed, dtype=int, copy=True )
 
     # compute level fractions
-    fractions = numpy.sqrt ( indicators.variance_diff / self.pairworks )
+    fractions = numpy.sqrt (indicators.variance_diff_opt ['infered'] / self.pairworks)
     
     # perform iterative optimization until valid number of samples is obtained
     optimize  = 1
@@ -139,7 +139,7 @@ class Estimated_Budget (Samples):
       optimize = 0
       
       # compute the new optimal number of samples for all levels
-      # taking into account that some samples are already computed
+      # taking into account that some samples are already computed (unavailable)
       for level in self.levels:
         
         # continue if this level is not available
@@ -147,7 +147,7 @@ class Estimated_Budget (Samples):
           continue
         
         # compute optimal number of samples for specified level
-        updated [level] = math.floor ( fractions [level] * budget / sum ( fractions * self.pairworks * available ) )
+        updated [level] = math.floor ( fractions [level] * budget / numpy.sum ( fractions * self.pairworks * available ) )
         
         # if the optimal number of samples is smaller than the already computed number of samples,
         # remove this level from the optimization problem (mark unavailable)

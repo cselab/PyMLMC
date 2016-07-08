@@ -129,46 +129,45 @@ class Estimated_Tolerance (Samples):
     updated = numpy.array ( computed, dtype=int, copy=True )
     
     # compute the work-weighted sum of all variances
-    variance_work_sum = sum ( sqrt ( [ indicators.variance_diff [level] * self.pairworks [level] for level in self.levels ] ) )
-    
+    variance_work = sqrt (indicators.variance_diff_opt ['infered'] * self.pairworks)
+
     # perform iterative optimization until valid number of samples is obtained
-    optimize = 1
-    fixed = zeros (len(self.levels))
+    optimize  = 1
+    available = numpy.ones ( len (self.levels) )
     while optimize:
       
       # for the next step, by default optimization should not be needed
       optimize = 0
       
       # compute the new required number of samples for all levels
-      # taking into account that some samples are already computed
+      # taking into account that some samples are already computed (unavailable)
       for level in self.levels:
         
-        # continue if this level is already fixed
-        if fixed [level]:
+        # continue if this level is not available
+        if not available [level]:
           continue
         
         # compute new sample number
-        updated [level] = math.ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff [level] / self.pairworks [level] ) * variance_work_sum )
+        updated [level] = math.ceil ( 1.0 / (required_error ** 2) * sqrt ( indicators.variance_diff_opt ['infered'] [level] / self.pairworks [level] ) * numpy.sum (variance_work * available) )
         
-        # if the new sample number is smaller than the already computed sample number,
-        # then remove this level from the optimization problem
-        # remark: comparison must include '=' since the upper bound for optimal number of samples is used
-        if updated [level] <= computed [level]:
+        # if the optimal number of samples is smaller than the already computed number of samples,
+        # remove this level from the optimization problem (mark unavailable)
+        if updated [level] < computed [level]:
           
           # leave the sample number unchanged
           updated [level] = computed [level]
           
           # declare this level as FIXED (no more optimization for this level)
-          fixed [level] = 1
+          available [level] = 0
           
           # the remaining number of samples need to be recomputed
           optimize = 1
           
-          # update variance_work_sum
-          variance_work_sum -= sqrt ( indicators.variance_diff [level] * self.pairworks [level] )
-          
           # update required sampling error
-          required_error = sqrt ( (required_error ** 2) - indicators.variance_diff [level] / computed [level] )
+          required_error = sqrt ( (required_error ** 2) - indicators.variance_diff_opt ['infered'] [level] / computed [level] )
+
+          # restart the optimization for all levels
+          break
     
     return updated
  
