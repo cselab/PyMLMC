@@ -39,31 +39,31 @@ class Indicator (object):
     self.weights   = numpy.full ( len (levels), float ('nan') )
     self.measured  = numpy.full ( len (levels), float ('nan') )
     self.infered   = numpy.full ( len (levels), float ('nan') )
-    
-    def report (self, key):
+  
+  def __getitem__ (self, key):
+    return getattr (self, key)
 
-      print '  : %-20s:' % self.name,
-      print '    ---',
-      #for level in self.levels [ : start ]:
-      #  print '    ---',
-      #for level in self.levels [ start : ]:
-      for level in self.levels:
-        if numpy.isnan (self [key]):
-          print '    N/A',
-        else:
-          print helpers.scif (self [key] [level], table=1),
-      print
+  def __setitem__(self, key, item):
+    setattr (self, key, item) 
+  
+  def report (self, key):
 
-    def __getitem__ (self, key):
-      return getattr (self, key)
-
-    def __setitem__(self, key, item):
-      setattr (self, key, item) 
+    print '  : %-20s:' % self.name,
+    print '    ---',
+    #for level in self.levels [ : start ]:
+    #  print '    ---',
+    #for level in self.levels [ start : ]:
+    for level in self.levels:
+      if numpy.isnan (self [key]):
+        print '    N/A',
+      else:
+        print helpers.scif (self [key] [level], table=1),
+    print
 
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, infer=True, lsqfit=True):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference=True, lsqfit=True):
     
     # store configuration 
     vars (self) .update ( locals() )
