@@ -364,15 +364,9 @@ class Indicators (object):
     print '  : %-18s:' % 'COEFFICIENT',
     for level in self.levels:
       print helpers.scif (self.coefficients.values [level], table=1),
-    print ' [OPTIMIZATION: %.2f]' % self.coefficients.optimization,
+    print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
     print
-
-    # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
-    print 
-
-    # splitter
-    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
-
+    
     # report 'mean diff opt'
     self.mean_diff_opt.report ('measured', self.normalization)
 
@@ -381,8 +375,8 @@ class Indicators (object):
 
     # === report infered values
 
-    #if not self.inference:
-    #  return
+    if not self.inference:
+      return
 
     print
     print ' :: INFERED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
@@ -419,6 +413,13 @@ class Indicators (object):
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+    print '  : %-18s:' % 'COEFFICIENT',
+    for level in self.levels:
+      print helpers.scif (self.coefficients.values [level], table=1),
+    print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
+    print
 
     # report 'mean diff opt'
     self.mean_diff_opt.report ('infered', self.normalization)
