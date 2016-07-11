@@ -305,7 +305,8 @@ class Indicators (object):
       data = numpy.abs (indicator ['measured'] [indicator.start:])
 
     # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data undertainties
-    line = numpy.polyfit (self.levels [indicator.start:], data, self.degree, w = indicator ['weights'] [indicator.start:])
+    #line = numpy.polyfit (self.levels [indicator.start:], data, self.degree, w = indicator ['weights'] [indicator.start:])
+    line = numpy.polyfit (self.levels [indicator.start:], data, self.degree)
 
     # update indicator values to the maximum likelihood estimations
     indicator ['infered'] [indicator.start:] = numpy.polyval (line, self.levels [indicator.start:])
