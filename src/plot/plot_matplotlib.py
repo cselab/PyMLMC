@@ -1507,10 +1507,10 @@ class MatPlotLib (object):
     
     # === load all required data
 
-    mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured'] [levels]
-    variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured'] [levels]
-    mean_infered          = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered']  [levels]
-    variance_infered      = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['infered']  [levels]
+    mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured']
+    variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured']
+    mean_infered          = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered']
+    variance_infered      = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['infered']
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
     qoi           = self.mlmc.config.solver.qoi
