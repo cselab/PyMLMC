@@ -37,8 +37,13 @@ class Indicator (object):
     self.levels = levels
     self.start  = start
 
+    # weights for each level
     self.weights   = numpy.full ( len (levels), float ('nan') )
+
+    # measured values (signed)
     self.measured  = numpy.full ( len (levels), float ('nan') )
+
+    # infered values (magnitude)
     self.infered   = numpy.full ( len (levels), float ('nan') )
   
   def __getitem__ (self, key):
@@ -97,12 +102,12 @@ class Indicators (object):
     # === MEAN & VARIANCE indicators
 
     self.mean     = [ Indicator ('MEAN     FINE', self.levels), Indicator ('MEAN     COARSE', self.levels, start = 1) ]
-    self.variance = [ Indicator ('VARIANCE FINE', self.levels), Indicator ('VARIANCE COARSE',   self.levels, start = 1) ]
+    self.variance = [ Indicator ('VARIANCE FINE', self.levels), Indicator ('VARIANCE COARSE', self.levels, start = 1) ]
 
     # compute mean and variance for all levels and types
     for level, type in self.levels_types:
-      self.mean     [type] ['weights']  [level] = numpy.sqrt (values [level] [type] .size)
-      self.variance [type] ['weights']  [level] = values [level] [type] .size
+      self.mean     [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
+      self.variance [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
       self.mean     [type] ['measured'] [level] = numpy.mean ( values [level] [type] )
       self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
     
@@ -113,11 +118,11 @@ class Indicators (object):
     else:
       self.normalization = numpy.abs (self.mean [self.FINE] ['measured'] [0])
     
-    # least squares inference of indicator level values based on the measured level values
-    self.infer (self.mean     [self.FINE  ], critical = False)
-    self.infer (self.mean     [self.COARSE], critical = False)
-    self.infer (self.variance [self.FINE  ], critical = True )
-    self.infer (self.variance [self.COARSE], critical = True )
+    # least squares inference of indicator level values based on the magnitides of measured level values
+    self.infer (self.mean     [self.FINE  ], log=True, critical = False)
+    self.infer (self.mean     [self.COARSE], log=True, critical = False)
+    self.infer (self.variance [self.FINE  ], log=True, critical = True )
+    self.infer (self.variance [self.COARSE], log=True, critical = True )
 
     # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITHOUT optimal control variate coefficients computed below)
@@ -127,29 +132,38 @@ class Indicators (object):
     
     # compute level distances
     for level in self.levels:
-      self.mean_diff     ['weights']  [level] = numpy.sqrt (distances [level] .size)
-      self.variance_diff ['weights']  [level] = distances [level] .size
+      self.mean_diff     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
+      self.variance_diff ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.mean_diff     ['measured'] [level] = numpy.mean ( distances [level] )
       self.variance_diff ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
     
-    # least squares inference of indicator level values based on the measured level values
-    self.infer (self.mean_diff,     critical = False)
-    self.infer (self.variance_diff, critical = True )
+    # least squares inference of indicator level values based on the magnitides of measured level values
+    self.infer (self.mean_diff,     log=True, critical = False)
+    #self.infer (self.variance_diff, log=True, critical = True )
 
     # === COVARIANCES and CORRELATIONS
     
-    self.covariance  = Indicator ('COVARIANCE',  self.levels)
-    self.correlation = Indicator ('CORRELATION', self.levels)
+    self.covariance  = Indicator ('COVARIANCE',  self.levels, start = 1)
+    self.correlation = Indicator ('CORRELATION', self.levels, start = 1)
     
     # compute covariance and correlation, both measured and infered
     # remark: computing covariances and correlations from 'values' leads to inconsistent estimations and should be avoided
     for level in self.levels [ 1 : ]:
-      self.covariance  ['weights']  [level] = distances [level] .size
+      self.covariance  ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.covariance  ['measured'] [level] = 0.5 * ( self.variance [self.FINE] ['measured'] [level] + self.variance [self.COARSE] ['measured'] [level] - self.variance_diff ['measured'] [level] )
-      self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered']  [level] + self.variance [self.COARSE] ['infered']  [level] - self.variance_diff ['infered']  [level] )
-      self.covariance  ['weights']  [level] = distances [level] .size
+      #self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered']  [level] + self.variance [self.COARSE] ['infered']  [level] - self.variance_diff ['infered']  [level] )
+      self.correlation ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.correlation ['measured'] [level] = self.covariance ['measured'] [level] / numpy.sqrt (self.variance [self.FINE] ['measured'] [level] * self.variance [self.COARSE] ['measured'] [level] )
-      self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt (self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
+      #self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt (self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
+    
+    # least squares inference of indicator level values based on the magnitides of measured level values
+    self.infer (self.correlation, log=False, critical = True, min = -1.0, max = 1.0 )
+    
+    # infered covariances are computed from infered correlations;
+    # infered variances diffs are computed from infered covariances
+    for level in self.levels [ 1 : ]:
+      self.covariance    ['infered'] [level] = self.correlation ['infered'] [level] * self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered'] [level]
+      self.variance_diff ['infered'] [level] = self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - 2 * self.covariance ['infered'] [level]
     
     # === OPTIMAL control variate COEFFICIENTS
     
@@ -167,8 +181,8 @@ class Indicators (object):
 
     # compute optimized level distances (measured values)
     for level in self.levels:
-      self.mean_diff_opt     ['weights']  [level] = numpy.sqrt (distances [level] .size)
-      self.variance_diff_opt ['weights']  [level] = distances [level] .size
+      self.mean_diff_opt     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
+      self.variance_diff_opt ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.mean_diff_opt     ['measured'] [level] = numpy.mean ( distances [level] )
       self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
     
@@ -179,9 +193,11 @@ class Indicators (object):
     for level in self.levels [ 1 : ]:
       self.mean_diff_opt     ['infered'] [level]  = self.coefficients.values [level    ]      * self.mean     [self.FINE]   ['infered'] [level]
       self.mean_diff_opt     ['infered'] [level] -= self.coefficients.values [level - 1]      * self.mean     [self.COARSE] ['infered'] [level]
+      self.mean_diff_opt     ['infered'] [level]  = numpy.abs ( self.mean_diff_opt ['infered'] [level] )
       self.variance_diff_opt ['infered'] [level]  = self.coefficients.values [level    ] ** 2 * self.variance [self.FINE]   ['infered'] [level]
       self.variance_diff_opt ['infered'] [level] += self.coefficients.values [level - 1] ** 2 * self.variance [self.COARSE] ['infered'] [level]
       self.variance_diff_opt ['infered'] [level] -= 2 * self.coefficients.values [level] * self.coefficients.values [level - 1] * self.covariance ['infered'] [level]
+      self.variance_diff_opt ['infered'] [level]  = numpy.abs ( self.variance_diff_opt ['infered'] [level] )
     
     print 'done.'
 
@@ -196,9 +212,9 @@ class Indicators (object):
 
       # evaluate indicators
       if indices == None:
-        values [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [ self.pick [level][type] ] .results if result != None ] )
+        values [level] [type] = numpy.array ( [ self.indicator (result) for result in mcs [ self.pick [level] [type] ] .results if result != None ] )
       else:
-        values [level] [type] = numpy.array ( [ self.indicator (result) for sample, result in enumerate (mcs [ self.pick [level][type] ] .results) if sample in indices [level] ] )
+        values [level] [type] = numpy.array ( [ self.indicator (result) for sample, result in enumerate (mcs [ self.pick [level] [type] ] .results) if sample in indices [level] ] )
 
       # handle unavailable simulations
       if len (values [level] [type]) == 0:
@@ -248,8 +264,8 @@ class Indicators (object):
 
     return distances
   
-  # least squares inference of indicator level values based on the measured level values
-  def infer (self, indicator, critical):
+  # least squares inference of indicator level values based on the magnitudes of measured level values
+  def infer (self, indicator, log, critical, min = None, max = None):
 
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
@@ -263,14 +279,30 @@ class Indicators (object):
     
     # if only one measurement is available, assign it to all infered level values
     if  numpy.sum ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) == 1:
-      indicator ['infered'] [indicator.start:] = indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) ]
+      indicator ['infered'] [indicator.start:] = numpy.abs ( indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) ] )
       return
     
-    # fit a linear polynomial using linear least squares, weighted by data undertainties
-    line = numpy.polyfit (self.levels [indicator.start:], numpy.log (indicator ['measured'] [indicator.start:]), self.degree, w = indicator ['weights'] [indicator.start:])
+    # use log-coordinates, if specified
+    if log:
+      data = numpy.log ( numpy.abs (indicator ['measured'] [indicator.start:]) )
+    else:
+      data = numpy.abs (indicator ['measured'] [indicator.start:])
+
+    # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data undertainties
+    line = numpy.polyfit (self.levels [indicator.start:], data, self.degree, w = indicator ['weights'] [indicator.start:])
 
     # update indicator values to the maximum likelihood estimations
-    indicator ['infered'] [indicator.start:] = numpy.exp ( numpy.polyval (line, self.levels [indicator.start:]) )
+    indicator ['infered'] [indicator.start:] = numpy.polyval (line, self.levels [indicator.start:])
+
+    # transform back to linear coordinates
+    if log:
+      indicator ['infered'] [indicator.start:] = numpy.exp ( indicator ['infered'] [indicator.start:] )
+
+    # respect envelope specifications
+    if min != None:
+      indicator ['infered'] [indicator.start:] = numpy.maximum ( min, indicator ['infered'] [indicator.start:] )
+    if max != None:
+      indicator ['infered'] [indicator.start:] = numpy.minimum ( max, indicator ['infered'] [indicator.start:] )
   
   def report (self):
 

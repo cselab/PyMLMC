@@ -1456,18 +1456,18 @@ class MatPlotLib (object):
     # plot mean diffs (measured, infered and optimized)
     
     pylab.subplot(121)
-    pylab.semilogy (levels, mean_diff_measured    / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, mean_diff_infered     / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
-    pylab.semilogy (levels, mean_diff_opt_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
+    pylab.semilogy (levels, numpy.abs (mean_diff_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_diff_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    pylab.semilogy (levels, mean_diff_opt_infered          / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
       #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
-    pylab.title  ('Rel. level means for Q = %s' % name (qoi))
-    pylab.ylabel (r'mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
+    pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
+    pylab.ylabel (r'|mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$|')
     pylab.xlabel ('mesh level')
-    ymin = numpy.max ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] )
-    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] )
+    ymin = numpy.max ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
+    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
     adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
@@ -1483,8 +1483,8 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
-    ymin = numpy.max ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] )
-    ymax = numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] )
+    ymin = numpy.sqrt ( numpy.max ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] ) ) / NORMALIZATION
+    ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] ) ) / NORMALIZATION
     adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')

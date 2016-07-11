@@ -65,7 +65,8 @@ class CubismMPCF (Solver):
 
       # maximum-norm based indicator
       if self.norm == 'max':
-        self.indicator = lambda x : numpy.max ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
+        #self.indicator = lambda x : numpy.max ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
+        self.indicator = lambda x : numpy.max ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] )
 
       # 1-norm based indicator
       if self.norm == 1:
@@ -79,7 +80,8 @@ class CubismMPCF (Solver):
 
       # maximum-norm based distance
       if self.norm == 'max':
-        self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else self.indicator (f)
+        #self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) if c != None else self.indicator (f)
 
       # 1-norm based distance
       if self.norm == 1:

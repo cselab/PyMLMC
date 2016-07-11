@@ -98,7 +98,7 @@ class Coefficients (object):
       
       # a-posteriori (sample-weighted) optimization
       else:
-
+        
         # assemble matrix from indicators
         for level in range (self.L):
           if level != 0:
@@ -113,7 +113,7 @@ class Coefficients (object):
       
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
-
+    
     # if the result is 'fishy', revert to default values
     if numpy.isnan (self.values).any():
       message = 'Invalid values of optimized coefficients - resetting all to 1.0'
