@@ -29,9 +29,9 @@ class Errors (object):
     self.history     = {}
   
   # compute errors for each level from variance_diff and sample counts
-  def errors (self, variance_diff, counts):
+  def errors (self, variances, counts):
 
-    return numpy.sqrt ( variance_diff / numpy.maximum ( counts, numpy.ones (len(self.levels)) ) )
+    return numpy.sqrt ( variances / numpy.maximum ( counts, numpy.ones (len(self.levels)) ) )
   
   # compute total error
   def total (self, errors):
@@ -141,7 +141,7 @@ class Errors (object):
     print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
     
     # compute OCV MLMC vs. PLAIN MLMC speedup
-    self.speedup_ocv = plain ** 2 / error ** 2
+    self.speedup_ocv = plain / error
     
     # report
     print

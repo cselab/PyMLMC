@@ -162,8 +162,8 @@ class Indicators (object):
 
       # compute covariance and correlation (infered)
       for level in self.levels [ 1 : ]:
-        self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered']  [level] + self.variance [self.COARSE] ['infered']  [level] - self.variance_diff ['infered']  [level] )
-        self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt ( self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
+        self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - self.variance_diff ['infered']  [level] )
+        self.correlation ['infered']  [level] = self.covariance ['infered'] [level] / numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered']  [level] )
     
     # for 'correlations' inference, 'correlations' is infered and variance diffs with covariances and computed from it
     else:
@@ -175,7 +175,10 @@ class Indicators (object):
       for level in self.levels [ 1 : ]:
         self.covariance    ['infered'] [level] = self.correlation ['infered'] [level] * numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered'] [level] )
         self.variance_diff ['infered'] [level] = self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - 2 * self.covariance ['infered'] [level]
+      self.variance_diff ['infered'] [0] = self.variance [self.FINE] ['infered'] [0]
     
+    print self.variance_diff ['infered']
+
     # === OPTIMAL control variate COEFFICIENTS
     
     # compute optimal control variate coefficients
@@ -197,7 +200,7 @@ class Indicators (object):
       self.mean_diff_opt     ['measured'] [level] = numpy.mean ( distances [level] )
       self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
     
-    # compute optimized level distances (infered values)
+    # compute magnitudes of optimized level distances (infered values)
     # remark: infering optimized differences from measured optimized differences could lead to inconsistencies with other infered indicators
     self.mean_diff_opt     ['infered'] [0] = self.coefficients.values [0]      * self.mean     [self.FINE] ['infered'] [0]
     self.variance_diff_opt ['infered'] [0] = self.coefficients.values [0] ** 2 * self.variance [self.FINE] ['infered'] [0]
@@ -229,13 +232,8 @@ class Indicators (object):
 
       # handle unavailable simulations
       if len (values [level] [type]) == 0:
-        values [level] [type] = numpy.array ( [ float('NaN') ] )
-
-      # check if NaN's are present
-      # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan (values [level] [type]) .any() or len (values [level] [type]) < 2:
-        self.nans = 1
-
+        values [level] [type] = numpy.array ( [ float('nan') ] )
+    
     return values
 
   # evaluates distances between indicators on every two consecute levels for each sample (alternatively, specific indices can also be provided)
@@ -252,13 +250,13 @@ class Indicators (object):
       # for coarsest level, distance is taken w.r.t. 'None'
       if level == 0:
         if indices == None:
-          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for result in mcs [ self.pick [level][0] ] .results ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for result in mcs [ self.pick [level] [self.FINE] ] .results ] )
         else:
-          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for sample, result in enumerate (mcs [ self.pick [level][0] ] .results) if sample in indices [level] ] )
+          distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * result, None) for sample, result in enumerate (mcs [ self.pick [level] [self.FINE] ] .results) if sample in indices [level] ] )
 
       # for the remaining levels, evaluate distance indicators between every two consecutive levels
       else:
-        zipped = izip (mcs [ self.pick [level][0] ] .results, mcs [ self.pick [level][1] ] .results)
+        zipped = izip (mcs [ self.pick [level] [self.FINE] ] .results, mcs [ self.pick [level] [self.COARSE] ] .results)
         if indices == None:
           distances [level] = numpy.array ( [ self.distance (self.coefficients.values [level] * fine, self.coefficients.values [level - 1] * coarse) for fine, coarse in zipped ] )
         else:
@@ -266,12 +264,7 @@ class Indicators (object):
 
       # handle unavailable simulations
       if len (distances [level]) == 0:
-        distances [level] = numpy.array ( [ float('NaN') ] )
-
-      # check if NaN's are present
-      # TODO: this should be checked later, after actual computations... :)
-      if numpy.isnan (distances [level]) .any() or len (distances [level]) < 2:
-        self.nans = 1
+        distances [level] = numpy.array ( [ float('nan') ] )
 
     return distances
   
@@ -281,7 +274,7 @@ class Indicators (object):
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
 
-    # check if sufficiently of measurements is available for inference
+    # check if sufficiently many measurements are available for inference
     if numpy.isnan (indicator ['measured'] [indicator.start:]) .all ():
       if critical:
         self.available = 0
@@ -380,7 +373,7 @@ class Indicators (object):
       return
 
     print
-    print ' :: INFERED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
+    print ' :: INFERED INDICATORS: (w.r.t. \'%s\', normalized to %s)' % ( self.inference, helpers.scif (self.normalization) )
     print '  :'
     print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
