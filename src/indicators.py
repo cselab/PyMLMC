@@ -68,7 +68,7 @@ class Indicator (object):
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = True, lsqfit = True, degree = 2):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = True, lsqfit = True, degree = 1):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -157,7 +157,7 @@ class Indicators (object):
       #self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt (self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
     
     # least squares inference of indicator level values based on the magnitides of measured level values
-    self.infer (self.correlation, log=False, critical = True, min = -1.0, max = 1.0 )
+    self.infer (self.correlation, log=False, critical = True, min = -1.0, max = 1.0)
     
     # infered covariances are computed from infered correlations;
     # infered variances diffs are computed from infered covariances
@@ -282,6 +282,11 @@ class Indicators (object):
       indicator ['infered'] [indicator.start:] = numpy.abs ( indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) ] )
       return
     
+    # if inference is disabled, simply copy the values
+    if not self.inference:
+      indicator ['infered'] [indicator.start:] = indicator ['measured'] [indicator.start:]
+      return
+
     # use log-coordinates, if specified
     if log:
       data = numpy.log ( numpy.abs (indicator ['measured'] [indicator.start:]) )
