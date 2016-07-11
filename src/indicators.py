@@ -153,8 +153,8 @@ class Indicators (object):
       self.covariance  ['measured'] [level] = 0.5 * ( self.variance [self.FINE] ['measured'] [level] + self.variance [self.COARSE] ['measured'] [level] - self.variance_diff ['measured'] [level] )
       #self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered']  [level] + self.variance [self.COARSE] ['infered']  [level] - self.variance_diff ['infered']  [level] )
       self.correlation ['weights']  [level] = numpy.sqrt ( distances [level] .size )
-      self.correlation ['measured'] [level] = self.covariance ['measured'] [level] / numpy.sqrt (self.variance [self.FINE] ['measured'] [level] * self.variance [self.COARSE] ['measured'] [level] )
-      #self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt (self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
+      self.correlation ['measured'] [level] = self.covariance ['measured'] [level] / numpy.sqrt ( self.variance [self.FINE] ['measured'] [level] * self.variance [self.COARSE] ['measured'] [level] )
+      #self.correlation ['infered']  [level] = self.covariance ['infered']  [level] / numpy.sqrt ( self.variance [self.FINE] ['infered']  [level] * self.variance [self.COARSE] ['infered']  [level] )
     
     # least squares inference of indicator level values based on the magnitides of measured level values
     self.infer (self.correlation, log=False, critical = True, min = -1.0, max = 1.0)
@@ -162,7 +162,7 @@ class Indicators (object):
     # infered covariances are computed from infered correlations;
     # infered variances diffs are computed from infered covariances
     for level in self.levels [ 1 : ]:
-      self.covariance    ['infered'] [level] = self.correlation ['infered'] [level] * self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered'] [level]
+      self.covariance    ['infered'] [level] = self.correlation ['infered'] [level] * numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered'] [level] )
       self.variance_diff ['infered'] [level] = self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - 2 * self.covariance ['infered'] [level]
     
     # === OPTIMAL control variate COEFFICIENTS
@@ -320,7 +320,7 @@ class Indicators (object):
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'correlation'
-    self.correlation .report ('measured')
+    self.correlation.report ('measured')
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
@@ -338,24 +338,40 @@ class Indicators (object):
     self.variance [self.COARSE] .report ('measured', self.normalization ** 2)
 
     # report 'mean diff'
-    self.mean_diff .report ('measured', self.normalization)
+    self.mean_diff.report ('measured', self.normalization)
 
     # report 'variance diff'
-    self.variance_diff .report ('measured', self.normalization ** 2)
+    self.variance_diff.report ('measured', self.normalization ** 2)
     
     # report 'covariance'
-    self.covariance .report ('measured', self.normalization ** 2)
+    self.covariance.report ('measured', self.normalization ** 2)
+
+    # splitter
+    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+    # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+    print '  : %-18s:' % 'COEFFICIENT',
+    for level in self.levels:
+      print helpers.scif (self.coefficients.values [level], table=1),
+    print ' [OPTIMIZATION: %.2f]' % self.coefficients.optimization,
+    print
+
+    # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+    print 
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
     # report 'mean diff opt'
-    self.mean_diff_opt .report ('measured', self.normalization)
+    self.mean_diff_opt.report ('measured', self.normalization)
 
     # report 'variance diff opt'
-    self.variance_diff_opt .report ('measured', self.normalization ** 2)
+    self.variance_diff_opt.report ('measured', self.normalization ** 2)
 
     # === report infered values
+
+    #if not self.inference:
+    #  return
 
     print
     print ' :: INFERED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
@@ -365,16 +381,6 @@ class Indicators (object):
 
     # report 'correlation'
     self.correlation.report ('infered')
-
-    # report 'coefficients'
-    print '  : %-18s:' % 'COEFFICIENT',
-    for level in self.levels:
-      print helpers.scif (self.coefficients.values [level], table=1),
-    print
-
-    # report OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
-    print '  :'
-    print '  : OPTIMIZATION: %.2f' % self.coefficients.optimization
 
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
