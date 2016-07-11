@@ -113,4 +113,4 @@ class MLMC_Config (object):
     print   '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
     print   '  : INFERENCE    :    %-30s' % self.inference
     if self.inference:
-      print '  : DEGREE       :    %-30s' % str (degree)
+      print '  : DEGREE       :    %-30s' % str (self.degree)

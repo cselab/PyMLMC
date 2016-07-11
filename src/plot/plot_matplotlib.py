@@ -1418,10 +1418,10 @@ class MatPlotLib (object):
 
     print ' done.'
 
-  # plot indicators
-  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+  # plot indicators (diffs)
+  def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
     
-    print ' :: INFO: Plotting indicators...',
+    print ' :: INFO: Plotting diffs...',
     sys.stdout.flush()
     
     # === load all required data
@@ -1495,10 +1495,87 @@ class MatPlotLib (object):
       show_info(self)
     
     if not frame:
+      self.draw (save, qoi, suffix='diffs')
+
+    print ' done.'
+  
+  # plot indicators
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+    
+    print ' :: INFO: Plotting indicators...',
+    sys.stdout.flush()
+    
+    # === load all required data
+
+    # use only levels with true differences 
+    levels = self.mlmc.config.levels
+    if not coarsest and len (levels) > 1:
+      levels = levels  [ 1 : ]
+    
+    mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured'] [levels]
+    variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured'] [levels]
+    mean_infered          = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered']  [levels]
+    variance_infered      = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['infered']  [levels]
+    #TOL           = self.mlmc.config.samples.tol
+    NORMALIZATION = self.mlmc.errors.normalization
+    qoi           = self.mlmc.config.solver.qoi
+    
+    # === compute error using the exact solution mean_exact
+    
+    if exact:
+      
+      # TODO: this needs to be reviewed
+      error = numpy.abs ( exact - self.mlmc.stats [ qoi ] ) / NORMALIZATION
+    
+    # === plot
+    
+    if not frame:
+      figure (infolines, subplots=2)
+    
+    # plot mean diffs (measured, infered and optimized)
+    
+    pylab.subplot(121)
+    pylab.semilogy (levels, numpy.abs (mean_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='measured')
+    if run == 1:
+      if exact:
+        pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
+      #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
+    pylab.ylabel (r'|mean of relative $Q_\ell$|')
+    pylab.xlabel ('mesh level')
+    ymin = numpy.min ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
+    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
+    adjust_extent ([ymin, ymax], factor=1.5)
+    levels_extent (levels)
+    pylab.legend (loc='upper right')
+    
+    # plot variance diffs (measured, infered and optimized)
+    
+    pylab.subplot(122)
+    pylab.semilogy (levels, numpy.sqrt (variance_measured) / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    #if run == 1:
+    #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
+    pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
+    pylab.ylabel (r'std. dev. of rel. $Q_\ell$')
+    pylab.xlabel ('mesh level')
+    ymin = numpy.sqrt ( numpy.min ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] ) ) / NORMALIZATION
+    ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] ) ) / NORMALIZATION
+    adjust_extent ([ymin, ymax], factor=1.5)
+    levels_extent (levels)
+    pylab.legend (loc='upper right')
+    
+    adjust (infolines, subplots=2)
+    
+    if infolines:
+      show_info(self)
+    
+    if not frame:
       self.draw (save, qoi, suffix='indicators')
 
     print ' done.'
-
+  
   # plot correlations
   def correlations (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
 

@@ -138,11 +138,15 @@ class Indicators (object):
       self.variance_diff ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
     
     # least squares inference of indicator level values based on the magnitides of measured level values
-    self.infer (self.mean_diff, log=True, critical = False)
+    #self.infer (self.mean_diff, log=True, critical = False)
+    # compute 'mean diff' from infered 'mean'
+    self.mean_diff ['infered'] [ 0   ] = self.mean [self.FINE] ['infered'] [ 0 ]
+    self.mean_diff ['infered'] [ 1 : ] = numpy.abs ( self.mean [self.FINE] ['infered'] [ 1 : ] - self.mean [self.COARSE] ['infered'] [ 1 : ] )
     
-    # for 'diffs' inference, 'variance_diff' is infered
+    # least squares inference of 'variance diff' indicator level values based on the magnitides of measured level values
     if self.inference == 'diffs':
       self.infer (self.variance_diff, log=True, critical = True )
+      self.variance_diff ['infered'] [0] = self.variance [self.FINE] ['infered'] [0]
 
     # === COVARIANCES and CORRELATIONS
     
@@ -177,7 +181,7 @@ class Indicators (object):
         self.variance_diff ['infered'] [level] = self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - 2 * self.covariance ['infered'] [level]
       self.variance_diff ['infered'] [0] = self.variance [self.FINE] ['infered'] [0]
     
-    print self.variance_diff ['infered']
+    print self.variance_diff ['infered'] / self.normalization ** 2
 
     # === OPTIMAL control variate COEFFICIENTS
     
