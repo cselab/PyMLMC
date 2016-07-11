@@ -49,7 +49,7 @@ class MLMC_Config (object):
   root            = '.'
   deterministic   = 0
   recycle         = 0
-  inference       = 0
+  inference       = 'correlations'
   degree          = 1
   iteration       = None
   
