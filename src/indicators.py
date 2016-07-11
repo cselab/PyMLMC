@@ -109,7 +109,7 @@ class Indicators (object):
       self.mean     [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
       self.variance [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
       self.mean     [type] ['measured'] [level] = numpy.mean ( values [level] [type] )
-      self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type] ) if len (values [level] [type]) > 1 else float ('nan')
+      self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type], ddof = 1 ) if len (values [level] [type]) > 1 else float ('nan')
     
     # set the normalization
     if numpy.isnan (self.mean [self.FINE] ['measured'] [0]):
@@ -135,7 +135,7 @@ class Indicators (object):
       self.mean_diff     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.variance_diff ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.mean_diff     ['measured'] [level] = numpy.mean ( distances [level] )
-      self.variance_diff ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+      self.variance_diff ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
     
     # least squares inference of indicator level values based on the magnitides of measured level values
     #self.infer (self.mean_diff, log=True, critical = False)
@@ -202,7 +202,7 @@ class Indicators (object):
       self.mean_diff_opt     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.variance_diff_opt ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.mean_diff_opt     ['measured'] [level] = numpy.mean ( distances [level] )
-      self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level] ) if len (distances [level]) > 1 else float ('nan')
+      self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
     
     # compute magnitudes of optimized level distances (infered values)
     # remark: infering optimized differences from measured optimized differences could lead to inconsistencies with other infered indicators

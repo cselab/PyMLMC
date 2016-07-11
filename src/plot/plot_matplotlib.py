@@ -1500,17 +1500,12 @@ class MatPlotLib (object):
     print ' done.'
   
   # plot indicators
-  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
     
     print ' :: INFO: Plotting indicators...',
     sys.stdout.flush()
     
     # === load all required data
-
-    # use only levels with true differences 
-    levels = self.mlmc.config.levels
-    if not coarsest and len (levels) > 1:
-      levels = levels  [ 1 : ]
     
     mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured'] [levels]
     variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured'] [levels]
