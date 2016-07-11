@@ -1506,7 +1506,7 @@ class MatPlotLib (object):
     sys.stdout.flush()
     
     # === load all required data
-    
+
     mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured'] [levels]
     variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured'] [levels]
     mean_infered          = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered']  [levels]
@@ -1514,6 +1514,7 @@ class MatPlotLib (object):
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
     qoi           = self.mlmc.config.solver.qoi
+    levels        = self.mlmc.config.levels
     
     # === compute error using the exact solution mean_exact
     
