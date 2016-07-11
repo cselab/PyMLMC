@@ -1466,8 +1466,8 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
     pylab.ylabel (r'|mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$|')
     pylab.xlabel ('mesh level')
-    ymin = numpy.min ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
-    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
+    ymin = numpy.min ( [ numpy.min (numpy.abs (mean_diff_measured)), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
+    ymax = numpy.max ( [ numpy.max (numpy.abs (mean_diff_measured)), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
     adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
@@ -1544,8 +1544,8 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
     pylab.ylabel (r'|mean of relative $Q_\ell$|')
     pylab.xlabel ('mesh level')
-    ymin = numpy.min ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
-    ymax = numpy.max ( [ numpy.max (mean_diff_measured), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
+    ymin = numpy.min ( [ numpy.min (numpy.abs (mean_measured)), numpy.min (mean_infered) ] ) / NORMALIZATION
+    ymax = numpy.max ( [ numpy.max (numpy.abs (mean_measured)), numpy.max (mean_infered) ] ) / NORMALIZATION
     adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
@@ -1560,8 +1560,8 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $Q_\ell$')
     pylab.xlabel ('mesh level')
-    ymin = numpy.sqrt ( numpy.min ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] ) ) / NORMALIZATION
-    ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] ) ) / NORMALIZATION
+    ymin = numpy.sqrt ( numpy.min ( [ numpy.min (variance_measured), numpy.min (variance_infered) ] ) ) / NORMALIZATION
+    ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_measured), numpy.max (variance_infered) ] ) ) / NORMALIZATION
     adjust_extent ([ymin, ymax], factor=1.5)
     levels_extent (levels)
     pylab.legend (loc='upper right')
