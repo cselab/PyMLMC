@@ -1419,7 +1419,7 @@ class MatPlotLib (object):
     print ' done.'
 
   # plot indicators (diffs)
-  def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, save=None):
+  def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, accuracies=True, cutoff=1e-3, save=None):
     
     print ' :: INFO: Plotting diffs...',
     sys.stdout.flush()
@@ -1433,6 +1433,8 @@ class MatPlotLib (object):
     
     mean_diff_measured         = self.mlmc.indicators.mean_diff         ['measured'] [levels]
     variance_diff_measured     = self.mlmc.indicators.variance_diff     ['measured'] [levels]
+    mean_diff_accuracy         = self.mlmc.indicators.mean_diff         ['accuracy'] [levels]
+    variance_diff_accuracy     = self.mlmc.indicators.variance_diff     ['accuracy'] [levels]
     mean_diff_infered          = self.mlmc.indicators.mean_diff         ['infered']  [levels]
     variance_diff_infered      = self.mlmc.indicators.variance_diff     ['infered']  [levels]
     mean_diff_opt_infered      = self.mlmc.indicators.mean_diff_opt     ['infered']  [levels]
@@ -1440,7 +1442,7 @@ class MatPlotLib (object):
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
     qoi           = self.mlmc.config.solver.qoi
-    
+
     # === compute error using the exact solution mean_exact
     
     if exact:
@@ -1456,9 +1458,13 @@ class MatPlotLib (object):
     # plot mean diffs (measured, infered and optimized)
     
     pylab.subplot(121)
-    pylab.semilogy (levels, numpy.abs (mean_diff_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, mean_diff_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
-    pylab.semilogy (levels, mean_diff_opt_infered          / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
+    if accuracies:
+      color = brighten (color_params('epsilon'), factor=0.7)
+      pylab.errorbar (levels, numpy.abs (mean_diff_measured) / NORMALIZATION, yerr=mean_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+    else:
+      pylab.semilogy (levels, numpy.abs (mean_diff_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_diff_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    pylab.semilogy (levels, mean_diff_opt_infered          / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
@@ -1466,26 +1472,40 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
     pylab.ylabel (r'|mean of relative $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$|')
     pylab.xlabel ('mesh level')
+    '''
     ymin = numpy.min ( [ numpy.min (numpy.abs (mean_diff_measured)), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
     ymax = numpy.max ( [ numpy.max (numpy.abs (mean_diff_measured)), numpy.max (mean_diff_infered), numpy.max (mean_diff_opt_infered) ] ) / NORMALIZATION
+    if accuracies:
+      ymin = min ( ymin, numpy.min (numpy.abs (mean_diff_measured) - mean_diff_accuracy) / NORMALIZATION )
+      ymax = max ( ymax, numpy.max (numpy.abs (mean_diff_measured) + mean_diff_accuracy) / NORMALIZATION )
     adjust_extent ([ymin, ymax], factor=1.5)
+    '''
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
     # plot variance diffs (measured, infered and optimized)
     
     pylab.subplot(122)
-    pylab.semilogy (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
-    pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='optimized')
+    if accuracies:
+      color = brighten (color_params('sigma'), factor=0.7)
+      pylab.errorbar (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, yerr=variance_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+    else:
+      pylab.semilogy (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$')
     pylab.xlabel ('mesh level')
+    '''
     ymin = numpy.sqrt ( numpy.min ( [ numpy.min (variance_diff_measured), numpy.min (variance_diff_infered), numpy.min (variance_diff_opt_infered) ] ) ) / NORMALIZATION
     ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_diff_measured), numpy.max (variance_diff_infered), numpy.max (variance_diff_opt_infered) ] ) ) / NORMALIZATION
+    if accuracies:
+      ymin = min ( ymin, numpy.min (numpy.sqrt (variance_diff_measured) - variance_diff_accuracy) / NORMALIZATION )
+      ymax = max ( ymax, numpy.max (numpy.sqrt (variance_diff_measured) + variance_diff_accuracy) / NORMALIZATION )
     adjust_extent ([ymin, ymax], factor=1.5)
+    '''
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
@@ -1500,7 +1520,7 @@ class MatPlotLib (object):
     print ' done.'
   
   # plot indicators
-  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
+  def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, accuracies=True, save=None):
     
     print ' :: INFO: Plotting indicators...',
     sys.stdout.flush()
@@ -1509,6 +1529,8 @@ class MatPlotLib (object):
 
     mean_measured         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured']
     variance_measured     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured']
+    mean_accuracy         = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['accuracy']
+    variance_accuracy     = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['accuracy']
     mean_infered          = self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered']
     variance_infered      = self.mlmc.indicators.variance [self.mlmc.config.FINE] ['infered']
     #TOL           = self.mlmc.config.samples.tol
@@ -1531,8 +1553,12 @@ class MatPlotLib (object):
     # plot mean diffs (measured, infered and optimized)
     
     pylab.subplot(121)
-    pylab.semilogy (levels, numpy.abs (mean_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, mean_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='measured')
+    if accuracies:
+      color = brighten (color_params('epsilon'), factor=0.7)
+      pylab.errorbar (levels, numpy.abs (mean_measured) / NORMALIZATION, yerr=mean_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+    else:
+      pylab.semilogy (levels, numpy.abs (mean_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
@@ -1540,25 +1566,39 @@ class MatPlotLib (object):
     pylab.title  ('Rel. level means magnitude for Q = %s' % name (qoi))
     pylab.ylabel (r'|mean of relative $Q_\ell$|')
     pylab.xlabel ('mesh level')
+    '''
     ymin = numpy.min ( [ numpy.min (numpy.abs (mean_measured)), numpy.min (mean_infered) ] ) / NORMALIZATION
     ymax = numpy.max ( [ numpy.max (numpy.abs (mean_measured)), numpy.max (mean_infered) ] ) / NORMALIZATION
+    if accuracies:
+      ymin = min ( ymin, numpy.min (numpy.abs (mean_measured) - mean_accuracy) / NORMALIZATION )
+      ymax = max ( ymax, numpy.max (numpy.abs (mean_measured) + mean_accuracy) / NORMALIZATION )
     adjust_extent ([ymin, ymax], factor=1.5)
+    '''
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
     # plot variance diffs (measured, infered and optimized)
     
     pylab.subplot(122)
-    pylab.semilogy (levels, numpy.sqrt (variance_measured) / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    if accuracies:
+      color = brighten (color_params('sigma'), factor=0.7)
+      pylab.errorbar (levels, numpy.sqrt (variance_measured) / NORMALIZATION, yerr=variance_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+    else:
+      pylab.semilogy (levels, numpy.sqrt (variance_measured) / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
     pylab.ylabel (r'std. dev. of rel. $Q_\ell$')
     pylab.xlabel ('mesh level')
+    '''
     ymin = numpy.sqrt ( numpy.min ( [ numpy.min (variance_measured), numpy.min (variance_infered) ] ) ) / NORMALIZATION
     ymax = numpy.sqrt ( numpy.max ( [ numpy.max (variance_measured), numpy.max (variance_infered) ] ) ) / NORMALIZATION
+    if accuracies:
+      ymin = min ( ymin, numpy.min (numpy.sqrt (variance_measured) - variance_accuracy) / NORMALIZATION )
+      ymax = max ( ymax, numpy.max (numpy.sqrt (variance_measured) + variance_accuracy) / NORMALIZATION )
     adjust_extent ([ymin, ymax], factor=1.5)
+    '''
     levels_extent (levels)
     pylab.legend (loc='upper right')
     
@@ -1592,8 +1632,8 @@ class MatPlotLib (object):
 
     # plot correlations
 
-    pylab.plot (levels, correlation_measured, color=color_params('correlation'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
-    pylab.plot (levels, correlation_infered,  color=color_params('correlation'), linestyle=style(2), alpha=alpha(run), marker='x', label='infered')
+    pylab.plot (levels, correlation_measured, color=color_params('correlation'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+    pylab.plot (levels, correlation_infered,  color=color_params('correlation'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle='-', linewidth=2, alpha=0.6, label='correlation = 1/2')
     pylab.title  ('Level correlations for Q = %s' % name (qoi))

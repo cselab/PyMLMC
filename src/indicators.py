@@ -38,13 +38,16 @@ class Indicator (object):
     self.start  = start
 
     # weights for each level
-    self.weights   = numpy.full ( len (levels), float ('nan') )
+    self.weights  = numpy.full ( len (levels), float ('nan') )
 
     # measured values (signed)
-    self.measured  = numpy.full ( len (levels), float ('nan') )
+    self.measured = numpy.full ( len (levels), float ('nan') )
+
+    # accuracy of estimates
+    self.accuracy = numpy.full ( len (levels), float ('nan') )
 
     # infered values (magnitude)
-    self.infered   = numpy.full ( len (levels), float ('nan') )
+    self.infered  = numpy.full ( len (levels), float ('nan') )
   
   def __getitem__ (self, key):
     return getattr (self, key)
@@ -68,7 +71,7 @@ class Indicator (object):
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = 'correlations', lsqfit = True, degree = 1):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = 'correlations', lsqfit = True, degree = 1, enforce = True):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -78,6 +81,14 @@ class Indicators (object):
     self.available       = 0
     self.history         = {}
   
+  def accuracy (self, values, moment = 1):
+
+    if values.size > moment:
+      power = 2 * moment
+      return numpy.power ( numpy.mean ( (values - numpy.mean (values)) ** power ) / (values.size - moment), 1.0 / power )
+    else:
+      return float ('nan')
+
   def compute (self, mcs, indices):
 
     print
@@ -111,6 +122,11 @@ class Indicators (object):
       self.mean     [type] ['measured'] [level] = numpy.mean ( values [level] [type] )
       self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type], ddof = 1 ) if len (values [level] [type]) > 1 else float ('nan')
     
+    # compute accuracy of mean and variance indicators for all levels and types
+    for level, type in self.levels_types:
+      self.mean     [type] ['accuracy'] [level] = self.accuracy (values [level] [type], moment = 1)
+      self.variance [type] ['accuracy'] [level] = self.accuracy (values [level] [type], moment = 2)
+    
     # set the normalization
     if numpy.isnan (self.mean [self.FINE] ['measured'] [0]):
       self.normalization = 1
@@ -119,10 +135,10 @@ class Indicators (object):
       self.normalization = numpy.abs (self.mean [self.FINE] ['measured'] [0])
     
     # least squares inference of indicator level values based on the magnitides of measured level values
-    self.infer (self.mean     [self.FINE  ], log=True, critical = False)
-    self.infer (self.mean     [self.COARSE], log=True, critical = False)
-    self.infer (self.variance [self.FINE  ], log=True, critical = True )
-    self.infer (self.variance [self.COARSE], log=True, critical = True )
+    self.infer (self.mean     [self.FINE  ], degree=0, log=True, critical = False)
+    self.infer (self.mean     [self.COARSE], degree=0, log=True, critical = False)
+    self.infer (self.variance [self.FINE  ], degree=0, log=True, critical = True )
+    self.infer (self.variance [self.COARSE], degree=0, log=True, critical = True )
 
     # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITHOUT optimal control variate coefficients computed below)
@@ -137,6 +153,11 @@ class Indicators (object):
       self.mean_diff     ['measured'] [level] = numpy.mean ( distances [level] )
       self.variance_diff ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
     
+    # compute accuracy of mean diff and variance diff indicators for all levels and types
+    for level, type in self.levels_types:
+      self.mean_diff     ['accuracy'] [level] = self.accuracy (distances [level], moment = 1)
+      self.variance_diff ['accuracy'] [level] = self.accuracy (distances [level], moment = 2)
+
     # least squares inference of indicator level values based on the magnitides of measured level values
     #self.infer (self.mean_diff, log=True, critical = False)
     # compute 'mean diff' from infered 'mean'
@@ -145,7 +166,7 @@ class Indicators (object):
     
     # least squares inference of 'variance diff' indicator level values based on the magnitides of measured level values
     if self.inference == 'diffs':
-      self.infer (self.variance_diff, log=True, critical = True )
+      self.infer (self.variance_diff, degree=1, log=True, critical = True )
       self.variance_diff ['infered'] [0] = self.variance [self.FINE] ['infered'] [0]
 
     # === COVARIANCES and CORRELATIONS
@@ -173,7 +194,7 @@ class Indicators (object):
     else:
       
       # least squares inference of indicator level values based on the magnitides of measured level values
-      self.infer (self.correlation, log=False, critical = True, min = -1.0, max = 1.0)
+      self.infer (self.correlation, degree=1, log=False, critical = True, min = -1.0, max = 1.0)
 
       # compute covariance and variance diffs (infered)
       for level in self.levels [ 1 : ]:
@@ -181,8 +202,6 @@ class Indicators (object):
         self.variance_diff ['infered'] [level] = self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - 2 * self.covariance ['infered'] [level]
       self.variance_diff ['infered'] [0] = self.variance [self.FINE] ['infered'] [0]
     
-    print self.variance_diff ['infered'] / self.normalization ** 2
-
     # === OPTIMAL control variate COEFFICIENTS
     
     # compute optimal control variate coefficients
@@ -273,7 +292,19 @@ class Indicators (object):
     return distances
   
   # least squares inference of indicator level values based on the magnitudes of measured level values
-  def infer (self, indicator, log, critical, min = None, max = None):
+  def infer (self, indicator, degree, log, critical, min = None, max = None):
+
+    # check if inference is not enforced
+    if not self.enforce:
+      
+      # proceed only in case some indicators are not available
+      if not numpy.isnan (indicator ['measured'] [indicator.start:]) .any ():
+      
+        # simply copy all values
+        indicator ['infered'] = indicator ['measured'] [:]
+
+        # do not proceed with the inference
+        return
 
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
@@ -302,8 +333,8 @@ class Indicators (object):
       data = numpy.abs (indicator ['measured'] [indicator.start:])
 
     # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data undertainties
-    #line = numpy.polyfit (self.levels [indicator.start:], data, self.degree, w = indicator ['weights'] [indicator.start:])
-    line = numpy.polyfit (self.levels [indicator.start:], data, self.degree)
+    #line = numpy.polyfit (self.levels [indicator.start:], data, degree, w = indicator ['weights'] [indicator.start:])
+    line = numpy.polyfit (self.levels [indicator.start:], data, degree)
 
     # update indicator values to the maximum likelihood estimations
     indicator ['infered'] [indicator.start:] = numpy.polyval (line, self.levels [indicator.start:])
@@ -469,112 +500,3 @@ class Indicators (object):
     if config.iteration > 0:
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )
-  
-  '''
-  # extrapolate missing indicators from the coarser levels
-  def extrapolate (self):
-
-    self.extrapolated = 1
-    self.available    = 1
-
-    for level in self.levels:
-      if numpy.isnan ( self.mean [level] [0] ):
-        if level != 0:
-          self.mean     [level] [0] = self.mean [level-1] [0]
-        else:
-          self.mean     [level] [0] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'EPSILON [FINE]\' not possible!')
-
-    for level in self.levels:
-      if numpy.isnan ( self.variance [level] [0] ):
-        if level != 0:
-          self.variance [level] [0] = self.variance [level-1] [0]
-        else:
-          self.variance [level] [0] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'SIGMA [FINE]\' not possible!')
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.mean [level] [1] ):
-        if level != 1:
-          self.mean     [level] [1] = self.mean [level-1] [1]
-        else:
-          self.mean     [level] [1] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'EPSILON [COARSE]\' not possible!')
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.variance [level] [1] ):
-        if level != 1:
-          self.variance [level] [1] = self.variance [level-1] [1]
-        else:
-          self.variance [level] [1] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'SIGMA [COARSE]\' not possible!')
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.correlation [level] ):
-        if level != 0:
-          self.correlation [level] = self.correlation [level-1] + 0.5 * (1.0 - self.correlation [level-1])
-        else:
-          self.correlation [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'CORRELATION\' not possible!')
-
-    for level in self.levels [1:]:
-      if numpy.isnan ( self.covariance [level] ):
-        if level != 0 and not numpy.isnan ( self.correlation [level] ):
-          self.covariance [level] = self.correlation [level] * numpy.sqrt (self.variance [level] [0] * self.variance [level-1] [0])
-        else:
-          self.covariance [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'COVARIANCE\' not possible!')
-
-    self.nans = 0
-
-  # extrapolate missing difference indicators from the coarser levels
-  def extrapolate_diffs (self):
-
-    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
-
-    for level in self.levels:
-      if numpy.isnan ( self.mean_diff [level] ):
-        if level != 0:
-          self.mean_diff [level] = self.mean_diff [level-1] / 2
-        else:
-          self.mean_diff [level] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
-
-    for level in self.levels:
-      if numpy.isnan ( self.variance_diff [level] ):
-        if level != 0:
-          self.variance_diff [level] = self.variance_diff [level-1] / 2
-        else:
-          self.variance_diff [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
-
-    self.nans = 0
-
-  # extrapolate missing plain difference indicators from the coarser levels
-  def extrapolate_diffs_plain (self):
-
-    # TODO: if at least two data points are available, use least squares interpolation to fit a linear function in log-log scale
-
-    for level in self.levels:
-      if numpy.isnan ( self.mean_diff_plain [level] ):
-        if level != 0:
-          self.mean_diff_plain [level] = self.mean_diff_plain [level-1] / 2
-        else:
-          self.mean_diff_plain [level] = numpy.nan
-          helpers.warning ('Extrapolation of indicators \'EPSILON DIFF\' not possible!')
-
-    for level in self.levels:
-      if numpy.isnan ( self.variance_diff_plain [level] ):
-        if level != 0:
-          self.variance_diff_plain [level] = self.variance_diff_plain [level-1] / 2
-        else:
-          self.variance_diff_plain [level] = numpy.nan
-          self.available = 0
-          helpers.warning ('Extrapolation of indicators \'SIGMA DIFF\' not possible!')
-
-    self.nans = 0
-  '''
