@@ -1,143 +1,74 @@
 
-# === import PyMLMC
+import numpy
 
-from pymlmc import *
+# === configuration
 
-# === global configuration
+N0    = 8 # coarsest resolution
+L     = 6 # finest level (levels = 0, ..., L)
+times = numpy.linspace (0, 1, 10)
 
-name  = 'int2d'
-email = 'sukys.jonas@gmail.com'
+# === deterministic application
 
-N0 = 8          # coarsest resolution
-L  = 4          # finest level (levels = 0, ..., L)
+def Integral2D (N, seed):
 
-cores    = 4    # requested number of cores
-walltime = 1    # requested walltime (in hours)
+  f = lambda x, y, t, u : 1 + u ** 2 * x ** 2 * numpy.cos (y) * numpy.sqrt (t)
+  numpy.random.seed (seed)
+  u = 1 + 0.1 * numpy.random.uniform ()
+  g = numpy.linspace (0, 2, N)
+  x,y = numpy.meshgrid (g,g)
+  I = [1.0 / N ** 2 * numpy.sum (f(x,y,t,u)) for t in times]
+  return I
 
-warmup   = 4    # number of warmup samples on the finest level L
+# === helpers
 
-workunit = 0.1  # estimated workunit (in core hours), such that runtime = workunit * solver.work (resolution)
-budget   = 10   # prescribed total budget (in core hours) for all samples on all levels
+def pair (a, b):
+  return a ** 2 + a + b if a >= b else a + b ** 2
 
-# === modules configuration
+# === MLMC simulation
 
-# general
-config = MLMC_Config ()
-config.deterministic = 0    # simulation runs directly in 'output' directory and the update phases are skipped
+levels  = numpy.arange (L + 1)
+samples = 4 * 2 ** (L - levels)
+N       = N0 * 2 ** levels
 
-# solver
-from solver_Integral2D import Integral2D
-config.solver = Integral2D (name=name, workunit=workunit)
+results = [ numpy.empty ( (samples [level], len (times)), dtype=float ) for level in levels ]
 
-# discretizations
-config.discretizations = helpers.grids (N0, L)
+for level in levels:
+  for sample in range ( samples [level] ):
+    results [level] [sample, :] = Integral2D ( N [level], pair (level, sample) )
 
-# samples
-from samples_estimated_budget import Estimated_Budget
-config.samples = Estimated_Budget (budget, warmup)
+# === statistics assembly
 
-# scheduler
-from scheduler_static import Static
-config.scheduler = Static (cores=cores, walltime=walltime, email=email)
+mean = numpy.zeros ( len (times) )
+var  = numpy.zeros ( len (times) )
 
-# === simulation
+for level in levels:
+  for snapshot, time in enumerate (times):
 
-# create MLMC simulation
-mlmc = MLMC (config)
+    if level == 0:
+      mean [snapshot] = numpy.mean ( results [level] [:, snapshot] )
+      var  [snapshot] = numpy.var  ( results [level] [:, snapshot] )
 
-# check if interactive
-if __name__ == '__main__':
+    else:
+      mean [snapshot] += numpy.mean ( results [level] [:, snapshot] - results [level - 1] [ : samples [level], snapshot ] )
+      var  [snapshot] += numpy.var  ( results [level] [:, snapshot] - results [level - 1] [ : samples [level], snapshot ] )
 
-  # run MLMC simulation
-  mlmc.simulation()
+# === output
 
-# === results and analysis
+print mean
+print var
 
-# check if interactive
-if __name__ == '__main__':
+# === plotting
 
-  from plot_matplotlib import MatPlotLib
+import pylab
+lower = mean - numpy.sqrt (var)
+upper = mean + numpy.sqrt (var)
+pylab.plot (times, mean, linewidth=3, label='mean')
+color = 'red'
+pylab.fill_between (times, lower, upper, facecolor=color, edgecolor=color, linewidth=3)
+pylab.plot ([], [], color=color, linewidth=10, label='mean +/- std. dev.')
 
-  # initialize plotting backend
-  plot = MatPlotLib (mlmc)
-
-  # setup plotting
-  plot.autosave = 1
-  plot.set_extent  (10.0)
-  plot.set_surface (2.5)
-
-  qois = { 'I' : [0, 1], ??? }
-
-  # plotting emnsembles
-  for qoi, extent in qois.iteritems():
-    plot.ensembles ( qoi=qoi, extent=extent, both=0 )
-    plot.ensembles ( qoi=qoi, extent=extent, both=1 )
-
-  # show ensembles
-  if not local.cluster:
-    plot.show()
-  
-  # required qoi ranges for MLMC estimates
-  ranges = []
-  ranges.append ( ['I', 0, None] )
-
-  # statistics
-  from stats_numpy import *
-  from stats_confidence import *
-  from stats_histogram import *
-  figures = {}
-  figures ['mean-confidence'] = [ NumPy_Stat ('mean'), Confidence (lower=25, upper=75), Confidence (lower=5, upper=95) ]
-  figures ['histogram']       = [ Histogram () ]
-
-  # assemble and plot all statistics
-  for suffix, stats in figures.iteritems():
-
-    # assemble MLMC estimates
-    mlmc.assemble ( stats, qois )
-    
-    # add shells to qois
-    qois.update (shells) 
-    
-    # clip MLMC estimates
-    mlmc.clip (ranges)
-    
-    # plot all qois
-    for qoi, extent in qois.iteritems():
-
-      # plot MC results
-      plot.stats_mcs ( qoi=qoi, extent=extent, suffix=suffix )
-
-      # plot diffs of MC results
-      plot.stats_diffs ( qoi=qoi, extent=extent, suffix=suffix )
-
-      # plot MLMC results
-      plot.stats_mlmc ( qoi=qoi, extent=extent, suffix=suffix )
-    
-    # show statistics
-    if not local.cluster:
-      plot.show()
-
-  # plot samples
-  plot.samples ()
-
-  # plot budget
-  plot.budget ()
-
-  # plot indicators
-  plot.indicators ()
-
-  # plot correlations
-  plot.correlations ()
-
-  # plot coefficients
-  plot.coefficients ()
-
-  # plot errors
-  plot.errors ()
-
-  # show indicators
-  if not local.cluster:
-    plot.show()
-
-  # query for further action
-  plot.query()
+pylab.title  ( 'MLMC statistics' )
+pylab.xlabel ( 'time' )
+pylab.ylabel ( 'quantity of interest' )
+pylab.legend ( loc='best' )
+pylab.show   ()
