@@ -1,6 +1,6 @@
-
-PyMLMC is a highly modular Python Multi-Level Monte Carlo (MLMC) software targeted at launching and managing
-Uncertainty Quantification campaigns of deterministic HPC simulation software on super-computers and post-processing the results.
+PyMLMC is a highly modular Python Multi-Level Monte Carlo (MLMC) software
+targeted at launching and managing Uncertainty Quantification campaigns
+of deterministic HPC simulation software on super-computers and post-processing the results.
 
 ### Installation ###
 
