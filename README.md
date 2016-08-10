@@ -15,7 +15,7 @@ Afterwards, copy the appropriate machine configuration file from 'cfg/' to the r
 
 For example script using the PyMLMC framework, check 'doc/examples/', in particular 'example_deterministic.py' and 'example_mlmc.py'.
 
-### Acknowledgement ###
+### Acknowledgements ###
 
 If you are using this code (modified or unmodified), please cite:
 J. Šukys, U. Rasthofer, F. Wermelinger, P. Hadjidoukas, P.Koumoutsakos.
