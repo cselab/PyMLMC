@@ -17,5 +17,5 @@ For example script using the PyMLMC framework, check 'doc/examples/', in particu
 
 ### Support ###
 
-This code was developed in ETH Zurich, Switzerland,
-by Jonas Sukys, email: jonas.sukys@mavt.ethz.ch
+This code was developed in ETH Zurich, Switzerland.  
+Contact: Jonas Sukys, jonas.sukys@mavt.ethz.ch.
