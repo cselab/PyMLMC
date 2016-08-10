@@ -1,4 +1,13 @@
 
+# # # # # # # # # # # # # # # # # # # # # # # # # #
+# Simple serial code exhibiting the main idea of a single-stage MLMC algorithm
+#
+# Jonas Sukys
+# CSE Lab, ETH Zurich, Switzerland
+# sukys.jonas@gmail.com
+# All rights reserved.
+# # # # # # # # # # # # # # # # # # # # # # # # # #
+
 import numpy
 
 # === configuration

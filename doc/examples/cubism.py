@@ -1,4 +1,13 @@
 
+# # # # # # # # # # # # # # # # # # # # # # # # # #
+# Example script for using PyMLMC with CubismMPCF solver
+#
+# Jonas Sukys
+# CSE Lab, ETH Zurich, Switzerland
+# sukys.jonas@gmail.com
+# All rights reserved.
+# # # # # # # # # # # # # # # # # # # # # # # # # #
+
 # === import PyMLMC
 
 from pymlmc import *

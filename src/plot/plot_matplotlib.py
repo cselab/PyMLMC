@@ -335,8 +335,6 @@ def filter (vs, width):
 # main class for plotting using MatPlotLib
 class MatPlotLib (object):
 
-  autosave = 0
-
   extent_x = 'N/A'
   extent_y = 'N/A'
   extent_z = 'N/A'
@@ -345,10 +343,11 @@ class MatPlotLib (object):
   xend_max = None
 
   # initialization
-  def __init__ (self, mlmc, auto=False):
+  def __init__ (self, mlmc, autosave=0, auto=False):
 
-    self.mlmc = mlmc
-    self.auto = auto
+    self.mlmc     = mlmc
+    self.autosave = autosave
+    self.auto     = auto
 
     # non-blocking pylab.show ()
     if self.auto:

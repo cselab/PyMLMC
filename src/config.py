@@ -31,9 +31,9 @@ sys.path.append ( os.path.join (os.path.dirname(__file__), 'plot' ) )
 
 # === default MLMC configuration
 
-from solver_Integral2D import Integral2D
-from samples_estimated import Estimated
-from scheduler_static  import Static
+from solver_Integral2D           import Integral2D
+from samples_estimated_tolerance import Estimated_Tolerance
+from scheduler_static            import Static
 
 # === classes
 
@@ -44,7 +44,7 @@ class MLMC_Config (object):
   # default configuration
   solver          = Integral2D ()
   discretizations = helpers.grids (4)
-  samples         = Estimated ()
+  samples         = Estimated_Tolerance ()
   scheduler       = Static ()
   root            = '.'
   deterministic   = 0
