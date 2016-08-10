@@ -17,9 +17,9 @@ For example script using the PyMLMC framework, check 'doc/examples/', in particu
 
 ### Acknowledgements ###
 
-If you are using this code (modified or unmodified), please cite:
-J. Šukys, U. Rasthofer, F. Wermelinger, P. Hadjidoukas, P.Koumoutsakos.
-Uncertainty quantification in multi-phase cloud cavitation collapse flows using optimal control variate multi-level Monte Carlo sampling.
+If you are using this code (modified or unmodified), please cite:  
+J. Šukys, U. Rasthofer, F. Wermelinger, P. Hadjidoukas, P.Koumoutsakos.  
+Uncertainty quantification in multi-phase cloud cavitation collapse flows using optimal control variate multi-level Monte Carlo sampling.  
 In progress, 2016.
 
 ### Support ###
