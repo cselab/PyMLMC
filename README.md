@@ -4,7 +4,7 @@ of deterministic HPC simulation software on super-computers and post-processing 
 
 ### Installation ###
 
-To obtain a local copy of the repository
+To obtain a local copy of the repository, execute in terminal:
 ```
 git clone https://sukysjonas@bitbucket.org/sukysjonas/pymlmc.git
 ```
