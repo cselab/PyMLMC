@@ -19,7 +19,7 @@ numpy.seterr ( divide='ignore', invalid='ignore' )
 
 class Estimated_Tolerance (Samples):
   
-  def __init__ (self, tol=1e-1, warmup=1, warmup_finest_level='last', aggression=0.9, proximity=1.1):
+  def __init__ (self, tol=1e-1, warmup=1, warmup_finest_level='last', aggression=1.1, proximity=1.1):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -65,9 +65,9 @@ class Estimated_Tolerance (Samples):
     # compute the required cumulative sampling error
     self.required_error = self.tol * errors.normalization
     
-    # take into account desired aggression
-    if self.aggression > 1.0 or errors.total_relative_error / self.tol > self.proximity
-      self.required_error *= self.aggression
+    # take into account desired aggression, if the total error is far (according to specified proximity) from the required tolerance
+    if errors.total_relative_error / self.tol > self.proximity
+      self.required_error /= self.aggression
     
     # compute optimal number of samples
     # assuming that no samples were computed so far

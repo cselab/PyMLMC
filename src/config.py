@@ -43,7 +43,7 @@ class MLMC_Config (object):
   
   # default configuration
   solver          = Integral2D ()
-  discretizations = helpers.grids (4)
+  discretizations = helpers.grids (8)
   samples         = Estimated_Tolerance ()
   scheduler       = Static ()
   root            = '.'
