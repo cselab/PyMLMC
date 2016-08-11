@@ -16,7 +16,8 @@ class NumPy_Stat (Stat):
   
   def __init__ (self, stat, name=None, params=None):
     
-    self.size = 1
+    self.size  = 1
+    self.limit = 1
 
     self.stat = getattr ( numpy, stat )
 

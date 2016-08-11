@@ -17,6 +17,7 @@ class Confidence (Stat):
   def __init__ (self, name=None, level=5, lower=None, upper=None):
     
     self.size  = 2
+    self.limit = 2
     self.level = level
     self.lower = lower
     self.upper = upper

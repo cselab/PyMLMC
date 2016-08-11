@@ -75,7 +75,7 @@ class Stat (object):
           ensemble = [ sample.data [name] [step] for sample in samples if not numpy.isnan (sample.data [name] [step]) ]
         
         # compute statistic
-        if len (ensemble) > 0:
+        if len (ensemble) >= self.limit:
           self.estimate.data [name] [step] = self.compute (ensemble, extent)
         else:
           self.estimate.data [name] [step] = self.empty ()

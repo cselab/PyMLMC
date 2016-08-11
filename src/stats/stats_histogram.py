@@ -17,6 +17,7 @@ class Histogram (Stat):
   def __init__ (self, name='histogram', bins=100):
     
     self.size = bins
+    self.limit = 1
     self.name = name
     self.clip = [0.0, 1.0]
   
