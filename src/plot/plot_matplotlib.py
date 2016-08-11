@@ -730,7 +730,7 @@ class MatPlotLib (object):
         stat_extent = extent
       
       # if the specified qoi was not assembled, continue
-      if stat.estmate == None or qoi not in stat.estimate.data or stat.estimate.data [qoi] == None:
+      if stat.estimate == None or qoi not in stat.estimate.data or stat.estimate.data [qoi] == None:
 
         # special plotting for shells
         if 'shell' in qoi:
