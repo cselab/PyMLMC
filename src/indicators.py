@@ -318,7 +318,7 @@ class Indicators (object):
     
     # if only one measurement is available, assign it to all infered level values
     if  numpy.sum ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) == 1:
-      indicator ['infered'] [indicator.start:] = numpy.abs ( indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) ] )
+      indicator ['infered'] [indicator.start:] = numpy.abs ( indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) [0] ] )
       return
     
     # if inference is disabled, simply copy the values
