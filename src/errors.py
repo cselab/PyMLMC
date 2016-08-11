@@ -132,6 +132,7 @@ class Errors (object):
     # avoid round-off errors for pure MC runs
     if len (self.levels) == 1:
       self.speedup_mlmc = 1.0
+      samples_mc = counts [0]
     
     # report
     print
