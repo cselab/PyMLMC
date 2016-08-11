@@ -801,7 +801,7 @@ class MLMC (object):
       # report missing levels
       else:
 
-        helpers.warning ('Level %d is missing in MLMC assembly (additional bias could be introduced!)')
+        helpers.warning ('Level %d is missing in MLMC assembly (additional bias could be introduced!)' % level)
     
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
