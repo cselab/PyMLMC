@@ -787,12 +787,21 @@ class MLMC (object):
     
     # assemble differences of the remaining levels
     for level in self.config.levels [self.L0 + 1 : ]:
-      for index, stat in enumerate (self.diffs [level]):
-        
-        # if at least one sample from that level is available
-        if self.config.samples.counts.loaded [level] != 0:
+
+      # if at least one sample from that level is available
+      if self.config.samples.counts.loaded [level] != 0:
+
+        # assemble all statistics
+        for index, stat in enumerate (self.diffs [level]):
+
+          # assemble the difference
           stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
           stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
+
+      # report missing levels
+      else:
+
+        helpers.warning ('Level %d is missing in MLMC assembly (additional bias could be introduced!)')
     
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
@@ -806,8 +815,6 @@ class MLMC (object):
       for diff in self.diffs [self.L0 + 1 : ]:
         if diff [index] .estimate != None:
           stat.estimate += diff [index] .estimate
-
-    # TODO: issue at least a warning if some levels are missing in the _middle_ of level hierarchy (additional bias in introduced!)
 
     print '  : DONE'
 
