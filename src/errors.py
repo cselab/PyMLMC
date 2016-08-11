@@ -137,8 +137,9 @@ class Errors (object):
     print
     if forecast: print ' :: FORECAST'
     print ' :: SPEEDUP (MLMC vs. MC): %.1f' % self.speedup_mlmc + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
-    print '  : -> MLMC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
-    print '  : ->   MC budget: %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
+    print '  : -> MLMC budget : %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
+    print '  : ->   MC budget : %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
+    print '  : ->   MC samples: %s' % helpers.intf ( samples_mc )
     
     # compute OCV MLMC vs. PLAIN MLMC speedup
     self.speedup_ocv = plain / error
