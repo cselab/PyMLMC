@@ -39,7 +39,7 @@ from scheduler_static            import Static
 
 # configuration class for MLMC simulations
 
-class MLMC_Config (object):
+class Config (object):
   
   # default configuration
   solver          = Integral2D ()
@@ -49,7 +49,7 @@ class MLMC_Config (object):
   root            = '.'
   deterministic   = 0
   recycle         = 0
-  inference       = 'correlations'
+  inference       = 'diffs'
   degree          = 1
   iteration       = None
   

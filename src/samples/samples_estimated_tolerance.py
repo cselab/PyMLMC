@@ -66,7 +66,7 @@ class Estimated_Tolerance (Samples):
     self.required_error = self.tol * errors.normalization
     
     # take into account desired aggression, if the total error is far (according to specified proximity) from the required tolerance
-    if errors.total_relative_error / self.tol > self.proximity
+    if errors.total_relative_error / self.tol > self.proximity:
       self.required_error /= self.aggression
     
     # compute optimal number of samples

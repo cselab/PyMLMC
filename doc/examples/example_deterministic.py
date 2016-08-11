@@ -25,7 +25,6 @@ walltime       = 1    # requested walltime in hours
 # === modules configuration
 
 # general
-config = MLMC_Config ()
 config.deterministic = 1
 
 # solver

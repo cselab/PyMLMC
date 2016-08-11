@@ -31,7 +31,7 @@ class Integral2D (Solver):
     
     # command to be executed in terminal
     # see available list of dynamic arguments in '/doc' directory, others can be set in 'self.run()'
-    self.cmd  = 'python -c "from numpy import *; f = lambda x, y, t, u : 1 + u**2 * x**2 * cos(y) * sqrt(t); random.seed (%(seed)d); u = 1 + 0.1 * random.uniform(); g = linspace (0, 2, %(N)d); x,y = meshgrid (g,g); I = [1.0 / %(N)d ** 2 * sum (f(x,y,t,u)) for t in linspace (0, 1, 10)]; print I; f = open (\'output.dat\', \'w\'); f.write (str(I)); f.close()"'
+    self.cmd = 'python -c "from numpy import *; f = lambda x, y, t, u : 1 + u**2 * x**2 * cos(y) * sqrt(t); random.seed (%(seed)d); u = 1 + 0.1 * random.uniform(); g = linspace (0, 2, %(N)d); x,y = meshgrid (g,g); I = [1.0 / %(N)d ** 2 * sum (f(x,y,t,u)) for t in linspace (0, 1, 10)]; print I; f = open (\'output.dat\', \'w\'); f.write (str(I)); f.close()"'
 
     # set path from the environment variable
     #if not path: self.path = self.env ('ENV_VARIABLE_FOR_PATH')
@@ -76,7 +76,7 @@ class Integral2D (Solver):
   
   # run the specified deterministic simulation (level, type, sample)
   # note, that current contents of the 'input' directory (if exists) will be copied to the working directory
-  def run (self, level, type, sample, seed, discretization, params, paralellization):
+  def run (self, level, type, sample, seed, discretization, parameters, parallelization):
     
     # get parallelization args
     args = parallelization.args()
@@ -88,7 +88,7 @@ class Integral2D (Solver):
     args ['N']    = discretization
     args ['seed'] = seed
     
-    # execute/submit job
+    # execute/submit job (self.cmd % args)
     self.launch (args, parallelization, level, type, sample)
   
   # open output file and read results

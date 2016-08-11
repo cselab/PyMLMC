@@ -32,7 +32,6 @@ budget   = 0.1  # prescribed total (warmup AND update stages) computational budg
 # === modules configuration
 
 # general
-config = MLMC_Config ()
 config.deterministic = 0    # simulation runs directly in 'output' directory and the update phases are skipped
 
 # solver

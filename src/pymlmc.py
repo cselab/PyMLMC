@@ -26,6 +26,10 @@ from errors import *
 import helpers
 import local
 
+# === default configuration
+
+config = Config ()
+
 # === MLMC class
 
 class MLMC (object):

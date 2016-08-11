@@ -181,7 +181,7 @@ from samples_estimated_budget import Estimated_Budget
 from scheduler_static import Static
 
 # assemble MLMC configuration
-config = MLMC_Config ()
+config = Config ()
 config.solver          = CubismMPCF (tend, options, name=name, workunit=workunit, init=cloud)
 config.discretizations = grids
 config.samples         = Estimated_Budget (budget, warmup)
