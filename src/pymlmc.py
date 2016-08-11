@@ -782,6 +782,7 @@ class MLMC (object):
     self.diffs = [ copy.deepcopy (stats) for level in self.config.levels ]
 
     # coarsest level difference is just a plain MC estimate
+    # TODO: what if this estimate is missing?
     for index, stat in enumerate (self.diffs [self.L0]):
       stat.estimate = self.indicators.coefficients.values [self.L0] * self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [index] .estimate
     
@@ -791,17 +792,9 @@ class MLMC (object):
       # assemble all statistics
       for index, stat in enumerate (self.diffs [level]):
 
-        # if at least one sample from that level is available
-        if self.config.samples.counts.loaded [level] >= stat.limit:
-
-          # assemble the difference
-          stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
-          stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
-
-        # report missing levels
-        else:
-
-          helpers.warning ('Statistic \'%s\' for level %d is missing in MLMC assembly, leading to an increase in bias!' % (stat.name, level))
+        # assemble the difference
+        stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
+        stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
     
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
@@ -812,10 +805,19 @@ class MLMC (object):
       stat.estimate = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
 
       # add remaining differences
-      for diff in self.diffs [self.L0 + 1 : ]:
-        if diff [index] .estimate != None:
-          stat.estimate += diff [index] .estimate
+      for level in levels [self.L0 + 1 : ]:
 
+        # if at least one sample from that level is available
+        if self.config.samples.counts.loaded [level] >= stat.limit:
+        #if diff [index] .estimate != None:
+
+          stat.estimate += self.diffs [level] [index] .estimate
+
+        # report missing levels
+        else:
+
+          helpers.warning ('Statistic \'%s\' for level %d is missing in MLMC assembly, leading to an increase in bias!' % (stat.name, level))
+    
     print '  : DONE'
 
   # clip MLMC estimates
