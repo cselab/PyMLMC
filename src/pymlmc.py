@@ -805,11 +805,11 @@ class MLMC (object):
       stat.estimate = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
 
       # add remaining differences
-      for level in levels [self.L0 + 1 : ]:
+      for level in self.config.levels [self.L0 + 1 : ]:
 
         # if at least one sample from that level is available
-        if self.config.samples.counts.loaded [level] >= stat.limit:
-        #if diff [index] .estimate != None:
+        #if self.config.samples.counts.loaded [level] >= stat.limit:
+        if self.diffs [level] [index] .estimate != None:
 
           stat.estimate += self.diffs [level] [index] .estimate
 
@@ -817,7 +817,7 @@ class MLMC (object):
         else:
 
           helpers.warning ('Statistic \'%s\' for level %d is missing in MLMC assembly, leading to an increase in bias!' % (stat.name, level))
-    
+
     print '  : DONE'
 
   # clip MLMC estimates
