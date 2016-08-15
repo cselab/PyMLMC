@@ -112,4 +112,4 @@ class Config (object):
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
     print   '  : ROOT         :    %-30s' % self.root
     print   '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
-    print   '  : INFERENCE    :    %-30s' % self.inference + ' [enforced]' if self.enforce
+    print   '  : INFERENCE    :    %-30s' % self.inference + ' [enforced]' if self.enforce else ''
