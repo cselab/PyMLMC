@@ -50,7 +50,7 @@ class Config (object):
   deterministic   = 0
   recycle         = 0
   inference       = 'diffs'
-  degree          = 1
+  enforce         = 0
   iteration       = None
   
   def __init__ (self, id=0):
@@ -112,6 +112,4 @@ class Config (object):
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
     print   '  : ROOT         :    %-30s' % self.root
     print   '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
-    print   '  : INFERENCE    :    %-30s' % self.inference
-    if self.inference:
-      print '  : DEGREE       :    %-30s' % str (self.degree)
+    print   '  : INFERENCE    :    %-30s' % self.inference + ' ' + ('[enforced]' if self.enforce else '[not enforced]')
