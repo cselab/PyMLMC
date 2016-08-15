@@ -17,6 +17,9 @@ class Stat (object):
   # containers for results
   estimate = None
 
+  # whether statistic is available
+  available = 0
+  
   # special clipping
   clip = 1
 
@@ -55,6 +58,7 @@ class Stat (object):
     # use progress indicator, report current statistic each time
     prefix = '       %-30s' % self.name
     progress = helpers.Progress (prefix=prefix, steps=len(names), length=20)
+    self.available = 1
     
     # compute sample statistics for each qoi
     for i, (name, extent) in enumerate (zip (names, extents)):
@@ -79,6 +83,7 @@ class Stat (object):
           self.estimate.data [name] [step] = self.compute (ensemble, extent)
         else:
           self.estimate.data [name] [step] = self.empty ()
+          self.available = 0
       
       # update progress
       progress.update (i + 1)

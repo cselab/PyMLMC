@@ -793,30 +793,49 @@ class MLMC (object):
       for index, stat in enumerate (self.diffs [level]):
 
         # assemble the difference
-        stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
-        stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
-    
+        stat.available = 1
+
+        # assemble the FINE term
+        if self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .available:
+          stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
+        else:
+          stat.estimate = stat.empty()
+          stat.available = 0
+
+        # assemble the COARSE term
+        if self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .available:
+          stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
+        else:
+          stat.estimate = stat.empty()
+          stat.available = 0
+
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = copy.deepcopy (stats)
+
+    # for each statistic
     for index, stat in enumerate (self.stats):
 
       # copy coarsest difference
       stat.estimate = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
 
-      # add remaining differences
-      for level in self.config.levels [self.L0 + 1 : ]:
+    # add remaining differences
+    for level in self.config.levels [self.L0 + 1 : ]:
 
-        # if at least one sample from that level is available
-        #if self.config.samples.counts.loaded [level] >= stat.limit:
-        if self.diffs [level] [index] .estimate != None:
+      # check if all stats are available
+      available = 1
+      for stat in self.diffs [level]:
+        if not stat.available:
+          available = 0
+      
+      # report if a level is missing
+      if not available:
+        helpers.warning ('Level %d is missing in MLMC assembly, leading to an increase in bias!' % level)
+        continue
 
-          stat.estimate += self.diffs [level] [index] .estimate
-
-        # report missing levels
-        else:
-
-          helpers.warning ('Statistic \'%s\' for level %d is missing in MLMC assembly, leading to an increase in bias!' % (stat.name, level))
+      # add up statistics
+      for index, stat in enumerate (self.stats):
+        stat.estimate += self.diffs [level] [index] .estimate
 
     print '  : DONE'
 

@@ -70,6 +70,16 @@ if __name__ == '__main__':
   # initialize plotting backend
   plot = MatPlotLib ( mlmc, autosave=1 )
 
+  # plot samples
+  plot.samples ()
+
+  # plot budget
+  plot.budget ()
+
+  # show indicators
+  if not local.cluster:
+    plot.show()
+
   # quantities of interest to be plotted and (optionally) their extents (can be set to 'None')
   qois = { 'I' : [0, 1] }
 
@@ -81,7 +91,23 @@ if __name__ == '__main__':
   # show ensembles
   if not local.cluster:
     plot.show()
+
+  # plot indicators
+  plot.indicators ()
+
+  # plot correlations
+  plot.correlations ()
+
+  # plot coefficients
+  plot.coefficients ()
+
+  # plot errors
+  plot.errors ()
   
+  # show indicators
+  if not local.cluster:
+    plot.show()
+
   # required qoi ranges for MLMC estimates
   ranges = []
   ranges.append ( ['I', 0, None] )
@@ -124,28 +150,6 @@ if __name__ == '__main__':
     # show statistics
     if not local.cluster:
       plot.show()
-
-  # plot samples
-  plot.samples ()
-
-  # plot budget
-  plot.budget ()
-
-  # plot indicators
-  plot.indicators ()
-
-  # plot correlations
-  plot.correlations ()
-
-  # plot coefficients
-  plot.coefficients ()
-
-  # plot errors
-  plot.errors ()
-
-  # show indicators
-  if not local.cluster:
-    plot.show()
 
   # query for further action
   plot.query()
