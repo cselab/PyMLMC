@@ -191,7 +191,7 @@ class Indicators (object):
         self.correlation ['infered']  [level] = self.covariance ['infered'] [level] / numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered']  [level] )
     
     # for 'correlations' inference, 'correlations' is infered and variance diffs with covariances and computed from it
-    elif:
+    elif self.inference == 'correlations':
       
       # least squares inference of indicator level values based on the magnitides of measured level values
       self.infer (self.correlation, degree=1, log=False, critical = True, min = -1.0, max = 1.0)
