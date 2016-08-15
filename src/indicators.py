@@ -414,7 +414,7 @@ class Indicators (object):
       return
 
     print
-    print ' :: INFERED INDICATORS: (w.r.t. \'%s\', normalized to %s)' % ( self.inference, helpers.scif (self.normalization) )
+    print ' :: INFERED INDICATORS: (w.r.t. \'%s\'%s, normalized to %s)' % ( self.inference, ' [enforced]' if self.enforce else '', helpers.scif (self.normalization) )
     print '  :'
     print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
     print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
