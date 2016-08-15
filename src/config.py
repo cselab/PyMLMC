@@ -98,7 +98,7 @@ class Config (object):
 
   # report configuration
   def report (self):
-
+    
     print
     print   ' :: CONFIGURATION:    '
     print   '  : MACHINE      :    %-30s' % local.name                         + '    ' + '[TYPE: %s]' % ('cluster'       if local.cluster      else 'standalone')
@@ -106,6 +106,7 @@ class Config (object):
     if self.levels > 0 and not self.deterministic:
       print '                 |->  %-30s' % 'WORK RATIOS'                      + '    ' + '%s' % ' '.join ( [ helpers.intf (ratio) for ratio in self.work_ratios ] )
       print '                 |->  %-30s' % 'CORE RATIOS'                      + '    ' + '%s' % ' '.join ( [ helpers.intf (ratio) for ratio in self.core_ratios ] )
+    print   '                 |->  %-30s' % 'INIT SCRIPT'                      + '    ' + '%s' % self.solver.init.__name__ if self.solver.init != None else 'None'
     print   '  : SAMPLES      :    %-30s' % self.samples   .__class__.__name__
     if not self.deterministic:
       print '  : SCHEDULER    :    %-30s' % self.scheduler .__class__.__name__
