@@ -90,7 +90,7 @@ simple_job = '''ulimit -c 0; runjob \
   --envs XLSMPOPTS=parthds=%(threads)d \
   --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
-  : %(cmd)s %(options)s
+  : %(cmd)s
   '''
 
 # MPI run command
@@ -102,7 +102,7 @@ mpi_job = '''ulimit -c 0; runjob \
   --envs XLSMPOPTS=parthds=%(threads)d \
   --block BATCH_JOB_BLOCK_HOOK \
   %(envs)s \
-  : %(cmd)s %(options)s
+  : %(cmd)s
   '''
 
 # batch job block hook

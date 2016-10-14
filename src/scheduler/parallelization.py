@@ -16,7 +16,7 @@ import copy
 
 class Parallelization (object):
   
-  def __init__ (self, cores, walltime, sharedmem, batch=None, limit=None, merge=None, email=''):
+  def __init__ (self, cores, walltime, sharedmem, batch=None, merge=None, email='', limit=None):
     
     # save configuration
     vars (self) .update ( locals() )

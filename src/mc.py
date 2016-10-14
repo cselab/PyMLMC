@@ -114,8 +114,8 @@ class MC (object):
     # get information of the MC run and the prescribed parallelization
     info_mc = self.info()
     
-    # initialize solver
-    config.solver.initialize (config.level, config.type, self.parallelization, config.iteration)
+    # set solver iteration
+    config.solver.iteration = config.iteration
 
     # use progress indicator, report MC info each time
     prefix = info_mc + '  '
@@ -123,16 +123,16 @@ class MC (object):
     progress.init ()
 
     import time
-    # run all samples
+    # queue all samples
     for step, sample in enumerate (config.samples):
       config.solver.run ( config.level, config.type, sample, self.seed (sample), config.discretization, self.params, self.parallelization )
       progress.update (step + 1)
 
     # reset progress indicator
-    progress.message ('Finalizing...')
+    progress.message ('Dispatching...')
 
-    # finalize solver
-    info_solver = config.solver.finalize (config.level, config.type, self.parallelization)
+    # dispatch all samples
+    info_solver = config.solver.dispatch (config.level, config.type, self.parallelization)
 
     # print combined info: MC info and additional (scheduler-related) information from the solver
     info = progress.message (info_solver)
@@ -246,7 +246,7 @@ class MC (object):
           self.results [i] = None
             
     loaded = [ i for i, result in enumerate (self.results) if result != None ]
-
+    
     self.available = (len (loaded) > 0)
 
     return loaded
@@ -260,4 +260,4 @@ class MC (object):
     
     # assemble MC estimates using only specified subset of all samples
     for stat in self.stats:
-      stat.steps ( self.results, indices=indices, qois=qois )
+      stat.evaluate ( self.results, indices=indices, qois=qois )

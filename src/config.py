@@ -22,6 +22,7 @@ import numpy
 
 # === additional Python paths
 
+sys.path.append ( os.path.join (os.path.dirname(__file__), 'dataclass' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'solver' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'samples' ) )
 sys.path.append ( os.path.join (os.path.dirname(__file__), 'scheduler' ) )

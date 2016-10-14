@@ -9,20 +9,26 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import numpy
-import copy
+import copy, os
 
-class Time_Series (object):
-  
-  def __init__ (self):
-    
-    # somehow this is needed here --
-    # otherwise I get non-empty dictionaries upon instantiation
+class Series (object):
+
+  name       = 'series'
+  dimensions = 1
+
+  def __init__ (self, filename='statistics.dat', split=('step', 't'), uid='t', span=None, sampling=1000, ranges=None):
+
+    # save configuration
+    vars (self) .update ( locals() )
+
     self.meta = {}
     self.data = {}
-  
-  def load (self, filename, meta_keys):
+
+  def load (self, directory, verbosity):
     
-    outputfile = open ( filename, 'r' )
+    results = copy.deepcopy (self)
+
+    outputfile = open ( os.path.join (directory, self.filename), 'r' )
     
     data = numpy.genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
     records = dict ( (key, data [key]) for key in data.dtype.names )
@@ -30,12 +36,41 @@ class Time_Series (object):
     outputfile.close()
     
     # split metadata from actual data
-    
-    for key in meta_keys:
-      self.meta [key] = records [key]
+    for key in self.split:
+      results.meta [key] = records [key]
       del records [key]
-    self.data = records
-  
+    results.data = records
+
+    # filter out duplicate entries and then sort results
+    if results.uid != None:
+      results.unique ()
+      results.sort   ()
+
+    # interpolate results
+    if results.sampling != None:
+      results.interpolate ()
+
+    # additional meta data
+    results.meta ['xrange'] = results.span
+    results.meta ['xlabel'] = 'time'
+    results.meta ['xunit']  = r'$\mu s$'
+    results.meta ['x']      = results.meta ['t']
+
+    return results
+
+  # returns data for a requested qoi
+  def __getitem__ (self, qoi):
+    return self.data [qoi]
+
+  # stores data for a requested qoi
+  def __setitem__ (self, qoi, data):
+    self.data [qoi] = data
+
+  # serialized access to data
+  def serialize (self, qoi):
+    return self.data [qoi]
+
+  '''
   def append (self, filename, meta_keys):
     
     outputfile = open ( filename, 'r' )
@@ -217,14 +252,15 @@ class Time_Series (object):
     for key in self.data.keys():
       if key not in records.keys():
         self.data [key] = numpy.append ( self.data [key], nan_array )
-  
+  '''
+
   # filter out duplicate entries (keep the first occurrence only)
-  def unique (self, key):
+  def unique (self):
     
     # obtain positions of duplicate entries
     positions = []
     values    = []
-    for position, value in enumerate (self.meta ['step']):
+    for position, value in enumerate (self.meta [self.uid]):
       if value in values:
         positions .append (position)
       else:
@@ -238,11 +274,11 @@ class Time_Series (object):
     for key in self.data.keys():
       self.data [key] = numpy.delete ( self.data [key], positions )
   
-  def sort (self, key):
+  def sort (self):
     
     # obtain sorting order
-    order = numpy.argsort (self.meta [key])
-
+    order = numpy.argsort (self.meta [self.uid])
+    
     # sort metadata
     for key in self.meta.keys():
       self.meta [key] = self.meta [key] [order]
@@ -251,15 +287,18 @@ class Time_Series (object):
     for key in self.data.keys():
       self.data [key] = self.data [key] [order]
   
-  def interpolate (self, points, begin=None, end=None):
+  def interpolate (self):
+
+    begin = self.span [0]
+    end   = self.span [1]
+
+    if begin == None: begin = self.meta [self.uid] [0]
+    if end   == None: end   = self.meta [self.uid] [-1]
     
-    if begin == None: begin = self.meta ['t'] [0]
-    if end   == None: end   = self.meta ['t'] [-1]
+    leftnan  = numpy.abs (begin - self.meta [self.uid] [0] ) > 0.01 * numpy.abs (end - begin)
+    rightnan = numpy.abs (end   - self.meta [self.uid] [-1]) > 0.01 * numpy.abs (end - begin)
     
-    leftnan  = numpy.abs (begin - self.meta ['t'] [0] ) > 0.1 * numpy.abs (end - begin)
-    rightnan = numpy.abs (end   - self.meta ['t'] [-1]) > 0.1 * numpy.abs (end - begin)
-    
-    times = numpy.linspace ( begin, end, points )
+    times = numpy.linspace ( begin, end, self.sampling )
     for key in self.data.keys():
       if leftnan:
         left = float ('nan')
@@ -269,18 +308,28 @@ class Time_Series (object):
         right = float ('nan')
       else:
         right = self.data [key] [-1]
-      self.data [key] = numpy.interp ( times, self.meta ['t'], self.data [key], left=left, right=right )
+      self.data [key] = numpy.interp ( times, self.meta [self.uid], self.data [key], left=left, right=right )
     
-    self.meta ['t']  = times
+    self.meta [self.uid] = times
   
-  def clip (self, ranges):
-    for qoi, lower, upper in ranges:
+  def clip (self, range=None):
+
+    if range:
+      (lower, upper) = range
       for key in self.data.keys():
-        if qoi in key:
-          if lower != None:
-            self.data [key] = numpy.maximum ( lower, self.data [key] )
-          if upper != None:
-            self.data [key] = numpy.minimum ( upper, self.data [key] )
+        if lower != None:
+          self.data [key] = numpy.maximum ( lower, self.data [key] )
+        if upper != None:
+          self.data [key] = numpy.minimum ( upper, self.data [key] )
+
+    if self.ranges and not range:
+      for key in self.data.keys():
+        for qoi, (lower, upper) in self.ranges.iteritems():
+          if qoi in key:
+            if lower != None:
+              self.data [key] = numpy.maximum ( lower, self.data [key] )
+            if upper != None:
+              self.data [key] = numpy.minimum ( upper, self.data [key] )
 
   def init (self, a):
     self.meta = a.meta
@@ -288,9 +337,12 @@ class Time_Series (object):
       self.data [key] = numpy.zeros ( len ( a.data [key] ) )
 
   def resize (self, size):
+
     for key in self.data.keys():
-      shape = (len (self.data [key]), size) if size > 1 else len (self.data [key])
-      self.data [key] = numpy.empty (shape)
+      shape = self.data [key] .shape
+      if size > 1:
+        shape += tuple([size])
+      self.data [key] = numpy.full (shape, float ('nan'))
 
   def __rmul__ (self, a):
     result = copy.deepcopy (self)

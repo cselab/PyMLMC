@@ -17,14 +17,16 @@ class Deviations (Stat):
   def __init__ (self, name=None, factor=1):
     
     self.size   = 2
-    self.limit = 2
+    self.limit  = 2
+    self.online = 0
+    
     self.factor = factor
     self.alpha  = min (1.0, 0.2 + 0.3 * factor)
     
     if name == None:
       self.name = 'mean +/- %d std. dev.' % self.factor
-
-    self.clip = 0
+    
+    self.clip = [-float('inf'), float('inf')]
     
   # compute mean and standard deviation
   def compute (self, samples, extent):

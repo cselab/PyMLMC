@@ -13,6 +13,7 @@
 # discretization = N
 
 from solver import Solver
+from dataclass_series import Series
 import local
 import os, subprocess
 
@@ -24,7 +25,7 @@ class Integral2D (Solver):
   # 'name'          name of this solver (used as prefix for the job names, so better keep it short, ~4-6 characters)
   # 'workunit'      estimated workunit (in core hours), such that runtime = workunit * solver.work (resolution)
   # 'init'          function to execute before starting each simulation; format: 'init (seed)'
-  def __init__ (self, options='', path=None, name='int2d', workunit=None, init=None):
+  def __init__ (self, path=None, name='int2d', workunit=None, init=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -38,6 +39,9 @@ class Integral2D (Solver):
 
     # default workunit
     if not workunit: workunit = 1e-4
+
+    # default setup
+    self.dataclass = Series
 
     # name of the relevant output file
     self.outputfile = 'output.dat'

@@ -29,8 +29,10 @@ class Status (object):
   
   # save status
   def save (self, config):
-  
-    with open ( os.path.join (config.root, self.status_file + ('' if config.deterministic else '.%d' % config.iteration)), 'w' ) as f:
+
+    statusfile = self.status_file + ('' if config.deterministic else '.%d' % config.iteration)
+
+    with open ( os.path.join (config.root, statusfile), 'w' ) as f:
 
       f.write ( 'iteration = %d\n' % config.iteration )
 
@@ -61,7 +63,7 @@ class Status (object):
         cores [level] [type] = config.scheduler.parallelizations [level] [type] .cores
       f.write ( 'parallelization = %s' % cores + '\n' )
 
-      f.write ( 'works = %s' % str(config.works) + '\n' )
+      f.write ( 'works = %s' % str(list[config.works]) + '\n' )
 
       walltimes = helpers.level_type_list (config.levels)
       for level, type in config.levels_types:
@@ -69,7 +71,7 @@ class Status (object):
       f.write ( 'walltimes = %s' % walltimes + '\n' )
 
     print
-    print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, self.status_file))
+    print (' :: INFO: MLMC status saved to %s' % os.path.join (config.root, statusfile))
   
   # load status
   def load (self, config):

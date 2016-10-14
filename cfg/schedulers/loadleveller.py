@@ -81,7 +81,7 @@ simple_job = '''runjob \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
   %(envs)s \
-  : %(cmd)s %(options)s
+  : %(cmd)s
   '''
 
 # MPI run command
@@ -92,7 +92,7 @@ mpi_job = '''runjob \
   --envs OMP_NUM_THREADS=%(threads)d \
   --envs XLSMPOPTS=parthds=%(threads)d \
   %(envs)s \
-  : %(cmd)s %(options)s
+  : %(cmd)s
   '''
 
 # submission script template

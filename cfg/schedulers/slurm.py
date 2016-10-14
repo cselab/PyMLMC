@@ -63,10 +63,10 @@ def get_shape (nodes):
 envs = ''
 
 # simple run command
-simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s %(options)s'
+simple_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s %(cmd)s'
 
 # MPI run command
-mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d --ntasks-per-node %(tasks)d -c %(threads)d %(cmd)s %(options)s'
+mpi_job = 'export OMP_NUM_THREADS=%(threads)d; %(envs)s srun -n %(ranks)d --ntasks-per-node %(tasks)d -c %(threads)d %(cmd)s'
 
 # submission script template
 script = '''#!/bin/bash

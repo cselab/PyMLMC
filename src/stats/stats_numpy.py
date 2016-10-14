@@ -14,10 +14,11 @@ import warnings
 
 class NumPy_Stat (Stat):
   
-  def __init__ (self, stat, name=None, params=None):
+  def __init__ (self, stat, name=None, params=None, clip=None):
     
-    self.size  = 1
-    self.limit = 1
+    self.size   = 1
+    self.limit  = 1
+    self.online = 0
 
     self.stat = getattr ( numpy, stat )
 
@@ -27,6 +28,7 @@ class NumPy_Stat (Stat):
       self.name = stat
     
     self.params = params
+    self.clip   = clip
   
   # compute statistic 'self.stat' of given samples
   def compute (self, samples, extent):

@@ -16,7 +16,8 @@ from numpy import round, floor, ceil
 class Static (Scheduler):
   
   def __init__ ( self, nodes=None, walltime=None, cores=None, email='', separate=0, batchsize=1, limit=None, ratios=None ):
-    
+
+    self.name      = 'static'
     self.walltime  = walltime
     self.nodes     = nodes
     self.cores     = cores
@@ -27,10 +28,6 @@ class Static (Scheduler):
     self.ratios    = ratios
   
   def distribute (self):
-    
-    print
-    print ' :: SCHEDULER: static'
-    self.report ()
 
     for level, type in self.levels_types:
 
@@ -47,7 +44,7 @@ class Static (Scheduler):
       required = self.cores * float (self.ratios [level - type]) / float (self.ratios [self.L])
 
       # round the result
-      cores = int ( round ( required ) )
+      cores = int ( ceil ( required ) )
 
       # respect the minimal amount of cores on the machine, if merging is not active for this level
       if not self.merge [level] [type]:
@@ -60,4 +57,4 @@ class Static (Scheduler):
       walltime /= self.batchsize
 
       # construct parallelization according to all computed parameters
-      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], self.limit, self.merge [level] [type], self.email )
+      self.parallelizations [level] [type] = Parallelization ( cores, walltime, self.sharedmem, self.batch [level] [type], self.merge [level] [type], self.email, self.limit )

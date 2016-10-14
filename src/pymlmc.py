@@ -48,12 +48,12 @@ class MLMC (object):
     
     # status
     self.status = Status ()
-    
-    # setup solver
-    self.config.solver.setup ( self.params, self.config.root, self.config.deterministic, self.config.recycle )
 
     # setup scheduler
     self.config.scheduler.setup ( self.config.levels, self.config.levels_types, self.config.works, self.config.core_ratios, self.config.solver.sharedmem )
+
+    # setup solver
+    self.config.solver.setup ( self.config.scheduler, self.params, self.config.root, self.config.deterministic, self.config.recycle )
 
     # setup samples
     self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate, self.config.recycle )
@@ -67,9 +67,10 @@ class MLMC (object):
     # availability
     self.available = 0
     
-    # submission file name
+    # default file names
     self.submission_file = 'queue.dat'
-  
+    self.progress_file   = 'progress.dat'
+
   # change root of the MLMC simulation
   def chroot (self, root):
     
@@ -88,6 +89,9 @@ class MLMC (object):
     # check for consistency
     if self.params.restart and self.params.proceed:
       helpers.error ('Both \'-r\' (--restart) and \'-p\' (--proceed) were specified.', advice='Use either of the options, not both.')
+
+    # report scheduler
+    self.config.scheduler.report ()
 
     # initial phase
     if self.params.restart:
@@ -117,7 +121,7 @@ class MLMC (object):
     
     # make indices for the required number of samples
     self.config.samples.make ()
-    
+
     # distribute initial samples
     self.config.scheduler.distribute ()
     
@@ -140,7 +144,7 @@ class MLMC (object):
     self.save ()
     
     # for clusters: if non-interactive session -> exit
-    if local.cluster and not self.params.interactive:
+    if not self.params.interactive:
       print
       print ' :: INFO: Non-interactive mode specified -> exiting.'
       print '  : -> Run PyMLMC with \'-i\' option for an interactive mode.'
@@ -155,6 +159,10 @@ class MLMC (object):
       # load MLMC simulation
       self.load ()
 
+      # check availability
+      if not self.available:
+        helpers.error ('No results were loaded - exiting...')
+
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
@@ -163,7 +171,7 @@ class MLMC (object):
       self.config.samples.append ()
 
       # compute, report, and save error indicators
-      self.indicators.compute (self.mcs, self.config.samples.indices.loaded)
+      self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
       self.indicators.report  ()
       self.indicators.save    (self.config.iteration)
 
@@ -647,23 +655,31 @@ class MLMC (object):
     if not self.params.interactive:
       self.join ()
 
+    # open progress file
+    f = open (self.progress_file, 'w')
+
     # load the results from MC simulations and report
     from helpers import intf
-    print
-    print ' :: LOADING RESULTS:'
+    header = ' :: LOADING RESULTS:'
 
     if self.config.recycle:
-      print '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
-      print '  :-------------------------------------------------------------------|'
+      header += '\n' + '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
+      header += '\n' + '  :-------------------------------------------------------------------|'
       format = '  :      %d  |    %s  |   %s  |   %s  |   %s   |   %s'
 
     else:
-      print '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
-      print '  :------------------------------------------------------------------------------|'
+      header += '\n' + '  :  LEVEL  |   TYPE   |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
+      header += '\n' + '  :------------------------------------------------------------------------------|'
       format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |   %s'
+
+    print
+    print header
 
     # candidate for the coarsest level
     self.L0 = None
+
+    # buffer
+    buffer = ''
 
     # load all levels
     for level in self.config.levels:
@@ -679,10 +695,6 @@ class MLMC (object):
         loaded  [type] = mc.load ()
         invalid [type] = mc.invalid ()
 
-        # check if at least one sample at some level with type FINE
-        if mc.available and mc.config.type == self.config.FINE:
-          self.available = 1
-
         # report
         typestr    = [' FINE ', 'COARSE'] [mc.config.type]
         samplesstr = intf(len(mc.config.samples), table=1)
@@ -695,12 +707,20 @@ class MLMC (object):
         else:
           invalidstr += '   |'
         if self.config.recycle:
-          print format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+          string = format % (mc.config.level, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+          print string
+          buffer += '\n' + string
         else:
-          print format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+          string = format % (mc.config.level, typestr, samplesstr, loadedstr, failedstr, pendingstr, invalidstr)
+          print string
+          buffer += '\n' + string
 
         # remove invalid samples
         loaded [type] = list ( set (loaded [type]) - set (invalid [type]) )
+
+        # check if at least one sample at some level and type
+        if mc.available:
+          self.available = 1
 
       # loading is level-dependent (i.e. for non-coarsest levels, samples of both types should be loaded)
       if self.L0 == None:
@@ -723,17 +743,32 @@ class MLMC (object):
       self.config.samples.indices.invalid [level] = list ( set (invalid [self.config.FINE]) | set (invalid [self.config.COARSE]) )
       self.config.samples.counts.invalid  [level] = len (self.config.samples.indices.invalid [level])
 
+    # save progress to a file
+    f.write (header + buffer)
+
     # report how many pairs of fine and course samples were loaded
-    print
-    print ' :: LOADED VALID PAIRS (FINE & COARSE):'
-    print '  :  LEVEL  |  SAMPLES  |  INCLUDED  |  EXCLUDED  |'
-    print '  :-----------------------------------------------|'
+    header = ' :: LOADED VALID PAIRS (FINE & COARSE):'
+    header += '\n' + '  :  LEVEL  |  SAMPLES  |  INCLUDED  |  EXCLUDED  |'
+    header += '\n' + '  :-----------------------------------------------|'
     format = '  :      %d  |    %s  |    %s   |    %s   |'
+
+    print
+    print header
+
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
       failedstr = intf (self.config.samples.counts.failed [level], table=1, empty=1)
-      print format % (level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
-    
+      string = format % (level, intf (self.config.samples.counts.combined [level], table=1), loadedstr, failedstr)
+      buffer += '\n' + string
+      print string
+
+    # save progress to a file
+    f.write ('\n\n')
+    f.write (header + buffer)
+
+    # close progress file
+    f.close ()
+
     # report detailed progrees of individual samples
     self.progress ()
 
@@ -743,11 +778,11 @@ class MLMC (object):
   # report dedailed progress of individual samples
   def progress (self):
 
-    yes = helpers.query ('Show detailed progress of individual samples?')
-
-    if not yes:
+    reply = helpers.query ('Show detailed progress of individual samples?', default='n', exit=0)
+    
+    if reply != 'y':
       return
-
+    
     print
     print ' :: PROGRESS:'
     
@@ -755,82 +790,97 @@ class MLMC (object):
       mc.progress ()
 
   # assemble MC and MLMC estimates
-  def assemble (self, stats, qois=None):
+  def assemble (self, stats, qois=None, clip=True):
 
-    # check if statistics can be assembled (at least one sample at some level with type 0)
+    # check if at least one sample at some level
+    self.available = [ count for count in self.config.samples.counts.loaded if count > 0 ] != []
     if not self.available:
       helpers.error ('Statistics can not be assembled')
-
+    
     print
     print ' :: ASSEMBLING:'
 
     # report quantities of interest to be assembled
     if qois != None:
 
-      print '  : Specified qois:'
+      print '  : Specified qois:',
       for qoi in qois.keys():
         print qoi,
       print
     
     # assemble MC estimates on all levels and types for each statistic
     print '  : MC estimates...'
-    for mc in self.mcs:
-      mc.assemble (stats, self.config.samples.indices.loaded [mc.config.level], qois)
 
+    for mc in self.mcs:
+
+      # bugfix when self.L0 != 0
+      if mc.config.level == self.L0 and mc.config.type == self.config.COARSE:
+        indices = []
+      else:
+        indices = self.config.samples.indices.loaded [mc.config.level]
+      
+      # assemble MC estimate
+      mc.assemble (stats, indices, qois)
+    
     # assemble differences of MC estimates between type = 0 and type = 1 on all levels for each statistic
     print '  : Differences of MC estimates...'
     self.diffs = [ copy.deepcopy (stats) for level in self.config.levels ]
-
-    # coarsest level difference is just a plain MC estimate
+    
+    # coarsest level difference is just a plain MC estimate (for all statistics)
     # TODO: what if this estimate is missing?
-    for index, stat in enumerate (self.diffs [self.L0]):
-      stat.estimate = self.indicators.coefficients.values [self.L0] * self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats [index] .estimate
+    for index, stat in enumerate ( self.mcs [ self.config.pick [self.L0] [self.config.FINE] ] .stats ):
+      if stat.available:
+        self.diffs [self.L0] [index] .estimate  = stat.estimate
+        self.diffs [self.L0] [index] .available = stat.available
     
     # assemble differences of the remaining levels
     for level in self.config.levels [self.L0 + 1 : ]:
-
+      
       # assemble all statistics
       for index, stat in enumerate (self.diffs [level]):
 
-        # assemble the difference
+        # check if both required components of the difference are available
+        if not self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .available:
+          stat.available = 0
+          continue
+        if not self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .available:
+          stat.available = 0
+          continue
         stat.available = 1
 
         # assemble the FINE term
-        if self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .available:
-          stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
-        else:
-          stat.estimate = stat.empty()
-          stat.available = 0
-
+        stat.estimate  = self.indicators.coefficients.values [level]     * self.mcs [ self.config.pick [level] [self.config.FINE  ] ] .stats [index] .estimate
+        
         # assemble the COARSE term
-        if self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .available:
-          stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
-        else:
-          stat.estimate = stat.empty()
-          stat.available = 0
-
+        stat.estimate -= self.indicators.coefficients.values [level - 1] * self.mcs [ self.config.pick [level] [self.config.COARSE] ] .stats [index] .estimate
+        
     # assemble MLMC estimates (sum of differences for each statistic)
     print '  : MLMC estimates...'
     self.stats = copy.deepcopy (stats)
 
-    # for each statistic
+    # check if all stats are available for the coarsest level
+    available = [ stat for stat in self.diffs [self.L0] if not stat.available ] == []
+
+    # report if a level is missing
+    if not available:
+      helpers.warning ('Some statistics are not available for the coarsest level %d in MLMC assembly!' % self.L0)
+      self.available = 0
+      return
+    
+    # copy coarsest difference for each statistic
     for index, stat in enumerate (self.stats):
-
-      # copy coarsest difference
-      stat.estimate = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
-
+      stat.estimate  = copy.deepcopy (self.diffs [self.L0] [index] .estimate)
+      stat.available = self.diffs [self.L0] [index] .available
+    
     # add remaining differences
     for level in self.config.levels [self.L0 + 1 : ]:
 
       # check if all stats are available
-      available = 1
-      for stat in self.diffs [level]:
-        if not stat.available:
-          available = 0
+      available = [ stat for stat in self.diffs [level] if not stat.available ] == []
       
       # report if a level is missing
       if not available:
-        helpers.warning ('Level %d is missing in MLMC assembly, leading to an increase in bias!' % level)
+        helpers.warning ('Some statistics at level %d are missing in MLMC assembly, leading to an increase in bias!' % level)
         continue
 
       # add up statistics
@@ -839,8 +889,11 @@ class MLMC (object):
 
     print '  : DONE'
 
+    # clip MLMC estimates, if specified
+    if clip: self.clip ()
+
   # clip MLMC estimates
-  def clip (self, ranges):
+  def clip (self):
     
     print
     print ' :: CLIPPING MLMC estimates...'
@@ -848,16 +901,13 @@ class MLMC (object):
     # apply prescribed ranges for all stats
     for stat in self.stats:
 
-      # only if clipping is required
-      if stat.clip:
-
-        # if global clipping is specified, clip all qois accordingly
-        if isinstance ( stat.clip, (list, tuple) ):
-          stat.estimate.clip ( [ [ '', stat.clip [0], stat.clip [1] ] ] )
+      # if global clipping is required by the statistic, clip all qois accordingly
+      if stat.clip and stat.available:
+        stat.estimate.clip (stat.clip)
         
-        # otherwise clip according to the specified ranges
-        else:
-          stat.estimate.clip (ranges)
+      # otherwise clip according to ranges specified in the dataclass
+      elif stat.available:
+        stat.estimate.clip ()
 
     print '  : DONE'
 

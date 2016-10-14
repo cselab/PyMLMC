@@ -31,9 +31,10 @@ class Solver (object):
   path       = None
   init       = None
   workunit   = 1
-  
+  batch      = []
+
   # common setup routines
-  def setup (self, params, root, deterministic, recycle):
+  def setup (self, scheduler, params, root, deterministic, recycle):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -102,7 +103,7 @@ class Solver (object):
     try:
       return os.environ [var]
     except:
-      helpers.warning ('environment variable %s not set' % var, details = 'Using path = None')
+      helpers.warning ('environment variable %s not set' % var, details = 'Using: path = None')
       return None
 
   # make file executable
@@ -117,8 +118,8 @@ class Solver (object):
     
     else:
       if self.recycle:
-        dir = '%d%s' % (level, ['f', 'c'] [type])
-        #dir = '%d' % level
+        #dir = '%d%s' % (level, ['f', 'c'] [type])
+        dir = '%d' % level
       else:
         #dir = '%d_%d' % (level, type)
         dir = '%d%s' % (level, ['f', 'c'] [type])
@@ -143,7 +144,7 @@ class Solver (object):
       return '%s_%s%s' % (self.name, dir, suffix) + ('.%d' % self.iteration if iteration else '')
   
   # assemble job command
-  def job (self, args, block=0, corner=0, shape=None):
+  def job (self, args, block=0, corner=0, shape=None, wrap=True):
     
     # cluster run
     if local.cluster:
@@ -159,6 +160,12 @@ class Solver (object):
       
       # assemble executable command
       args ['cmd'] = self.cmd % args
+
+    # if no wrapping is required
+    if not wrap:
+
+      # return plain execution command only
+      return args ['cmd']
 
     # set default harware topology arguments
     args ['block']  = block
@@ -208,7 +215,7 @@ class Solver (object):
     
     # create jobfile
     jobfile = os.path.join (directory, self.jobfile + suffix)
-    with open ( jobfile, 'w') as f:
+    with open ( jobfile, 'w' ) as f:
       f.write ('#!/bin/bash\n')
       f.write (job)
       self.chmodx (jobfile)
@@ -256,9 +263,6 @@ class Solver (object):
   # for parallelization.batch = 1, all jobs (for specified level and type) are combined into several batch scripts
   def launch (self, args, parallelization, level, type, sample):
 
-    # append options to args
-    args ['options'] = self.options
-
     # append sample to args
     args ['sample'] = sample
 
@@ -269,8 +273,8 @@ class Solver (object):
     if not self.params.proceed:
       self.prepare (directory, args ['seed'])
     
-    # cluster run 
-    if local.cluster:
+    # cluster run or specific dispatch routine
+    if local.cluster or self.scheduler.dispatch != None:
       
       # if batch mode -> add job to batch
       if parallelization.batch:
@@ -304,15 +308,22 @@ class Solver (object):
     # if specified, execute solver init script
     if self.init and not self.params.noinit:
       self.init (directory, seed)
+  
+  # fork job to background
+  def fork (self, job):
+    return '(\n\n%s\n\n) &\n' % job
 
+  # add synchronization
+  def sync (self):
+    return '\n' + 'wait'
+  
   # add booting and freeing
   def boot (self, job, block=0):
 
     if local.boot and local.free:
       boot = local.boot % {'block' : block}
-      wait = 'wait'
       free = local.free % {'block' : block}
-      job = '%s\n\n%s\n%s\n%s\n' % (boot, job, wait, free)
+      job = '%s\n\n%s\n\n%s\n' % (boot, job, free)
       return job
 
     else:
@@ -359,18 +370,34 @@ class Solver (object):
 
     return wrapped
 
-  # finalize solver
-  def finalize (self, level, type, parallelization):
-    
+  # dispatch all jobs
+  def dispatch (self, level, type, parallelization):
+
+    # get directory
+    directory = self.directory (level, type)
+
+    # if available, use scheduler's dispatch routine
+    if self.scheduler.dispatch != None:
+
+      # set label
+      label = self.label (level, type)
+
+      jobs = [ self.job (args, wrap=False) for args in self.batch ]
+
+      # dispatch and get info
+      info = self.scheduler.dispatch (self.batch, jobs, directory, label, parallelization)
+
+      # empty queue
+      self.batch = []
+
+      return info
+
     # if batch mode -> submit batch job(s)
     if local.cluster and parallelization.batch:
 
       # suffix format for batch jobs and ensembles
       suffix_format = '.%s%03d'
 
-      # get directory
-      directory = self.directory (level, type)
-      
       # split batch job into smaller batches according to 'parallelization.batchmax'
       if parallelization.batchmax:
         batches = helpers.chunks (self.batch, parallelization.batchmax)
@@ -397,6 +424,9 @@ class Solver (object):
 
           # submit
           self.execute ( self.submit (batch, parallelization, label, directory, suffix=suffix, timer=1), directory )
+
+        # empty queue
+        self.batch = []
 
         return ''
 
@@ -485,7 +515,7 @@ class Solver (object):
 
               # end of header for the batch job
               subensemble += '\n'
-
+              
               # append additional parameters to 'args'
               jobs = []
               for args in batch:
@@ -501,23 +531,29 @@ class Solver (object):
                 batch = local.timer.rstrip() % { 'job' : '\n\n' + batch + '\n', 'timerfile' : self.timerfile + suffix_format % ('b', index) }
 
               # fork to background (such that other batch jobs in subensemble could proceed)
-              batch = '(\n\n%s\n\n) &\n' % batch
+              if subblocks > 1:
+                batch = self.fork (batch)
 
               # add batch job to the subensemble
               subensemble += batch
+            
+            # add synchronization
+            if subblocks > 1:
+              subensemble += self.sync ()
 
             # add block booting and block freeing
             subensemble = self.boot (subensemble, block)
 
             # fork to background (such that other subensemble jobs in ensemble could proceed)
-            if subblocks != 1:
-              subensemble = '(\n\n%s\n\n) &\n' % subensemble
+            if merge > 1:
+              subensemble = self.fork (subensemble)
 
             # add batch job to the ensemble
             ensemble += subensemble
           
-          # add sinchronization
-          ensemble += '\n' + 'wait'
+          # add synchronization
+          if merge > 1:
+            ensemble += self.sync()
 
           # adjust parallelization according to the number of subblocks
           parallelization.nodes *= subblocks
@@ -528,6 +564,9 @@ class Solver (object):
 
           # update 'submitted' counter
           submitted += size
+
+        # empty queue
+        self.batch = []
 
         # return information about ensembles
         from helpers import intf

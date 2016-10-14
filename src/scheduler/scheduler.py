@@ -12,6 +12,9 @@ from parallelization import *
 
 class Scheduler (object):
 
+  dispatch = None
+  limit    = None
+  
   def setup (self, levels, levels_types, works, core_ratios, sharedmem):
 
     vars (self) .update ( locals() )
@@ -52,6 +55,8 @@ class Scheduler (object):
 
   def report (self):
 
+    print
+    print ' :: SCHEDULER: %s' % self.name
     if len (self.ratios) > 1:
       print '  : Requested core ratios on each resolution level:'
       print '    %s' % str (self.ratios)

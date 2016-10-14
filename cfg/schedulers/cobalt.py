@@ -89,7 +89,7 @@ runjob \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
 %(envs)s \
-: %(cmd)s %(options)s
+: %(cmd)s
 '''
 
 # MPI run command
@@ -101,7 +101,7 @@ runjob \
 --envs OMP_NUM_THREADS=%(threads)d \
 --envs XLSMPOPTS=parthds=%(threads)d \
 %(envs)s \
-: %(cmd)s %(options)s
+: %(cmd)s
 '''
 
 # block boot

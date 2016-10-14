@@ -12,7 +12,6 @@
 # discretization = {'NX' : ?, 'NY' : ?, 'NZ' : ?, 'NS' : ?}
 
 from solver import Solver
-from dataclass import Time_Series
 import local
 import helpers
 
@@ -22,7 +21,7 @@ import os
 
 class CubismMPCF (Solver):
   
-  def __init__ (self, tend, options='', path=None, name='mpcf', points=1000, bs=32, workunit=None, init=None, indicator=None, distance=None, norm='max'):
+  def __init__ (self, tend, options='', qoi=None, path=None, name='mpcf', bs=32, workunit=None, init=None, indicator=None, distance=None, norm='max', dataclass=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -37,7 +36,7 @@ class CubismMPCF (Solver):
     if not path: self.path = self.env ('MPCF_CLUSTER_PATH')
     
     # set executable command template
-    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -tend %(tend)f -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d -vp %(vp)d -hdf %(hdf)d'
+    args = '-bpdx %(bpdx)d -bpdy %(bpdy)d -bpdz %(bpdz)d -tend %(tend)f -spongewidth %(spongewidth)d -seed %(seed)d -ncores %(cpucores)d -restart %(proceed)d %(options)s'
     if local.cluster:
       self.cmd = self.executable + ' ' + args + ' ' + '-xpesize %(xpesize)d -ypesize %(ypesize)d -zpesize %(zpesize)d -dispatcher omp'
     else:
@@ -47,38 +46,55 @@ class CubismMPCF (Solver):
     self.sharedmem = 1
 
     # default workunit
-    if not workunit: workunit = 2 * tend * float (8192 * 16 * 24) / (4096 ** 4)
-    
+    if not workunit: self.workunit = 2 * tend * float (8192 * 16 * 24) / (4096 ** 4)
+
+    '''
     # set files
     self.outputfile       = 'statistics.dat'
     self.outputfileformat = 'statistics*.dat'
     self.outputfile_v1    = 'integrals.dat'
+    '''
+
+    # set default dataclass
+    if dataclass == None:
+      from dataclass_series import Series
+      ranges = {}
+      ranges ['p_sen'] = [0, None]
+      ranges ['a2_']   = [0, 1]
+      ranges ['V2_']   = [0, None]
+      ranges ['c_' ]   = [0, None]
+      ranges ['m_' ]   = [0, None]
+      ranges ['M_' ]   = [0, None]
+      ranges ['ke_']   = [0, None]
+      self.dataclass   = Series (filename='statistics.dat', split=('step', 't'), uid='t', span=(0, tend), sampling=1000, ranges=ranges)
 
     # set default quantity of interest
-    self.qoi = 'p_sensor1'
+    if not qoi:
+      qois = { 'series' : 'p_sensor1', 'shells' : 'p', 'slice' : 'p' }
+      self.qoi = qois [self.dataclass.name]
 
     # set indicator
     if not self.indicator:
 
       # maximum-norm based indicator
       if self.norm == 'max':
-        #self.indicator = lambda x : numpy.max ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
-        self.indicator = lambda x : numpy.max ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] )
+        #self.indicator = lambda x : numpy.max ( numpy.abs ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] ) )
+        self.indicator = lambda x : numpy.max ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] )
 
       # 1-norm based indicator
       if self.norm == 1:
-        self.indicator = lambda x : numpy.mean ( numpy.abs ( x.data [self.qoi] [ ~ numpy.isnan (x.data [self.qoi]) ] ) )
+        self.indicator = lambda x : numpy.mean ( numpy.abs ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] ) )
       
     # set distance
     if not self.distance:
 
       if self.norm == 'max':
-        #self.distance = lambda f, c : numpy.abs ( numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) ) if c != None else self.indicator (f)
-        self.distance = lambda f, c : numpy.max ( f.data [self.qoi] [ ~ numpy.isnan (f.data [self.qoi]) ] ) - numpy.max ( c.data [self.qoi] [ ~ numpy.isnan (c.data [self.qoi]) ] ) if c != None else self.indicator (f)
+        #self.distance = lambda f, c : numpy.abs ( numpy.max ( f [self.qoi] [ ~ numpy.isnan (f [self.qoi]) ] ) - numpy.max ( c [self.qoi] [ ~ numpy.isnan (c [self.qoi]) ] ) ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : numpy.max ( f [self.qoi] [ ~ numpy.isnan (f [self.qoi]) ] ) - numpy.max ( c [self.qoi] [ ~ numpy.isnan (c [self.qoi]) ] ) if c != None else self.indicator (f)
 
       # 1-norm based distance
       if self.norm == 1:
-        self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f.data [self.qoi] - c.data [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f [self.qoi] - c [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
 
   # return string representing the resolution of a give discretization 'd'
   def resolution_string (self, d):
@@ -136,9 +152,9 @@ class CubismMPCF (Solver):
     
     # get parallelization args
     args = parallelization.args()
-    
+
     # === set additional arguments
-    
+
     args ['bpdx'] = discretization ['NX'] / self.bs
     args ['bpdy'] = discretization ['NY'] / self.bs
     args ['bpdz'] = discretization ['NZ'] / self.bs
@@ -146,25 +162,12 @@ class CubismMPCF (Solver):
     args ['tend'] = self.tend
     
     args ['spongewidth'] = discretization ['spongewidth']
-    
-    '''
-    if 'NS' in discretization:
-      args ['nsteps'] = discretization ['NS']
-    else:
-      args ['nsteps'] = 0
-    '''
+
+    args ['options']  = self.options
     
     args ['seed'] = seed
     
     args ['proceed'] = params.proceed
-
-    # I/O: use HDF only for resolutions up to 1024^3 (~4GB per channel per snapshot)
-    if discretization ['NX'] * discretization ['NY'] * discretization ['NZ'] <= 1024 ** 3:
-      args ['vp']  = 0
-      args ['hdf'] = 1
-    else:
-      args ['vp']  = 1
-      args ['hdf'] = 0
 
     # cluster run
     if local.cluster:
@@ -183,15 +186,19 @@ class CubismMPCF (Solver):
   def progress (self, results):
 
     time = numpy.max ( [ time for step, time in enumerate (results.meta ['t']) if not numpy.isnan (results.data [self.qoi] [step]) ] )
-
     return float (time) / self.tend
 
-  def load (self, level=0, type=0, sample=0, file=None):
+  def load (self, level=0, type=0, sample=0):
     
+    # load results from the specified directory
+    return self.dataclass.load ( self.directory (level, type, sample), self.params.verbose )
+
+    # TODO: remove legacy code below
+    '''
     # get all available output files for version 2.0
     from glob import glob
-    if file:
-      outputfiles = [self.root + file]
+    if filename:
+      outputfiles = [self.root + filename]
     else:
       outputfileformat = os.path.join ( self.directory (level, type, sample), self.outputfileformat )
       outputfiles = glob (outputfileformat)
@@ -207,7 +214,7 @@ class CubismMPCF (Solver):
         helpers.warning ('Output file does not exist (version 1.0 is also absent)', details = outputfileformat)
       raise Exception ('Output file does not exist')
     
-    results = Time_Series ()
+    results = Series ()
     
     # meta data
     meta_keys    = ( 'step', 't',  'dt' )
@@ -237,15 +244,13 @@ class CubismMPCF (Solver):
     #results .data ['ke_avg'] = numpy.abs (results .data ['ke_avg'])
     
     # correct time dimension
-    '''
-    results .meta ['t'] *= numpy.sqrt(10)
-    base_qois = ['c', 'm', 'u', 'v', 'w', 'W']
-    types = ['_avg', '_min', '_max']
-    for base_qoi in base_qois:
-      for type in types:
-        qoi = base_qoi + type
-        if qoi in results.data: results.data [qoi] /= numpy.sqrt(10)
-    '''
+    #results .meta ['t'] *= numpy.sqrt(10)
+    #base_qois = ['c', 'm', 'u', 'v', 'w', 'W']
+    #types = ['_avg', '_min', '_max']
+    #for base_qoi in base_qois:
+    #  for type in types:
+    #    qoi = base_qoi + type
+    #    if qoi in results.data: results.data [qoi] /= numpy.sqrt(10)
 
     # filter out duplicate entries
     results.unique ('step')
@@ -261,11 +266,9 @@ class CubismMPCF (Solver):
       # are usually different for every simulation
       results .interpolate ( self.points + 1, begin=0, end=self.tend )
       #results .interpolate ( self.points + 1, begin=0, end=self.tend*numpy.sqrt(10) )
-      
-      # compute meta parameters for interpolation
-      results.meta ['dt'] = numpy.diff (results.meta ['t'])
 
     return results
+    '''
 
   def efficiency (self, level=0, type=0, sample=0, file=None):
 
@@ -280,7 +283,7 @@ class CubismMPCF (Solver):
 
       # use the 'timerfile'
       file = os.path.join (directory, self.timerfile)
-
+    
     # parse the file
     efficiencies = []
     if os.path.exists (file):
@@ -305,13 +308,13 @@ class CubismMPCF (Solver):
   # check if the loaded result is invalid
   def invalid (self, results):
 
-    if numpy.isnan (results.data [self.qoi]) .any() or numpy.isinf (results.data [self.qoi]) .any():
-      return 1
-
-    if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
+    if numpy.isnan (results [self.qoi]) .any() or numpy.isinf (results [self.qoi]) .any():
       return 1
 
     '''
+    if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
+      return 1
+
     qois = [ 'c_global_max', 'p_global_max' ]
     for qoi in qois:
       if numpy.isnan (results.data [qoi]) .any() or numpy.isinf (results.data [qoi]) .any():
@@ -319,3 +322,8 @@ class CubismMPCF (Solver):
     '''
 
     return 0
+
+
+
+
+
