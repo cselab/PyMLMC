@@ -68,7 +68,8 @@ class Shells (Series):
       shape = self.data [key] .shape
       if size > 1:
         shape += tuple([size])
-      self.data [key] = numpy.full (shape, float ('nan'))
+      self.data [key] = numpy.empty (shape)
+      self.data [key] .fill (float ('nan'))
 
   def __str__ (self):
 
