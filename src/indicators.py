@@ -38,16 +38,20 @@ class Indicator (object):
     self.start  = start
 
     # weights for each level
-    self.weights  = numpy.full ( len (levels), float ('nan') )
+    self.weights  = numpy.empty (len (levels))
+    self.weights.fill (float('nan'))
 
     # measured values (signed)
-    self.measured = numpy.full ( len (levels), float ('nan') )
+    self.measured = numpy.empty (len (levels))
+    self.measured.fill (float('nan'))
 
     # accuracy of estimates
-    self.accuracy = numpy.full ( len (levels), float ('nan') )
+    self.accuracy = numpy.empty (len (levels))
+    self.accuracy.fill (float('nan'))
 
     # infered values (magnitude)
-    self.infered  = numpy.full ( len (levels), float ('nan') )
+    self.infered  = numpy.empty (len (levels))
+    self.infered.fill (float('nan'))
   
   def __getitem__ (self, key):
     return getattr (self, key)

@@ -687,7 +687,9 @@ class MatPlotLib (object):
       stride = int ( ceil ( steps / samples ) ) 
       if steps % stride != 0:
         padding = stride - steps % stride
-        padded = numpy.vstack ( [ vs, numpy.full ((padding, vs.shape[1]), float('nan')) ] )
+        nans    = numpy.empty ((padding, vs.shape[1]))
+        nans.fill (float('nan'))
+        padded  = numpy.vstack ( [ vs, nans ] )
       else:
         padded = vs
       shape = padded.T.shape
