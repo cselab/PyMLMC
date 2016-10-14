@@ -6,7 +6,7 @@ of deterministic HPC simulation software on super-computers and post-processing 
 
 To obtain a local copy of the repository, execute in terminal:
 ```
-git clone https://sukysjonas@bitbucket.org/sukysjonas/pymlmc.git
+git clone https://github.com/cselab/PyMLMC.git
 ```
 
 Afterwards, copy the appropriate machine configuration file from 'cfg/' to the root of the repository and rename it to 'local.py'
