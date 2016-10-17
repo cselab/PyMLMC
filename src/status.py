@@ -63,7 +63,7 @@ class Status (object):
         cores [level] [type] = config.scheduler.parallelizations [level] [type] .cores
       f.write ( 'parallelization = %s' % cores + '\n' )
 
-      f.write ( 'works = %s' % str(list[config.works]) + '\n' )
+      f.write ( 'works = %s' % config.works + '\n' )
 
       walltimes = helpers.level_type_list (config.levels)
       for level, type in config.levels_types:

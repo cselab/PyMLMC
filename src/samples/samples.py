@@ -92,7 +92,7 @@ class Samples (object):
     vars (self) .update ( locals() )
     
     # if recycling is disabled, a 'sample' is considered to be a pair of fine and coarse samples
-    self.pairworks = works [:]
+    self.pairworks = numpy.array (works)
     if not self.recycle:
       self.pairworks [ 1 : ] += works [ : -1 ]
 
