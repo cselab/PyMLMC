@@ -596,14 +596,13 @@ class Solver (object):
           line = lines [-3]
           if line.strip().split(' ') [0] == 'real':
             return float ( line.strip().split(' ') [-1] )
-      return -1
 
     return None
 
   # report timer results
-  def timer (self, level, type, sample='all'):
+  def timer (self, level, type, sample=None):
 
-    if sample == 'all':
+    if sample == None:
 
       # get directory
       directory = self.directory ( level, type )

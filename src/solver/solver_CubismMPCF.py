@@ -96,7 +96,7 @@ class CubismMPCF (Solver):
       if self.norm == 1:
         self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f [self.qoi] - c [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
 
-  # return string representing the resolution of a give discretization 'd'
+  # return string representing the resolution of a given discretization 'd'
   def resolution_string (self, d):
     from helpers import intf
     if d ['NX'] == d ['NY'] and d ['NX'] == d ['NZ']:

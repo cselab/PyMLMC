@@ -171,14 +171,17 @@ class MC (object):
     else:
       runtimes = [ config.solver.timer ( config.level, config.type, sample ) for sample in config.samples ]
 
+    '''
+    # TODO: this should be set based on status file, not timerfile
     # set maximum runtime for runs that went over walltime limit
-    for sample, runtime in enumerate (runtimes):
+    for index, runtime in enumerate (runtimes):
       if runtime == -1:
         if walltime != None:
-          runtimes [sample] = 3600 * walltime
+          runtimes [index] = 3600 * walltime
         else:
-          runtimes [sample] = None
-
+          runtimes [index] = None
+    '''
+    
     # filter out invalid entries (pending and failed simulations)
     runtimes = [ runtime for runtime in runtimes if runtime != None ]
 

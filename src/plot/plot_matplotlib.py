@@ -14,7 +14,7 @@
 import matplotlib
 
 # for pylab.tight_layout()
-#matplotlib.use('Agg')
+matplotlib.use('agg')
 
 import pylab
 import numpy
@@ -1113,7 +1113,7 @@ class MatPlotLib (object):
   
   # plot results of one sample of the specified level and type
   def sample (self, level=None, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, isolines=None, run=1, trendline=None, smoothen=41, label=None, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
-    
+
     # some dynamic values
     if level == None: level = 'finest'
     if level == 'finest':   level = self.mlmc.config.L
@@ -1400,7 +1400,7 @@ class MatPlotLib (object):
             count += 1
 
           ts = numpy.array ( results.meta ['x'] )
-          vs = numpy.array ( results.data [qoi]  )
+          vs = numpy.array ( results.data [qoi] )
 
           xend = max (xend, numpy.max(ts))
 
@@ -1412,7 +1412,11 @@ class MatPlotLib (object):
           if type == self.mlmc.config.FINE:
             line, = pylab.plot  (ts, vs, linewidth=1, alpha=1.0 )
           else:
-            pylab.plot  (ts, vs, linewidth=1, alpha=0.3, color=line.get_color() )
+            try:
+              color = line.get_color()
+              pylab.plot  (ts, vs, linewidth=1, alpha=0.3, color=color )
+            except:
+              pylab.plot  (ts, vs, linewidth=1, alpha=0.3 )
 
       if log:
         pylab.gca().set_yscale ('log', nonposy='clip')
