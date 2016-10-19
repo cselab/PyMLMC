@@ -205,7 +205,7 @@ def timef (seconds):
   mins = int (seconds / 60) - 60 * hrs
   secs = seconds % 60
 
-  return '%2d:%2d:%2d' % (hrs, mins, secs)
+  return '%02d:%02d:%02d' % (hrs, mins, secs)
 
 # provides an update'able progress bar for the command line
 class Progress (object):
