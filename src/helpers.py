@@ -198,6 +198,15 @@ def load (dir):
   print
   return list
 
+# format time from seconds
+def timef (seconds):
+
+  hrs  = int (seconds / 3600)
+  mins = int (seconds / 60) - 60 * hrs
+  secs = seconds % 60
+
+  return '%2d:%2d:%2d' % (hrs, mins, secs)
+
 # provides an update'able progress bar for the command line
 class Progress (object):
 

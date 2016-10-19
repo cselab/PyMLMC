@@ -494,7 +494,7 @@ class MLMC (object):
         # report walltime
         walltime_sample = self.status.list ['walltimes'] [mc.config.level] [mc.config.type]
         if walltime_sample != 'unknown':
-          walltime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (walltime_sample * 3600) )
+          walltime_sample_str = helpers.timef (walltime_sample * 3600)
           args += (walltime_sample_str, )
         else:
           args += ('   N/A  ', )
@@ -510,8 +510,8 @@ class MLMC (object):
           if runtime_sample ['min'] != None and runtime_sample ['max'] != None:
 
             # runtimes
-            min_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['min']) )
-            max_runtime_sample_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_sample ['max']) )
+            min_runtime_sample_str = helpers.timef (runtime_sample ['min'])
+            max_runtime_sample_str = helpers.timef (runtime_sample ['max'])
             args += ( min_runtime_sample_str, max_runtime_sample_str )
 
             # walltime usage
@@ -581,8 +581,8 @@ class MLMC (object):
           if runtime_batch ['min'] != None and runtime_batch ['max'] != None:
 
             # runtimes
-            min_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['min']) )
-            max_runtime_batch_str = time.strftime ( '%H:%M:%S', time.gmtime (runtime_batch  ['max']) )
+            min_runtime_batch_str = helpers.timef (runtime_batch  ['min'])
+            max_runtime_batch_str = helpers.timef (runtime_batch  ['max'])g
             args += ( min_runtime_batch_str, max_runtime_batch_str )
 
             '''
