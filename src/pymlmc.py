@@ -880,7 +880,7 @@ class MLMC (object):
       
       # report if a level is missing
       if not available:
-        helpers.warning ('Some statistics at level %d are missing in MLMC assembly, leading to an increase in bias!' % level)
+        helpers.warning ('Level %d is missing in MLMC assembly, leading to an increase in bias!' % level)
         continue
 
       # add up statistics

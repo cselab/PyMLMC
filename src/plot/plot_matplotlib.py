@@ -550,7 +550,7 @@ class MatPlotLib (object):
   # center extent
   def center_extent (self, qoi, extent):
 
-    if extent:
+    if extent and extent [0] != None and exent [1] != None:
       extent_range    = extent [1] - extent [0]
       extent_centered = ( - 0.5 * extent_range, 0.5 * extent_range )
     elif '_pos_d' in qoi:
@@ -558,8 +558,10 @@ class MatPlotLib (object):
     else:
       extent_centered = None
 
+    '''
     if 'shell' in qoi and extent_centered != None:
       extent_centered = [ 2 * extent_centered [0], 2 * extent_centered [1] ]
+    '''
 
     return extent_centered
 
