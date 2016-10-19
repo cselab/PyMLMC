@@ -718,8 +718,8 @@ class MatPlotLib (object):
     else:
       norm = None
 
-    interpolation = 'none'
-    #interpolation = 'hermite'
+    #interpolation = 'none'
+    interpolation = 'hermite'
 
     pylab.imshow (numpy.transpose (masked), cmap=cmap, origin='lower', aspect='auto', norm=norm, extent=extent, interpolation=interpolation, vmin=vmin, vmax=vmax)
     colorbar = pylab.colorbar ()
@@ -818,7 +818,7 @@ class MatPlotLib (object):
         else:
           cmap = matplotlib.colors.LinearSegmentedColormap.from_list ( 'gradient', ['white', color (qoi)] )
 
-        pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect=aspect, norm=norm, extent=data_extent, interpolation='none', vmin=vmin, vmax=vmax)
+        pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect=aspect, norm=norm, extent=data_extent, interpolation='hermite', vmin=vmin, vmax=vmax)
         pylab.colorbar ()
 
         pylab.xlabel ('%s [%s]' % (stat.estimate.meta ['xlabel'], stat.estimate.meta ['xunit']))
@@ -1215,7 +1215,7 @@ class MatPlotLib (object):
         else:
           aspect = 'equal'
 
-        pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect=aspect, norm=norm, extent=data_extent, interpolation='none', vmin=vmin, vmax=vmax)
+        pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect=aspect, norm=norm, extent=data_extent, interpolation='hermite', vmin=vmin, vmax=vmax)
         pylab.colorbar ()
 
         if axis != None:
@@ -1737,7 +1737,7 @@ class MatPlotLib (object):
       pylab.errorbar (levels, numpy.abs (mean_measured) / NORMALIZATION, yerr=mean_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
       pylab.semilogy (levels, numpy.abs (mean_measured) / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, mean_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='measured')
+    pylab.semilogy (levels, mean_infered              / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
