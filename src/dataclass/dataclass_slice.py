@@ -24,7 +24,7 @@ class Slice (object):
     vars (self) .update ( locals() )
     
     self.filename = 'data_%06d-%s_slice%d.h5'
-    self.qoinames = { 'p' : 'pressure', 'a' : 'alpha', 'r' : 'density' }
+    self.qoinames = { 'p' : 'pressure', 'a' : 'alpha', 'm' : 'velocity', 'r' : 'density' }
     self.logsfile  = 'dump.log'
 
     self.meta = {}
@@ -64,6 +64,10 @@ class Slice (object):
       
       # remove trivial dimensions
       results.data [qoi] = numpy.squeeze (results.data [qoi])
+
+      # compute magnitude of vector-valued elements
+      if results.data [qoi] .ndim > 2:
+        results.data [qoi] = numpy.linalg.norm (results.data [qoi], norm=2, axis=2)
     
     # load meta data
     results.meta = {}

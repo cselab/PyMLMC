@@ -711,7 +711,7 @@ class MatPlotLib (object):
       colors = [ brighten ( color (qoi), factor=1.0 ), color (qoi) ]
       cmap = matplotlib.colors.LinearSegmentedColormap.from_list ( 'gradient', colors )
 
-    masked = numpy.where ( downsampled == 0.0, float ('nan'), downsampled )
+    masked = numpy.where ( downsampled == 0.0, 1e-16, downsampled )
 
     if log and not centered:
       from matplotlib.colors import LogNorm
