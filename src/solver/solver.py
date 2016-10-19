@@ -14,6 +14,7 @@ import subprocess
 import shutil
 import stat
 import math
+import copy
 
 import local
 import helpers
@@ -375,6 +376,9 @@ class Solver (object):
 
     # get directory
     directory = self.directory (level, type)
+
+    # copy parallelization for further modifications
+    parallelization = copy.deepcopy (parallelization)
 
     # if available, use scheduler's dispatch routine
     if self.scheduler.dispatch != None:
