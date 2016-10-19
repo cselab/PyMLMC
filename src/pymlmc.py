@@ -582,7 +582,7 @@ class MLMC (object):
 
             # runtimes
             min_runtime_batch_str = helpers.timef (runtime_batch  ['min'])
-            max_runtime_batch_str = helpers.timef (runtime_batch  ['max'])g
+            max_runtime_batch_str = helpers.timef (runtime_batch  ['max'])
             args += ( min_runtime_batch_str, max_runtime_batch_str )
 
             '''
