@@ -140,11 +140,11 @@ class Indicators (object):
     else:
       self.normalization = numpy.abs (self.mean [self.FINE] ['measured'] [self.L0])
     
-    # least squares inference of indicator level values based on the magnitides of measured level values
-    self.infer (self.mean     [self.FINE  ], degree=0, log=True, critical = False)
-    self.infer (self.mean     [self.COARSE], degree=0, log=True, critical = False)
-    self.infer (self.variance [self.FINE  ], degree=0, log=True, critical = True )
-    self.infer (self.variance [self.COARSE], degree=0, log=True, critical = True )
+    # least squares inference of indicator level values based on the magnitudes of measured level values
+    self.infer (self.mean     [self.FINE  ], degree=0, log=False, critical = False)
+    self.infer (self.mean     [self.COARSE], degree=0, log=False, critical = False)
+    self.infer (self.variance [self.FINE  ], degree=0, log=False, critical = True )
+    self.infer (self.variance [self.COARSE], degree=0, log=False, critical = True )
 
     # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITHOUT optimal control variate coefficients computed below)
@@ -164,7 +164,7 @@ class Indicators (object):
       self.mean_diff     ['accuracy'] [level] = self.accuracy (distances [level], moment = 1)
       self.variance_diff ['accuracy'] [level] = self.accuracy (distances [level], moment = 2)
 
-    # least squares inference of indicator level values based on the magnitides of measured level values
+    # least squares inference of indicator level values based on the magnitudes of measured level values
     #self.infer (self.mean_diff, log=True, critical = False)
     # compute 'mean diff' from infered 'mean'
     self.mean_diff ['infered'] [ self.L0       ] = self.mean [self.FINE] ['infered'] [ self.L0 ]
@@ -209,10 +209,9 @@ class Indicators (object):
       self.variance_diff ['infered'] [self.L0] = self.variance [self.FINE] ['infered'] [self.L0]
 
     # report non-available inference modes
-    else:
+    elif self.inference != None:
 
       helpers.error ('Inference mode \'%s\' is not implemented' % self.inference)
-
     
     # === OPTIMAL control variate COEFFICIENTS
     
@@ -326,32 +325,30 @@ class Indicators (object):
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
 
+    # filter out invalid entries
+    levels  = numpy.array (self.levels [indicator.start:]) [ ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ]
+    values  = numpy.abs ( indicator ['measured'] [levels] )
+    weights = numpy.sqrt (indicator ['weights'] [levels])
+
     # check if sufficiently many measurements are available for inference
-    if numpy.isnan (indicator ['measured'] [indicator.start:]) .all ():
+    if len (values) == 0:
       if critical:
         self.available = 0
       helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
       return
-    
+
     # if only one measurement is available, assign it to all infered level values
-    if  numpy.sum ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) == 1:
-      indicator ['infered'] [indicator.start:] = numpy.abs ( indicator ['measured'] [ indicator.start + numpy.where ( ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ) [0] ] )
-      return
-    
-    # if inference is disabled, simply copy the values
-    if not self.inference:
-      indicator ['infered'] [indicator.start:] = indicator ['measured'] [indicator.start:]
+    if  len (values) == 1:
+      indicator ['infered'] [indicator.start:] = values [0]
       return
 
     # use log-coordinates, if specified
     if log:
-      data = numpy.log ( numpy.abs (indicator ['measured'] [indicator.start:]) )
-    else:
-      data = numpy.abs (indicator ['measured'] [indicator.start:])
+      values = numpy.log (values)
 
-    # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data undertainties
-    #line = numpy.polyfit ( self.levels [indicator.start:], data, degree, w = numpy.sqrt (indicator ['weights'] [indicator.start:]) )
-    line = numpy.polyfit ( self.levels [indicator.start:], data, degree )
+    # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
+    line = numpy.polyfit ( levels, values, degree, w = weights )
+    #line = numpy.polyfit ( levels, values, degree )
 
     # update indicator values to the maximum likelihood estimations
     indicator ['infered'] [indicator.start:] = numpy.polyval (line, self.levels [indicator.start:])
