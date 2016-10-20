@@ -18,7 +18,7 @@ class Shells (Series):
   name       = 'shells'
   dimensions = 2
 
-  def __init__ (self, qois, filename='statistics.dat', split=('step', 't'), uid='t', span=None, sampling=1000, ranges=None, count=1, extent=None):
+  def __init__ (self, qois, filename='statistics.dat', split=('step', 't'), uid='t', span=[0,1], sampling=1000, ranges=None, count=1, extent=[0,1]):
 
     # save configuration
     vars (self) .update ( locals() )

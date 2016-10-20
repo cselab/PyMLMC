@@ -105,7 +105,7 @@ class MLMC (object):
     self.update()
 
     # query for progress
-    helpers.query ('Continue with data analysis?')
+    helpers.query ('Quit simulation?')
   
   # initial phase
   def init (self):

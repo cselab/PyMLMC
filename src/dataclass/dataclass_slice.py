@@ -18,7 +18,7 @@ class Slice (object):
   name       = 'slice'
   dimensions = 2
 
-  def __init__ (self, qois=None, slices=None, dump=1, ranges=None, extent=None):
+  def __init__ (self, qois=None, slices=1, dump=1, ranges=None, extent=[0,1]):
     
     # save configuration
     vars (self) .update ( locals() )

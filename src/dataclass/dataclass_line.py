@@ -20,7 +20,7 @@ class Line (Slice):
   name       = 'line'
   dimensions = 1
 
-  def __init__ (self, qois=None, slices=None, dump=1, line=0.5, ranges=None, extent=None):
+  def __init__ (self, qois=None, slices=1, dump=1, line=0.5, ranges=None, extent=[0,1]):
     
     # save configuration
     vars (self) .update ( locals() )

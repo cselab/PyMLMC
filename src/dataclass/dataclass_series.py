@@ -16,7 +16,7 @@ class Series (object):
   name       = 'series'
   dimensions = 1
 
-  def __init__ (self, filename='statistics.dat', split=('step', 't'), uid='t', span=None, sampling=1000, ranges=None):
+  def __init__ (self, filename='statistics.dat', split=('step', 't'), uid='t', span=[0,1], sampling=1000, ranges=None):
 
     # save configuration
     vars (self) .update ( locals() )

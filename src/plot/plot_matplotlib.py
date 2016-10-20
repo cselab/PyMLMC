@@ -1581,7 +1581,7 @@ class MatPlotLib (object):
     if optimal and self.mlmc.config.iteration > 0:
       pylab.semilogy (levels, budget_optimal, color=color_params('optimal'), linestyle=style(run), marker='|', label='optimal (~%d%% less work)' % (100 * self.mlmc.config.samples.overhead))
     pylab.title  ('Computational budget')
-    pylab.ylabel ('computational budget [%s core hours]' % unit)
+    pylab.ylabel ('budget [%s core hours]' % unit)
     pylab.xlabel ('mesh level')
     levels_extent (levels)
     pylab.ylim   (ymin=basevalue)
@@ -1651,7 +1651,7 @@ class MatPlotLib (object):
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
       #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. difference means for Q = %s' % name (qoi))
-    pylab.ylabel (r'|relative mean of $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$|')
+    pylab.ylabel (r'|rel. mean of $\alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1}$|')
     pylab.xlabel ('mesh level')
     '''
     ymin = numpy.min ( [ numpy.min (mean_diff_measured), numpy.min (mean_diff_infered), numpy.min (mean_diff_opt_infered) ] ) / NORMALIZATION
@@ -1662,7 +1662,7 @@ class MatPlotLib (object):
     adjust_extent ([ymin, ymax], factor=1.5)
     '''
     levels_extent (levels)
-    pylab.legend (loc='upper right')
+    pylab.legend (loc='lower left')
     
     # plot variance diffs (measured, infered and optimized)
     
@@ -1688,7 +1688,7 @@ class MatPlotLib (object):
     adjust_extent ([ymin, ymax], factor=1.5)
     '''
     levels_extent (levels)
-    pylab.legend (loc='upper right')
+    pylab.legend (loc='lower left')
     
     self.adjust (infolines, subplots=2)
     
@@ -1745,7 +1745,7 @@ class MatPlotLib (object):
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
       #pylab.axhline   (y=TOL,   xmin=levels[0], xmax=levels[-1], color=color_params('tol'),   linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. level means for Q = %s' % name (qoi))
-    pylab.ylabel (r'|relative mean of $Q_\ell$|')
+    pylab.ylabel (r'|rel. mean of $Q_\ell$|')
     pylab.xlabel ('mesh level')
     '''
     ymin = numpy.min ( [ numpy.min (mean_measured), numpy.min (mean_infered) ] ) / NORMALIZATION
@@ -1785,7 +1785,7 @@ class MatPlotLib (object):
     pylab.gca().set_ylim (bottom = 0.0)
     pylab.gca().set_ylim (top    = 1.5)
     levels_extent (levels)
-    pylab.legend (loc='lower left')
+    pylab.legend (loc='upper left')
     
     self.adjust (infolines, subplots=2)
     
@@ -1818,7 +1818,7 @@ class MatPlotLib (object):
     # plot correlations
 
     color = color_params('correlation')
-    pylab.plot (levels, correlation_measured, color=color, linestyle=style(3), alpha=alpha(run), marker='o', markeredgecolor=color, markerfacecolor='w', label='measured')
+    pylab.plot (levels, correlation_measured, color=color, linestyle='',       alpha=alpha(run), marker='o', markeredgecolor=color, markerfacecolor='w', label='measured')
     pylab.plot (levels, correlation_infered,  color=color, linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       #pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle='-', linewidth=2, alpha=0.6, label='correlation = 1/2')
@@ -1917,7 +1917,7 @@ class MatPlotLib (object):
     #  pylab.axhline  (y=TOL, color=color_params('tol'), linestyle=style(run), alpha=0.6, label='required TOL = %1.1e' % TOL )
     if self.mlmc.errors.speedup_mlmc != None:
       pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.1fx' % self.mlmc.errors.speedup_mlmc)
-    pylab.title  ('Relative sampling errors for Q = %s' % name (qoi))
+    pylab.title  ('Rel. sampling errors for Q = %s' % name (qoi))
     pylab.ylabel (r'$\sqrt{\operatorname{Var} ( \alpha_\ell Q_\ell - \alpha_{\ell-1} Q_{\ell-1} ) / M_\ell}$')
     pylab.xlabel ('mesh level')
     levels_extent (levels)
