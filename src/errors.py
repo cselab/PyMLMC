@@ -124,7 +124,8 @@ class Errors (object):
     # compute MLMC vs. MC speedup
     FINEST      = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
     work_mlmc   = sum ( [ indicators.pairworks [level] * counts [level] for level in self.levels ] )
-    variance_mc = numpy.max ( [ indicators.variance [0] ['infered'] [level] for level in self.levels [0 : FINEST + 1] ] )
+    #variance_mc = numpy.max ( [ indicators.variance [0] ['infered'] [level] for level in self.levels [0 : FINEST + 1] ] )
+    variance_mc = indicators.variance [0] ['infered'] [FINEST]
     samples_mc  = numpy.ceil ( variance_mc / error ** 2 )
     work_mc     = indicators.works [FINEST] * samples_mc
     self.speedup_mlmc = work_mc / work_mlmc

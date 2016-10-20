@@ -70,7 +70,7 @@ class CubismMPCF (Solver):
 
     # set default quantity of interest
     if not qoi:
-      qois = { 'series' : 'p_sensor1', 'shells' : 'p', 'slice' : 'p' }
+      qois = { 'series' : 'p_sensor1', 'shells' : 'p', 'slice' : 'p', 'line' : 'p' }
       self.qoi = qois [self.dataclass.name]
 
     # set indicator
@@ -78,23 +78,24 @@ class CubismMPCF (Solver):
 
       # maximum-norm based indicator
       if self.norm == 'max':
-        #self.indicator = lambda x : numpy.max ( numpy.abs ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] ) )
-        self.indicator = lambda x : numpy.max ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] )
+        self.indicator = lambda x : numpy.max ( numpy.abs (x [self.qoi]) )
 
       # 1-norm based indicator
       if self.norm == 1:
-        self.indicator = lambda x : numpy.mean ( numpy.abs ( x [self.qoi] [ ~ numpy.isnan (x [self.qoi]) ] ) )
+        self.indicator = lambda x : numpy.mean ( numpy.abs (x [self.qoi]) )
       
     # set distance
     if not self.distance:
 
       if self.norm == 'max':
-        #self.distance = lambda f, c : numpy.abs ( numpy.max ( f [self.qoi] [ ~ numpy.isnan (f [self.qoi]) ] ) - numpy.max ( c [self.qoi] [ ~ numpy.isnan (c [self.qoi]) ] ) ) if c != None else self.indicator (f)
-        self.distance = lambda f, c : numpy.max ( f [self.qoi] [ ~ numpy.isnan (f [self.qoi]) ] ) - numpy.max ( c [self.qoi] [ ~ numpy.isnan (c [self.qoi]) ] ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : self.indicator (f) - self.indicator (c) if c != None else self.indicator (f)
+        #self.distance = lambda f, c : numpy.max ( numpy.abs (f [self.qoi]) - numpy.abs (c [self.qoi]) ) if c != None else self.indicator (f)
+        #self.distance = lambda f, c : numpy.max ( f [self.qoi] [ ~ numpy.isnan (f [self.qoi]) ] ) - numpy.max ( c [self.qoi] [ ~ numpy.isnan (c [self.qoi]) ] ) if c != None else self.indicator (f)
 
       # 1-norm based distance
       if self.norm == 1:
-        self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f [self.qoi] - c [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
+        #self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f [self.qoi] - c [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : numpy.mean ( numpy.abs ( f [self.qoi] - c [self.qoi] ) ) if c != None else self.indicator (f)
 
   # return string representing the resolution of a given discretization 'd'
   def resolution_string (self, d):
