@@ -9,6 +9,10 @@
 # All rights reserved.
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# === local imports
+
+import local
+
 # === global imports
 
 import matplotlib
@@ -26,7 +30,8 @@ import warnings
 warnings.filterwarnings ('ignore', message='No labelled objects found. ')   # when empty subplot is displayed due to failed runs
 
 # figure configuration
-#matplotlib.rcParams ['figure.max_open_warning'] = 100 # not working on MIRA or HIPPO
+if not local.name in ['mira', 'hippo']:
+  matplotlib.rcParams ['figure.max_open_warning'] = 100
 matplotlib.rcParams ['savefig.dpi']             = 300
 
 # font configuration
