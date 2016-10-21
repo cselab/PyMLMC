@@ -331,14 +331,14 @@ class Indicators (object):
 
     # filter out invalid entries
     levels  = numpy.array (self.levels [indicator.start:]) [ ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ]
-    values  = numpy.abs ( indicator ['measured'] [levels] )
-    weights = numpy.sqrt (indicator ['weights'] [levels])
+    values  = numpy.abs  ( indicator ['measured'] [levels] )
+    weights = numpy.sqrt ( indicator ['weights']  [levels] )
 
     # add offset, if specified
     values += offset
 
     # check if sufficiently many measurements are available for inference
-    if (exp == None and len (values) < degree + 1) or (exp != None and len (values) < 3):
+    if (not exp and len (values) < degree + 1) or (exp and len (values) < 3):
       if critical:
         self.available = 0
       helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
@@ -352,7 +352,7 @@ class Indicators (object):
     '''
 
     # nonlinear fit for y = a * exp (b * x) + c
-    if exp != None:
+    if exp:
 
       # not yet implemented
       helpers.warning ('Inference of indicator \'%s\' using nonlinear fit not implemented!' % indicator.name)
