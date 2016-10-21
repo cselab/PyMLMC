@@ -771,7 +771,7 @@ class MLMC (object):
 
     # query for progress
     else:
-      helpers.query ('Loading complete. Continue?')
+      helpers.query ('Loading complete! Continue?')
 
     # update the computed number of samples
     self.config.samples.append ()
