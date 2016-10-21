@@ -46,7 +46,7 @@ matplotlib.colors.ColorConverter.colors ['custom_orange'] = (251/256.0, 124/256.
 matplotlib.colors.ColorConverter.colors ['custom_green']  = (182/256.0, 212/256.0,  43/256.0)
 
 # default color cycle (not working on MIRA)
-matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
+#matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
 
 # === parser for base qoi
 
