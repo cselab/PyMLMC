@@ -1,6 +1,6 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Local configuration for MacBook Pro (2014)
+# Local configuration for Hippo (Dalco Raid 6 storage server)
 # For a detailed description of string mapping keys refer to documentation in 'cfg/local.txt'
 #
 # Jonas Sukys
@@ -10,13 +10,13 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # name
-name = 'Apple MacBook Pro (2014)'
+name = 'Hippo (CSE lab)'
 
-# Mac is not a cluster
+# Hippo is not a cluster
 cluster = 0
 
 # default configuration
-cores     = 2    # per node
+cores     = 4    # per node
 threads   = 1    # per core
 walltime  = None # hours
 memory    = None # GB per core
@@ -24,7 +24,7 @@ memory    = None # GB per core
 # constraints
 bootup       = None
 min_cores    = 1
-max_cores    = 2
+max_cores    = 4
 
 def min_walltime (cores): # hours
   return None
