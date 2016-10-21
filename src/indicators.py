@@ -87,7 +87,7 @@ class Indicators (object):
 
     # initialize control variate COEFFICIENTS
     self.coefficients = Coefficients (self.levels, self.recycle)
-  
+
   def accuracy (self, values, moment = 1):
 
     if values.size > moment:
@@ -351,8 +351,8 @@ class Indicators (object):
       values = numpy.log (values)
 
     # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
-    line = numpy.polyfit ( levels, values, degree, w = weights )
-    #line = numpy.polyfit ( levels, values, degree )
+    #line = numpy.polyfit ( levels, values, degree, w = weights )
+    line = numpy.polyfit ( levels, values, degree )
 
     # get infered maximum likelihood values
     infered = numpy.polyval (line, self.levels)
