@@ -47,7 +47,7 @@ class Errors (object):
   def bias (self, diffs):
 
     # determine the finest available level
-    FINEST = numpy.max ( [ index for index, diff in senumerate (diffs) if not numpy.isnan (diff) ] )
+    FINEST = numpy.max ( [ index for index, diff in enumerate (diffs) if not numpy.isnan (diff) ] )
 
     # at least two valid diffs are required to estimate the bias
     if not diffs [FINEST] or not diffs [FINEST - 1]:

@@ -204,7 +204,7 @@ class Indicators (object):
     elif self.inference == 'correlations':
       
       # least squares inference of indicator level values based on the magnitides of measured level values
-      self.infer (self.correlation, degree=1, log=False, critical = True, min = -1.0, max = 1.0)
+      self.infer (self.correlation, log=True, exp=1, offset=-1, critical = True, min = -1.0, max = 1.0)
 
       # compute covariance and variance diffs (infered)
       for level in self.levels [ self.L0 + 1 : ]:
@@ -312,7 +312,7 @@ class Indicators (object):
     return distances
   
   # least squares inference of indicator level values based on the magnitudes of measured level values
-  def infer (self, indicator, degree, log, critical, min = None, max = None):
+  def infer (self, indicator, degree=1, log=0, exp=0, offset=0, critical=0, min=None, max=None):
 
     # check if inference is not enforced
     if not self.enforce:
@@ -334,32 +334,50 @@ class Indicators (object):
     values  = numpy.abs ( indicator ['measured'] [levels] )
     weights = numpy.sqrt (indicator ['weights'] [levels])
 
+    # add offset, if specified
+    values += offset
+
     # check if sufficiently many measurements are available for inference
-    if len (values) == 0:
+    if (exp == None and len (values) < degree + 1) or (exp != None and len (values) < 3):
       if critical:
         self.available = 0
       helpers.warning ('Inference of indicator \'%s\' not possible!' % indicator.name)
       return
 
+    '''
     # if only one measurement is available, assign it to all infered level values
     if  len (values) == 1:
       indicator ['infered'] [indicator.start:] = values [0]
       return
+    '''
 
-    # use log-coordinates, if specified
-    if log:
-      values = numpy.log (values)
+    # nonlinear fit for y = a * exp (b * x) + c
+    if exp != None:
 
-    # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
-    #line = numpy.polyfit ( levels, values, degree, w = weights )
-    line = numpy.polyfit ( levels, values, degree )
+      # not yet implemented
+      helpers.warning ('Inference of indicator \'%s\' using nonlinear fit not implemented!' % indicator.name)
+      return
 
-    # get infered maximum likelihood values
-    infered = numpy.polyval (line, self.levels)
+    # linear fit for y = a * x + b or y = a * exp (b * x)
+    else:
 
-    # transform back to linear coordinates
-    if log:
-      infered = numpy.exp (infered)
+      # use log-coordinates, if specified
+      if log:
+        values = numpy.log (values)
+
+      # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
+      #line = numpy.polyfit ( levels, values, degree, w = weights )
+      line = numpy.polyfit ( levels, values, degree )
+
+      # get infered maximum likelihood values
+      infered = numpy.polyval (line, self.levels)
+
+      # transform back to linear coordinates
+      if log:
+        infered = numpy.exp (infered)
+
+    # subtract offset, if specified
+    values -= offset
 
     # respect envelope specifications
     if min != None:
