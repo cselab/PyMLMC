@@ -61,11 +61,6 @@ class Coefficients (object):
     if len (self.levels) == 1:
       return
 
-    # debugging
-    self.values = numpy.ones (self.L+1)
-    self.optimization = 1
-    return
-
     # cost of plain (non-optimized) estimator
     cost_plain = self.cost (indicators)
 
