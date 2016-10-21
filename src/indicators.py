@@ -204,7 +204,7 @@ class Indicators (object):
     elif self.inference == 'correlations':
       
       # least squares inference of indicator level values based on the magnitides of measured level values
-      self.infer (self.correlation, degree = 1, log = True, offset = -1, critical = True, min = -1.0, max = 1.0)
+      self.infer (self.correlation, degree = 1, log = True, offset = -1, factor = -1, critical = True, min = -1.0, max = 1.0)
 
       # compute covariance and variance diffs (infered)
       for level in self.levels [ self.L0 + 1 : ]:
@@ -313,7 +313,7 @@ class Indicators (object):
     return distances
   
   # least squares inference of indicator level values based on the magnitudes of measured level values
-  def infer (self, indicator, degree=1, log=0, exp=0, offset=0, critical=0, min=None, max=None):
+  def infer (self, indicator, degree=1, log=0, exp=0, offset=0, factor=1, critical=0, min=None, max=None):
 
     # check if inference is not enforced
     if not self.enforce:
@@ -337,6 +337,9 @@ class Indicators (object):
 
     # add offset, if specified
     values += offset
+
+    # use factor, if specified
+    values *= factor
 
     # check if sufficiently many measurements are available for inference
     if (not exp and len (values) < degree + 1) or (exp and len (values) < 3):
@@ -377,8 +380,11 @@ class Indicators (object):
       if log:
         infered = numpy.exp (infered)
 
+    # use factor, if specified
+    infered /= factor
+
     # subtract offset, if specified
-    values -= offset
+    infered -= offset
 
     # respect envelope specifications
     if min != None:
@@ -432,7 +438,7 @@ class Indicators (object):
     
     # report 'covariance'
     self.covariance.report ('measured', self.normalization ** 2)
-    
+
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
