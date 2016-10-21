@@ -30,7 +30,7 @@ import warnings
 warnings.filterwarnings ('ignore', message='No labelled objects found. ')   # when empty subplot is displayed due to failed runs
 
 # figure configuration
-if not local.name in ['mira', 'hippo']:
+if not local.cluster:
   matplotlib.rcParams ['figure.max_open_warning'] = 100
 matplotlib.rcParams ['savefig.dpi']             = 300
 
