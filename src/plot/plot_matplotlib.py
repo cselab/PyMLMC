@@ -26,7 +26,7 @@ import warnings
 warnings.filterwarnings ('ignore', message='No labelled objects found. ')   # when empty subplot is displayed due to failed runs
 
 # figure configuration
-matplotlib.rcParams ['figure.max_open_warning'] = 100 # not working on MIRA
+#matplotlib.rcParams ['figure.max_open_warning'] = 100 # not working on MIRA or HIPPO
 matplotlib.rcParams ['savefig.dpi']             = 300
 
 # font configuration
