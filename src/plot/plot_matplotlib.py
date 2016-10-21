@@ -716,7 +716,7 @@ class MatPlotLib (object):
     if log and not centered:
       from matplotlib.colors import LogNorm
       norm = LogNorm (vmin=0, vmax=vmax)
-      vmin = 1e-4
+      vmin = 1e-3
     else:
       norm = None
 
