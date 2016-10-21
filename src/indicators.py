@@ -139,10 +139,10 @@ class Indicators (object):
       self.normalization = numpy.abs (self.mean [self.FINE] ['measured'] [self.L0])
     
     # least squares inference of indicator level values based on the magnitudes of measured level values
-    self.infer (self.mean     [self.FINE  ], degree=1, log=False, critical = False, min = 0)
-    self.infer (self.mean     [self.COARSE], degree=1, log=False, critical = False, min = 0)
-    self.infer (self.variance [self.FINE  ], degree=1, log=False, critical = True,  min = 0)
-    self.infer (self.variance [self.COARSE], degree=1, log=False, critical = True,  min = 0)
+    self.infer (self.mean     [self.FINE  ], degree = 1, log = False, critical = False, min = 0)
+    self.infer (self.mean     [self.COARSE], degree = 1, log = False, critical = False, min = 0)
+    self.infer (self.variance [self.FINE  ], degree = 0, log = False, critical = True,  min = 0)
+    self.infer (self.variance [self.COARSE], degree = 0, log = False, critical = True,  min = 0)
 
     # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITHOUT optimal control variate coefficients computed below)
@@ -175,7 +175,7 @@ class Indicators (object):
 
     # least squares inference of 'variance diff' indicator level values based on the magnitides of measured level values
     if self.inference == 'diffs':
-      self.infer (self.variance_diff, degree=1, log=True, critical = True, min = 0)
+      self.infer (self.variance_diff, degree = 1, log = True, critical = True, min = 0)
 
     # === COVARIANCES and CORRELATIONS
     
@@ -204,7 +204,7 @@ class Indicators (object):
     elif self.inference == 'correlations':
       
       # least squares inference of indicator level values based on the magnitides of measured level values
-      self.infer (self.correlation, log=True, exp=1, offset=-1, critical = True, min = -1.0, max = 1.0)
+      self.infer (self.correlation, exp = True, offset = -1, critical = True, min = -1.0, max = 1.0)
 
       # compute covariance and variance diffs (infered)
       for level in self.levels [ self.L0 + 1 : ]:
