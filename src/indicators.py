@@ -204,7 +204,7 @@ class Indicators (object):
     elif self.inference == 'correlations':
       
       # least squares inference of indicator level values based on the magnitides of measured level values
-      self.infer (self.correlation, exp = True, offset = -1, critical = True, min = -1.0, max = 1.0)
+      self.infer (self.correlation, degree = 1, log = True, offset = -1, critical = True, min = -1.0, max = 1.0)
 
       # compute covariance and variance diffs (infered)
       for level in self.levels [ self.L0 + 1 : ]:
