@@ -51,6 +51,7 @@ class Config (object):
   recycle         = 0
   inference       = 'diffs'
   enforce         = 0
+  ocv             = 0
   iteration       = None
   
   def __init__ (self, id=0):

@@ -99,7 +99,7 @@ class Errors (object):
     self.total_relative_error = self.relative (self.total_error)
 
     # compute estimated bias
-    self.relative_bias = self.bias (indicators.mean_diff_opt ['infered'] [1:])
+    self.relative_bias = self.relative ( self.bias (indicators.mean_diff_opt ['infered'] [1:]) )
 
   # report relative sampling errors
   def report (self):
@@ -120,9 +120,9 @@ class Errors (object):
     print
 
     print '  :'
-    print '  : Total sampling error      : %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
+    print '  : Total sampling error       : %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
 
-    print '  : Deterministic error (bias): %s [~%.1e]' % ( helpers.scif (self.relative_bias), self.relative_bias )
+    print '  : Deterministic error (bias) : %s [~%.1e]' % ( helpers.scif (self.relative_bias), self.relative_bias )
 
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0

@@ -75,7 +75,7 @@ class Indicator (object):
 # class for computation, inference and reporting of all indicators
 class Indicators (object):
   
-  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = 'diffs', enforce = True):
+  def __init__ (self, indicator, distance, levels, levels_types, pick, FINE, COARSE, works, pairworks, recycle, inference = 'diffs', enforce = True, ocv = False):
     
     # store configuration 
     vars (self) .update ( locals() )
@@ -220,7 +220,8 @@ class Indicators (object):
     # === OPTIMAL control variate COEFFICIENTS
     
     # compute optimal control variate coefficients
-    self.coefficients.optimize (self)
+    if self.ocv:
+      self.coefficients.optimize (self)
     
     # re-evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
@@ -431,7 +432,7 @@ class Indicators (object):
     
     # report 'covariance'
     self.covariance.report ('measured', self.normalization ** 2)
-
+    
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 

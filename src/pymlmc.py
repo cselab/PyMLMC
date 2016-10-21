@@ -59,7 +59,7 @@ class MLMC (object):
     self.config.samples.setup ( self.config.levels, self.config.works, self.params.tolerate, self.config.recycle )
 
     # indicators
-    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick, self.config.FINE, self.config.COARSE, self.config.works, self.config.samples.pairworks, self.config.recycle, inference = self.config.inference, enforce = self.config.enforce )
+    self.indicators = Indicators ( self.config.solver.indicator, self.config.solver.distance, self.config.levels, self.config.levels_types, self.config.pick, self.config.FINE, self.config.COARSE, self.config.works, self.config.samples.pairworks, self.config.recycle, inference = self.config.inference, enforce = self.config.enforce, ocv = self.config.ocv )
     
     # errors
     self.errors = Errors (self.config.levels, self.config.recycle)
