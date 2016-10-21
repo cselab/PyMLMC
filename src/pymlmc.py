@@ -159,16 +159,9 @@ class MLMC (object):
       # load MLMC simulation
       self.load ()
 
-      # check availability
-      if not self.available:
-        helpers.error ('No results were loaded - exiting...')
-
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
-
-      # update the computed number of samples
-      self.config.samples.append ()
 
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
@@ -772,8 +765,16 @@ class MLMC (object):
     # report detailed progrees of individual samples
     self.progress ()
 
+    # check availability
+    if not self.available:
+      helpers.error ('No results were loaded - exiting...')
+
     # query for progress
-    helpers.query ('Continue?')
+    else:
+      helpers.query ('Loading complete. Continue?')
+
+    # update the computed number of samples
+    self.config.samples.append ()
 
   # report dedailed progress of individual samples
   def progress (self):

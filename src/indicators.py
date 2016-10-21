@@ -84,6 +84,9 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
     self.available       = 0
     self.history         = {}
+
+    # initialize control variate COEFFICIENTS
+    self.coefficients = Coefficients (self.levels, self.recycle)
   
   def accuracy (self, values, moment = 1):
 
@@ -102,11 +105,6 @@ class Indicators (object):
     self.L0 = L0
 
     self.available = 1
-
-    # === initialize control variate COEFFICIENTS
-
-    # initialize coefficients
-    self.coefficients = Coefficients (self.levels, self.recycle)
 
     # === VALUES and DISTANCES
 
