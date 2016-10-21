@@ -439,6 +439,7 @@ class Indicators (object):
     # report 'covariance'
     self.covariance.report ('measured', self.normalization ** 2)
 
+    '''
     # splitter
     print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
@@ -455,6 +456,7 @@ class Indicators (object):
 
     # report 'variance diff opt'
     self.variance_diff_opt.report ('measured', self.normalization ** 2)
+    '''
 
     # === report infered values
 
@@ -494,22 +496,25 @@ class Indicators (object):
     # report 'covariance'
     self.covariance.report ('infered', self.normalization ** 2)
 
-    # splitter
-    print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+    # optimized values are infered only of OCV is enabled
+    if self.ocv:
 
-    # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
-    print '  : %-18s:' % 'COEFFICIENT',
-    for level in self.levels:
-      print helpers.scif (self.coefficients.values [level], table=1),
-    if self.coefficients.optimization != None:
-      print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
-    print
+      # splitter
+      print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
 
-    # report 'mean diff opt'
-    self.mean_diff_opt.report ('infered', self.normalization)
+      # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+      print '  : %-18s:' % 'COEFFICIENT',
+      for level in self.levels:
+        print helpers.scif (self.coefficients.values [level], table=1),
+      if self.coefficients.optimization != None:
+        print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
+      print
 
-    # report 'variance diff opt'
-    self.variance_diff_opt.report ('infered', self.normalization ** 2)
+      # report 'mean diff opt'
+      self.mean_diff_opt.report ('infered', self.normalization)
+
+      # report 'variance diff opt'
+      self.variance_diff_opt.report ('infered', self.normalization ** 2)
   
   def save (self, iteration):
 
