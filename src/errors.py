@@ -38,9 +38,27 @@ class Errors (object):
 
     return numpy.sqrt ( numpy.sum (errors ** 2) )
 
-  def relative (self, errors):
+  # compute relative quantities
+  def relative (self, quantity):
     
-    return errors / self.normalization
+    return quantity / self.normalization
+
+  # compute bias
+  def bias (self, diffs):
+
+    # determine the finest available level
+    FINEST = numpy.max ( [ level for level in self.levels if not numpy.isnan (diffs [level]) ] )
+
+    # at least two valid diffs are required to estimate the bias
+    if not diffs [FINEST] or not diffs [FINEST - 1]:
+      return float ('nan')
+
+    # compute convergence rate w.r.t. level
+    # i.e. factor by which the error is reduced for each level
+    rate = diffs [FINEST] / diffs [FINEST - 1]
+
+    # compute the total remaining error (decaying geometric progression)
+    return rate * diffs [FINEST] / (1 - rate)
 
   # compute errors
   def compute (self, indicators, counts):
@@ -80,6 +98,9 @@ class Errors (object):
     # compute the cumulative relative sampling error
     self.total_relative_error = self.relative (self.total_error)
 
+    # compute estimated bias
+    self.relative_bias = self.bias (indicators.mean_diff_opt ['infered'] [1:])
+
   # report relative sampling errors
   def report (self):
 
@@ -99,7 +120,9 @@ class Errors (object):
     print
 
     print '  :'
-    print '  : Total sampling error: %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
+    print '  : Total sampling error      : %s [~%.1e]' % ( helpers.scif (self.total_relative_error), self.total_relative_error )
+
+    print '  : Deterministic error (bias): %s [~%.1e]' % ( helpers.scif (self.relative_bias), self.relative_bias )
 
     if numpy.isnan (self.total_relative_error) or numpy.isinf (self.total_relative_error):
       self.available = 0

@@ -58,15 +58,7 @@ class CubismMPCF (Solver):
     # set default dataclass
     if dataclass == None:
       from dataclass_series import Series
-      ranges = {}
-      ranges ['p_sen'] = [0, None]
-      ranges ['a2_']   = [0, 1]
-      ranges ['V2_']   = [0, None]
-      ranges ['c_' ]   = [0, None]
-      ranges ['m_' ]   = [0, None]
-      ranges ['M_' ]   = [0, None]
-      ranges ['ke_']   = [0, None]
-      self.dataclass   = Series (filename='statistics.dat', split=('step', 't'), uid='t', span=(0, tend), sampling=1000, ranges=ranges)
+      self.dataclass = Series (filename='statistics.dat', split=('step', 't'), uid='t', span=(0, tend), sampling=1000)
 
     # set default quantity of interest
     if not qoi:
