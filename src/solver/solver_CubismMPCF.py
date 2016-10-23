@@ -300,10 +300,7 @@ class CubismMPCF (Solver):
 
   # check if the loaded result is invalid
   def invalid (self, results):
-
-    if numpy.isnan (results [self.qoi]) .any() or numpy.isinf (results [self.qoi]) .any():
-      return 1
-
+    
     '''
     if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
       return 1
@@ -315,7 +312,6 @@ class CubismMPCF (Solver):
     '''
 
     return 0
-
 
 
 

@@ -156,7 +156,7 @@ class MC (object):
   # check if some loaded results are invalid
   def invalid (self):
 
-    invalid = [ (self.config.solver.invalid (result) if result != None else 0) for result in self.results ]
+    invalid = [ ( ( result.invalid () or self.config.solver.invalid (result) ) if result != None else 0) for result in self.results ]
     indices = [ i for i, status in enumerate (invalid) if status ]
 
     return indices

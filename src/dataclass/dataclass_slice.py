@@ -137,7 +137,20 @@ class Slice (object):
               self.data [key] = numpy.maximum ( lower, self.data [key] )
             if upper != None:
               self.data [key] = numpy.minimum ( upper, self.data [key] )
-  
+
+  # check if the loaded result is invalid
+  def invalid (self):
+
+    for result in self.data.values():
+      if numpy.isnan (result) .any() or numpy.isinf (result) .any():
+        return 1
+      '''
+      if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
+        return 1
+      '''
+
+    return 0
+
   def __rmul__ (self, a):
     for key in self.data.keys():
       self.data [key] *= a
