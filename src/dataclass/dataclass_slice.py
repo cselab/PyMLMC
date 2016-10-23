@@ -144,10 +144,6 @@ class Slice (object):
     for result in self.data.values():
       if numpy.isnan (result) .any() or numpy.isinf (result) .any():
         return 1
-      '''
-      if (results.data ['c_global_max'] > 100) .any() or (results.data ['c_global_max'] < 0.1) .any():
-        return 1
-      '''
 
     return 0
 

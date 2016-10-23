@@ -345,6 +345,15 @@ class Series (object):
       self.data [key] = numpy.empty (shape)
       self.data [key] .fill (float ('nan'))
 
+  # check if the loaded result is invalid
+  def invalid (self):
+
+    for result in self.data.values():
+      if numpy.isnan (result) .any() or numpy.isinf (result) .any():
+        return 1
+
+    return 0
+
   def __rmul__ (self, a):
     result = copy.deepcopy (self)
     for key in result.data.keys():
