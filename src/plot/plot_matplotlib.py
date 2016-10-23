@@ -1222,7 +1222,7 @@ class MatPlotLib (object):
           aspect = 'equal'
 
         pylab.imshow (numpy.transpose (vs), cmap=cmap, origin='lower', aspect=aspect, norm=norm, extent=data_extent, interpolation='hermite', vmin=vmin, vmax=vmax)
-        #pylab.colorbar ()
+        pylab.colorbar ()
 
         if axis != None:
           pylab.axis (axis)

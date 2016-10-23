@@ -189,7 +189,7 @@ class Slice (object):
     return self
   
   def __isub__ (self, a):
-    return self + (-1) * a
+    return self += (-1) * a
   
   '''
   def __str__ (self):
