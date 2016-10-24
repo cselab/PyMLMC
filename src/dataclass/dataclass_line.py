@@ -103,7 +103,7 @@ class Line (Slice):
       self.data [key] *= a
     return self
 
-  def __iadd__ (self, a):
+  def inplace (self, a, action):
 
     if not self.data:
       self.init (a)
@@ -111,29 +111,32 @@ class Line (Slice):
     if self.meta ['shape'] == a.meta ['shape']:
 
       for key in self.data.keys():
-        self.data [key] += a.data [key]
+        getattr (self.data [key], action) (a.data [key])
 
     if self.meta ['shape'] > a.meta ['shape']:
 
       factor = self.meta ['shape'] / a.meta ['shape']
 
       for key in self.data.keys():
-        self.data [key] += numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) )
+        getattr (self.data [key], action) ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
 
     elif self.meta ['shape'] < a.meta ['shape']:
 
       factor = a.meta ['shape'] / self.meta ['shape']
 
       for key in self.data.keys():
-        self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones ((1, factor)) ) ) + a.data [key]
+        self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones ((1, factor)) ) )
+        getattr (self.data [key], action) (a.data [key])
       
       self.meta = copy.deepcopy (a.meta)
 
     return self
   
+  def __iadd__ (self, a):
+    return self.inplace (a, '__iadd__')
+
   def __isub__ (self, a):
-    self += (-1) * a
-    return self
+    return self.inplace (a, '__isub__')
   
   '''
   def __str__ (self):

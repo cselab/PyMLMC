@@ -153,7 +153,7 @@ class MLMC (object):
   
   # iterative updating phase
   def update (self):
-    
+
     while True:
 
       # load MLMC simulation
@@ -162,6 +162,9 @@ class MLMC (object):
       # deterministic simulations are not suppossed to be updated
       if self.config.deterministic:
         return
+
+      # update the computed number of samples
+      self.config.samples.append ()
 
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
@@ -653,7 +656,7 @@ class MLMC (object):
 
     # load the results from MC simulations and report
     from helpers import intf
-    header = ' :: LOADING RESULTS:'
+    header = '\n :: LOADING RESULTS:'
 
     if self.config.recycle:
       header += '\n' + '  :  LEVEL  |  SAMPLES  |  LOADED  |  FAILED  |  PENDING  |  INVALID  |'
@@ -665,7 +668,6 @@ class MLMC (object):
       header += '\n' + '  :------------------------------------------------------------------------------|'
       format = '  :      %d  |  %s  |    %s  |   %s  |   %s  |   %s   |   %s'
 
-    print
     print header
 
     # candidate for the coarsest level
@@ -740,13 +742,15 @@ class MLMC (object):
     f.write (header + buffer)
 
     # report how many pairs of fine and course samples were loaded
-    header = ' :: LOADED VALID PAIRS (FINE & COARSE):'
+    header = '\n :: LOADED VALID PAIRS (FINE & COARSE):'
     header += '\n' + '  :  LEVEL  |  SAMPLES  |  INCLUDED  |  EXCLUDED  |'
     header += '\n' + '  :-----------------------------------------------|'
     format = '  :      %d  |    %s  |    %s   |    %s   |'
 
-    print
     print header
+
+    # buffer
+    buffer = ''
 
     for level in self.config.levels:
       loadedstr = intf (self.config.samples.counts.loaded [level], table=1, empty=1)
@@ -756,7 +760,7 @@ class MLMC (object):
       print string
 
     # save progress to a file
-    f.write ('\n\n')
+    f.write ('\n')
     f.write (header + buffer)
 
     # close progress file
@@ -772,9 +776,6 @@ class MLMC (object):
     # query for progress
     else:
       helpers.query ('Loading complete! Continue?')
-
-    # update the computed number of samples
-    self.config.samples.append ()
 
   # report dedailed progress of individual samples
   def progress (self):

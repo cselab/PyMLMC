@@ -104,11 +104,6 @@ class Slice (object):
   # stores data for a requested qoi
   def __setitem__ (self, qoi, data):
     self.data [qoi] = data
-  
-  def init (self, a):
-    self.meta = a.meta
-    for key in a.data.keys():
-      self.data [key] = numpy.zeros (a.meta ['shape'])
 
   def resize (self, size):
 
@@ -148,19 +143,20 @@ class Slice (object):
     return 0
 
   def __rmul__ (self, a):
-    for key in self.data.keys():
-      self.data [key] *= a
-    return self
+    result = copy.deepcopy (self)
+    for key in result.data.keys():
+      result.data [key] *= a
+    return result
 
-  def __iadd__ (self, a):
+  def __lmul__ (self, a):
+    return self * a
 
-    if not self.data:
-      self.init (a)
+  def inplace (self, a, action):
 
     if self.meta ['shape'] == a.meta ['shape']:
 
       for key in self.data.keys():
-        self.data [key] += a.data [key]
+        getattr (self.data [key], action) (a.data [key])
 
     if self.meta ['shape'] [0] > a.meta ['shape'] [0] and self.meta ['shape'] [1] > a.meta ['shape'] [1]:
 
@@ -168,7 +164,7 @@ class Slice (object):
       yfactor = self.meta ['shape'] [1] / a.meta ['shape'] [1]
 
       for key in self.data.keys():
-        self.data [key] += numpy.kron ( a.data [key], numpy.ones ((xfactor, yfactor)) )
+        getattr (self.data [key], action) ( numpy.kron ( a.data [key], numpy.ones ((xfactor, yfactor)) ) )
 
     elif self.meta ['shape'] [0] < a.meta ['shape'] [0] and self.meta ['shape'] [1] < a.meta ['shape'] [1]:
 
@@ -176,7 +172,8 @@ class Slice (object):
       yfactor = a.meta ['shape'] [1] / self.meta ['shape'] [1]
 
       for key in self.data.keys():
-        self.data [key] = numpy.kron ( self.data [key], numpy.ones ((xfactor, yfactor)) ) + a.data [key]
+        self.data [key] = numpy.kron ( self.data [key], numpy.ones ((xfactor, yfactor)) )
+        getattr (self.data [key], action) (a.data [key])
 
       self.meta = copy.deepcopy (a.meta)
 
@@ -187,10 +184,12 @@ class Slice (object):
       return None
 
     return self
-  
+
+  def __iadd__ (self, a):
+    return self.inplace (a, '__iadd__')
+
   def __isub__ (self, a):
-    self += (-1) * a
-    return self
+    return self.inplace (a, '__isub__')
   
   '''
   def __str__ (self):

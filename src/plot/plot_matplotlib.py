@@ -18,7 +18,7 @@ import local
 import matplotlib
 
 # for pylab.tight_layout()
-matplotlib.use('agg')
+#matplotlib.use('agg')
 
 import pylab
 import numpy
@@ -344,20 +344,17 @@ def execute (cmd, directory='.', verbose=1, pipe=0):
 # main class for plotting using MatPlotLib
 class MatPlotLib (object):
 
-  extent  = None
-  surface = None
-
-  xend_max = None
-
   # initialization
-  def __init__ (self, mlmc, autosave=0, auto=False, figpath='fig', movpath='mov', timeformat='%.2f'):
+  def __init__ (self, mlmc, autosave=0, auto=False, figpath='fig', movpath='mov', timeformat='%.2f', interactive=True):
 
-    self.mlmc       = mlmc
-    self.autosave   = autosave
-    self.auto       = auto
-    self.figpath    = figpath
-    self.movpath    = movpath
-    self.timeformat = timeformat
+    self.mlmc        = mlmc
+    self.autosave    = autosave
+    self.auto        = auto
+    self.figpath     = figpath
+    self.movpath     = movpath
+    self.timeformat  = timeformat
+    self.interactive = interactive
+
     self.dimensions = mlmc.config.solver.dataclass.dimensions
 
     if mlmc.config.solver.dataclass.dimensions >= 3:
@@ -366,6 +363,11 @@ class MatPlotLib (object):
     # non-blocking pylab.show ()
     if self.auto:
       pylab.ion ()
+
+    self.extent  = None
+    self.surface = None
+
+    self.xend_max = None
 
     print
     print ' :: MatPlotLib plotting backend initialized.'
@@ -526,6 +528,10 @@ class MatPlotLib (object):
 
   # show plots
   def show (self):
+
+    # only if enabled
+    if not self.interactive:
+      return
 
     # report success
     print
@@ -905,7 +911,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_mcs_' + suffix)
 
-    print ' done.'
+    print 'done.'
 
   # plot computed MC estimators of statistics
   def stats_mc (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, run=1, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -940,7 +946,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_mc' + suffix)
 
-    print ' done.'
+    print 'done.'
 
   # plot computed MC estimators of statistics for both types in separate sub-plots
   def stats_mcs_both (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, run=1, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -984,7 +990,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_mcs_both_' + suffix)
 
-    print ' done.'
+    print 'done.'
 
   # plot computed differences of MC estimators
   def stats_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=False, log=False, run=1, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -1022,7 +1028,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_diffs_' + suffix)
 
-    print ' done.'
+    print 'done.'
 
   # plot computed MC estimators and their differences
   def stats_mc_and_diffs (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, run=1, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -1083,7 +1089,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_mcs_and_diffs_' + suffix)
 
-    print ' done.'
+    print 'done.'
 
   # plot computed MLMC statistics
   def stats_mlmc (self, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, run=1, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -1115,7 +1121,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='stats_mlmc_' + suffix)
     
-    print ' done.'
+    print 'done.'
   
   # plot results of one sample of the specified level and type
   def sample (self, level=None, type=0, sample=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, isolines=None, run=1, trendline=None, smoothen=41, label=None, line=None, frame=False, title=True, axis=None, suffix='autosave', save=None):
@@ -1137,7 +1143,11 @@ class MatPlotLib (object):
         trendline = 0
 
     results = self.mlmc.mcs [ self.mlmc.config.pick [level] [type] ] .results [sample]
-    
+
+    if results == None:
+      print ' NOT available.'
+      return
+
     ts = numpy.array ( results.meta ['x'] )
     vs = numpy.array ( results.data [qoi] )
     
@@ -1279,7 +1289,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix = suffix + '_%s_L%d_T%d_S%d' % (results.name, level, type, sample))
 
-    print ' done.'
+    print 'done.'
 
   '''
   # plot the first sample of the finest level and type 0
@@ -1359,7 +1369,7 @@ class MatPlotLib (object):
     
     self.draw (save, qoi, suffix='ensemble_%d_%d' % (level, type))
     
-    print ' done.'
+    print 'done.'
 
   # plot results of all samples (ensemble) of all levels
   def ensembles (self, qoi=None, both=True, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, limit=1024, valid=False, line=None, save=None):
@@ -1442,7 +1452,7 @@ class MatPlotLib (object):
 
     self.draw (save, qoi, suffix='ensembles' + ('_both' if both else ''))
 
-    print ' done.'
+    print 'done.'
 
   def diagram (self, solver, params, param_name, param_unit, outputfilenames, qoi=None, ref_file=None, ref_label=None, infolines=False, extent=None, xorigin=True, yorigin=True, logx=False, run=1, label=None, frame=False, save=None):
     
@@ -1545,7 +1555,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_samples')
 
-    print ' done.'
+    print 'done.'
 
   # plot budget
   def budget (self, infolines=False, warmup=1, optimal=1, run=1, frame=False, total=1, fill=1, normalization=1e6, unit='million', save=None):
@@ -1601,7 +1611,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_budget')
 
-    print ' done.'
+    print 'done.'
 
   # plot indicators (diffs)
   def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, accuracies=True, cutoff=1e-3, save=None):
@@ -1702,7 +1712,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_diffs')
 
-    print ' done.'
+    print 'done.'
   
   # plot indicators
   def indicators (self, exact=None, infolines=False, run=1, frame=False, tol=False, accuracies=True, save=None):
@@ -1799,7 +1809,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_indicators')
 
-    print ' done.'
+    print 'done.'
 
   # plot correlations
   def correlations (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
@@ -1821,7 +1831,7 @@ class MatPlotLib (object):
 
     # plot correlations
 
-    color = color_params('correlation')
+    color = brighten (color_params('correlation'), factor=0.7)
     pylab.plot (levels, correlation_measured, color=color, linestyle='',       alpha=alpha(run), marker='o', markeredgecolor=color, markerfacecolor='w', label='measured')
     pylab.plot (levels, correlation_infered,  color=color, linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
@@ -1843,7 +1853,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_correlations')
 
-    print ' done.'
+    print 'done.'
 
   # plot coefficients
   def coefficients (self, exact=None, infolines=False, run=1, frame=False, tol=False, save=None):
@@ -1885,7 +1895,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_coefficients')
     
-    print ' done.'
+    print 'done.'
 
   # plot errors
   def errors (self, infolines=False, warmup=1, run=1, frame=False, total=1, fill=1, save=None):
@@ -1936,7 +1946,7 @@ class MatPlotLib (object):
     if not frame:
       self.draw (save, qoi, suffix='analytics_errors')
 
-    print ' done.'
+    print 'done.'
   
   def encode (self, directory='mov/frames', filenames=None, options='', duration=None, framerate=30, background='white', pause=3, verbose=1, suffix='autosave', extension='mp4', save=None):
 
@@ -1973,7 +1983,7 @@ class MatPlotLib (object):
       print ' :: Multiplying last frame...',
       for still in range (stills):
         shutil.copy (files [-1], files [-1] + '.still%04d' % still)
-      print ' done.'
+      print 'done.'
     
     # report frame rates
     print " :: Frame rate: %.1f (%.1f X)" % (fps, fps / 30.0)
