@@ -529,8 +529,9 @@ class MatPlotLib (object):
   # show plots
   def show (self):
 
-    # only if enabled
+    # if not interactive, close all figures and return
     if not self.interactive:
+      self.close ('all')
       return
 
     # report success
