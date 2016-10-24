@@ -30,7 +30,7 @@ import warnings
 warnings.filterwarnings ('ignore', message='No labelled objects found. ')   # when empty subplot is displayed due to failed runs
 
 # figure configuration
-#matplotlib.rcParams ['figure.max_open_warning'] = 100  # does not work on MIRA and HIPPO
+matplotlib.rcParams ['figure.max_open_warning'] = 100  # does not work on MIRA and HIPPO
 matplotlib.rcParams ['savefig.dpi']             = 300
 
 # font configuration
@@ -45,8 +45,8 @@ matplotlib.colors.ColorConverter.colors ['custom_blue']   = ( 38/256.0, 135/256.
 matplotlib.colors.ColorConverter.colors ['custom_orange'] = (251/256.0, 124/256.0,  42/256.0)
 matplotlib.colors.ColorConverter.colors ['custom_green']  = (182/256.0, 212/256.0,  43/256.0)
 
-# default color cycle (not working on MIRA)
-#matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
+# default color cycle (not working on MIRA and HIPPO)
+matplotlib.rcParams ['axes.color_cycle'] = ['custom_blue', 'custom_orange', 'custom_green'] + list (matplotlib.colors.cnames.keys())
 
 # === parser for base qoi
 
