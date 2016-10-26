@@ -108,21 +108,25 @@ class Line (Slice):
     if not self.data:
       self.init (a)
 
-    if self.meta ['shape'] == a.meta ['shape']:
+    if self.meta ['shape'] [0] == a.meta ['shape'] [0]:
 
       for key in self.data.keys():
         getattr (self.data [key], action) (a.data [key])
 
-    if self.meta ['shape'] > a.meta ['shape']:
+    if self.meta ['shape'] [0] > a.meta ['shape'] [0]:
 
-      factor = self.meta ['shape'] / a.meta ['shape']
+      factor = self.meta ['shape'] [0] / a.meta ['shape'] [0]
 
       for key in self.data.keys():
+        print self.data [key] .shape
+        print a.data [key] .shape
+        print factor
+        print numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) .shape
         getattr (self.data [key], action) ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
 
-    elif self.meta ['shape'] < a.meta ['shape']:
+    elif self.meta ['shape'] [0] < a.meta ['shape'] [0]:
 
-      factor = a.meta ['shape'] / self.meta ['shape']
+      factor = a.meta ['shape'] [0] / self.meta ['shape'] [0]
 
       for key in self.data.keys():
         self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones ((1, factor)) ) )

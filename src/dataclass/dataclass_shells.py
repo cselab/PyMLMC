@@ -18,7 +18,7 @@ class Shells (Series):
   name       = 'shells'
   dimensions = 2
 
-  def __init__ (self, qois, filename='statistics.dat', split=('step', 't'), uid='t', span=[0,1], sampling=1000, ranges=None, count=1, extent=[0,1]):
+  def __init__ (self, qois, filename='statistics.dat', metaqois=['step', 't'], uid='t', span=[0,1], sampling=1000, ranges=None, count=1, extent=[0,1]):
 
     # save configuration
     vars (self) .update ( locals() )
@@ -28,11 +28,18 @@ class Shells (Series):
 
   def load (self, directory, verbosity):
 
-    # create a copy of this class
+    # create a copy of this class or results
     results = copy.deepcopy (self)
 
+    # create a copy of this class for Series dataclass
+    series = copy.deepcopy (self)
+
     # get results for a Series dataclass
-    series = Series.load (self, directory, verbosity)
+    series.qois = []
+    for qoi in results.qois:
+      for shell in xrange (results.count):
+        series.qois.append ('%s_shell_avg%d' % (qoi, shell + 1))
+    super (Shells, series) .load (directory, verbosity)
     
     # copy meta data from Series dataclass
     results.meta = series.meta

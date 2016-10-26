@@ -16,8 +16,8 @@ class Series (object):
   name       = 'series'
   dimensions = 1
 
-  def __init__ (self, filename='statistics.dat', split=('step', 't'), uid='t', span=[0,1], sampling=1000, ranges=None):
-
+  def __init__ (self, qois=None, filename='statistics.dat', metaqois=['step', 't'], uid='t', span=[0, 1], sampling=1000, ranges=None):
+    
     # save configuration
     vars (self) .update ( locals() )
 
@@ -30,13 +30,13 @@ class Series (object):
 
     outputfile = open ( os.path.join (directory, self.filename), 'r' )
     
-    data = numpy.genfromtxt ( outputfile, names = True, delimiter = ' ', dtype = None )
+    data = numpy.genfromtxt ( outputfile, names = True, usecols = self.qois + self.metaqois, delimiter = ' ', dtype = None )
     records = dict ( (key, data [key]) for key in data.dtype.names )
     
     outputfile.close()
     
     # split metadata from actual data
-    for key in self.split:
+    for key in self.metaqois:
       results.meta [key] = records [key]
       del records [key]
     results.data = records

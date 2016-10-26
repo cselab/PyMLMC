@@ -644,3 +644,7 @@ class Solver (object):
     else:
 
       return self.efficiency (level, type, sample)
+
+  # check if the loaded result is invalid
+  def invalid (self, results):
+    return 0
