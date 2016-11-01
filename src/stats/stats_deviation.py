@@ -18,6 +18,7 @@ class Deviation (Stat):
     self.size   = 1
     self.limit  = 2
     self.online = 1
+    self.alpha  = min (1.0, 0.2 + 0.3 * factor)
     self.clip   = [0, None]
 
     self.name   = name

@@ -9,6 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import numpy
+from scipy import signal
 import h5py
 import copy, os
 import linecache
@@ -18,10 +19,11 @@ class Slice (object):
   name       = 'slice'
   dimensions = 2
 
-  def __init__ (self, qois=None, slices=1, dump=1, ranges=None, extent=[0,1]):
+  def __init__ (self, qois=None, slices=1, dump=1, ranges=None, extent=[0,1], picker=None, eps=None):
     
     # save configuration
     vars (self) .update ( locals() )
+    self.extent = copy.deepcopy (extent)
     
     self.filename = 'data_%06d-%s_slice%d.h5'
     self.qoinames = { 'p' : 'pressure', 'a' : 'alpha', 'm' : 'velocity', 'r' : 'density' }
@@ -29,18 +31,18 @@ class Slice (object):
 
     self.meta = {}
     self.data = {}
-  
+
   def load (self, directory, verbosity):
 
     # create a copy of this class
     results = copy.deepcopy (self)
 
+    # if picker is specified, get the dump
+    if self.picker != None:
+      self.dump = self.picker.pick (directory, verbosity)
+
     # read dump log
-    line = linecache.getline (os.path.join ( directory, self.logsfile ), self.dump)
-    linecache.clearcache ()
-    entries = line.strip().split()
-    step = int   ( entries [1] .split('=') [1] )
-    time = float ( entries [2] .split('=') [1] )
+    step, time = self.read_dump (directory)
 
     # load all qois
     for qoi in self.qois:
@@ -49,17 +51,17 @@ class Slice (object):
       if not hasattr (self.slices, '__iter__'):
         filename = self.filename % ( step, self.qoinames [qoi], self.slices )
         with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-          results.data [qoi] = numpy.array ( f.get ('data') )
+          results.data [qoi] = f ['data']
       
       # for multiple specified files, compute arithmetic average
       else:
         filename = self.filename % ( step, self.qoinames [qoi], self.slices [0] )
         with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-          results.data [qoi] = numpy.array ( f.get ('data') )
+          results.data [qoi] = f ['data']
         for slice in self.slices [1:]:
           filename = self.filename % ( step, self.qoinames [qoi], slice )
           with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-            results.data [qoi] += numpy.array ( f.get ('data') )
+            results.data [qoi] += f ['data']
         results.data [qoi] /= len (self.slices)
       
       # remove trivial dimensions
@@ -68,6 +70,11 @@ class Slice (object):
       # compute magnitude of vector-valued elements
       if results.data [qoi] .ndim > 2:
         results.data [qoi] = numpy.linalg.norm (results.data [qoi], norm=2, axis=2)
+
+      # smoothen data
+      if self.eps != None:
+        for qoi in self.qois:
+          results.smoothen (qoi, self.eps)
     
     # load meta data
     results.meta = {}
@@ -88,7 +95,18 @@ class Slice (object):
     results.meta ['y'] = numpy.linspace (results.meta ['yrange'] [0] + 0.5 * dy, results.meta ['yrange'] [1] - 0.5 * dy, results.meta ['NY'] )
 
     return results
-  
+
+  # read dump log
+  def read_dump (self, directory):
+
+    line = linecache.getline (os.path.join ( directory, self.logsfile ), self.dump)
+    linecache.clearcache ()
+    entries = line.strip().split()
+    step = int   ( entries [1] .split('=') [1] )
+    time = float ( entries [2] .split('=') [1] )
+
+    return step, time
+
   # serialized access to data
   def serialize (self, qoi):
 
@@ -141,6 +159,14 @@ class Slice (object):
         return 1
 
     return 0
+
+  def smoothen (self, qoi, eps):
+
+    length  = len (self [qoi])
+    width   = length * eps / (self.extent [1] - self.extent [0])
+    kernel  = numpy.outer (signal.gaussian (length, width), signal.gaussian (length, width))
+
+    self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 
   def __rmul__ (self, a):
     result = copy.deepcopy (self)
@@ -201,3 +227,72 @@ class Slice (object):
       output += '\n %10s :%s' % ( str (key), ( '%8s' * len (self.data [key]) ) % tuple ( [ '%1.1e' % value for value in self.data [key] ] ) )
     return output
   '''
+
+class Picker (object):
+
+  def __init__ (self, qoi):
+
+    self.qoi = qoi
+
+  # pick required dump
+  def pick (self, directory, verbosity):
+
+    from dataclass_series import Series
+    series = Series (qois=[self.qoi], sampling=None)
+    series = series.load (directory, verbosity)
+
+    index = series [self.qoi] .argmax ()
+    time  = series.meta ['t'] [index]
+
+    dumps, steps, times = self.read_dump (directory)
+
+    dump = dumps [ numpy.argmin ( numpy.abs (numpy.array (times) - time) ) ]
+
+    return dump
+
+  # read dump log
+  def read_dump (self, directory):
+
+    with open (os.path.join ( directory, 'dump.log' ), 'r') as f:
+      dumps = []
+      steps = []
+      times = []
+      for line in f.readlines ():
+        entries = line.strip().split()
+        dumps.append ( int   ( entries [0] .split('=') [1] ) )
+        steps.append ( int   ( entries [1] .split('=') [1] ) )
+        times.append ( float ( entries [2] .split('=') [1] ) )
+
+    return dumps, steps, times
+
+class Smooth_Picker (Picker):
+
+  def __init__ (self, qoi, slices, eps=None, dataclass=Slice):
+
+    self.qoi       = qoi
+    self.slices    = slices
+    self.eps       = eps
+    self.dataclass = dataclass
+
+  # pick required dump
+  def pick (self, directory, verbosity):
+
+    import scipy
+
+    dumps, steps, times = self.read_dump (directory)
+
+    dump_max = float ('-inf')
+    dump_idx = None
+
+    for idx, dump in enumerate (dumps):
+
+      results = self.dataclass (qois = [self.qoi], slices = self.slices, dump = dump)
+      results = results.load (directory, verbosity)
+      results.smoothen (self.qoi, self.eps)
+      max = numpy.max (results [self.qoi])
+      if max > dump_max:
+        dump_max = max
+        dump_idx = idx
+
+    return dumps [dump_idx]
+

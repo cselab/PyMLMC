@@ -239,6 +239,10 @@ class MC (object):
     
     config = self.config
 
+    prefix = '  :      %d  |  %s  |    %s  | ' % (config.level, [' FINE ', 'COARSE'] [config.type], intf(len(config.samples), table=1))
+    progress = Progress (prefix=prefix, steps=len(config.samples), length=33)
+    progress.init ()
+
     for i, sample in enumerate (config.samples):
       if self.params.verbose >= 2:
         self.results [i] = config.solver.load ( config.level, config.type, sample )
@@ -247,7 +251,10 @@ class MC (object):
           self.results [i] = config.solver.load ( config.level, config.type, sample )
         except:
           self.results [i] = None
-            
+      progress.update (i + 1)
+
+    progress.reset ()
+    
     loaded = [ i for i, result in enumerate (self.results) if result != None ]
     
     self.available = (len (loaded) > 0)

@@ -20,6 +20,7 @@ class Mean (Stat):
     self.size   = 1
     self.limit  = 1
     self.online = 1
+    self.alpha  = 0
   
   # initialize
   def init (self):

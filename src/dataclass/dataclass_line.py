@@ -9,6 +9,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import numpy
+from scipy import signal
 import h5py
 import copy, os
 import linecache
@@ -20,10 +21,11 @@ class Line (Slice):
   name       = 'line'
   dimensions = 1
 
-  def __init__ (self, qois=None, slices=1, dump=1, line=0.5, ranges=None, extent=[0,1]):
+  def __init__ (self, qois=None, slices=1, dump=1, line=0.5, ranges=None, extent=[0,1], picker=None, eps=None):
     
     # save configuration
     vars (self) .update ( locals() )
+    self.extent = copy.deepcopy (extent)
     
     self.filename = 'data_%06d-%s_slice%d.h5'
     self.qoinames = { 'p' : 'pressure', 'a' : 'alpha', 'r' : 'density' }
@@ -37,22 +39,62 @@ class Line (Slice):
     # create a copy of this class
     results = copy.deepcopy (self)
 
-    # load slices
-    slices = Slice.load (self, directory, verbosity)
+    # if picker is specified, get the dump
+    if self.picker != None:
+      self.dump = self.picker.pick (directory, verbosity)
 
-    # compute the required index for the line
-    index = int ( self.line * slices.meta ['NY'] )
+    # read dump log
+    step, time = self.read_dump (directory)
 
-    # pick the specified line only for all qois
+    # load all qois
     for qoi in self.qois:
-      results.data [qoi] = slices.data [qoi] [:, index]
+
+      # single slices are loaded normally
+      if not hasattr (self.slices, '__iter__'):
+        filename = self.filename % ( step, self.qoinames [qoi], self.slices )
+        with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
+          index = int ( self.line * f ['data'] .shape [1] )
+          results.data [qoi] = f ['data'] [:, index]
+
+      # for multiple specified files, compute arithmetic average
+      else:
+        filename = self.filename % ( step, self.qoinames [qoi], self.slices [0] )
+        with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
+          index = int ( self.line * f ['data'] .shape [1] )
+          results.data [qoi] = f ['data'] [:, index]
+        for slice in self.slices [1:]:
+          filename = self.filename % ( step, self.qoinames [qoi], slice )
+          with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
+            index = int ( self.line * f ['data'] .shape [1] )
+            results.data [qoi] += f ['data'] [:, index]
+      results.data [qoi] /= len (self.slices)
+
+      # remove trivial dimensions
+      results.data [qoi] = numpy.squeeze (results.data [qoi])
+
+    # compute magnitude of vector-valued elements
+    if results.data [qoi] .ndim > 1:
+      results.data [qoi] = numpy.linalg.norm (results.data [qoi], norm=2, axis=1)
+
+    # smoothen data
+    if self.eps != None:
+      for qoi in self.qois:
+        results.smoothen (qoi, self.eps)
 
     # load meta data
-    results.meta = copy.deepcopy (slices.meta)
-    results.meta ['shape'] = len (results.data [qoi])
+    results.meta = {}
+    results.meta ['step'] = step
+    results.meta ['t'] = time
+    results.meta ['NX'] = len ( results.data [qoi] )
+    results.meta ['shape'] = results.meta ['NX']
+    results.meta ['xlabel'] = 'x'
+    results.meta ['xrange'] = results.extent
+    results.meta ['xunit'] = r'$mm$'
+    dx = float ( numpy.diff (results.meta ['xrange']) ) / results.meta ['NX']
+    results.meta ['x'] = numpy.linspace (results.meta ['xrange'] [0] + 0.5 * dx, results.meta ['xrange'] [1] - 0.5 * dx, results.meta ['NX'] )
 
     return results
-  
+
   # serialized access to data
   def serialize (self, qoi):
     return self.data [qoi]
@@ -97,36 +139,45 @@ class Line (Slice):
               self.data [key] = numpy.maximum ( lower, self.data [key] )
             if upper != None:
               self.data [key] = numpy.minimum ( upper, self.data [key] )
-  
+
+  def smoothen (self, qoi, eps):
+
+    length  = len (self [qoi])
+    width   = length * eps / (self.extent [1] - self.extent [0])
+    kernel  = signal.gaussian (length, width)
+
+    self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
+
   def __rmul__ (self, a):
-    for key in self.data.keys():
-      self.data [key] *= a
-    return self
+    result = copy.deepcopy (self)
+    for key in result.data.keys():
+      result.data [key] *= a
+    return result
+
+  def __lmul__ (self, a):
+    return self * a
 
   def inplace (self, a, action):
 
     if not self.data:
       self.init (a)
 
-    if self.meta ['shape'] [0] == a.meta ['shape'] [0]:
+    if self.meta ['shape'] == a.meta ['shape']:
 
       for key in self.data.keys():
         getattr (self.data [key], action) (a.data [key])
 
-    if self.meta ['shape'] [0] > a.meta ['shape'] [0]:
+    if self.meta ['shape'] > a.meta ['shape']:
 
-      factor = self.meta ['shape'] [0] / a.meta ['shape'] [0]
+      factor = self.meta ['shape'] / a.meta ['shape']
 
       for key in self.data.keys():
-        print self.data [key] .shape
-        print a.data [key] .shape
-        print factor
-        print numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) .shape
+        #self.data [key] .__dict__ [action] ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
         getattr (self.data [key], action) ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
 
-    elif self.meta ['shape'] [0] < a.meta ['shape'] [0]:
+    elif self.meta ['shape'] < a.meta ['shape']:
 
-      factor = a.meta ['shape'] [0] / self.meta ['shape'] [0]
+      factor = a.meta ['shape'] / self.meta ['shape']
 
       for key in self.data.keys():
         self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones ((1, factor)) ) )

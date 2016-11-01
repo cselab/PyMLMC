@@ -114,3 +114,4 @@ class Config (object):
     print   '  : ROOT         :    %-30s' % self.root
     print   '  : RECYCLE      :    %-30s' % ( 'ENABLED' if self.recycle else 'DISABLED' )
     print   '  : INFERENCE    :    %-30s' % ( self.inference + (' [enforced]' if self.enforce else ' [not enforced]') )
+    print   '  : OPTIMAL C.V. :    %-30s' % ( 'ENABLED' if self.ocv else 'DISABLED' )

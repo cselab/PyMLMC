@@ -31,18 +31,17 @@ class Shells (Series):
     # create a copy of this class or results
     results = copy.deepcopy (self)
 
-    # create a copy of this class for Series dataclass
-    series = copy.deepcopy (self)
-
     # get results for a Series dataclass
+    series = copy.deepcopy (self)
+    series = super (Shells, series)
     series.qois = []
     for qoi in results.qois:
       for shell in xrange (results.count):
         series.qois.append ('%s_shell_avg%d' % (qoi, shell + 1))
-    super (Shells, series) .load (directory, verbosity)
+    series.load (directory, verbosity)
     
     # copy meta data from Series dataclass
-    results.meta = series.meta
+    results.meta = copy.deepcopy (series.meta)
 
     # merge shells
     shape = (results.sampling, results.count)

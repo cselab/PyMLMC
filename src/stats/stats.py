@@ -55,7 +55,7 @@ class Stat (object):
     
     # quantities of interest to be assembled
     if qois == None:
-      names   = stats.data.keys()
+      names   = self.estimate.qois
       extents = [ None for name in names ]
     else:
       names   = qois.keys()
@@ -77,12 +77,11 @@ class Stat (object):
         progress.update ( (i + 1) * len (indices) )
         continue
       
-      # initialize statistics
-      if self.online:
-        self.init ()
-      
       # templated online estimation is supported by statistic
       if self.online:
+
+        # initialize statistics
+        self.init ()
 
         # process all samples
         for index in indices:
@@ -106,8 +105,6 @@ class Stat (object):
           ensemble = [ sample.serialize (qoi) [element] for index, sample in enumerate (samples) if index in indices ]
           
           # compute statistic
-          #print self.estimate.serialize (qoi) [element]
-          #print self.compute (ensemble, extent)
           self.estimate.serialize (qoi) [element] = self.compute (ensemble, extent)
           
         # update progress

@@ -683,9 +683,6 @@ class MatPlotLib (object):
   # plot histogram
   def histogram (self, qoi, stat, extent, centered, line=None, log=1):
 
-    # for debugging only
-    log = 1
-
     vs = stat.estimate.data [qoi]
 
     if stat.estimate.dimensions == 2 and line != None:
@@ -765,7 +762,7 @@ class MatPlotLib (object):
         if stat.size > 2:
           if stat.name == 'histogram':
             if stat_extent != None:
-              self.histogram (qoi, stat, stat_extent, centered, line, log)
+              self.histogram (qoi, stat, stat_extent, centered, line)
             else:
               #self.mlmc.helpers.warning ('Histogram plotting requires explicit specification of \'extent\'')
               continue
@@ -778,13 +775,15 @@ class MatPlotLib (object):
           index = int ( line * stat.estimate.meta ['NY'] )
           vs = vs [:, index]
           ts = stat.estimate.meta ['x']
+
+        # set color
+        factor = 0.8 * stat.alpha
+        bright = brighten (color(qoi), factor=factor)
         
         # plot size 2 statistics (e.g. confidence intervals)
         if stat.size == 2:
           lower  = vs [:, 0]
           upper  = vs [:, 1]
-          factor = 0.8 * stat.alpha
-          bright = brighten (color(qoi), factor=factor)
           pylab.fill_between (ts, lower, upper, facecolor=bright, edgecolor=bright, linewidth=3)
           # hack to show the legend entry
           pylab.plot ([], [], color=bright, linewidth=10, label=stat.name)
@@ -792,7 +791,7 @@ class MatPlotLib (object):
           
         # general plotting for size 1 statistics (e.g. mean, median, variance)
         if stat.size == 1:
-          pylab.plot (ts, vs, color=color(qoi), linestyle=style(run), alpha=alpha(run), label=stat.name)
+          pylab.plot (ts, vs, color=bright, linestyle=style(run), alpha=alpha(run), label=stat.name)
 
         if log and not centered:
           pylab.gca().set_yscale ('log', nonposy='clip')
@@ -1288,7 +1287,7 @@ class MatPlotLib (object):
     self.adjust (infolines, line)
     
     if not frame:
-      self.draw (save, qoi, suffix = suffix + '_%s_L%d_T%d_S%d' % (results.name, level, type, sample))
+      self.draw (save, qoi, suffix = '_%s_L%d_T%d_S%d' % (results.name, level, type, sample) + suffix)
 
     print 'done.'
 
@@ -1305,7 +1304,7 @@ class MatPlotLib (object):
   '''
 
   # plot results of all samples (ensemble) of the specified level and type 
-  def ensemble (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, legend=4, limit=1024, line=None, save=None):
+  def ensemble (self, level, type=0, qoi=None, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, legend=4, limit=1024, line=None, suffix='autosave', save=None):
 
     if self.dimensions > 1 and line == None:
       self.mlmc.helpers.warning ('Ensemble plots are not available for multi-dimensional data [unless \'line\' is specifed]')
@@ -1368,12 +1367,12 @@ class MatPlotLib (object):
     
     self.adjust (infolines, line)
     
-    self.draw (save, qoi, suffix='ensemble_%d_%d' % (level, type))
+    self.draw (save, qoi, suffix = 'ensemble_%d_%d_' % (level, type) + suffix)
     
     print 'done.'
 
   # plot results of all samples (ensemble) of all levels
-  def ensembles (self, qoi=None, both=True, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, limit=1024, valid=False, line=None, save=None):
+  def ensembles (self, qoi=None, both=True, infolines=False, extent=None, xorigin=True, yorigin=True, log=False, limit=1024, valid=False, line=None, suffix='autosave', save=None):
 
     if self.dimensions > 1 and line == None:
       self.mlmc.helpers.warning ('Ensemble plots are not available for multi-dimensional data [unless \'line\' is specifed]')
@@ -1451,7 +1450,7 @@ class MatPlotLib (object):
 
     self.adjust (infolines, line, subplots=levels)
 
-    self.draw (save, qoi, suffix='ensembles' + ('_both' if both else ''))
+    self.draw (save, qoi, suffix = 'ensembles' + ('_both' if both else '') + '_' + suffix)
 
     print 'done.'
 
@@ -1615,7 +1614,7 @@ class MatPlotLib (object):
     print 'done.'
 
   # plot indicators (diffs)
-  def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=False, accuracies=True, cutoff=1e-3, save=None):
+  def diffs (self, exact=None, infolines=False, run=1, frame=False, tol=False, coarsest=True, accuracies=True, cutoff=1e-3, save=None):
     
     print ' :: INFO: Plotting diffs...',
     sys.stdout.flush()
@@ -1628,9 +1627,9 @@ class MatPlotLib (object):
       levels = levels  [ 1 : ]
     
     mean_diff_measured         = numpy.abs (self.mlmc.indicators.mean_diff         ['measured'] [levels])
-    variance_diff_measured     = numpy.abs (self.mlmc.indicators.variance_diff     ['measured'] [levels])
+    deviation_diff_measured    = numpy.abs (self.mlmc.indicators.deviation_diff    ['measured'] [levels])
     mean_diff_accuracy         = numpy.abs (self.mlmc.indicators.mean_diff         ['accuracy'] [levels])
-    variance_diff_accuracy     = numpy.abs (self.mlmc.indicators.variance_diff     ['accuracy'] [levels])
+    deviation_diff_accuracy    = numpy.abs (self.mlmc.indicators.deviation_diff    ['accuracy'] [levels])
     mean_diff_infered          = numpy.abs (self.mlmc.indicators.mean_diff         ['infered']  [levels])
     variance_diff_infered      = numpy.abs (self.mlmc.indicators.variance_diff     ['infered']  [levels])
     mean_diff_opt_infered      = numpy.abs (self.mlmc.indicators.mean_diff_opt     ['infered']  [levels])
@@ -1660,7 +1659,8 @@ class MatPlotLib (object):
     else:
       pylab.semilogy (levels, mean_diff_measured / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
     pylab.semilogy (levels, mean_diff_infered     / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
-    pylab.semilogy (levels, mean_diff_opt_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
+    if self.mlmc.config.ocv:
+      pylab.semilogy (levels, mean_diff_opt_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
@@ -1684,11 +1684,12 @@ class MatPlotLib (object):
     pylab.subplot(122)
     if accuracies:
       color = brighten (color_params('sigma'), factor=0.7)
-      pylab.errorbar (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, yerr=variance_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+      pylab.errorbar (levels, deviation_diff_measured / NORMALIZATION, yerr=deviation_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
-      pylab.semilogy (levels, numpy.sqrt (variance_diff_measured)    / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+      pylab.semilogy (levels, deviation_diff_measured / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
     pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
-    pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
+    if self.mlmc.config.ocv:
+      pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. difference std. devs. for Q = %s' % name (qoi))
@@ -1723,12 +1724,12 @@ class MatPlotLib (object):
     
     # === load all required data
 
-    mean_measured         = numpy.abs (self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['measured'])
-    variance_measured     = numpy.abs (self.mlmc.indicators.variance [self.mlmc.config.FINE] ['measured'])
-    mean_accuracy         = numpy.abs (self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['accuracy'])
-    variance_accuracy     = numpy.abs (self.mlmc.indicators.variance [self.mlmc.config.FINE] ['accuracy'])
-    mean_infered          = numpy.abs (self.mlmc.indicators.mean     [self.mlmc.config.FINE] ['infered'])
-    variance_infered      = numpy.abs (self.mlmc.indicators.variance [self.mlmc.config.FINE] ['infered'])
+    mean_measured         = numpy.abs (self.mlmc.indicators.mean      [self.mlmc.config.FINE] ['measured'])
+    deviation_measured    = numpy.abs (self.mlmc.indicators.deviation [self.mlmc.config.FINE] ['measured'])
+    mean_accuracy         = numpy.abs (self.mlmc.indicators.mean      [self.mlmc.config.FINE] ['accuracy'])
+    deviation_accuracy    = numpy.abs (self.mlmc.indicators.deviation [self.mlmc.config.FINE] ['accuracy'])
+    mean_infered          = numpy.abs (self.mlmc.indicators.mean      [self.mlmc.config.FINE] ['infered'])
+    variance_infered      = numpy.abs (self.mlmc.indicators.variance  [self.mlmc.config.FINE] ['infered'])
     #TOL           = self.mlmc.config.samples.tol
     NORMALIZATION = self.mlmc.errors.normalization
     qoi           = self.mlmc.config.solver.qoi
@@ -1771,7 +1772,7 @@ class MatPlotLib (object):
     adjust_extent ([ymin, ymax], factor=1.5)
     '''
     pylab.gca().set_ylim (bottom = 0.0)
-    pylab.gca().set_ylim (top    = 1.5)
+    pylab.gca().set_ylim (top    = 2.0)
     levels_extent (levels)
     pylab.legend (loc='lower left')
     
@@ -1780,9 +1781,9 @@ class MatPlotLib (object):
     pylab.subplot(122)
     if accuracies:
       color = brighten (color_params('sigma'), factor=0.7)
-      pylab.errorbar (levels, numpy.sqrt (variance_measured) / NORMALIZATION, yerr=variance_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
+      pylab.errorbar (levels, deviation_measured / NORMALIZATION, yerr=deviation_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
-      pylab.plot (levels, numpy.sqrt (variance_measured) / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
+      pylab.plot (levels, deviation_measured / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
     pylab.plot (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
@@ -1798,7 +1799,7 @@ class MatPlotLib (object):
     adjust_extent ([ymin, ymax], factor=1.5)
     '''
     pylab.gca().set_ylim (bottom = 0.0)
-    pylab.gca().set_ylim (top    = 1.5)
+    pylab.gca().set_ylim (top    = 2.0)
     levels_extent (levels)
     pylab.legend (loc='upper left')
     
@@ -1834,6 +1835,7 @@ class MatPlotLib (object):
 
     color = brighten (color_params('correlation'), factor=0.7)
     pylab.plot (levels, correlation_measured, color=color, linestyle='',       alpha=alpha(run), marker='o', markeredgecolor=color, markerfacecolor='w', label='measured')
+    color = color_params('correlation')
     pylab.plot (levels, correlation_infered,  color=color, linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       #pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle='-', linewidth=2, alpha=0.6, label='correlation = 1/2')

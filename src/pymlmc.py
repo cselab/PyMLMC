@@ -163,9 +163,6 @@ class MLMC (object):
       if self.config.deterministic:
         return
 
-      # update the computed number of samples
-      self.config.samples.append ()
-
       # compute, report, and save error indicators
       self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
       self.indicators.report  ()
@@ -768,6 +765,9 @@ class MLMC (object):
 
     # report detailed progrees of individual samples
     self.progress ()
+
+    # update the computed number of samples
+    self.config.samples.append ()
 
     # check availability
     if not self.available:

@@ -38,8 +38,8 @@ class Indicator (object):
     self.start  = start
 
     # weights for each level
-    self.weights  = numpy.empty (len (levels))
-    self.weights.fill (float('nan'))
+    #self.weights  = numpy.empty (len (levels))
+    #self.weights.fill (float('nan'))
 
     # measured values (signed)
     self.measured = numpy.empty (len (levels))
@@ -88,13 +88,26 @@ class Indicators (object):
     # initialize control variate COEFFICIENTS
     self.coefficients = Coefficients (self.levels, self.recycle)
 
-  def accuracy (self, values, moment = 1):
+  def accuracy_mean (self, deviation, size):
 
-    if values.size > moment:
-      power = 2 * moment
-      return numpy.power ( numpy.mean ( (values - numpy.mean (values)) ** power ) / (values.size - moment), 1.0 / power )
-    else:
+    if size < 1:
       return float ('nan')
+    else:
+      return deviation / numpy.sqrt (size)
+
+  def accuracy_variance (self, variance, size):
+
+    if size < 2:
+      return float ('nan')
+    else:
+      return variance * numpy.sqrt (2.0 / (size - 1))
+
+  def accuracy_deviation (self, deviation, size):
+
+    if size < 2:
+      return float ('nan')
+    else:
+      return deviation * numpy.sqrt (0.5 / (size - 1))
 
   def compute (self, mcs, indices, L0):
 
@@ -114,23 +127,27 @@ class Indicators (object):
     # evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
 
-    # === MEAN & VARIANCE indicators
+    # === MEAN, VARIANCE & DEVIATION indicators
 
-    self.mean     = [ Indicator ('MEAN     FINE', self.levels), Indicator ('MEAN     COARSE', self.levels, start = self.L0 + 1) ]
-    self.variance = [ Indicator ('VARIANCE FINE', self.levels), Indicator ('VARIANCE COARSE', self.levels, start = self.L0 + 1) ]
+    self.mean      = [ Indicator ('MEAN      FINE', self.levels), Indicator ('MEAN      COARSE', self.levels, start = self.L0 + 1) ]
+    self.variance  = [ Indicator ('VARIANCE  FINE', self.levels), Indicator ('VARIANCE  COARSE', self.levels, start = self.L0 + 1) ]
+    self.deviation = [ Indicator ('DEVIATION FINE', self.levels), Indicator ('DEVIATION COARSE', self.levels, start = self.L0 + 1) ]
 
-    # compute mean and variance for all levels and types
+    # compute mean, variance and deviation for all levels and types
     for level, type in self.levels_types:
-      self.mean     [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
-      self.variance [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
-      self.mean     [type] ['measured'] [level] = numpy.mean ( numpy.abs ( values [level] [type] ) )
-      self.variance [type] ['measured'] [level] = numpy.var  ( values [level] [type], ddof = 1 ) if len (values [level] [type]) > 1 else float ('nan')
+      #self.mean      [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
+      #self.variance  [type] ['weights']  [level] = numpy.sqrt ( values [level] [type] .size )
+      self.mean      [type] ['measured'] [level] = numpy.mean ( numpy.abs ( values [level] [type] ) )
+      self.variance  [type] ['measured'] [level] = numpy.var  ( values [level] [type], ddof = 1 ) if len (values [level] [type]) > 1 else float ('nan')
+      self.deviation [type] ['measured'] [level] = numpy.std  ( values [level] [type], ddof = 1 ) if len (values [level] [type]) > 1 else float ('nan')
     
-    # compute accuracy of mean and variance indicators for all levels and types
+    # compute accuracy of mean, variance and deviations indicators for all levels and types
     for level, type in self.levels_types:
-      self.mean     [type] ['accuracy'] [level] = self.accuracy (values [level] [type], moment = 1)
-      self.variance [type] ['accuracy'] [level] = self.accuracy (values [level] [type], moment = 2)
-    
+      size = values [level] [type] .size
+      self.mean      [type] ['accuracy'] [level] = self.accuracy_mean      (self.deviation [type] ['measured'] [level], size)
+      self.variance  [type] ['accuracy'] [level] = self.accuracy_variance  (self.variance  [type] ['measured'] [level], size)
+      self.deviation [type] ['accuracy'] [level] = self.accuracy_deviation (self.deviation [type] ['measured'] [level], size)
+
     # set the normalization
     if numpy.isnan (self.mean [self.FINE] ['measured'] [self.L0]):
       self.normalization = 1
@@ -141,26 +158,30 @@ class Indicators (object):
     # least squares inference of indicator level values based on the magnitudes of measured level values
     self.infer (self.mean     [self.FINE  ], degree = 1, log = False, critical = False, min = 0)
     self.infer (self.mean     [self.COARSE], degree = 1, log = False, critical = False, min = 0)
-    self.infer (self.variance [self.FINE  ], degree = 0, log = False, critical = True,  min = 0)
-    self.infer (self.variance [self.COARSE], degree = 0, log = False, critical = True,  min = 0)
+    self.infer (self.variance [self.FINE  ], degree = 1, log = False, critical = True,  min = 0)
+    self.infer (self.variance [self.COARSE], degree = 1, log = False, critical = True,  min = 0)
 
     # === MEAN DIFF and VARIANCE DIFF level distance indicators
     # (WITHOUT optimal control variate coefficients computed below)
 
-    self.mean_diff     = Indicator ('MEAN     DIFF', self.levels, start = self.L0 + 1)
-    self.variance_diff = Indicator ('VARIANCE DIFF', self.levels, start = self.L0 + 1)
+    self.mean_diff      = Indicator ('MEAN      DIFF', self.levels, start = self.L0 + 1)
+    self.variance_diff  = Indicator ('VARIANCE  DIFF', self.levels, start = self.L0 + 1)
+    self.deviation_diff = Indicator ('DEVIATION DIFF', self.levels, start = self.L0 + 1)
     
     # compute level distances
     for level in self.levels:
-      self.mean_diff     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
-      self.variance_diff ['weights']  [level] = numpy.sqrt ( distances [level] .size )
-      self.mean_diff     ['measured'] [level] = numpy.mean ( numpy.abs ( distances [level] ) )
-      self.variance_diff ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
+      #self.mean_diff     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
+      #self.variance_diff ['weights']  [level] = numpy.sqrt ( distances [level] .size )
+      self.mean_diff      ['measured'] [level] = numpy.mean ( numpy.abs ( distances [level] ) )
+      self.variance_diff  ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
+      self.deviation_diff ['measured'] [level] = numpy.std  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
     
     # compute accuracy of mean diff and variance diff indicators for all levels and types
     for level, type in self.levels_types:
-      self.mean_diff     ['accuracy'] [level] = self.accuracy (distances [level], moment = 1)
-      self.variance_diff ['accuracy'] [level] = self.accuracy (distances [level], moment = 2)
+      size = distances [level] .size
+      self.mean_diff      ['accuracy'] [level] = self.accuracy_mean      (self.deviation_diff ['measured'] [level], size)
+      self.variance_diff  ['accuracy'] [level] = self.accuracy_variance  (self.variance_diff  ['measured'] [level], size)
+      self.deviation_diff ['accuracy'] [level] = self.accuracy_deviation (self.deviation_diff ['measured'] [level], size)
 
     # least squares inference of indicator level values based on the magnitudes of measured level values
     # REMARK: in such case, 'infered' and 'optimal' values are inconsistent (differ even if all coeffs = 1), due to inconsistent computation
@@ -185,9 +206,7 @@ class Indicators (object):
     # compute covariance and correlation (measured)
     # remark: computing covariances and correlations from 'values' leads to inconsistent estimations and should be avoided
     for level in self.levels [ self.L0 + 1 : ]:
-      self.covariance  ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.covariance  ['measured'] [level] = 0.5 * ( self.variance [self.FINE] ['measured'] [level] + self.variance [self.COARSE] ['measured'] [level] - self.variance_diff ['measured'] [level] )
-      self.correlation ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.correlation ['measured'] [level] = self.covariance ['measured'] [level] / numpy.sqrt ( self.variance [self.FINE] ['measured'] [level] * self.variance [self.COARSE] ['measured'] [level] )
 
     # for 'diffs' inference, correlations and covariances are computed from infered 'variance_diff'
@@ -234,8 +253,6 @@ class Indicators (object):
 
     # compute optimized level distances (measured values)
     for level in self.levels:
-      self.mean_diff_opt     ['weights']  [level] = numpy.sqrt ( distances [level] .size )
-      self.variance_diff_opt ['weights']  [level] = numpy.sqrt ( distances [level] .size )
       self.mean_diff_opt     ['measured'] [level] = numpy.mean ( numpy.abs (distances [level]) )
       self.variance_diff_opt ['measured'] [level] = numpy.var  ( distances [level], ddof = 1 ) if len (distances [level]) > 1 else float ('nan')
     
@@ -333,7 +350,10 @@ class Indicators (object):
     # filter out invalid entries
     levels  = numpy.array (self.levels [indicator.start:]) [ ~ numpy.isnan (indicator ['measured'] [indicator.start:]) ]
     values  = numpy.abs  ( indicator ['measured'] [levels] )
-    weights = numpy.sqrt ( indicator ['weights']  [levels] )
+    if not numpy.isnan ( indicator ['accuracy'] [levels] ) .any ():
+      weights = 1.0 / indicator ['accuracy'] [levels]
+    else:
+      weights = None
 
     # add offset, if specified
     values += offset
@@ -354,7 +374,7 @@ class Indicators (object):
       indicator ['infered'] [indicator.start:] = values [0]
       return
     '''
-
+    
     # nonlinear fit for y = a * exp (b * x) + c
     if exp:
 
@@ -370,8 +390,10 @@ class Indicators (object):
         values = numpy.log (values)
 
       # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
-      #line = numpy.polyfit ( levels, values, degree, w = weights )
-      line = numpy.polyfit ( levels, values, degree )
+      if not numpy.isnan ( indicator ['accuracy'] [levels] ) .any ():
+        line = numpy.polyfit ( levels, values, degree, w = weights )
+      else:
+        line = numpy.polyfit ( levels, values, degree )
 
       # get infered maximum likelihood values
       infered = numpy.polyval (line, self.levels)
