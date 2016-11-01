@@ -390,10 +390,10 @@ class Indicators (object):
         values = numpy.log (values)
 
       # fit a linear polynomial to absolute valus in log-scale using linear least squares, weighted by data uncertainties
-      if not numpy.isnan ( indicator ['accuracy'] [levels] ) .any ():
-        line = numpy.polyfit ( levels, values, degree, w = weights )
-      else:
-        line = numpy.polyfit ( levels, values, degree )
+      #if not numpy.isnan ( indicator ['accuracy'] [levels] ) .any ():
+      #  line = numpy.polyfit ( levels, values, degree, w = weights )
+      #else:
+      line = numpy.polyfit ( levels, values, degree )
 
       # get infered maximum likelihood values
       infered = numpy.polyval (line, self.levels)
