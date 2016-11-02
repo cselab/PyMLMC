@@ -308,7 +308,7 @@ class Smooth_Picker (Picker):
       tasks.append ( (self.dataclass, self.qoi, self.slices, dump, directory, verbosity, self.eps) )
 
     import multiprocessing
-    pool = multiprocessing.Pool ()
+    pool = multiprocessing.Pool (16)
     max = pool.map (get_max, tasks)
 
     '''
