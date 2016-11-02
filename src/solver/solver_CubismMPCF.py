@@ -70,11 +70,11 @@ class CubismMPCF (Solver):
 
       # maximum-norm based indicator
       if self.norm == 'max':
-        self.indicator = lambda x : numpy.max ( numpy.abs (x [self.qoi]) )
+        self.indicator = lambda data : numpy.max ( numpy.abs (data [self.qoi]) )
 
       # 1-norm based indicator
       if self.norm == 1:
-        self.indicator = lambda x : numpy.mean ( numpy.abs (x [self.qoi]) )
+        self.indicator = lambda data : numpy.mean ( numpy.abs (data [self.qoi]) )
       
     # set distance
     if not self.distance:
@@ -87,7 +87,7 @@ class CubismMPCF (Solver):
       # 1-norm based distance
       if self.norm == 1:
         #self.distance = lambda f, c : numpy.mean ( numpy.abs ( numpy.array ( [ entry for entry in (f [self.qoi] - c [self.qoi]) if not numpy.isnan (entry) ] ) ) ) if c != None else self.indicator (f)
-        self.distance = lambda f, c : numpy.mean ( numpy.abs ( f [self.qoi] - c [self.qoi] ) ) if c != None else self.indicator (f)
+        self.distance = lambda f, c : numpy.mean ( numpy.abs ( (f - c) [self.qoi] ) ) if c != None else self.indicator (f)
 
   # return string representing the resolution of a given discretization 'd'
   def resolution_string (self, d):

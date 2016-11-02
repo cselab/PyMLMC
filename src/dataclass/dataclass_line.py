@@ -193,7 +193,17 @@ class Line (Slice):
 
   def __isub__ (self, a):
     return self.inplace (a, '__isub__')
-  
+
+  def __add__ (self, a):
+    result = copy.deepcopy (self)
+    result += a
+    return result
+
+  def __sub__ (self, a):
+    result = copy.deepcopy (self)
+    result -= a
+    return result
+
   '''
   def __str__ (self):
     output = '\n' + 'meta:'
