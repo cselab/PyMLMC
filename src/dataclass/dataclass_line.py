@@ -143,9 +143,10 @@ class Line (Slice):
   def smoothen (self, qoi, eps):
 
     length  = len (self [qoi])
-    width   = length * eps / (self.extent [1] - self.extent [0])
-    kernel  = signal.gaussian (length, width)
-
+    width   = length * eps / float (self.extent [1] - self.extent [0])
+    scaling = 1.0 / float ( width * numpy.sqrt (2 * numpy.pi) )
+    kernel  = scaling * signal.gaussian (length, width)
+    
     self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 
   def __rmul__ (self, a):

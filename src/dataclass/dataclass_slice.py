@@ -51,17 +51,17 @@ class Slice (object):
       if not hasattr (self.slices, '__iter__'):
         filename = self.filename % ( step, self.qoinames [qoi], self.slices )
         with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-          results.data [qoi] = f ['data']
+          results.data [qoi] = f ['data'] [:]
       
       # for multiple specified files, compute arithmetic average
       else:
         filename = self.filename % ( step, self.qoinames [qoi], self.slices [0] )
         with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-          results.data [qoi] = f ['data']
+          results.data [qoi] = f ['data'] [:]
         for slice in self.slices [1:]:
           filename = self.filename % ( step, self.qoinames [qoi], slice )
           with h5py.File ( os.path.join (directory, filename), 'r' ) as f:
-            results.data [qoi] += f ['data']
+            results.data [qoi] += f ['data'] [:]
         results.data [qoi] /= len (self.slices)
       
       # remove trivial dimensions
@@ -99,11 +99,15 @@ class Slice (object):
   # read dump log
   def read_dump (self, directory):
 
-    line = linecache.getline (os.path.join ( directory, self.logsfile ), self.dump)
-    linecache.clearcache ()
-    entries = line.strip().split()
-    step = int   ( entries [1] .split('=') [1] )
-    time = float ( entries [2] .split('=') [1] )
+    with open (os.path.join ( directory, self.logsfile ), 'r') as f:
+      dumps = []
+      steps = []
+      times = []
+      lines = f.readlines ()
+      line = lines [self.dump - 1]
+      entries = line.strip().split()
+      step = int   ( entries [1] .split('=') [1] )
+      time = float ( entries [2] .split('=') [1] )
 
     return step, time
 
@@ -163,8 +167,9 @@ class Slice (object):
   def smoothen (self, qoi, eps):
 
     length  = len (self [qoi])
-    width   = length * eps / (self.extent [1] - self.extent [0])
-    kernel  = numpy.outer (signal.gaussian (length, width), signal.gaussian (length, width))
+    width   = length * eps / float (self.extent [1] - self.extent [0])
+    scaling = 1.0 / float ( width * numpy.sqrt (2 * numpy.pi) )
+    kernel  = scaling ** 2 * numpy.outer (signal.gaussian (length, width), signal.gaussian (length, width))
 
     self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 
@@ -265,6 +270,15 @@ class Picker (object):
 
     return dumps, steps, times
 
+def get_max (params):
+
+  dataclass, qoi, slices, dump, directory, verbosity, eps = params
+
+  results = dataclass (qois = [qoi], slices = slices, dump = dump)
+  results = results.load (directory, verbosity)
+  results.smoothen (qoi, eps)
+  return numpy.max (results [qoi])
+
 class Smooth_Picker (Picker):
 
   def __init__ (self, qoi, slices, eps=None, dataclass=Slice):
@@ -273,26 +287,45 @@ class Smooth_Picker (Picker):
     self.slices    = slices
     self.eps       = eps
     self.dataclass = dataclass
+    self.cachefile = 'picker_%s_%.1f.cache' % (dataclass.name, eps)
 
   # pick required dump
   def pick (self, directory, verbosity):
+
+    # laod cached dump, if exists
+    if os.path.exists ( os.path.join (directory, self.cachefile) ):
+      with open ( os.path.join (directory, self.cachefile), 'r' ) as f:
+        return int ( f.readlines () [0] .strip () )
+
+    # pick the specified dump
 
     import scipy
 
     dumps, steps, times = self.read_dump (directory)
 
-    dump_max = float ('-inf')
-    dump_idx = None
+    tasks = []
+    for idx, dump in enumerate (dumps):
+      tasks.append ( (self.dataclass, self.qoi, self.slices, dump, directory, verbosity, self.eps) )
 
+    import multiprocessing
+    pool = multiprocessing.Pool ()
+    max = pool.map (get_max, tasks)
+
+    '''
+    max = numpy.empty (len (dumps))
     for idx, dump in enumerate (dumps):
 
       results = self.dataclass (qois = [self.qoi], slices = self.slices, dump = dump)
       results = results.load (directory, verbosity)
       results.smoothen (self.qoi, self.eps)
-      max = numpy.max (results [self.qoi])
-      if max > dump_max:
-        dump_max = max
-        dump_idx = idx
+      max [idx] = numpy.max (results [self.qoi])
+    '''
 
-    return dumps [dump_idx]
+    dump = dumps [ numpy.argmax (max) ]
+
+    # cache dump for future reuse
+    with open ( os.path.join (directory, self.cachefile), 'w' ) as f:
+      f.write ( str (dump) )
+
+    return dump
 
