@@ -291,8 +291,9 @@ class Indicators (object):
     if self.ocv:
 
       # === report measured values
-
       print
+      if forecast:
+        print ' :: FORECAST'
       print ' :: OPTIMIZED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
       print '  :'
       print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
