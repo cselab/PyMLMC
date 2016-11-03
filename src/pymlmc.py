@@ -154,6 +154,7 @@ class MLMC (object):
   # iterative updating phase
   def update (self):
 
+    # loop over simulation iterations
     while True:
 
       # load MLMC simulation
@@ -163,11 +164,16 @@ class MLMC (object):
       if self.config.deterministic:
         return
 
-      # compute, report, and save error indicators
-      self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
-      self.indicators.report  ()
-      self.indicators.save    (self.config.iteration)
+      # compute and report error indicators
+      self.indicators.compute  (self.mcs, self.config.samples.indices.loaded, self.L0)
+      self.indicators.report   ()
 
+      # optimize and report error indicators
+      self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0)
+
+      # save error indicators
+      self.indicators.save     (self.config.iteration)
+      
       # save coefficients
       self.indicators.coefficients.save (self.config.iteration)
 
@@ -219,7 +225,10 @@ class MLMC (object):
 
           helpers.warning ('indicators or errors not available - samples can not be updated')
           break
-        
+
+        # optimize and report error indicators
+        self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0, forecast=True)
+
         # report forecasted speedup (MLMC vs MC)
         self.errors.speedup (self.indicators, self.config.samples.counts, forecast=True)
 
@@ -246,11 +255,12 @@ class MLMC (object):
           # query user for input
           manual = self.config.samples.manual()
 
-          # always report manual sample specification or adjustment
+          # always report manual sample specification or adjustment and the resulting speedup
           if manual:
             self.config.samples.available = 1
             self.config.samples.report   ()
             self.config.samples.validate ()
+            self.errors.speedup (self.indicators, self.config.samples.counts, forecast=True)
 
           # proceed if no specification or adjustment were requested
           if not manual:

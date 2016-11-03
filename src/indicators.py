@@ -235,12 +235,27 @@ class Indicators (object):
     elif self.inference != None:
 
       helpers.error ('Inference mode \'%s\' is not implemented' % self.inference)
-    
+
+    print 'done.'
+
+  def optimize (self, mcs, indices, L0, forecast=False):
+
+    if self.ocv:
+      print
+      if forecast:
+        print ' :: FORECAST'
+      print ' :: Optimizing INDICATORS...',
+      sys.stdout.flush ()
+
     # === OPTIMAL control variate COEFFICIENTS
     
     # compute optimal control variate coefficients
     if self.ocv:
-      self.coefficients.optimize (self)
+      if forecast:
+        self.coefficients.optimize (self)
+      else:
+        counts = [ len (indices [level]) for level in self.levels ]
+        self.coefficients.optimize (self, samples=counts)
     
     # re-evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
@@ -270,6 +285,31 @@ class Indicators (object):
       self.variance_diff_opt ['infered'] [level]  = numpy.maximum ( 0, self.variance_diff_opt ['infered'] [level] )
     
     print 'done.'
+
+    # report only of OCV is enabled and successful
+    if self.ocv:
+
+      # === report measured values
+
+      print
+      print ' :: OPTIMIZED INDICATORS: (normalized to %s)' % helpers.scif (self.normalization)
+      print '  :'
+      print '  :       LEVEL       : ' + ' '.join ( [ '  ' + helpers.intf (level, table=1)       for level in self.levels ] )
+      print '  :---------------------' + '-'.join ( [        helpers.scif (None, table=1, bar=1) for level in self.levels ] )
+
+      # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
+      print '  : %-18s:' % 'COEFFICIENT',
+      for level in self.levels:
+        print helpers.scif (self.coefficients.values [level], table=1),
+      if self.coefficients.optimization != None:
+        print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
+      print
+
+      # report 'mean diff opt'
+      self.mean_diff_opt.report ('infered', self.normalization)
+
+      # report 'variance diff opt'
+      self.variance_diff_opt.report ('infered', self.normalization ** 2)
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
   def values (self, mcs, indices=None):
@@ -517,26 +557,6 @@ class Indicators (object):
     
     # report 'covariance'
     self.covariance.report ('infered', self.normalization ** 2)
-
-    # optimized values are infered only of OCV is enabled
-    if self.ocv:
-
-      # splitter
-      print '  :---------------------' + '-'.join ( [ helpers.scif (None, table=1, bar=1) for level in self.levels ] )
-
-      # report 'coefficients' and OCV MLMC vs. PLAIN MLMC speedup from coefficient optimization
-      print '  : %-18s:' % 'COEFFICIENT',
-      for level in self.levels:
-        print helpers.scif (self.coefficients.values [level], table=1),
-      if self.coefficients.optimization != None:
-        print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
-      print
-
-      # report 'mean diff opt'
-      self.mean_diff_opt.report ('infered', self.normalization)
-
-      # report 'variance diff opt'
-      self.variance_diff_opt.report ('infered', self.normalization ** 2)
   
   def save (self, iteration):
 

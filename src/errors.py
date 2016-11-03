@@ -167,7 +167,7 @@ class Errors (object):
     print '  : ->   MC samples: %s' % helpers.intf ( samples_mc )
     
     # compute OCV MLMC vs. PLAIN MLMC speedup
-    self.speedup_ocv = plain / error
+    self.speedup_ocv = (plain / error) ** 2
     
     # report
     print
@@ -183,7 +183,6 @@ class Errors (object):
       self.history ['relative_error']       = {}
       self.history ['total_relative_error'] = {}
       self.history ['total_error']          = {}
-
 
     # append history
     self.history ['relative_error']       [iteration] = self.relative_error       if self.available else float ('NaN')

@@ -44,7 +44,7 @@ class Coefficients (object):
     self.history = {}
 
   # compute cost functional
-  def cost (self, indicators):
+  def cost (self, indicators, factors):
     
     costs = numpy.zeros (self.L + 1)
 
@@ -53,7 +53,7 @@ class Coefficients (object):
     costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
     costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
 
-    costs *= ( indicators.pairworks / indicators.pairworks [0] ) ** 2
+    costs *= factors
     
     return numpy.sum (costs)
 
@@ -65,8 +65,17 @@ class Coefficients (object):
     if len (self.levels) == 1:
       return
 
+    # a-priori (work-weighted) optimization
+    if samples == []:
+      pairworks = indicators.pairworks / indicators.pairworks [0]
+      factors = numpy.array (pairworks) ** 2
+
+    # a-posteriori (sample-weighted) optimization
+    else:
+      factors = 1.0 / numpy.maximum ( 1, numpy.array (samples) )
+
     # cost of plain (non-optimized) estimator
-    cost_plain = self.cost (indicators)
+    cost_plain = self.cost (indicators, factors)
 
     # === if recycling is enabled, coefficients can be computed explicitly
 
@@ -84,52 +93,34 @@ class Coefficients (object):
       A = numpy.zeros ( [self.L, self.L] )
       b = numpy.zeros (self.L)
 
-      # a-priori (work-weighted) optimization
-      if samples == []:
-
-        # assemble matrix from indicators
-        pairworks = indicators.pairworks / indicators.pairworks [0]
-        for level in range (self.L):
-          if level != 0:
-            A [level] [level - 1] = - pairworks [level] ** 2 * indicators.covariance ['infered'] [level]
-          A [level] [level]  = pairworks [level    ] ** 2 * indicators.variance [0]  ['infered'] [level    ]
-          A [level] [level] += pairworks [level + 1] ** 2 * indicators.variance [1]  ['infered'] [level + 1]
-          if level != self.L - 1:
-            A [level] [level + 1] = - pairworks [level + 1] ** 2 * indicators.covariance ['infered'] [level + 1]
-        
-        # assemble right hand side
-        b [-1] = pairworks [self.L] ** 2 * indicators.covariance ['infered'] [self.L]
+      # assemble matrix from indicators
+      for level in range (self.L):
+        if level != 0:
+          A [level] [level - 1] = - factors [level] * indicators.covariance ['infered'] [level]
+        A [level] [level]  = factors [level    ] * indicators.variance [0]  ['infered'] [level    ]
+        A [level] [level] += factors [level + 1] * indicators.variance [1]  ['infered'] [level + 1]
+        if level != self.L - 1:
+          A [level] [level + 1] = - factors [level + 1] ** 2 * indicators.covariance ['infered'] [level + 1]
       
-      # a-posteriori (sample-weighted) optimization
-      else:
-        
-        # assemble matrix from indicators
-        for level in range (self.L):
-          if level != 0:
-            A [level] [level - 1] = - indicators.covariance  ['infered'] [level] / samples [level]
-          A [level] [level]  = indicators.variance [0] ['infered'] [level    ] / samples [level    ]
-          A [level] [level] += indicators.variance [1] ['infered'] [level + 1] / samples [level + 1]
-          if level != self.L - 1:
-            A [level] [level + 1] = - indicators.covariance  ['infered'] [level + 1] / samples [level + 1]
-        
-        # assemble right hand side
-        b [-1] = indicators.covariance  ['infered'] [self.L] / samples [self.L]
+      # assemble right hand side
+      b [-1] = factors [self.L] * indicators.covariance ['infered'] [self.L]
       
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
-    
-    # if the result is 'fishy', revert to default values
-    if numpy.isnan (self.values).any() or (self.values > 10).any() or (self.values < -10).any():
-      message = 'Invalid values of optimized coefficients - resetting all to 1.0'
-      details = ' '.join ( [ helpers.scif (value) for value in self.values ] )
-      helpers.warning (message, details=details)
-      self.values = numpy.ones (self.L+1)
-    
+
     # cost of OCV estimator
-    cost_ocv = self.cost (indicators)
+    cost_ocv = self.cost (indicators, factors)
 
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
+
+    # if the result is 'fishy', revert to default values
+    if self.optimization < 1 or numpy.isnan (self.values).any() or (self.values > 10).any() or (self.values < -10).any():
+      message = 'Invalid values of optimized coefficients or failed optimization - resetting all to 1.0'
+      details = ' '.join ( [ helpers.scif (value) for value in self.values ] ) + ', optimization = %.2f' % self.optimization
+      helpers.warning (message, details=details)
+      self.values = numpy.ones (self.L+1)
+      self.optimization = None
 
   # save coefficients
   def save (self, iteration):
