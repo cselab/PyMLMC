@@ -284,8 +284,9 @@ class Indicators (object):
       self.variance_diff_opt ['infered'] [level] += self.coefficients.values [level - 1] ** 2 * self.variance [self.COARSE] ['infered'] [level]
       self.variance_diff_opt ['infered'] [level] -= 2 * self.coefficients.values [level] * self.coefficients.values [level - 1] * self.covariance ['infered'] [level]
       self.variance_diff_opt ['infered'] [level]  = numpy.maximum ( 0, self.variance_diff_opt ['infered'] [level] )
-    
-    print 'done.'
+
+    if self.ocv:
+      print 'done.'
 
     # report only of OCV is enabled and successful
     if self.ocv:
