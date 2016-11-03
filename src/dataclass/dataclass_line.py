@@ -142,10 +142,11 @@ class Line (Slice):
 
   def smoothen (self, qoi, eps):
 
-    length  = len (self [qoi])
-    width   = length * eps / float (self.extent [1] - self.extent [0])
-    scaling = 1.0 / float ( width * numpy.sqrt (2 * numpy.pi) )
-    kernel  = scaling * signal.gaussian (length, width)
+    length    = len (self [qoi])
+    deviation = length * eps / float (self.extent [1] - self.extent [0])
+    scaling   = 1.0 / float ( deviation * numpy.sqrt (2 * numpy.pi) )
+    window    = 2 * deviation
+    kernel    = scaling * signal.gaussian (window, deviation)
     
     self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 

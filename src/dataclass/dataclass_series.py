@@ -362,7 +362,7 @@ class Series (object):
 
   def __lmul__ (self, a):
     return self * a
-    
+  
   def __iadd__ (self, a):
     if not self.data:
       self.init (a)
@@ -376,7 +376,17 @@ class Series (object):
     for key in self.data.keys():
       self.data [key] -= a.data [key]
     return self
-  
+
+  def __add__ (self, a):
+    result = copy.deepcopy (self)
+    result += a
+    return result
+
+  def __sub__ (self, a):
+    result = copy.deepcopy (self)
+    result -= a
+    return result
+
   def __str__ (self):
     output = '\n' + 'meta:'
     for key in self.meta.keys():

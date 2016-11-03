@@ -166,10 +166,11 @@ class Slice (object):
 
   def smoothen (self, qoi, eps):
 
-    length  = len (self [qoi])
-    width   = length * eps / float (self.extent [1] - self.extent [0])
-    scaling = 1.0 / float ( width * numpy.sqrt (2 * numpy.pi) )
-    kernel  = scaling ** 2 * numpy.outer (signal.gaussian (length, width), signal.gaussian (length, width))
+    length    = len (self [qoi])
+    deviation = length * eps / float (self.extent [1] - self.extent [0])
+    scaling   = 1.0 / float ( deviation * numpy.sqrt (2 * numpy.pi) )
+    window    = 2 * deviation
+    kernel    = scaling ** 2 * numpy.outer (signal.gaussian (window, deviation), signal.gaussian (window, deviation))
 
     self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 
@@ -221,7 +222,17 @@ class Slice (object):
 
   def __isub__ (self, a):
     return self.inplace (a, '__isub__')
-  
+
+  def __add__ (self, a):
+    result = copy.deepcopy (self)
+    result += a
+    return result
+
+  def __sub__ (self, a):
+    result = copy.deepcopy (self)
+    result -= a
+    return result
+
   '''
   def __str__ (self):
     output = '\n' + 'meta:'
