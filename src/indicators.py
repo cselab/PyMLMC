@@ -580,5 +580,6 @@ class Indicators (object):
   def load (self, config):
 
     if config.iteration > 0:
+
       self.history = {}
       execfile ( os.path.join (config.root, self.indicators_file), globals(), self.history )

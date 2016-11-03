@@ -20,6 +20,7 @@
 # === global imports
 
 import numpy
+import os
 
 # === local imports
 
@@ -38,7 +39,10 @@ class Coefficients (object):
     self.values = numpy.ones (self.L+1)
 
     self.optimization = None
-  
+
+    self.coefficients_file = 'coefficients.dat'
+    self.history = {}
+
   # compute cost functional
   def cost (self, indicators):
     
@@ -126,3 +130,24 @@ class Coefficients (object):
 
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
+
+  # save coefficients
+  def save (self, iteration):
+
+    # initialize history
+    self.history [iteration] = self.values
+
+    # dump history
+    helpers.delete (self.coefficients_file)
+    for iteration in range (iteration + 1):
+      helpers.dump (self.history [iteration], '%f', 'coefficients', self.coefficients_file, iteration)
+
+  # load coefficients
+  def load (self, config):
+    
+    self.history = {}
+    path = os.path.join (config.root, self.coefficients_file)
+    if os.path.exists (path):
+      execfile ( path, globals(), self.history )
+
+

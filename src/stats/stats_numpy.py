@@ -19,7 +19,6 @@ class NumPy_Stat (Stat):
     self.size   = 1
     self.limit  = 1
     self.online = 0
-    self.alpha  = min (1.0, 0.2 + 0.3 * factor)
 
     self.stat = getattr ( numpy, stat )
 

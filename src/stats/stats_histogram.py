@@ -21,7 +21,8 @@ class Histogram (Stat):
     self.limit  = 1
     self.online = 0
 
-    self.clip = [0.0, 1.0]
+    self.clip  = [0.0, 1.0]
+    self.alpha = 0
   
   # compute histogram using NumPy
   def compute (self, samples, extent):

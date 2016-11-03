@@ -23,6 +23,9 @@ class Stat (object):
   # special clipping
   clip = None
 
+  # alpha by default is disabled
+  alpha = 0
+
   # evalaute statistics for all qois
   def evaluate (self, samples, indices=None, qois=None):
 

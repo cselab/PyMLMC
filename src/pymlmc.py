@@ -168,6 +168,9 @@ class MLMC (object):
       self.indicators.report  ()
       self.indicators.save    (self.config.iteration)
 
+      # save coefficients
+      self.indicators.coefficients.save (self.config.iteration)
+
       # query for progress
       helpers.query ('Continue?')
 
@@ -637,6 +640,9 @@ class MLMC (object):
 
       # load indicators history
       self.indicators.load (self.config)
+
+      # load coefficients history
+      self.indicators.coefficients.load (self.config)
 
       # load errors history
       self.errors.load (self.config)
