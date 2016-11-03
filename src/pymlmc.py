@@ -232,6 +232,9 @@ class MLMC (object):
         # optimize and report error indicators
         self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0, forecast=True)
 
+        # debug
+        self.indicators.report ()
+
         # report forecasted speedup (MLMC vs MC)
         self.errors.speedup (self.indicators, self.config.samples.counts, forecast=True)
 
