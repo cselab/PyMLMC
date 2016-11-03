@@ -114,6 +114,7 @@ class Coefficients (object):
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
 
+    '''
     # if the result is 'fishy', revert to default values
     if self.optimization < 1 or numpy.isnan (self.values).any() or (self.values > 10).any() or (self.values < -10).any():
       message = 'Invalid values of optimized coefficients or failed optimization - resetting all to 1.0'
@@ -121,6 +122,7 @@ class Coefficients (object):
       helpers.warning (message, details=details)
       self.values = numpy.ones (self.L+1)
       self.optimization = None
+    '''
 
   # save coefficients
   def save (self, iteration):
