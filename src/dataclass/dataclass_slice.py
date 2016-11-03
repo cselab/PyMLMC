@@ -172,7 +172,8 @@ class Slice (object):
     window    = 2 * deviation
     kernel    = scaling ** 2 * numpy.outer (signal.gaussian (window, deviation), signal.gaussian (window, deviation))
 
-    self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
+    #self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
+    self [qoi] = signal.convolve (self [qoi], kernel, mode='same')
 
   def __rmul__ (self, a):
     result = copy.deepcopy (self)
