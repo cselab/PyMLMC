@@ -188,9 +188,6 @@ class MLMC (object):
       # report speedup (MLMC vs MC)
       self.errors.speedup (self.indicators, self.config.samples.counts)
 
-      # debug
-      self.errors.speedup (self.indicators, self.config.samples.counts)
-
       # query for progress
       helpers.query ('Continue?')
 
