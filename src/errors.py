@@ -165,7 +165,9 @@ class Errors (object):
     print '  : -> MLMC budget : %s CPU hours' % helpers.intf ( numpy.ceil (work_mlmc) )
     print '  : ->   MC budget : %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
     print '  : ->   MC samples: %s' % helpers.intf ( samples_mc )
-    
+
+    # TODO: below OCV speedup reporting is not needed - it is already reported in indicators.optimize()
+
     # compute OCV MLMC vs. PLAIN MLMC speedup
     self.speedup_ocv = (plain / error) ** 2
     

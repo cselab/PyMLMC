@@ -213,6 +213,9 @@ class MLMC (object):
 
           return
 
+        # optimize and report error indicators
+        self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0, forecast=True)
+
         # update, report, and validate the computed/required/pending number of samples
         if self.errors.available and self.indicators.available:
 
@@ -225,9 +228,6 @@ class MLMC (object):
 
           helpers.warning ('indicators or errors not available - samples can not be updated')
           break
-
-        # optimize and report error indicators
-        self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0, forecast=True)
 
         # report forecasted speedup (MLMC vs MC)
         self.errors.speedup (self.indicators, self.config.samples.counts, forecast=True)
