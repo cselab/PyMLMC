@@ -226,6 +226,9 @@ class MLMC (object):
           helpers.warning ('indicators or errors not available - samples can not be updated')
           break
 
+        # debug
+        self.indicators.report ()
+
         # optimize and report error indicators
         self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0, forecast=True)
 
