@@ -165,14 +165,14 @@ class MLMC (object):
         return
 
       # compute and report error indicators
-      self.indicators.compute  (self.mcs, self.config.samples.indices.loaded, self.L0)
-      self.indicators.report   ()
+      self.indicators.compute (self.mcs, self.config.samples.indices.loaded, self.L0)
+      self.indicators.report  ()
 
       # optimize and report error indicators
       self.indicators.optimize (self.mcs, self.config.samples.indices.loaded, self.L0)
 
       # save error indicators
-      self.indicators.save     (self.config.iteration)
+      self.indicators.save (self.config.iteration)
 
       # save coefficients
       self.indicators.coefficients.save (self.config.iteration)

@@ -61,9 +61,6 @@ class Coefficients (object):
   # optimization can be performed for required specific sample-scaled indicators if sample numbers on each level are provided
   def optimize (self, indicators, samples=[]):
 
-    # debug
-    print 'optimizing!'
-
     # no optimization if only one level is present
     if len (self.levels) == 1:
       return

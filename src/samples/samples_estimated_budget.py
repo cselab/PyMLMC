@@ -68,11 +68,6 @@ class Estimated_Budget (Samples):
     # compute overhead
     self.overhead = numpy.sum ( (self.counts.available() + self.counts.additional) * self.pairworks ) / numpy.sum ( self.counts.optimal * self.pairworks ) - 1.0
 
-    # compute optimal control variate coefficients
-    # TODO: check this
-    if self.optimal:
-      indicators.coefficients.optimize (indicators, self.counts.available() + self.counts.additional)
-    
     # check if the current coarsest level is optimal
     #self.check_optimal_coarsest_level ()
     

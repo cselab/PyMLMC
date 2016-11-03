@@ -143,10 +143,6 @@ class Errors (object):
     
     error  = self.total ( self.errors (indicators.variance_diff_opt ['infered'], counts) )
     plain  = self.total ( self.errors (indicators.variance_diff     ['infered'], counts) )
-    print counts
-    print indicators.variance_diff_opt ['infered']
-    print indicators.variance_diff     ['infered']
-    print error, plain
 
     # compute MLMC vs. MC speedup
     FINEST      = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
