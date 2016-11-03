@@ -269,7 +269,7 @@ def info (message, details=None, advice=None):
     print '  : -> %s' % advice
 
 # query
-def query (message='Continue?', hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1, format=None):
+def query (message='Continue?', hint='enter \'y\' or press ENTER', type=str, default='y', warning=None, exit=1, format=None, critical=0):
 
   print
   if warning != None:
@@ -277,7 +277,7 @@ def query (message='Continue?', hint='enter \'y\' or press ENTER', type=str, def
   print ' :: QUERY: %s [%s]' % (message, hint)
 
   # in auto mode, continue with the default value
-  if params.auto:
+  if params.auto and not critical:
     print '  : AUTO CONTINUE [%s]' % str (default)
     input = default
 

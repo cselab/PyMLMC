@@ -173,7 +173,7 @@ class MLMC (object):
 
       # save error indicators
       self.indicators.save     (self.config.iteration)
-      
+
       # save coefficients
       self.indicators.coefficients.save (self.config.iteration)
 
@@ -283,9 +283,9 @@ class MLMC (object):
 
       # query for progress
       if self.params.simulate:
-        helpers.query ('Simulate additional job submission (no actual submissions)?')
+        helpers.query ('Simulate additional job submission (no actual submissions)?', critical=1)
       else:
-        helpers.query ('Submit additional jobs?')
+        helpers.query ('Submit additional jobs?', critical=1)
 
       # increment iteration
       self.config.iteration += 1
