@@ -191,12 +191,13 @@ class Indicators (object):
     self.mean_diff ['infered'] [ self.L0       ] = self.mean [self.FINE] ['infered'] [ self.L0 ]
     self.mean_diff ['infered'] [ self.L0 + 1 : ] = numpy.abs ( self.mean [self.FINE] ['infered'] [ self.L0 + 1 : ] - self.mean [self.COARSE] ['infered'] [ self.L0 + 1 : ] )
 
-    # infered value of VARIANCE DIFF is always by default the infered value of VARIANCE [FINE]
-    self.variance_diff ['infered'] [self.L0] = self.variance [self.FINE] ['infered'] [self.L0]
-
     # least squares inference of 'variance diff' indicator level values based on the magnitides of measured level values
     if self.inference == 'diffs':
       self.infer (self.variance_diff, degree = 1, log = True, critical = True, min = 0)
+
+    # infered value of VARIANCE DIFF is always by default the infered value of VARIANCE [FINE]
+    # REMARK: this needs to be after inference, which overwrites non-infered values from the measured ones
+    self.variance_diff ['infered'] [self.L0] = self.variance [self.FINE] ['infered'] [self.L0]
 
     # === COVARIANCES and CORRELATIONS
     
