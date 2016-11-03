@@ -249,7 +249,8 @@ class Indicators (object):
       sys.stdout.flush ()
 
     # === OPTIMAL control variate COEFFICIENTS
-    
+
+    '''
     # compute optimal control variate coefficients
     if self.ocv:
       if forecast:
@@ -257,6 +258,7 @@ class Indicators (object):
       else:
         counts = [ len (indices [level]) for level in self.levels ]
         self.coefficients.optimize (self, samples=counts)
+    '''
     
     # re-evaluate distances between indicators for every two consecute levels of each sample for the specified indices
     distances = self.distances (mcs, indices)
