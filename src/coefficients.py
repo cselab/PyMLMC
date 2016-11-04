@@ -118,6 +118,7 @@ class Coefficients (object):
     # debug
     print A
     print b
+    print self.values
 
     # cost of OCV estimator
     cost_ocv = self.cost (indicators, factors)
