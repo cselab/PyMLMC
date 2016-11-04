@@ -74,13 +74,6 @@ class Coefficients (object):
     else:
       factors = 1.0 / numpy.maximum ( 1, numpy.array (samples) )
 
-    # debug
-    print 'factors:', factors
-    print 'variance F:', indicators.variance [0] ['infered']
-    print 'variance C:', indicators.variance [1] ['infered']
-    print 'covariance:', indicators.covariance ['infered']
-
-
     # cost of plain (non-optimized) estimator
     cost_plain = self.cost (indicators, factors)
 
@@ -115,17 +108,8 @@ class Coefficients (object):
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
-    # debug
-    print A
-    print b
-    print self.values
-
     # cost of OCV estimator
     cost_ocv = self.cost (indicators, factors)
-
-    # debug
-    print cost_plain
-    print cost_ocv
 
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
