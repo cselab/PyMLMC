@@ -78,7 +78,7 @@ class Coefficients (object):
     print 'factors:', factors
     print 'variance F:', indicators.variance [0] ['infered']
     print 'variance C:', indicators.variance [1] ['infered']
-    print 'covariance:', indicators.covariance
+    print 'covariance:', indicators.covariance ['infered']
 
 
     # cost of plain (non-optimized) estimator
