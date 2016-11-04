@@ -107,16 +107,16 @@ class Coefficients (object):
         A [level] [level]  = factors [level    ] * indicators.variance [0]  ['infered'] [level    ]
         A [level] [level] += factors [level + 1] * indicators.variance [1]  ['infered'] [level + 1]
         if level != self.L - 1:
-          A [level] [level + 1] = - factors [level + 1] ** 2 * indicators.covariance ['infered'] [level + 1]
+          A [level] [level + 1] = - factors [level + 1] * indicators.covariance ['infered'] [level + 1]
       
       # assemble right hand side
       b [-1] = factors [self.L] * indicators.covariance ['infered'] [self.L]
       
       # solve linear system
-      self.values [ : -1 ] = numpy.linalg.solve (A.T, b)
+      self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
     # debug
-    print A.T
+    print A
     print b
 
     # cost of OCV estimator
