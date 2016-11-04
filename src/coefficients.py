@@ -68,7 +68,7 @@ class Coefficients (object):
     # a-priori (work-weighted) optimization
     if samples == []:
       pairworks = indicators.pairworks / indicators.pairworks [0]
-      factors = numpy.array (pairworks) ** 2
+      factors = numpy.array (pairworks)
 
     # a-posteriori (sample-weighted) optimization
     else:
