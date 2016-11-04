@@ -123,6 +123,10 @@ class Coefficients (object):
     # cost of OCV estimator
     cost_ocv = self.cost (indicators, factors)
 
+    # debug
+    print cost_plain
+    print cost_ocv
+
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
 
