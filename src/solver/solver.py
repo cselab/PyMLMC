@@ -449,6 +449,8 @@ class Solver (object):
         # warn if the first block is not fully utilized
         if len (blocks) > 1:
           utilized = parallelization.cores * len (blocks [0]) >= local.min_cores
+        else:
+          return ''
         '''
         if not utilized:
           message = 'Requested number of cores and samples does not fully utilize the smallest block'
