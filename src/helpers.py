@@ -227,7 +227,7 @@ class Progress (object):
     return self.line
 
   def update (self, step):
-    fraction = float(step) / self.steps
+    fraction = float(step) / self.steps if self.steps != 0 else 1.0
     percent = int(round(100*fraction))
     if percent == self.percent:
       return self.line

@@ -10,13 +10,14 @@
 
 import numpy
 import copy, os
+from scipy import signal
 
 class Series (object):
 
   name       = 'series'
   dimensions = 1
 
-  def __init__ (self, qois=None, filename='statistics.dat', metaqois=['step', 't'], uid='t', span=[0, 1], sampling=1000, ranges=None):
+  def __init__ (self, qois=None, filename='statistics.dat', metaqois=['step', 't'], uid='t', span=[0, 1], sampling=1000, ranges=None, eps=None):
     
     # save configuration
     vars (self) .update ( locals() )
@@ -45,6 +46,11 @@ class Series (object):
     if results.uid != None:
       results.unique ()
       results.sort   ()
+
+    # smoothen results
+    if results.eps != None:
+      for qoi in results.data.keys ():
+        results.smoothen (qoi, results.eps)
 
     # interpolate results
     if results.sampling != None:
@@ -353,6 +359,16 @@ class Series (object):
         return 1
 
     return 0
+
+  def smoothen (self, qoi, eps):
+
+    length    = len (self [qoi])
+    deviation = length * eps / float (self.span [1] - self.span [0])
+    scaling   = 1.0 / float ( deviation * numpy.sqrt (2 * numpy.pi) )
+    window    = 2 * deviation
+    kernel    = scaling * signal.gaussian (window, deviation)
+
+    self [qoi] = signal.fftconvolve (self [qoi], kernel, mode='same')
 
   def __rmul__ (self, a):
     result = copy.deepcopy (self)
