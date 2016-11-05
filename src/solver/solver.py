@@ -462,10 +462,14 @@ class Solver (object):
         # respect parallelization.mergemax
         filtered = []
         for i, size in enumerate (decomposition):
+          print
+          print size, subblocks, parallelization.mergemax
           if parallelization.mergemax == None or size * subblocks <= parallelization.mergemax:
             filtered += [size]
           else:
             chunks = 2 ** int ( math.ceil ( math.log ( float (size * subblocks) / parallelization.mergemax, 2) ) )
+            print
+            print size / chunks, chunks
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
 
