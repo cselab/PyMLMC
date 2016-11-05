@@ -565,12 +565,12 @@ class Solver (object):
           if merge > 1:
             ensemble += self.sync()
 
-          # adjust parallelization according to the number of subblocks
-          parallelization.nodes *= subblocks
-          parallelization.cores *= subblocks
-
           # copy parallelization to prevent modifications
           submit_parallelization = copy.deepcopy (parallelization)
+
+          # adjust parallelization according to the number of subblocks
+          submit_parallelization.nodes *= subblocks
+          submit_parallelization.cores *= subblocks
 
           # submit
           self.execute ( self.submit (ensemble, submit_parallelization, label, directory, suffix=suffix, boot=0, timer=0), directory )
