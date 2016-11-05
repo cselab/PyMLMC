@@ -215,10 +215,13 @@ class Indicators (object):
 
       # compute covariance and correlation (infered)
       for level in self.levels [ self.L0 + 1 : ]:
-        self.covariance  ['infered']  [level] = 0.5 * ( self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - self.variance_diff ['infered']  [level] )
-        self.correlation ['infered']  [level] = self.covariance ['infered'] [level] / numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered']  [level] )
-        self.correlation ['infered']  [level] = numpy.minimum (  1, self.correlation ['infered']  [level] )
-        self.correlation ['infered']  [level] = numpy.maximum ( -1, self.correlation ['infered']  [level] )
+        self.covariance  ['infered'] [level] = 0.5 * ( self.variance [self.FINE] ['infered'] [level] + self.variance [self.COARSE] ['infered'] [level] - self.variance_diff ['infered'] [level] )
+        max_covariance_magnitude = numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered']  [level] )
+        if numpy.abs (self.covariance ['infered'] [level]) > max_covariance_magnitude:
+          self.covariance ['infered'] [level] = numpy.sign (self.covariance ['infered'] [level]) * max_covariance_magnitude
+        self.correlation ['infered'] [level] = self.covariance ['infered'] [level] / numpy.sqrt ( self.variance [self.FINE] ['infered'] [level] * self.variance [self.COARSE] ['infered']  [level] )
+        #self.correlation ['infered'] [level] = numpy.minimum (  1, self.correlation ['infered']  [level] )
+        #self.correlation ['infered'] [level] = numpy.maximum ( -1, self.correlation ['infered']  [level] )
 
     # for 'correlations' inference, 'correlations' is infered and variance diffs with covariances and computed from it
     elif self.inference == 'correlations':
