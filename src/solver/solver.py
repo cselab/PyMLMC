@@ -447,7 +447,8 @@ class Solver (object):
         blocks = helpers.chunks (batches, subblocks)
 
         # warn if the first block is not fully utilized
-        utilized = parallelization.cores * len (blocks [0]) >= local.min_cores
+        if len (blocks) > 1:
+          utilized = parallelization.cores * len (blocks [0]) >= local.min_cores
         '''
         if not utilized:
           message = 'Requested number of cores and samples does not fully utilize the smallest block'
