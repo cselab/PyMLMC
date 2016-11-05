@@ -466,7 +466,6 @@ class Solver (object):
         # respect parallelization.mergemax
         filtered = []
         for i, size in enumerate (decomposition):
-          print
           if parallelization.mergemax == None or size * subblocks <= parallelization.mergemax:
             filtered += [size]
           else:
