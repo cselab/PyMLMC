@@ -53,6 +53,9 @@ class Coefficients (object):
     costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
     costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
 
+    print self.values [ 1 :    ] ** 2                   * indicators.variance [0] ['infered'] [ 1 : ]
+    print self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
+    print self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
     print costs
 
     costs *= factors
