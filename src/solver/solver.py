@@ -583,7 +583,7 @@ class Solver (object):
 
         # return information about ensembles
         from helpers import intf
-        info = [ '%s (%s N)' % ( intf (subblocks * merge), intf (parallelization.nodes * merge) ) for merge in decomposition ]
+        info = [ '%s (%s N)' % ( intf (subblocks * merge), intf (parallelization.nodes * subblocks * merge) ) for merge in decomposition ]
         return ' + '.join (info) + (' [not fully utilized]' if not utilized else '')
     
     return ''
