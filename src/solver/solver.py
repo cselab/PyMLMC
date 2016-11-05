@@ -450,7 +450,7 @@ class Solver (object):
         if len (blocks) > 1:
           utilized = parallelization.cores * len (blocks [0]) >= local.min_cores
         else:
-          return ''
+          return 'SKIPPED'
         '''
         if not utilized:
           message = 'Requested number of cores and samples does not fully utilize the smallest block'
