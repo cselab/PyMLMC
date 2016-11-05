@@ -229,6 +229,9 @@ class Solver (object):
     args ['label']      = label
     args ['xopts']      = self.params.xopts
 
+    # create a copy of parallelization to avoid override
+    parallelization = copy.deepcopy (parallelization)
+
     # update args with adjusted parallelization
     # TODO: maybe would be better to introduce separate variables, such as 'walltime_batch', 'nodes_merge', etc.
     args.update ( parallelization.adjust().validate().args() )
@@ -463,13 +466,10 @@ class Solver (object):
         filtered = []
         for i, size in enumerate (decomposition):
           print
-          print size, subblocks, parallelization.mergemax
           if parallelization.mergemax == None or size * subblocks <= parallelization.mergemax:
             filtered += [size]
           else:
             chunks = 2 ** int ( math.ceil ( math.log ( float (size * subblocks) / parallelization.mergemax, 2) ) )
-            print
-            print size / chunks, chunks
             filtered += [ size / chunks ] * chunks
         decomposition = filtered
 
