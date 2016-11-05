@@ -10,7 +10,7 @@
 
 import numpy
 import copy, os
-from scipy import signal
+#from scipy import signal
 
 class Series (object):
 
