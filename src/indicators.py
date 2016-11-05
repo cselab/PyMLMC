@@ -304,8 +304,6 @@ class Indicators (object):
       print '  : %-18s:' % 'COEFFICIENT',
       for level in self.levels:
         print helpers.scif (self.coefficients.values [level], table=1),
-      if self.coefficients.optimization != None:
-        print '[OPTIMIZATION: %.2f]' % self.coefficients.optimization,
       print
 
       # report 'mean diff opt'
@@ -313,6 +311,13 @@ class Indicators (object):
 
       # report 'variance diff opt'
       self.variance_diff_opt.report ('infered', self.normalization ** 2)
+
+      # report optimization performance
+      if self.coefficients.optimization != None:
+        print
+        if forecast:
+          print ' :: FORECAST'
+        print ' :: OPTIMIZATION (OCV vs. PLAIN): %.2f' % self.coefficients.optimization
 
   # evaluates indicators for each sample (alternatively, specific indices can also be provided)
   def values (self, mcs, indices=None):

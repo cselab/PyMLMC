@@ -142,7 +142,6 @@ class Errors (object):
       counts = counts.loaded
     
     error  = self.total ( self.errors (indicators.variance_diff_opt ['infered'], counts) )
-    plain  = self.total ( self.errors (indicators.variance_diff     ['infered'], counts) )
 
     # compute MLMC vs. MC speedup
     FINEST      = numpy.max ( [ level for level in self.levels if counts [level] > 0 ] )
@@ -166,17 +165,19 @@ class Errors (object):
     print '  : ->   MC budget : %s CPU hours' % helpers.intf ( numpy.ceil (work_mc) )
     print '  : ->   MC samples: %s' % helpers.intf ( samples_mc )
 
-    # TODO: below OCV speedup reporting is not needed - it is already reported in indicators.optimize()
-
-    # compute OCV MLMC vs. PLAIN MLMC speedup
-    self.speedup_ocv = (plain / error) ** 2
-    
-    # report
-    print
-    if forecast: print ' :: FORECAST'
-    print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.speedup_ocv + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
-    print '  : ->   OCV MLMC error: %1.2e' % (error / self.normalization)
-    print '  : -> PLAIN MLMC error: %1.2e' % (plain / self.normalization)
+    # compute and report OCV MLMC vs. PLAIN MLMC speedup
+    # REMARK: since samples were optimized for OSV, this is not an accurate measure for speedup
+    # REMARK: speedup of the variance reduction cost functional is already reported in indicators.optimize()
+    '''
+    if forecast:
+      self.speedup_ocv = (plain / error) ** 2
+      plain = self.total ( self.errors (indicators.variance_diff ['infered'], counts) )
+      print
+      print ' :: FORECAST'
+      print ' :: SPEEDUP (OCV vs. PLAIN): %.2f' % self.speedup_ocv + (' [finest level: %d]' % FINEST if FINEST != self.L else '')
+      print '  : ->   OCV MLMC error: %1.2e' % (error / self.normalization)
+      print '  : -> PLAIN MLMC error: %1.2e' % (plain / self.normalization)
+    '''
 
   def save (self, iteration):
 

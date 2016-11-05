@@ -53,11 +53,6 @@ class Coefficients (object):
     costs [ 1 : ] +=     self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
     costs [ 1 : ] -= 2 * self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
 
-    print self.values [ 1 :    ] ** 2                   * indicators.variance [0] ['infered'] [ 1 : ]
-    print self.values [   : -1 ] ** 2                   * indicators.variance [1] ['infered'] [ 1 : ]
-    print self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
-    print costs
-
     costs  = numpy.maximum (0, costs)
     costs *= factors
     
@@ -111,10 +106,6 @@ class Coefficients (object):
       # assemble right hand side
       b [-1] = factors [self.L] * indicators.covariance ['infered'] [self.L]
 
-      # debug
-      print A
-      print b
-
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
@@ -124,7 +115,6 @@ class Coefficients (object):
     # compute optimization factor
     self.optimization = cost_plain / cost_ocv
 
-    '''
     # if the result is 'fishy', revert to default values
     if self.optimization < 1 or numpy.isnan (self.values).any() or (self.values > 10).any() or (self.values < -10).any():
       message = 'Invalid values of optimized coefficients or failed optimization - resetting all to 1.0'
@@ -132,7 +122,6 @@ class Coefficients (object):
       helpers.warning (message, details=details)
       self.values = numpy.ones (self.L+1)
       self.optimization = None
-    '''
 
   # save coefficients
   def save (self, iteration):
