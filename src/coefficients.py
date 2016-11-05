@@ -104,7 +104,11 @@ class Coefficients (object):
       
       # assemble right hand side
       b [-1] = factors [self.L] * indicators.covariance ['infered'] [self.L]
-      
+
+      # debug
+      print A
+      print b
+
       # solve linear system
       self.values [ : -1 ] = numpy.linalg.solve (A, b)
 
