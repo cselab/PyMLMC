@@ -58,6 +58,7 @@ class Coefficients (object):
     print self.values [ 1 :    ] * self.values [ : -1 ] * indicators.covariance   ['infered'] [ 1 : ]
     print costs
 
+    costs  = numpy.maximum (0, costs)
     costs *= factors
     
     return numpy.sum (costs)
