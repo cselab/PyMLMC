@@ -568,9 +568,12 @@ class Solver (object):
           # adjust parallelization according to the number of subblocks
           parallelization.nodes *= subblocks
           parallelization.cores *= subblocks
-          
+
+          # copy parallelization to prevent modifications
+          submit_parallelization = copy.deepcopy (parallelization)
+
           # submit
-          self.execute ( self.submit (ensemble, parallelization, label, directory, suffix=suffix, boot=0, timer=0), directory )
+          self.execute ( self.submit (ensemble, submit_parallelization, label, directory, suffix=suffix, boot=0, timer=0), directory )
 
           # update 'submitted' counter
           submitted += size
