@@ -146,7 +146,10 @@ class Solver (object):
   
   # assemble job command
   def job (self, args, block=0, corner=0, shape=None, wrap=True):
-    
+
+    # copy args for further modifications
+    args = copy.deepcopy (args)
+
     # cluster run
     if local.cluster:
       
