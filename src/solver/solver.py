@@ -318,7 +318,11 @@ class Solver (object):
   
   # fork job to background
   def fork (self, job):
-    return '(\n\n%s\n\n) &\n' % job
+    if local.delay != None:
+      delay = '\nsleep %d\n' % local.delay
+    else:
+      delay = ''
+    return '(\n\n%s\n\n) &\n%s' % (job, delay)
 
   # add synchronization
   def sync (self):
@@ -462,6 +466,13 @@ class Solver (object):
           helpers.warning (message, details=details, advice=advice)
           # TODO: in such case, should batchsize be reduced (for all under-utilized blocks) to improve the utilization?
         '''
+
+        # check if the number of sub-blocks does not exceed machine limit
+        if local.max_ensemble != None and len (blocks) * subblocks > local.max_ensemble:
+          message = 'Maximum number of ensemble jobs exceeded:'
+          details = '%d > %d' (len (blocks) * subblocks > local.max_ensemble)
+          advice  = 'Reduce the number of ensemble jobs or use more nodes per job and apply batching.'
+          helpers.error (message, details, advice)
 
         # split blocks into ensembles (with ensemble sizes being powers of 2)
         binary = bin ( len (blocks) )

@@ -28,6 +28,7 @@ rack      = 1024 # nodes
 bootup       = 5   # minutes
 min_cores    = 512 * cores
 max_cores    = 49152 * cores
+max_ensemble = 256 # global limit (for ALL users) is 512
 
 def min_walltime (cores): # hours
   return 0.5
@@ -81,8 +82,7 @@ envs = '''\
 #  --mapping TABCDE \
 
 # simple run command
-simple_job = '''ulimit -c 0
-runjob \
+simple_job = '''runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
 --cwd $PWD \
@@ -93,8 +93,7 @@ runjob \
 '''
 
 # MPI run command
-mpi_job = '''ulimit -c 0
-runjob \
+mpi_job = '''runjob \
 --np %(ranks)d \
 --ranks-per-node %(tasks)d \
 --cwd $PWD \
@@ -118,6 +117,9 @@ corner = '--corner ${CORNERS[%(corner)d]}'
 
 # shape option
 shape = '--shape %(shape)s'
+
+# delay between job dispatches (seconds)
+delay = 5
 
 '''
 # boot blocks (3 attempts are recommended)

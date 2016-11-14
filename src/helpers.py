@@ -324,6 +324,7 @@ def query (message='Continue?', hint='enter \'y\' or press ENTER', type=str, def
 # error
 def error (message, details=None, advice=None):
   print
+  print
   print ' :: ERROR: %s' % message
   if details != None:
     print '  : %s' % details
@@ -335,6 +336,7 @@ def error (message, details=None, advice=None):
 
 # warning
 def warning (message, details=None, advice=None):
+  print
   print
   print ' :: WARNING: %s' % message
   if details != None:
