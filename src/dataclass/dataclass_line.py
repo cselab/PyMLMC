@@ -33,6 +33,8 @@ class Line (Slice):
 
     self.meta = {}
     self.data = {}
+
+    self.size = 1
   
   def load (self, directory, verbosity):
 
@@ -114,6 +116,7 @@ class Line (Slice):
 
   def resize (self, size):
 
+    self.size = size
     for key in self.data.keys():
       shape = self.data [key] .shape
       if size > 1:
@@ -175,16 +178,22 @@ class Line (Slice):
 
       for key in self.data.keys():
         #self.data [key] .__dict__ [action] ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
-        getattr (self.data [key], action) ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones ((1, factor)) ) ) )
+        kronshape = (1, factor) if self.size == 1 else (factor, 1)
+        getattr (self.data [key], action) ( numpy.squeeze ( numpy.kron ( a.data [key], numpy.ones (kronshape) ) ) )
 
     elif self.meta ['shape'] < a.meta ['shape']:
 
       factor = a.meta ['shape'] / self.meta ['shape']
 
       for key in self.data.keys():
-        self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones ((1, factor)) ) )
+        kronshape = (1, factor) if self.size == 1 else (factor, 1)
+        print self.data [key] .shape
+        print kronshape
+        self.data [key] = numpy.squeeze ( numpy.kron ( self.data [key], numpy.ones (kronshape) ) )
+        print self.data [key] .shape
+        print a.data [key] .shape
         getattr (self.data [key], action) (a.data [key])
-      
+
       self.meta = copy.deepcopy (a.meta)
 
     return self

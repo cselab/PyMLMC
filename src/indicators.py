@@ -84,6 +84,7 @@ class Indicators (object):
     self.indicators_file = 'indicators.dat'
     self.available       = 0
     self.history         = {}
+    self.infered         = 0
 
     # initialize control variate COEFFICIENTS
     self.coefficients = Coefficients (self.levels, self.recycle)
@@ -395,6 +396,9 @@ class Indicators (object):
         # do not proceed with the inference
         return
 
+    # inference will be performed
+    self.infered = 1
+
     # simply copy all values before 'start'
     indicator ['infered'] [:indicator.start] = indicator ['measured'] [:indicator.start]
 
@@ -534,8 +538,15 @@ class Indicators (object):
     # === report infered values
 
     if not self.inference:
+      print
+      print ' :: INFERENCE OF INDICATORS IS DISABLED'
       return
 
+    if not self.infered:
+      print
+      print ' :: INFERENCE OF INDICATORS IS NOT NECESSARY'
+      return
+    
     print
     print ' :: INFERED INDICATORS: (w.r.t. \'%s\'%s, normalized to %s)' % ( self.inference, ' [enforced]' if self.enforce else ' [not enforced]', helpers.scif (self.normalization) )
     print '  :'

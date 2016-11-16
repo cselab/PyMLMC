@@ -1658,7 +1658,8 @@ class MatPlotLib (object):
       pylab.errorbar (levels, mean_diff_measured / NORMALIZATION, yerr=mean_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
       pylab.semilogy (levels, mean_diff_measured / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, mean_diff_infered     / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    if self.mlmc.indicators.infered:
+      pylab.semilogy (levels, mean_diff_infered     / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if self.mlmc.config.ocv:
       pylab.semilogy (levels, mean_diff_opt_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     if run == 1:
@@ -1687,7 +1688,8 @@ class MatPlotLib (object):
       pylab.errorbar (levels, deviation_diff_measured / NORMALIZATION, yerr=deviation_diff_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
       pylab.semilogy (levels, deviation_diff_measured / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
-    pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    if self.mlmc.indicators.infered:
+      pylab.semilogy (levels, numpy.sqrt (variance_diff_infered)     / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if self.mlmc.config.ocv:
       pylab.semilogy (levels, numpy.sqrt (variance_diff_opt_infered) / NORMALIZATION, color=color_params('sigma'), linestyle=style(2), alpha=alpha(run), marker='x', label='optimized')
     #if run == 1:
@@ -1755,7 +1757,8 @@ class MatPlotLib (object):
       pylab.errorbar (levels, mean_measured / NORMALIZATION, yerr=mean_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
       pylab.plot (levels, mean_measured / NORMALIZATION, color=color_params('epsilon'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
-    pylab.plot (levels, mean_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    if self.mlmc.indicators.infered:
+      pylab.plot (levels, mean_infered / NORMALIZATION, color=color_params('epsilon'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       if exact:
         pylab.axhline (y=error, xmin=levels[0], xmax=levels[-1], color=color_params('error'), linestyle=style(run), alpha=0.3, label='MLMC error (%1.1e) for K = 1' % error)
@@ -1784,7 +1787,8 @@ class MatPlotLib (object):
       pylab.errorbar (levels, deviation_measured / NORMALIZATION, yerr=deviation_accuracy / NORMALIZATION, fmt='o', capsize=6, color=color, markeredgecolor=color, markerfacecolor='w', alpha=alpha(run), label='measured')
     else:
       pylab.plot (levels, deviation_measured / NORMALIZATION, color=color_params('sigma'), linestyle=style(3), alpha=alpha(run), marker='x', label='measured')
-    pylab.plot (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    if self.mlmc.indicators.infered:
+      pylab.plot (levels, numpy.sqrt (variance_infered)  / NORMALIZATION, color=color_params('sigma'), linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     #if run == 1:
     #  pylab.axhline (y=TOL, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle=style(run), alpha=0.6, label='TOL = %1.1e' % TOL)
     pylab.title  ('Rel. level std. devs. for Q = %s' % name (qoi))
@@ -1836,7 +1840,8 @@ class MatPlotLib (object):
     color = brighten (color_params('correlation'), factor=0.7)
     pylab.plot (levels, correlation_measured, color=color, linestyle='',       alpha=alpha(run), marker='o', markeredgecolor=color, markerfacecolor='w', label='measured')
     color = color_params('correlation')
-    pylab.plot (levels, correlation_infered,  color=color, linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
+    if self.mlmc.indicators.infered:
+      pylab.plot (levels, correlation_infered,  color=color, linestyle=style(1), alpha=alpha(run), marker='x', label='infered')
     if run == 1:
       #pylab.axhline (y=0.5, xmin=levels[0], xmax=levels[-1], color=color_params('tol'), linestyle='-', linewidth=2, alpha=0.6, label='correlation = 1/2')
       pylab.axhline (y=0.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
@@ -1867,6 +1872,7 @@ class MatPlotLib (object):
     # === load all required data
 
     coefficients = self.mlmc.indicators.coefficients.values
+    optimization = self.mlmc.indicators.coefficients.optimization
     levels       = self.mlmc.config.levels
     qoi          = self.mlmc.config.solver.qoi
 
@@ -1878,8 +1884,8 @@ class MatPlotLib (object):
     # plot coefficients
 
     pylab.plot (levels, coefficients, color=color_params('coefficient'), linestyle=style(run), alpha=alpha(run), marker='x', label='level coefficients')
-    if self.mlmc.errors.speedup_ocv != None:
-      pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % self.mlmc.errors.speedup_ocv)
+    if optimization != None:
+      pylab.plot ([], [], color='w', alpha=0, linewidth=0, label='speedup: %.2fx' % optimization)
     if run == 1:
       pylab.axhline (y=0.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)
       pylab.axhline (y=1.0, xmin=levels[0], xmax=levels[-1], color='black', linestyle='-', linewidth=2, alpha=0.3)

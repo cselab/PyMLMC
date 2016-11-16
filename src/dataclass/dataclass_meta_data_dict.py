@@ -16,8 +16,6 @@ class MetaDataDict (object):
   
   def __init__ (self):
     
-    # somehow this is needed here --
-    # otherwise I get non-empty dictionaries upon instantiation
     self.meta = {}
     self.data = {}
   

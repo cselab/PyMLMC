@@ -106,10 +106,10 @@ class Stat (object):
 
           # create an ensemble of sample values
           ensemble = [ sample.serialize (qoi) [element] for index, sample in enumerate (samples) if index in indices ]
-          
+
           # compute statistic
           self.estimate.serialize (qoi) [element] = self.compute (ensemble, extent)
-          
+
         # update progress
         progress.update ( (i + 1) * len (indices) )
       

@@ -27,7 +27,7 @@ class Slice (object):
     
     self.filename = 'data_%06d-%s_slice%d.h5'
     self.qoinames = { 'p' : 'pressure', 'a' : 'alpha', 'm' : 'velocity', 'r' : 'density' }
-    self.logsfile  = 'dump.log'
+    self.logsfile = 'dump.log'
 
     self.meta = {}
     self.data = {}
